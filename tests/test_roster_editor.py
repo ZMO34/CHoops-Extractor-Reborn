@@ -40,3 +40,8 @@ class RosterTests(WorkspaceTest):
             {'table':'players','index':0,'field':'jersey_number','value':24},
             {'table':'players','index':0,'field':'position','value':99}]})
         self.assertEqual(bytes(m.data),before);self.assertEqual(m.edits,[]);self.assertEqual(m.history,[])
+    def test_overlapping_string_storage_is_blocked(self):
+        m=roster_fixture();field=0x40+0x14;target=field+struct.unpack_from('>i',m.data,field)[0]
+        other=0x40+308+0x14;struct.pack_into('>i',m.data,other,target+2-other);m.reload();before=bytes(m.data)
+        with self.assertRaises(ToolError):m.edit('players',1,'first_name','XY')
+        self.assertEqual(bytes(m.data),before)

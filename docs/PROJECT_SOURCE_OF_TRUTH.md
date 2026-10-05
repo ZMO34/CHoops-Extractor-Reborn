@@ -42,7 +42,7 @@ AUDO segment headers can carry a payload length at +18; interleaved audio banks 
 
 2kTl is BE magic 326B546C, header size, u16 type ID, u16 block count, BE u32 sizes, concatenated blocks. Header size = 12+4*count. Use numeric type IDs; no unvalidated semantic ID mapping. Strictly reject trailing/truncated wrapper bytes.
 
-Standard TXTR often uses separate header and payload blocks; exports preserve individual blocks plus record manifest. Uniform jersey_numbers and names are embedded TXTR subfiles, with separate NAME records possible. Atlas glyph layout is not validated. Candidate texture header fields +58 format, +60 packed width/high16 height/low16, +64 mip/count, +68 pitch, +6C parameter, +90 repeated dimensions (SCNE), +A4 payload offset+1. Report candidates; do not fake DDS output or convert pixel formats blindly.
+Standard TXTR often uses separate header and payload blocks; exports preserve individual blocks plus record manifest. Uniform jersey_numbers and names are embedded TXTR subfiles, with separate NAME records possible. Atlas glyph layout is not validated. Validated TXTR descriptor: +58 format byte, +59 mip count, +5A dimension, +5B cube flag, +60 width u16, +62 height u16, +64 depth u16, +68 pitch u32; +A4 is payload offset+1. Unknown variants remain raw-preserved and blocked for DDS edits.
 
 ## SCNE / courts
 

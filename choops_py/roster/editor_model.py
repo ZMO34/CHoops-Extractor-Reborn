@@ -31,7 +31,7 @@ class EditorModel:
                 if not code:
                     text=b.slice(target,end-target).decode('utf-16-le')
                     if any(ord(c)<32 for c in text):raise ValueError('Control character in roster string')
-                    self.string_users[target].append(user);return text
+                    self.string_users[target].append(user);self.string_ranges[target]=end+2;return text
                 end+=2
             raise ValueError('String exceeds 256 characters')
         except (ValueError,UnicodeError) as error:
@@ -44,7 +44,7 @@ class EditorModel:
             self.issues.append({'kind':'invalid_table_pointer','field_offset':field,'target':target,'table':table,'expected_bias':bias});return None
         return None if empty_player and index==0 else index
     def reload(self):
-        self.rows={};self.issues=[];self.string_users=defaultdict(list)
+        self.rows={};self.issues=[];self.string_users=defaultdict(list);self.string_ranges={}
         b=Binary(self.data)
         for table,(start,count,size) in self.tables.items():
             rows=[]
@@ -74,6 +74,11 @@ class EditorModel:
             if len(encoded)!=len(old):raise ToolError('string_length_mismatch','Names must retain their original UTF-16 byte length')
             if any(ord(c)<32 for c in str(value)):raise ToolError('invalid_roster_name','Control characters are blocked')
             if len(self.string_users.get(target,[]))!=1:raise ToolError('shared_string_write_blocked','This name storage is shared with other rows; heap relocation is not validated')
+            end=target+len(encoded)
+            if any(other!=target and target<limit and other<end for other,limit in self.string_ranges.items()):
+                raise ToolError('shared_string_write_blocked','This name overlaps another string storage range')
+            if any(target<start+count*size and start<end for start,count,size in self.tables.values()):
+                raise ToolError('invalid_string_storage','Name storage overlaps a fixed roster table')
             changes.append((target,encoded))
         elif table=='players':
             value=self.integer(value);ranges={'jersey_number':(0,99),'height_inches':(36,100),'position_code':(0,4)}

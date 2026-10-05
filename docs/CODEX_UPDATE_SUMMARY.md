@@ -65,3 +65,14 @@ Smoke tests run: all five requested real texture containers, imports, actual JB 
 Bugs fixed: failed multi-edit roster patches now roll back atomically.
 Next step: Windows/Linux CI then master publication and release.
 Blockers: six unsupported texture layouts; console gameplay untested; local pytest/direct Git network blocked by proxy.
+
+## 2026-10-05T03:55:49.194244+00:00 - Focused phase 9: CI verification
+
+Completed: Windows and Linux CI passed genuine pytest and unittest on Python 3.11. Bundled executable roundtrip tests passed on Windows; proprietary fixture and Windows converter tests skip where unavailable.
+Files changed: docs/CODEX_UPDATE_SUMMARY.md, PROJECT_SOURCE_OF_TRUTH.md, roster/editor_model.py, tests/test_roster_editor.py.
+Tests run: initial focused CI passed; added regression for overlapping roster string storage and all 30 local unittest tests now pass.
+Smoke tests run: previously completed real exports/imports, JB build and roster edit remain valid.
+Bugs fixed: reject overlapping substring pointers and writes into fixed roster tables.
+Next step: final CI verification, publish master and release.
+Blockers: six unsupported sideline layouts and untested console gameplay; no delivery blocker.
+Evidence: https://github.com/ZMO34/CHoops-Extractor-Reborn/actions/runs/37261265592
