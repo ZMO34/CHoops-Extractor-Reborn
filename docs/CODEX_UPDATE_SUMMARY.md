@@ -76,3 +76,27 @@ Bugs fixed: reject overlapping substring pointers and writes into fixed roster t
 Next step: final CI verification, publish master and release.
 Blockers: six unsupported sideline layouts and untested console gameplay; no delivery blocker.
 Evidence: https://github.com/ZMO34/CHoops-Extractor-Reborn/actions/runs/37261265592
+
+## 2026-10-05T03:57:45.786675+00:00 - Focused final verification and master publication
+
+Completed: final tested tree published to GitHub master through the connected GitHub API because direct Git transport is proxy-blocked. Bundled converters are tracked; no JavaScript/editor/output artifacts appear in the current tree.
+Files changed: docs/CODEX_UPDATE_SUMMARY.md; ignored focused_feature_summary reports updated with CI evidence.
+Tests run: 30 local unittest tests passed; Windows pytest 29 passed/1 skipped; Linux pytest 28 passed/2 skipped.
+Smoke tests run: 831 real DDS exports; uniform/atlas/court/CDF imports; copied JB build with edited texture and roster; real roster GUI load.
+Bugs fixed: none after final CI.
+Next step: verify master release workflow and branch cleanup.
+Blockers: unsupported sideline variants and console gameplay certification remain documented; no publication blocker.
+CI evidence: https://github.com/ZMO34/CHoops-Extractor-Reborn/actions/runs/37261384700
+Master implementation commit: d7c64a8b502a1ac13aeb37d32dc437314ccab275
+
+## 2026-10-05T03:59:00.579792+00:00 - Focused publication complete
+
+Completed: master CI passed on Windows/Linux; v1.1.0-focused-modding release created. Remote has master only; python-main, legacy and temporary verification branch are absent. Master tree contains 89 tracked files including exactly the two authorized converter binaries, with no JavaScript/editor/generated-output artifacts.
+Files changed: docs/CODEX_UPDATE_SUMMARY.md (publication evidence only; no code changes after tested implementation).
+Tests run: master compileall, unittest and pytest succeeded on both runners.
+Smoke tests run: additional byte comparison confirmed both uniform NAME records unchanged and exactly one logical roster byte changed at 160507 for the safe jersey edit. All vanilla files retain the pre-task size/mtime inventory.
+Bugs fixed: none.
+Next step: user texture/roster modding workflow; extend only validated variants.
+Blockers: six unknown sideline texture layouts remain raw-preserved; console gameplay not tested.
+Evidence: https://github.com/ZMO34/CHoops-Extractor-Reborn/actions/runs/37261451107
+Release: https://github.com/ZMO34/CHoops-Extractor-Reborn/releases/tag/v1.1.0-focused-modding
