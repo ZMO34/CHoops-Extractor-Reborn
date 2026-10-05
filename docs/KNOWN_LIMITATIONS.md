@@ -1,13 +1,10 @@
 # Known limitations
 
-- Roster detect/decode/validate provides raw wrapper/size/hash evidence; semantic decoding, save-container recognition and field editing are blocked. It never labels unvalidated fields safe.
-- TXTR dimensions/format words are candidates; DDS conversion and uniform glyph mapping are not implemented.
-- Standard compressed replacement and multi-block replacement are blocked. No recompression or size-changing archive writer.
-- CDF physical same-size replacement preserves bytes but does not certify payload codec semantics. Whole-pair build staging is blocked.
-- Floor SCNE exposes header/model records; no mesh export, material rewrite or UV editing. Audio stays raw; inspect-audo inspects one raw file, not an automatically resolved pair.
-- Cache is reproducible and fingerprint checked, but reparses the TOC. Namespace resolution is extensive rather than guaranteed complete; hash collisions need future explicit handling.
-- validate-build checks file existence, sizes and hashes; console boot/gameplay testing remains required. No ISO authoring or texture resizing profiles.
-- Full-game rip has not been run. Real-game smoke tests cover one standard uniform and one CDF pair.
-- Existing output files/builds are refused. GUI has live jobs but no cancellation. Use numeric wrapper type IDs.
-
-Publication and test environment blockers are recorded in CODEX_UPDATE_SUMMARY.md.
+- Bundled DDS converters require Windows. Raw extraction works without converters; DDS export/import requires bundled converter tools.
+- Unknown TXTR layouts, unsupported DDS formats (including DX10/cubes) and unvalidated pixel transformations are blocked. Manifest warnings describe per-texture export failures.
+- Standard IFF changes must preserve logical slice sizes and fit the original file extent. Unchanged compressed blocks remain byte-identical; modified blocks preserve unknown fields and original token choices where possible. Invalid/shared slices and insufficient capacity are blocked.
+- CDF imports must fit original physical allocations; virtual-to-physical layout relocation is not implemented. Segment headers and metadata are preserved.
+- Roster names require equal encoded length and unshared string storage. Appearance, skin tone, conference, prestige, and long-string rebuilding are read-only. Encrypted saves require external decryption. Team references use confirmed internal row biases, not guessed row starts.
+- SCNE texture edits preserve geometry. Geometry/material/UV editing, audio decoding and broad research scans are outside the focused UI.
+- JB builds support existing archive extents and staged safe edits; adding archive entries or increasing allocated file sizes is blocked. Validation checks files/structure, not console gameplay.
+- Existing output files are refused for import/export. Build --overwrite only replaces an owned generated build, transactionally.

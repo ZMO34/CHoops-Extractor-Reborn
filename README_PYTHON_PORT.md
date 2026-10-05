@@ -1,5 +1,5 @@
-# Python rewrite
+# Python port
 
-This is a fresh Python package, not a Node wrapper. Archived research was consolidated into docs/PROJECT_SOURCE_OF_TRUTH.md; docs/MASTER_HANDOFF.md preserves the expanded research source. Filename hashes and format constants were intentionally retained as data. The old JavaScript/native desktop architecture and binaries are obsolete.
+The current tree is Python-first. Only the two original texture converter executables are bundled from the old tool. No JavaScript source, Node packages or desktop editor builds are required.
 
-Use CLI --help or launch Tkinter with `python -m choops_py.cli gui`. Review the limitations before preparing console builds. No proprietary assets, generated caches or smoke output are tracked.
+Related workflows share one implementation: archive readers/cache/ripper, a preservation-first IFF writer, package parsing, one texture container pipeline, one roster model, and one transactional JB builder. The CLI and Tkinter GUI consume the same command registry and backends. See docs/OLD_TOOL_ARCHITECTURE_AUDIT.md for parity and remaining restrictions.

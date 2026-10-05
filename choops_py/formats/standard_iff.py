@@ -11,25 +11,7 @@ def names(data,offset,count):
         entry=body.relative(table+i*4,"<")
         result.append((body.utf16(body.relative(entry,"<")),body.utf16(body.relative(entry+4,"<"))))
     return result
-def decompress(raw,expected):
-    b=Binary(raw)
-    if len(raw)<4 or b.u32(0)!=0x0E4837C3:
-        if len(raw)!=expected: raise ValueError("Uncompressed block size mismatch")
-        return raw
-    if b.u32(4)!=expected or b.u32(8)!=len(raw): raise ValueError("H7A wrapper length mismatch")
-    shift=b.u32(16)
-    if not 1<=shift<=16 or expected>512*1024*1024: raise ValueError("Unsupported H7A allocation/shift")
-    out=bytearray(); pos=20
-    while len(out)<expected:
-        descriptor=b.slice(pos,1)[0];pos+=1
-        for bit in range(8):
-            if len(out)==expected: break
-            if descriptor & (1<<bit):
-                token=b.u16(pos);pos+=2;distance=token&((1<<shift)-1);length=(token>>shift)+3
-                if not distance or distance>len(out): raise ValueError("Invalid H7A backreference")
-                for _ in range(min(length,expected-len(out))): out.append(out[-distance])
-            else: out.extend(b.slice(pos,1));pos+=1
-    return bytes(out)
+from .compression import decode as decompress
 class StandardIFF:
     def __init__(self,data):
         self.raw=data;b=Binary(data)

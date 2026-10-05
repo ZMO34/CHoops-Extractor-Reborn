@@ -1,48 +1,24 @@
 # Commands
 
-Run from the project folder. All destination paths must be under output/. Use each command's --help for flags. Numeric wrapper type IDs preserve the legacy wrapper contract. Replacement commands require --same-size-only.
+Use `python -m choops_py.cli --help` or `<command> --help` for complete flags. All generated destinations must be within this checkout's output/.
 
-```text
-usage: bootstrap_docs.py gui [-h]
-usage: bootstrap_docs.py build-cache [-h] [--game-name {choops2k8}] source
-usage: bootstrap_docs.py cache-info [-h] source
-usage: bootstrap_docs.py resolve-name [-h] value
-usage: bootstrap_docs.py rip [-h] [--game-name {choops2k8}] [--cache |
-                             --build-cache] [--index INDEX] [--file FILE]
-                             [--iff-only] [--raw-iff] [--type TYPE [TYPE ...]]
-                             [--log-output LOG_OUTPUT] [--strict]
-                             source output
-usage: bootstrap_docs.py inspect-iff [-h] [--dump-subfiles] input output
-usage: bootstrap_docs.py validate-iff [-h] input output
-usage: bootstrap_docs.py round-trip-iff [-h] [--compare] input output
-usage: bootstrap_docs.py dump-iff-subfiles [-h] input output
-usage: bootstrap_docs.py replace-iff-subfile [-h] --same-size-only
-                                             input selector replacement output
-usage: bootstrap_docs.py inspect-cdf-pair [-h] input cdf output
-usage: bootstrap_docs.py validate-cdf-pair [-h] input cdf output
-usage: bootstrap_docs.py dump-cdf-pair [-h] input cdf output
-usage: bootstrap_docs.py round-trip-cdf-pair [-h] [--compare] input cdf output
-usage: bootstrap_docs.py replace-cdf-payload [-h] --same-size-only
-                                             input cdf selector replacement
-                                             output
-usage: bootstrap_docs.py inspect-tool-wrapper [-h] input
-usage: bootstrap_docs.py unwrap-tool-file [-h] input output
-usage: bootstrap_docs.py wrap-tool-file [-h] type blocks [blocks ...] output
-usage: bootstrap_docs.py inspect-txtr [-h] input output
-usage: bootstrap_docs.py extract-textures [-h] [--raw] input output
-usage: bootstrap_docs.py inspect-uniform-atlas [-h] input output
-usage: bootstrap_docs.py import [-h] --iff IFF [--sub SUB] mod input
-usage: bootstrap_docs.py list-overrides [-h] mod
-usage: bootstrap_docs.py validate-mod [-h] mod
-usage: bootstrap_docs.py build-copy [-h] [--overwrite] [--dry-run]
-                                    source mod output
-usage: bootstrap_docs.py validate-build [-h] source modded output
-usage: bootstrap_docs.py audit-rip [-h] inventory rip_output output
-usage: bootstrap_docs.py roster-detect [-h] input
-usage: bootstrap_docs.py roster-decode [-h] input output
-usage: bootstrap_docs.py roster-compare [-h] input custom output
-usage: bootstrap_docs.py roster-validate [-h] input
-usage: bootstrap_docs.py inspect-floor-scne [-h] input output
-usage: bootstrap_docs.py inspect-audo [-h] input output
-usage: bootstrap_docs.py extract-audio-payloads [-h] input [cdf] output
+| Workflow | Commands |
+| --- | --- |
+| GUI | gui |
+| Archive | build-cache, cache-info, resolve-name, rip |
+| Converter setup | texture-tools-status, setup-texture-tools --copy-from-old-sources, configure-texture-tools --gtf2dds PATH --dds2gtf PATH, test-texture-tools |
+| DDS export | export-dds, export-iff-textures, export-cdf-textures, export-teamselectlogo-dds, export-uniform-atlas-dds, export-scne-textures, export-court-textures |
+| DDS import | import-dds, replace-iff-texture, replace-cdf-texture, import-teamselectlogo-dds, import-uniform-atlas-dds, import-scne-texture, replace-court-texture |
+| Mod staging | import MOD FILE --iff ARCHIVE [--sub TEXTURE], list-overrides MOD, validate-mod MOD |
+| JB build | build-copy VANILLA_JB MOD OUTPUT --overwrite [--dry-run], validate-build VANILLA_USRDIR MODDED_USRDIR REPORTS |
+| Roster | roster-detect, roster-decode, roster-export-json, roster-validate, roster-save INPUT JSON OUTPUT --safe-only |
+| Container checks | inspect-txtr, inspect-iff, validate-iff, round-trip-iff, inspect-cdf-pair, validate-cdf-pair, inspect-tool-wrapper |
+
+Texture exports accept --raw, --dds and --gtf2dds PATH as applicable; raw payload preservation is always performed. Imports require --same-format-only or --same-size-only as shown by help and accept --dds2gtf PATH. Standard IFF/SCNE imports output a new file; CDF imports output a paired folder. Team logo batch import uses the original export manifest and a directory of edited DDS files.
+
+```powershell
+python -m choops_py.cli rip "C:/Games/College Hoops 2K8/PS3_GAME/USRDIR" output/rips/base --file ua000.iff --raw-iff
+python -m choops_py.cli import output/builds/mod output/temp/ua000.iff --iff ua000.iff
+python -m choops_py.cli build-copy "C:/Games/College Hoops 2K8" output/builds/mod output/builds/my_build --overwrite
+python -m choops_py.cli validate-build "C:/Games/College Hoops 2K8/PS3_GAME/USRDIR" output/builds/my_build/PS3_GAME/USRDIR output/reports/my_build
 ```

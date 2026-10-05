@@ -1,5 +1,6 @@
-import pytest
+import unittest
 from choops_py.formats.tool_wrapper import wrap,unwrap
-def test_wrapper():
-    data=wrap('7',[b'abc',b'def']);assert unwrap(data)==(7,[b'abc',b'def']);assert wrap(0,[])==wrap('0',[])
-    with pytest.raises(ValueError):unwrap(data[:-1])
+class WrapperTests(unittest.TestCase):
+    def test_roundtrip(self):
+        data=wrap(1,[b'abc',b'def']);self.assertEqual(unwrap(data),(1,[b'abc',b'def']));self.assertEqual(unwrap(wrap(0,[])),(0,[]))
+        with self.assertRaises(ValueError):unwrap(data[:-1])

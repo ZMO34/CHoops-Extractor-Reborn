@@ -1,7 +1,9 @@
 # GUI
 
-Run `python -m choops_py.cli gui`. Tkinter must be included with your Python installation. Workspace pickers select vanilla/JB input, mod folder, rip output, build output and reports. The left list exposes all 22 requested panels; related commands have a selector. File/folder Browse controls populate arguments. Options accept CLI flags, including `--iff archive.iff --sub 0` for override import.
+Launch `python -m choops_py.cli gui`. The twelve focused panels cover Project Setup, Texture Tool Setup, DDS Export, DDS Import, Uniforms, Court/SCNE Textures, Team Logo/CDF Textures, Mod Staging, Build JB Folder, Roster Editor, Validate Build and Logs/Reports.
 
-The Preview and Run button shows the complete command and requires a visible confirmation. Jobs run in a worker subprocess with live output and exit code. Save Logs enforces output safety; Open Report reads a text/JSON report. Roster and floor panels explicitly mark experimental/read-only behavior. The CLI backend owns all parsing and write rules.
+Project Setup provides vanilla JB, mod, rip, build and report folder pickers and converter file pickers. Outputs default under output/. Texture Tool Setup shows each bundled converter found/missing, export/import readiness and the last test conversion result.
 
-Output pickers for single-file commands require typing a new filename if browsing cannot select one. Multiple wrapper block paths use the blocks field. Choose fresh output directories; exports do not overwrite existing reports. Job cancellation is not implemented; the window asks you to wait before closing.
+Commands show a preview before running. Long commands run in a background subprocess with live logs; logs can be saved under output/reports. The roster editor uses the same validated backend as the CLI, with row editing, search, roster slots, validation, undo/revert and save-copy/export actions.
+
+Build controls are Select Vanilla JB Folder, Select Mod Folder, Select Output Build Folder, Build JB Folder and Validate Build. Builds go under output/builds/<name>/. Existing generated builds require --overwrite; folders without this tool's manifest are refused. Output equal to or inside vanilla is always rejected.

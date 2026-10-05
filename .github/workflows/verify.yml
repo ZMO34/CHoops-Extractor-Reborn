@@ -1,20 +1,25 @@
-name: Verify Python rewrite
+name: Verify focused Python tool
 on:
   push:
-    branches: [master, python-rewrite-verification]
+    branches: [master, focused-verification]
   workflow_dispatch:
 permissions:
   contents: write
 jobs:
   test:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: python -m pip install -e ".[test]"
-      - run: mkdir -p output/temp && python -m pytest -q --basetemp=output/temp/pytest
+      - run: python -m pip install pytest
+      - run: python -m compileall choops_py tests
+      - run: python -m unittest discover -s tests -v
+      - run: python -m pytest -q
       - run: python -m choops_py.cli --help
   publish:
     if: github.ref == 'refs/heads/master'
@@ -22,15 +27,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Remove obsolete branches and create release after tests
+      - name: Publish verified focused update
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          for branch in python-main legacy python-rewrite-verification; do
+          for branch in python-main legacy focused-verification; do
             if gh api "repos/$GITHUB_REPOSITORY/branches/$branch" > /dev/null 2>&1; then
               gh api --method DELETE "repos/$GITHUB_REPOSITORY/git/refs/heads/$branch"
             fi
           done
-          if ! gh release view v1.0.0-python-rewrite > /dev/null 2>&1; then
-            gh release create v1.0.0-python-rewrite --target "$GITHUB_SHA" --title "CHoops Extractor Reborn Python Rewrite" --notes-file docs/RELEASE_NOTES.md
+          if ! gh release view v1.1.0-focused-modding > /dev/null 2>&1; then
+            gh release create v1.1.0-focused-modding --target "$GITHUB_SHA" --title "CHoops DDS, Roster Editor and JB Builds" --notes-file docs/RELEASE_NOTES.md
+          else
+            gh release edit v1.1.0-focused-modding --notes-file docs/RELEASE_NOTES.md
           fi

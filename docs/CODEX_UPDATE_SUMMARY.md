@@ -25,3 +25,43 @@ Completed: GitHub Actions installed the package/test dependencies and ran the sy
 
 ## 2026-10-05T02:57:08.724495+00:00 ? Publication completed
 Completed: remote master replaced with clean Python-only current tree through the authorized GitHub connector (direct Git push is proxy-blocked). Master CI passed; workflow deleted python-main, legacy and temporary verification branch; created v1.0.0-python-rewrite release. Remote branch listing now contains master only. Current remote tree has 58 tracked files and zero JavaScript/editor/executable/output artifacts. Local project is a committed orphan master with requested origin. Files changed: docs/CODEX_UPDATE_SUMMARY.md. Tests: master GitHub Actions pytest passed; CLI help passed. Smoke: real IFF/CDF extraction and byte-identical round trips plus Tkinter launch already passed. Bugs fixed: none. Next: validated compressed writing, roster adapters and texture variant research as documented. Blockers: no delivery blocker; local pytest install and direct Git transport remain restricted by proxy. Evidence: https://github.com/ZMO34/CHoops-Extractor-Reborn/actions/runs/37257299560 ; release https://github.com/ZMO34/CHoops-Extractor-Reborn/releases/tag/v1.0.0-python-rewrite
+
+## 2026-10-05T03:49:52.931993+00:00 - Focused phase 1 - supporting architecture
+
+Completed: Audited original modules and consolidated archive/package/TXTR/CDF/wrapper/compression/importer/builder backends.
+Files changed: core/*, formats/compression.py, standard_iff_writer.py, package.py, archive/importer.py, build_copy.py, OLD_TOOL_ARCHITECTURE_AUDIT.md
+Tests run: Synthetic parser/writer/staging/build tests passed.
+Smoke tests run: converter and copied real-asset workflows as noted above.
+Bugs fixed: ROST pointers require internal-row target biases; compressed writer recomputes physical offsets while preserving unrelated blocks.
+Next step: DDS conversion.
+Blockers: local pytest unavailable and direct Git transport proxy-blocked; genuine pytest will run in CI.
+
+## 2026-10-05T03:49:52.931993+00:00 - Focused phases 2-3 - bundled DDS export/import
+
+Completed: Bundled both byte-identical original converters, added discovery/readiness/execution reports, shared texture pipeline and validated linear L8 fallback.
+Files changed: tools/*.exe, texture_tools/*, formats/txtr.py
+Tests run: Real converter roundtrip passed; real uniform regular and atlas imports succeeded on copies; raw fallback tests passed.
+Smoke tests run: converter and copied real-asset workflows as noted above.
+Bugs fixed: Corrected DDS2GTF swizzle flags and linear L8 mip row padding.
+Next step: JB building and roster GUI.
+Blockers: local pytest unavailable and direct Git transport proxy-blocked; genuine pytest will run in CI.
+
+## 2026-10-05T03:49:52.931993+00:00 - Focused phases 4-6 - JB builder and roster GUI
+
+Completed: Implemented transactional JB builds and safe roster adapters/model/editor with shared CLI/GUI registry; focused GUI has 12 panels.
+Files changed: roster/*, gui.py, cli.py, commands.py, archive/build_copy.py
+Tests run: 28 unittest tests passed locally, including real fixture integration; Tk App and loaded roster view initialized.
+Smoke tests run: converter and copied real-asset workflows as noted above.
+Bugs fixed: Preserve loaded unsaved roster when switching panels; refuse unowned overwrite; retain original wrapper/unknown bytes.
+Next step: Final smoke, documentation, CI and publication.
+Blockers: local pytest unavailable and direct Git transport proxy-blocked; genuine pytest will run in CI.
+
+## 2026-10-05T03:52:32.091093+00:00 - Focused phases 7-8: validation and documentation
+
+Completed: real DDS exports: ua000 9/9, uh000 9/9, s000 51/51, sideline_items 242/248, teamselectlogo 520/520. Raw export preserved all candidates; six unknown sideline layouts remain blocked. Regular uniform, edited atlas, court and both CDF import smoke tests succeeded on output copies. Modded JB test_build contains edited ua000 and roster_english; build validation passed and vanilla pre-task size/mtime inventory is unchanged. Roster GUI loaded 5685 players, 443 teams, 379 arenas and 1373 coaches.
+Files changed: focused workflow docs, tests, reports under ignored output/reports.
+Tests run: compileall and 29 unittest tests passed locally; pytest pending CI.
+Smoke tests run: all five requested real texture containers, imports, actual JB copy, roster safe jersey edit and Tk launch.
+Bugs fixed: failed multi-edit roster patches now roll back atomically.
+Next step: Windows/Linux CI then master publication and release.
+Blockers: six unsupported texture layouts; console gameplay untested; local pytest/direct Git network blocked by proxy.
