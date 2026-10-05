@@ -1,0 +1,42 @@
+from pathlib import Path
+from .hash_names import lookup
+from ..formats.binary import Binary
+def usrdir(path):
+    p=Path(path).resolve()
+    for candidate in (p,p/'PS3_GAME'/'USRDIR',p/'USRDIR'):
+        if (candidate/'0A').is_file():return candidate
+    raise ValueError("No PS3 USRDIR/0A found")
+class Archive:
+    def __init__(self,path):
+        self.path=usrdir(path)
+        with (self.path/'0A').open('rb') as f:
+            b=Binary(f.read(24));self.magic=b.u32(0);self.alignment=b.u32(4);na=b.u32(8);nf=b.u32(16)
+            if self.magic!=0xAA00B3BF or not self.alignment or na>256 or nf>1000000:raise ValueError("Invalid CH2K8 archive header")
+            desc=Binary(f.read(na*16));self.parts=[]
+            for i in range(na):
+                name=desc.slice(i*16+8,8).decode('utf-16-be').rstrip('\0')
+                if Path(name).name!=name or name in ('.','..'):raise ValueError("Unsafe archive part name")
+                p=self.path/name;size=desc.u32(i*16)<<11
+                if p.stat().st_size!=size:raise ValueError("Archive part size mismatch")
+                self.parts.append(dict(name=name,size=size))
+            toc=Binary(f.read(nf*16));self.entries=[]
+            for i in range(nf):
+                h=toc.u32(i*16);off=toc.u32(i*16+4)*self.alignment;size=toc.u32(i*16+12)*self.alignment
+                self.entries.append(dict(index=i,hash=h,name=lookup().get(h),offset=off,stored_size=size,size=size))
+        ordered=sorted(self.entries,key=lambda e:e['offset']);total=sum(p['size'] for p in self.parts)
+        for i,e in enumerate(ordered):
+            boundary=ordered[i+1]['offset'] if i+1<len(ordered) else total
+            if not 0<=e['offset']<boundary<=total:raise ValueError("Invalid TOC ordering/range")
+            if not 0<e['size']<=boundary-e['offset']:e['size']=boundary-e['offset'];e['size_derived']=True
+    def read(self,entry):
+        start=entry['offset'];remaining=entry['size'];chunks=[];base=0
+        for part in self.parts:
+            end=base+part['size']
+            if base<=start<end and remaining:
+                n=min(remaining,end-start)
+                with (self.path/part['name']).open('rb') as f:f.seek(start-base);data=f.read(n)
+                if len(data)!=n:raise ValueError("Short archive read")
+                chunks.append(data);remaining-=n;start+=n
+            base=end
+        if remaining:raise ValueError("Archive range outside split parts")
+        return b''.join(chunks)
