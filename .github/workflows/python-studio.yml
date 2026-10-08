@@ -1,0 +1,28 @@
+name: Python Studio regression checks
+on:
+  pull_request:
+    paths:
+      - 'choops_py/studio*'
+      - 'choops_py/cli.py'
+      - 'tests/test_studio_web.py'
+      - '.github/workflows/python-studio.yml'
+  push:
+    branches: [master]
+    paths:
+      - 'choops_py/studio*'
+      - 'tests/test_studio_web.py'
+jobs:
+  studio:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Compile native modules
+        run: python -m compileall -q choops_py tests
+      - name: Run Studio regression tests
+        run: python -m unittest discover -s tests -p test_studio_web.py -v
+      - name: Verify GUI entrypoint
+        run: python -m choops_py.studio_web --help
