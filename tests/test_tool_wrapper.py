@@ -1,3 +1,5 @@
+import pytest
+pytestmark = pytest.mark.unit
 import unittest
 from choops_py.formats.tool_wrapper import wrap,unwrap
 class WrapperTests(unittest.TestCase):

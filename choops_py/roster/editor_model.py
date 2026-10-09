@@ -10,7 +10,7 @@ from .adapters import load,load_bytes
 class EditorModel:
     def __init__(self,source,tables=None):
         self.source=source;self.tables=dict(tables or TABLES);self.original=source.payload;self.data=bytearray(self.original)
-        self.edits=[];self.history=[]
+        self.edits=[];self.history=[];self.redo_history=[]
         for name,(start,count,size) in self.tables.items():Binary(self.data).slice(start,count*size)
         self.rows={};self.issues=[];self.string_users=defaultdict(list);self.reload()
     @classmethod
@@ -109,7 +109,7 @@ class EditorModel:
         if not result['valid']:
             self.data=bytearray(before);self.reload();raise ToolError('roster_validation_failed',str(result['issues'][:5]))
         if self.data==before:return
-        self.history.append((before,list(self.edits)));self.edits.append({'table':table,'index':index,'field':field,'slot':slot,'old':old_value,'value':value})
+        self.redo_history=[];self.history.append((before,list(self.edits)));self.edits.append({'table':table,'index':index,'field':field,'slot':slot,'old':old_value,'value':value})
     @staticmethod
     def integer(value):
         if isinstance(value,bool):raise ToolError('invalid_roster_value','Expected integer')
@@ -119,14 +119,18 @@ class EditorModel:
         except (TypeError,ValueError) as error:raise ToolError('invalid_roster_value',str(value)) from error
     def undo(self):
         if self.history:
-            data,self.edits=self.history.pop();self.data=bytearray(data);self.reload()
-    def revert(self):self.data=bytearray(self.original);self.history=[];self.edits=[];self.reload()
+            self.redo_history.append((bytes(self.data),list(self.edits)));data,self.edits=self.history.pop();self.data=bytearray(data);self.reload()
+    def redo(self):
+        if self.redo_history:
+            self.history.append((bytes(self.data),list(self.edits)))
+            data,self.edits=self.redo_history.pop();self.data=bytearray(data);self.reload()
+    def revert(self):self.data=bytearray(self.original);self.history=[];self.redo_history=[];self.edits=[];self.reload()
     def document(self):return {'schema':1,'source_type':self.source.kind,'source_sha256':digest(self.source.original),'payload_sha256':digest(self.original),'tables':self.rows,'editable_fields':{k:list(v) for k,v in EDITABLE.items()},'validation':self.validate()}
     def apply_document(self,document):
-        before=bytes(self.data);history=list(self.history);edits=list(self.edits)
+        before=bytes(self.data);history=list(self.history);edits=list(self.edits);redo=list(self.redo_history)
         try:self._apply_document(document)
         except Exception:
-            self.data=bytearray(before);self.history=history;self.edits=edits;self.reload()
+            self.data=bytearray(before);self.history=history;self.edits=edits;self.redo_history=redo;self.reload()
             raise
     def _apply_document(self,document):
         if document.get('source_sha256')!=digest(self.source.original):raise ToolError('roster_source_mismatch','Patch must include the original source SHA256')

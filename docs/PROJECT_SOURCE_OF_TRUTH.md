@@ -1,16 +1,18 @@
+> Rebuild update 2026-10-09: the current native GUI is choops_py.studio (PySide6). Historical Tk/cache/publication statements below describe the baseline. Current evidence and unresolved gates are in rebuild/FEATURE_MATRIX.md and TEST_REPORT.md. Converter execution does not establish redistribution permission.
+
 # Project source of truth
 
 Target: PS3 College Hoops 2K8, Python 3.11+, argparse and Tkinter. This document and MASTER_HANDOFF.md replace reliance on the old JavaScript folders. The handoff is research evidence, not a promise that every historical editor field is validated.
 
 ## Provenance and confidence
 
-Read-only references: expanded 2026-06-18 master handoff; original BPhit continuation README, archive configuration; downloaded Reborn gameProfiles, ChoopsReader, IFFReader, CDF extractor, H7A utilities, ToolWrappedReader and floor notes. Constants, pointer formulas and useful filename hash/name pairs were intentionally rewritten into Python. No Node runtime, native editor, conversion executables or legacy build products are retained. Original source authors' provenance is recorded here; upstream licensing must be clarified before adding more borrowed implementation or distributing proprietary assets.
+Read-only references: expanded 2026-06-18 master handoff; original continuation README, archive configuration; downloaded Reborn gameProfiles, ChoopsReader, IFFReader, CDF extractor, H7A utilities, ToolWrappedReader and floor notes. Constants, pointer formulas and useful filename hash/name pairs were intentionally rewritten into Python. No Node runtime, native editor, conversion executables or legacy build products are retained. Original source authors' provenance is recorded here; upstream licensing must be clarified before adding more borrowed implementation or distributing proprietary assets.
 
 `MASTER_HANDOFF.md` preserves the full research record and inventory. Confirmed below means corroborated by source and/or current fixture checks; candidate fields remain read-only. No game assets belong in Git.
 
 ## Archive and identity
 
-The archive header is six BE u32 words: magic AA00B3BF, alignment, part count, zero, entry count, zero. Part descriptors are 16 bytes: first word is size in 0x800 units; bytes +8..+15 encode the part filename as UTF-16BE (confirmed on JB 0A). Logical space concatenates listed parts, allowing entries across boundaries. CH2K8 TOC uses 16-byte records: hash +0, offset units +4, unknown +8, stored size units +12. Offsets multiply by alignment. Stored sizes can be impossible on this fixture; derive only from next offset/end and flag the derivation. Preserve padding by extracting the complete bounded extent. Do not clamp an invalid read silently.
+The archive header is six BE u32 words: magic AA00B3BF, alignment, part count, zero, entry count, zero. Part descriptors are 16 bytes: first word is size in 0x800 units; bytes +8..+15 encode the part filename as UTF-16BE. Logical space concatenates listed parts, allowing entries across boundaries. CH2K8 TOC uses 16-byte records: hash +0, offset units +4, unknown +8, stored size units +12. Offsets multiply by alignment. Stored sizes must be validated against archive boundaries; derive only from next offset/end and flag the derivation. Preserve padding by extracting the complete bounded extent. Do not clamp an invalid read silently.
 
 Case-insensitive ASCII filename hashing matches CRC32 of uppercase bytes for generated candidates. Retained reference hash/name pairs take precedence. Namespace includes ua/uh/ux/selua/seluh/selux/s/m/p/coach 000..999, h0000..9999 and known named banks, with iff/cdf/bin variants. Outer TOC names and inner IFF names are distinct identities. Unresolved entries remain hash names. Sparse alternates are meaningful: a cache name does not add a game-loadable archive or team.
 
@@ -24,7 +26,7 @@ Block descriptors are 0x20 bytes (eight BE words): name/hash, type/hash, unknown
 
 The BE file pointer table follows the blocks. Target = pointer field position + value - 1; inverse = target - field + 1. Follow actual pointers rather than assuming records are contiguous. Each file record is ID, type hash, offset count, then block-relative logical offsets. FFFFFFFF means absent. Infer each span using the next larger valid offset in that block or its logical end. Duplicate starts can imply aliasing; replacement must reject ambiguous shared ranges.
 
-Optional AA171516 name table starts at fileLength: BE magic, LE body size/pointers, UTF-16LE strings. The body contains count and relative pointer to entry-pointer table; each entry has relative name/type pointers. Missing name tables are valid (observed ua256/s212). Fallback names are numeric, with known type hashes when available.
+Optional AA171516 name table starts at fileLength: BE magic, LE body size/pointers, UTF-16LE strings. The body contains count and relative pointer to entry-pointer table; each entry has relative name/type pointers. Missing name tables may be valid. Fallback names are numeric, with known type hashes when available.
 
 Common types: TXTR 5C369069, SCNE E26C9B5D, LAYT 86A1AC9E, ROST C61649B2, AUDO 1AEDDA1F, NAME 68B693B2, CDAN A7701F00. Full historical type map remains in MASTER_HANDOFF.
 
@@ -62,6 +64,4 @@ Future development should extend validated texture variants and bounded writers,
 
 All outputs, including mod staging and logs, are restricted to project output/{rips,builds,reports,cache,temp,tools,config,smoke_tests}. Reject resolved paths inside vanilla/JB source, source overwrite, path traversal and linked build trees. Builds preflight every override before copying and patch only same-size extents in the copy. --overwrite is supported only for owned generated builds, using transactional replacement. CLI and 12-panel focused Tkinter GUI share a command registry/backend; worker subprocesses stream logs without touching Tk from worker threads.
 
-Smoke evidence: ua000.iff raw extent 602112 bytes, SHA256 ea00dae62c9747f314d03462c8d9b605fc9fd355a1c928d4011a8d18b6d9f266; standard parser found two compressed blocks and eleven records; H7A decode and subfile dumps succeeded. sideline_items.iff/.cdf parsed and dumped six records. Tk root and all 22 panels initialized successfully. No write operations target the vanilla fixture. See CODEX_UPDATE_SUMMARY for test and publication results; do not infer completion from feature command registration.
-
-Current workflow details and architecture parity are in OLD_TOOL_ARCHITECTURE_AUDIT.md, TEXTURE_CONVERSION.md and ROSTER_EDITOR.md. Earlier smoke evidence below describes the initial port; current validation is appended to CODEX_UPDATE_SUMMARY.md.
+Validation procedures are documented in TEST_REPORT.md and rebuild/ACCEPTANCE_TESTS.md. Public documentation excludes fixture fingerprints, extraction measurements, session records and environment-specific results. Do not infer current capability from historical smoke observations or command registration.

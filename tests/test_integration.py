@@ -1,3 +1,5 @@
+import pytest
+pytestmark = pytest.mark.real_game
 import os
 import unittest
 from pathlib import Path

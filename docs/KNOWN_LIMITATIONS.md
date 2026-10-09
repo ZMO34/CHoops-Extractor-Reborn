@@ -1,3 +1,5 @@
+> Native rebuild acceptance gaps and publication blockers: [rebuild/RISKS.md](rebuild/RISKS.md). Geometry remains read-only, converters are not cleared for public bundling, and runtime testing is NOT RUN.
+
 # Known limitations
 
 - Bundled DDS converters require Windows. Raw extraction works without converters; DDS export/import requires bundled converter tools.

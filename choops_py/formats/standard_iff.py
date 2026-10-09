@@ -35,11 +35,16 @@ class StandardIFF:
             self.records.append(dict(index=i,name=name,type=typ,id=b.u32(off),type_hash=b.u32(off+4),offsets=offsets))
     def manifest(self): return dict(family='standard-iff',header_size=self.header_size,file_length=self.file_length,blocks=self.blocks,records=self.records)
     def spans(self,record):
-        for j,start in enumerate(record['offsets']):
-            if start==0xffffffff: continue
-            offsets=[r['offsets'][j] for r in self.records if len(r['offsets'])>j and r['offsets'][j]!=0xffffffff and r['offsets'][j]>start]
-            end=min(offsets,default=self.blocks[j]['logical_size'])
-            yield j,start,end
+        if not hasattr(self, '_span_ends'):
+            self._span_ends = []
+            for j, block in enumerate(self.blocks):
+                offsets = sorted({r['offsets'][j] for r in self.records
+                                  if len(r['offsets']) > j and r['offsets'][j] != 0xffffffff})
+                ends = offsets[1:] + [block['logical_size']]
+                self._span_ends.append(dict(zip(offsets, ends)))
+        for j, start in enumerate(record['offsets']):
+            if start != 0xffffffff:
+                yield j, start, self._span_ends[j][start]
     def dump(self,output,types=()):
         decoded={};items=[]
         for r in self.records:

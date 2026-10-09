@@ -1,6 +1,6 @@
 from pathlib import Path
-import json, hashlib
-ROOT=Path(__file__).resolve().parents[2]
+import json, hashlib, sys
+ROOT=Path(sys.executable).resolve().parent if getattr(sys,'frozen',False) else Path(__file__).resolve().parents[2]
 OUTPUT=ROOT/"output"
 def source_root(path):
     p=Path(path).resolve()

@@ -1,3 +1,5 @@
+import pytest
+pytestmark = pytest.mark.unit
 import struct
 from support import WorkspaceTest,roster_fixture,iff_fixture
 from choops_py.roster.adapters import load_bytes

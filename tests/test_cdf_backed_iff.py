@@ -1,3 +1,5 @@
+import pytest
+pytestmark = pytest.mark.unit
 from support import WorkspaceTest,pair_fixture
 from choops_py.formats.cdf_backed_iff import CDFPair
 class CDFTests(WorkspaceTest):

@@ -4,3 +4,11 @@ __pycache__/
 .pytest_cache/
 *.egg-info/
 .venv/
+
+/private_fixtures/
+/dist/
+/build/
+/.private/
+/.mypy_cache/
+/.ruff_cache/
+/*.spec

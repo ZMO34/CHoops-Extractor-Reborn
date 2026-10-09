@@ -1,3 +1,5 @@
+import pytest
+pytestmark = pytest.mark.unit
 import os
 import struct
 from pathlib import Path
@@ -40,6 +42,7 @@ class TextureTests(WorkspaceTest):
         source=self.work/'input.txtr';source.write_bytes(txtr_fixture()[0]);file=self.work/'input.dds';file.write_bytes(dds.linear_l8(8,4,1,b'X'*32))
         with self.assertRaises(ToolError) as error:import_texture(source,'input',file,self.work/'result.txtr')
         self.assertEqual(error.exception.code,'texture_width_mismatch');self.assertFalse((self.work/'result.txtr').exists())
+    @pytest.mark.windows
     @__import__('unittest').skipUnless(os.name=='nt','Bundled converters are Windows executables')
     def test_real_bundled_dds_roundtrip(self):
         source=self.work/'input.txtr';source.write_bytes(txtr_fixture()[0]);result=export(source,self.work/'export');file=Path(result['textures'][0]['dds_output_path']);modified=bytearray(file.read_bytes());modified[128]^=1;edited=self.work/'edited.dds';edited.write_bytes(modified)

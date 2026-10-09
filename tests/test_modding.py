@@ -1,3 +1,5 @@
+import pytest
+pytestmark = pytest.mark.integration
 from support import WorkspaceTest,iff_fixture,game_fixture
 from choops_py.archive.importer import stage,validate
 from choops_py.archive.build_copy import build
