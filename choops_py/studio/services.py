@@ -35,7 +35,7 @@ def extract(
     job = job or JobContext()
     out = safe_output(output, [archive.path])
     # Pair known outer IFF/CDF identities; raw data is retained even if decode fails.
-    name_index = {}
+    name_index: dict[str, list[dict]] = {}
     for item in archive.entries:
         if item["name"]:
             name_index.setdefault(item["name"].casefold(), []).append(item)
