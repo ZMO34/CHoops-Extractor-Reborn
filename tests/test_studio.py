@@ -247,3 +247,18 @@ def test_cli_interrupt_records_cancelled_export(tmp_path):
     report=json.loads((output/'extraction_manifest.json').read_text())
     assert report['status']=='cancelled' and report['completed']==0
     assert not list(output.glob('.extract_*'))
+
+
+@pytest.mark.windows
+@pytest.mark.skipif(os.name!='nt',reason='Windows legacy path limit')
+def test_report_at_deep_windows_path():
+    import json
+    from choops_py.core.reports import save_json
+    base=OUTPUT/'temp';base.mkdir(parents=True,exist_ok=True)
+    # Directory stays below the legacy directory limit; the old long temp name did not.
+    folder=base/('r'+uuid.uuid4().hex[:8]+'x'*max(0,230-len(str(base.resolve()))-10))
+    assert len(str(folder.resolve()))<=230
+    output=folder/'state.json'
+    save_json(output,{'valid':True})
+    assert json.loads(output.read_text())['valid']
+    assert not list(folder.glob('.r_*.tmp'))
