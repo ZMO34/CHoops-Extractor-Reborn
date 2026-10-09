@@ -23,10 +23,10 @@ Use `python -m choops_py.cli --help` or `<command> --help` for complete flags. A
 Texture exports accept --raw, --dds and --gtf2dds PATH as applicable; raw payload preservation is always performed. Imports require --same-format-only or --same-size-only as shown by help and accept --dds2gtf PATH. Standard IFF/SCNE imports output a new file; CDF imports output a paired folder. Team logo batch import uses the original export manifest and a directory of edited DDS files.
 
 ```powershell
-python -m choops_py.cli rip "C:/Games/College Hoops 2K8/PS3_GAME/USRDIR" output/rips/base --file ua000.iff --raw-iff
+python -m choops_py.cli rip "<GAME_ROOT>/PS3_GAME/USRDIR" output/rips/base --file ua000.iff --raw-iff
 python -m choops_py.cli import output/builds/mod output/temp/ua000.iff --iff ua000.iff
-python -m choops_py.cli build-copy "C:/Games/College Hoops 2K8" output/builds/mod output/builds/my_build --overwrite
-python -m choops_py.cli validate-build "C:/Games/College Hoops 2K8/PS3_GAME/USRDIR" output/builds/my_build/PS3_GAME/USRDIR output/reports/my_build
+python -m choops_py.cli build-copy "<GAME_ROOT>" output/builds/mod output/builds/my_build --overwrite
+python -m choops_py.cli validate-build "<GAME_ROOT>/PS3_GAME/USRDIR" output/builds/my_build/PS3_GAME/USRDIR output/reports/my_build
 ```
 
 Difference packages: `export-mod-patch SOURCE MOD OUTPUT.chpatch` and `import-mod-patch SOURCE INPUT.chpatch NEW_MOD`. Builder Ctrl+C cleans the owned staging copy and returns exit 130.

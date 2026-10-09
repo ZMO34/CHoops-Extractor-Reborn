@@ -13,7 +13,7 @@ python -m venv .venv
 
 Open the original JB/USRDIR in Explorer, double-click an asset, inspect/preview textures, save compatible edited copies, and stage them through Mod Builder. All generated output currently belongs under output/. No Node or HTTP server is required.
 
-Local verification exercised read-only real inputs and separate generated outputs; numerical fixture/workstation evidence remains private pending public-disclosure approval. Unknown formats stay read-only/unavailable, and runtime testing is NOT RUN.
+Local verification exercised read-only real inputs and separate generated outputs; environment-specific measurements are excluded from public documentation. Unknown formats stay read-only/unavailable, and runtime testing is NOT RUN.
 
 The existing converter executables work locally, but their public redistribution grant has not been established. Packaging excludes them until resolved; [provenance](docs/rebuild/CONVERTER_PROVENANCE.md). The local prototype is a development build, not a released beta.
 
