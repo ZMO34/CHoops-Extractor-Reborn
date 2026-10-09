@@ -1,4 +1,4 @@
-# CHoops Modding Studio — development rebuild
+# CHoops Modding Studio â€” development rebuild
 
 Native PySide6 desktop tools for PS3 College Hoops 2K8: lazy archive/nested-record browsing, raw extraction, DDS preview/export/import, confirmed roster fields, replacement-folder staging and separate JB builds. The source game remains read-only.
 
@@ -13,7 +13,7 @@ python -m venv .venv
 
 Open the original JB/USRDIR in Explorer, double-click an asset, inspect/preview textures, save compatible edited copies, and stage them through Mod Builder. All generated output currently belongs under output/. No Node or HTTP server is required.
 
-Local Windows structural evidence: 3,376/3,376 raw archive entries; 831 successful DDS exports from 837 candidates; controlled atlas, roster, court and logo edits; copied JB exact patched/unpatched byte checks; all ten original hashes unchanged. Runtime PS3/RPCS3 testing has not run. Six sideline texture layouts, arbitrary archive growth, unknown roster semantics, geometry import/export and audio codecs remain unavailable/read-only.
+Local verification exercised read-only real inputs and separate generated outputs; numerical fixture/workstation evidence remains private pending public-disclosure approval. Unknown formats stay read-only/unavailable, and runtime testing is NOT RUN.
 
 The existing converter executables work locally, but their public redistribution grant has not been established. Packaging excludes them until resolved; [provenance](docs/rebuild/CONVERTER_PROVENANCE.md). The local prototype is a development build, not a released beta.
 

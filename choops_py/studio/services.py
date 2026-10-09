@@ -35,6 +35,10 @@ def extract(
     job = job or JobContext()
     out = safe_output(output, [archive.path])
     # Pair known outer IFF/CDF identities; raw data is retained even if decode fails.
+    name_index = {}
+    for item in archive.entries:
+        if item["name"]:
+            name_index.setdefault(item["name"].casefold(), []).append(item)
     selected_ids = {e["index"] for e in entries}
     expanded = list(entries)
     for entry in entries:
@@ -45,11 +49,7 @@ def extract(
                     ".cdf" if name.lower().endswith(".iff") else ".iff"
                 )
             )
-            matches = [
-                e
-                for e in archive.entries
-                if e["name"] and e["name"].casefold() == partner.casefold()
-            ]
+            matches = name_index.get(partner.casefold(), [])
             if len(matches) == 1 and matches[0]["index"] not in selected_ids:
                 expanded.append(matches[0])
                 selected_ids.add(matches[0]["index"])
@@ -95,6 +95,9 @@ def extract(
             rows.append({**entry, "output": name, "sha256": h.hexdigest()})
     except Cancelled:
         status = "cancelled"
+    except KeyboardInterrupt:
+        status = "cancelled"
+        raise
     except Exception:
         status = "failed"
         raise
@@ -129,6 +132,16 @@ def inspect_asset(path: Path) -> dict:
     from ..formats.standard_iff import StandardIFF
     from ..texture_tools.pipeline import Container
 
+    if path.stat().st_size > 128 * 1024 * 1024:
+        with path.open("rb") as stream:
+            header = stream.read(4096)
+        return {
+            "path": path,
+            "records": [],
+            "textures": [],
+            "hex": header,
+            "warning": "Interactive decode limit is 128 MiB; streamed raw extraction remains available.",
+        }
     raw = path.read_bytes()
     records = []
     cdf = path.with_suffix(".cdf")

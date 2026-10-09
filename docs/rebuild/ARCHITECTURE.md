@@ -16,4 +16,6 @@ Qt work runs on a bounded QThreadPool (one active operation). Signals return res
 
 Folder staging matches canonical outer TOC names, rejects links/unknown names, preflights all replacements in an owned temporary workspace, and records original entry hashes as source preconditions. Builders validate these before copying. Build publication is transactional. Exact output patch bytes and every unpatched byte are compared with source before success.
 
-Known architectural debt: app.py should be split into panel modules; legacy modules remain sparsely typed; caches still reparse the TOC, no SQLite persistent acceleration; output roots remain constrained to output/; conversion/parse/build jobs lack cooperative cancellation. These are explicit acceptance gaps, not finished features.
+Known architectural debt: app.py should be split into panel modules; legacy modules remain sparsely typed; caches still reparse the TOC, no SQLite persistent acceleration; output roots remain constrained to output/; conversion/parse jobs lack cooperative cancellation. These are explicit acceptance gaps, not finished features.
+
+modding/patch_package.py writes source-bound XOR ZIP deltas, validates bounded ZIP members/checksums, reconstructs matching allocation-sized replacements and reuses the staging preflight. UI and CLI share this service. JB copy is chunked with cooperative cancellation during copy/verification; cleanup handles CLI interruption and never targets source.

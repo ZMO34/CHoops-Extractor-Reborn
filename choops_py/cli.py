@@ -41,6 +41,9 @@ def execute(a):
         return launch([])
     sources=[getattr(a,key) for key in ('source','input','cdf','dds_file','mod','modded','edited','patch') if getattr(a,key,None)]
     if hasattr(a,'output'):a.output=safe_output(a.output,sources)
+    if c in ('export-mod-patch','import-mod-patch'):
+        from .modding.patch_package import export_patch,import_patch
+        return export_patch(Path(a.source),Path(a.mod),Path(a.output)) if c=='export-mod-patch' else import_patch(Path(a.source),Path(a.input),Path(a.output))
     if c=='extract-raw':
         from .studio.services import extract
         from .archive.usrdir_reader import Archive
@@ -122,6 +125,8 @@ def main(argv=None):
         if result is not None:print(json.dumps(result,indent=2,ensure_ascii=True))
         if isinstance(result,dict) and (result.get('valid') is False or result.get('status')=='failed'):return 1
         return 0
+    except KeyboardInterrupt:
+        print('Cancelled',file=sys.stderr);return 130
     except (ValueError,OSError,KeyError) as error:
         print(f'Error: {error}',file=sys.stderr);return 1
 if __name__=='__main__':sys.exit(main())

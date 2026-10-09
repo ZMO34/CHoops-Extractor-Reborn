@@ -85,10 +85,10 @@ def patch_parts(archive,directory,entry,data):
         base=end
     if remaining:raise ToolError('incomplete_archive_patch','Split archive write did not consume all data')
 
-def verify_preserved_ranges(source, copied, archive, patches):
+def verify_preserved_ranges(source, copied, archive, patches, job=None):
     """Prove every byte outside staged logical extents equals the source."""
     source=Path(source);copied=Path(copied)
-    ranges={};base=0
+    ranges={};base=0;verified=0;total=sum(item['size'] for item in inventory(source).values())
     for part in archive.parts:
         intervals=[]
         for entry,data in patches:
@@ -100,6 +100,7 @@ def verify_preserved_ranges(source, copied, archive, patches):
         excluded=ranges.get(relative,[]);position=0
         with (source/relative).open('rb') as left,(copied/relative).open('rb') as right:
             while True:
+                if job:job.check()
                 old=left.read(1024*1024);new=right.read(1024*1024)
                 if not old:
                     if new:raise ToolError('build_validation_failed','Copied file grew')
@@ -112,10 +113,12 @@ def verify_preserved_ranges(source, copied, archive, patches):
                     if old[cursor:start]!=new[cursor:start]:raise ToolError('build_validation_failed','Untouched bytes changed')
                     cursor=end
                 if old[cursor:]!=new[cursor:]:raise ToolError('build_validation_failed','Untouched bytes changed')
-                position+=len(old)
+                position+=len(old);verified+=len(old)
+                if job:job.progress(total+verified,2*total,'Verifying untouched bytes')
 
 
-def build(source,mod,output,overwrite=False,dry_run=False):
+def build(source,mod,output,overwrite=False,dry_run=False,job=None):
+    if job:job.check()
     src=jb_root(source);out=safe_output(output,[src,mod])
     if not out.is_relative_to((OUTPUT/'builds').resolve()) or out==(OUTPUT/'builds').resolve():raise ToolError('unsafe_build_output','Build destinations must be output/builds/<build_name>/')
     reject_links(src)
@@ -130,16 +133,31 @@ def build(source,mod,output,overwrite=False,dry_run=False):
     staging=safe_output(out.parent/('.jb_build_'+uuid.uuid4().hex),[src,mod]);backup=None
     print('Copying vanilla JB into a separate output build...',flush=True)
     try:
-        shutil.copytree(src,staging)
+        total=sum(item['size'] for item in before.values());copied_bytes=0
+        def copy_file(left,right):
+            nonlocal copied_bytes
+            if job:job.check()
+            with Path(left).open('rb') as original,Path(right).open('xb') as destination:
+                while True:
+                    if job:job.check()
+                    data=original.read(1024*1024)
+                    if not data:break
+                    destination.write(data);copied_bytes+=len(data)
+                    if job:job.progress(copied_bytes,2*total,'Copying original JB')
+            shutil.copystat(left,right)
+            return right
+        shutil.copytree(src,staging,copy_function=copy_file)
         copied_usrdir=staging/archive.path.relative_to(src)
-        for entry,data in patches:patch_parts(archive,copied_usrdir,entry,data)
+        for entry,data in patches:
+            if job:job.check()
+            patch_parts(archive,copied_usrdir,entry,data)
         copied=Archive(copied_usrdir)
         for entry,data in patches:
             if copied.read(copied.entries[entry['index']])!=data:raise ToolError('build_validation_failed',f"Written archive differs: {entry['name']}")
         for relative,metadata in before.items():
             path=staging/relative
             if not path.is_file() or path.stat().st_size!=metadata['size']:raise ToolError('build_validation_failed',f'Copied file missing or resized: {relative}')
-        verify_preserved_ranges(src,staging,archive,patches)
+        verify_preserved_ranges(src,staging,archive,patches,job)
         if inventory(src)!=before:raise ToolError('vanilla_changed_during_build','Vanilla source inventory changed during copying; discard build and retry')
         manifest={'project_kind':'choops-jb-copy','source':str(src),'mod':str(Path(mod).resolve()),'output':str(out),'patches':plan,'file_count':len(before),'vanilla_inventory_unchanged':True,'validation':{'inventory_and_sizes':True,'patched_extents_byte_exact':True,'all_unpatched_bytes_exact':True,'console_gameplay':'not tested'}}
         save_json(staging/'build_manifest.json',manifest,[src,mod])
@@ -148,7 +166,8 @@ def build(source,mod,output,overwrite=False,dry_run=False):
         staging.rename(out)
         if backup:shutil.rmtree(backup)
         return manifest
-    except Exception:
+    except BaseException:
+        # Cleanup also applies to CLI Ctrl+C/SystemExit before publication.
         if staging.exists():shutil.rmtree(safe_output(staging))
         if backup and backup.exists() and not out.exists():backup.rename(out)
         raise

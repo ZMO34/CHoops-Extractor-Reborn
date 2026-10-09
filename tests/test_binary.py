@@ -1,3 +1,5 @@
+import pytest
+pytestmark = pytest.mark.unit
 import unittest
 from choops_py.formats.binary import Binary,relative_target,relative_value
 class BinaryTests(unittest.TestCase):

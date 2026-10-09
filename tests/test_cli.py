@@ -1,3 +1,5 @@
+import pytest
+pytestmark = pytest.mark.unit
 import contextlib
 import io
 from support import WorkspaceTest,iff_fixture

@@ -6,6 +6,8 @@ class Command:
     options: tuple = ()
     output_file: bool = False
 COMMANDS={
+    'export-mod-patch':Command(('source','mod','output'),(),True),
+    'import-mod-patch':Command(('source','input','output')),
     'extract-raw':Command(('source','output'),('selection',)),
     'stage-folder':Command(('source','input','output')),
     'build-cache':Command(('source',)), 'cache-info':Command(('source',)), 'resolve-name':Command(('value',)),

@@ -1,3 +1,5 @@
+import pytest
+pytestmark = pytest.mark.unit
 from support import WorkspaceTest,iff_fixture,game_fixture
 from choops_py.archive.hash_names import namespace,hash_name,lookup
 from choops_py.archive.usrdir_reader import Archive

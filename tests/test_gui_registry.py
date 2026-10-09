@@ -1,3 +1,5 @@
+import pytest
+pytestmark = pytest.mark.unit
 import unittest
 from choops_py.gui import COMMAND_REGISTRY,PANELS
 from choops_py.commands import COMMANDS

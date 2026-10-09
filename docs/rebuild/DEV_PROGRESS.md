@@ -1,19 +1,7 @@
-# Rebuild progress — 2026-10-09
+# Development progress
 
-Phase A: repository and actual fixture discovered; baseline SHA/metadata recorded; .venv created; read-only SHA-256 inventory of ten game files; hazardous release/branch deletion job removed; GitHub connector admin access verified. Baseline tests 30 passed.
+Work implemented: native Qt explorer/nested inspection, actual image preview, confirmed roster fields with undo/redo and friendly selections, bounded extraction, source-bound XOR mod packages, replacement-folder staging, transactional chunked JB builds, exact untouched-range verification, cancellation and truthful interrupted-export reports. Tests include split-boundary reads/writes, native edit/save/reopen, malformed metadata and ZIP/path safety. Original inputs stay read-only.
 
-Phase B: chunked split archive iterator; precomputed IFF span index; paired exclusive raw extraction and cancellation; folder staging with original-source preconditions; exact unpatched-byte verification in builder. Focused synthetic tests added.
+Draft PR: https://github.com/ZMO34/CHoops-Extractor-Reborn/pull/3. Source commits preserve the baseline and historical tags. Initial Linux Qt runtime dependency failure was corrected and prior Windows/Linux checks passed; final checks must be observed separately. No merge, beta tag or release was created.
 
-Phase C: actual native Qt window with Explorer, texture, roster, scene metadata, builder, raw research and diagnostics. Model/view tables, proxy search, worker jobs/progress, nested records, real DDS preview, remembered geometry and game path. Source GUI real-game smoke passed.
-
-Phase D: existing validated texture/roster backends connected to Qt; roster redo added with rollback regression. Real DDS exports: 831 successful of 837 texture candidates. Atlas, roster, court and paired logo edits reparsed. One logo edit correctly blocked by compressed allocation, alternative within capacity succeeded. SCNE metadata inspected (80 parts); geometry remains read-only.
-
-Phase E: full raw game rip (3,376/3,376), replacement-folder stage, copied JB with five staged archive extents, exact patched/unpatched bytes verified. Original SHA-256 inventory unchanged. Build time and measured workflow times are in PERFORMANCE.md.
-
-Phase F: PyInstaller onedir prototype built and actual Qt startup tested. Packaged GUI fixture smoke and ZIP verification are recorded in private reports. Public release/merge remains withheld for the remaining mandatory acceptance gaps. No v1.0beta tag/release created. Windows/Linux CI and source PR evidence must reflect actual returned state.
-
-Current automated suite: 37 passed locally, including one private real-game integration and one actual Windows converter test. Source native GUI smoke: 3,376 archive entries, decoded preview, 5,685 player rows, 68 Smith search results, harmless export. Tests initially hit sandbox pytest temp ACL failures; reran successfully with approved local access. Reused synthetic output names were fixed by per-test isolation.
-
-Next work: complete remaining GUI/workspace/patch-package/caching/cancellation requirements, resolve binary notices/redistribution, add validated geometry only with evidence, execute packaged and CI gates, then review/merge/release if all gates pass. This assignment is not declared complete.
-
-Publication checkpoint: draft PR https://github.com/ZMO34/CHoops-Extractor-Reborn/pull/3, connector-published commit cf1d7057e2a3f674c1030cec0e8075593d5147f4; identical local code tree. Initial Ubuntu CI exposed absent libEGL.so.1; Linux runtime dependencies added, fail-fast disabled to complete independent Windows packaging. No merge/release.
+Private workstation specifications, fixture inventory and exact measurements/results remain in ignored local review evidence. The full mandate remains incomplete: finish workspace/profile/context-action/hex/cache/UX acceptance gaps, complete distribution-license notices, validate advanced formats only with evidence, and perform runtime verification when legitimately configured. See FEATURE_MATRIX.md and RISKS.md. The development executable is not a released beta.

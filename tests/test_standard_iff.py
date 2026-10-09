@@ -1,3 +1,5 @@
+import pytest
+pytestmark = pytest.mark.unit
 import struct
 from support import WorkspaceTest,iff_fixture,literal
 from choops_py.formats.standard_iff import StandardIFF

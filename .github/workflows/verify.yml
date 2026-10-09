@@ -29,8 +29,8 @@ jobs:
       - run: python -m pytest -q
       - run: python -m choops_py.cli --help
       - run: python -m choops_py.studio --smoke
-      - run: python -m ruff check choops_py/studio
-      - run: python -m mypy choops_py/studio --follow-imports=skip --ignore-missing-imports
+      - run: python -m ruff check choops_py/studio choops_py/modding/patch_package.py
+      - run: python -m mypy choops_py/studio choops_py/modding/patch_package.py --follow-imports=skip --ignore-missing-imports
       - name: Windows standalone build and smoke
         if: runner.os == 'Windows'
         shell: pwsh

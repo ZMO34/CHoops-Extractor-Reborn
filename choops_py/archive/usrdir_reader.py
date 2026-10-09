@@ -3,6 +3,7 @@ from .hash_names import lookup
 from ..formats.binary import Binary
 def usrdir(path):
     p=Path(path).resolve()
+    if p.is_file() and p.name=='0A':p=p.parent
     for candidate in (p,p/'PS3_GAME'/'USRDIR',p/'USRDIR'):
         if (candidate/'0A').is_file():return candidate
     raise ValueError("No PS3 USRDIR/0A found")

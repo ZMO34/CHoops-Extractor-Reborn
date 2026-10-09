@@ -28,3 +28,5 @@ python -m choops_py.cli import output/builds/mod output/temp/ua000.iff --iff ua0
 python -m choops_py.cli build-copy "C:/Games/College Hoops 2K8" output/builds/mod output/builds/my_build --overwrite
 python -m choops_py.cli validate-build "C:/Games/College Hoops 2K8/PS3_GAME/USRDIR" output/builds/my_build/PS3_GAME/USRDIR output/reports/my_build
 ```
+
+Difference packages: `export-mod-patch SOURCE MOD OUTPUT.chpatch` and `import-mod-patch SOURCE INPUT.chpatch NEW_MOD`. Builder Ctrl+C cleans the owned staging copy and returns exit 130.

@@ -19,3 +19,5 @@ include = ["choops_py*"]
 choops_py = ["archive/names.json"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+markers = ["unit: synthetic parser/model tests", "integration: workflow tests", "windows: actual native converter tests", "real_game: private immutable game fixture", "gui: Qt window tests", "performance: measured benchmarks", "runtime_manual: manual console/emulator gate"]
