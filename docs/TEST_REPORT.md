@@ -23,3 +23,5 @@ Runtime PS3/RPCS3: NOT RUN. Public CI fixture tests must skip when absent. GitHu
 Packaged prototype: extracted ZIP startup exit 0; separately supplied local converters enabled real-game GUI preview/roster/export smoke. Final original SHA-256/size/mtime audit repeated after the extended build: all ten match. PR #2 argparse NameError reproduced by loading its exact remote branch modules and invoking main; no branch merge.
 
 Final regression suite: 37 passed in 1.62s. Actual legacy Tk window also launched/closed successfully with system Python 3.14.5. New tests cover CLI-to-Qt launch (argument isolation), TOC/header overlap rejection and source precondition mismatch.
+
+Draft PR #3: initial push/PR CI failed on Ubuntu with ImportError libEGL.so.1 absent; Windows tests, CLI, Qt startup, lint and type checks passed before packaging was matrix-cancelled. Workflow now installs libegl1/libopengl0 and disables fail-fast; corrected checks must be observed before claiming success. Source commit cf1d7057e2a3f674c1030cec0e8075593d5147f4 matches the locally packaged code tree.

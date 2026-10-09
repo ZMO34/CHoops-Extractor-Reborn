@@ -21,3 +21,5 @@ Windows 11 build 26200, Python 3.12.14, 8 physical/16 logical CPUs, approximatel
 | build_seconds | 28.8679 |
 
 Full raw rip completed 3,376/3,376. Eight representative selective extents: 29,169,664 bytes. Texture exports: 831/837 candidates. Initial build measurement predates addition of exhaustive unpatched-byte comparison, so it must not be represented as the final stronger builder timing. Cold/warm startup, peak resident memory, full-cache acceleration, cancellation latency and model viewport are not measured yet.
+
+Targeted synthetic before/after benchmark: 5,000 IFF records, all spans enumerated once. Baseline source 2.532895s; precomputed spans 0.003778s. Same generated file, final spans checked. This is a synthetic parser comparison, not a real-game overall speedup claim.

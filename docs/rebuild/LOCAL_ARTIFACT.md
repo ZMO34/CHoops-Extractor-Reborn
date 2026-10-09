@@ -2,12 +2,15 @@
 
 {
   "name": "CHoops-Modding-Studio-development-windows-x64.zip",
-  "bytes": 54586181,
-  "sha256": "891162ca56f1d59753338e3ee94d0c49d6e114baa5a63727a07ea4cb8e383d7e",
+  "bytes": 54587493,
+  "sha256": "72a3767c83c5abe2e70050f8f80a820ae57ea34ca91a0f9848ef6f4071da2aa8",
   "files": 222,
+  "source_tree": "1206e5c1566fc3e3191e13379c8d036138915d6d",
+  "source_commit": "cf1d7057e2a3f674c1030cec0e8075593d5147f4",
   "converters_included": false,
   "game_assets_included": false,
-  "public_release": false
+  "public_release": false,
+  "extracted_zip_startup_exit": 0
 }
 
-This prototype was extracted into a path containing spaces: real Qt window startup/game indexing exit 0. A separate local test folder with the existing authorized converters supplied locally passed texture preview, 5,685-player load/search and harmless export. Converters are not in the ZIP. No GitHub release created. This is not the final beta acceptance gate.
+Clean extracted ZIP in a path containing spaces: actual Qt window/game-index smoke exit 0. Separate local authorized converters enabled real-game preview, roster search and harmless export. Converters and game assets are excluded from this ZIP. Source code tree matches the draft PR; later CI/documentation edits do not change its code. No v1.0beta published.

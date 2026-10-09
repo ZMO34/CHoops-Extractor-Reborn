@@ -15,3 +15,5 @@ Phase F: PyInstaller onedir prototype built and actual Qt startup tested. Packag
 Current automated suite: 37 passed locally, including one private real-game integration and one actual Windows converter test. Source native GUI smoke: 3,376 archive entries, decoded preview, 5,685 player rows, 68 Smith search results, harmless export. Tests initially hit sandbox pytest temp ACL failures; reran successfully with approved local access. Reused synthetic output names were fixed by per-test isolation.
 
 Next work: complete remaining GUI/workspace/patch-package/caching/cancellation requirements, resolve binary notices/redistribution, add validated geometry only with evidence, execute packaged and CI gates, then review/merge/release if all gates pass. This assignment is not declared complete.
+
+Publication checkpoint: draft PR https://github.com/ZMO34/CHoops-Extractor-Reborn/pull/3, connector-published commit cf1d7057e2a3f674c1030cec0e8075593d5147f4; identical local code tree. Initial Ubuntu CI exposed absent libEGL.so.1; Linux runtime dependencies added, fail-fast disabled to complete independent Windows packaging. No merge/release.
