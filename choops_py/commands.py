@@ -6,6 +6,8 @@ class Command:
     options: tuple = ()
     output_file: bool = False
 COMMANDS={
+    'extract-raw':Command(('source','output'),('selection',)),
+    'stage-folder':Command(('source','input','output')),
     'build-cache':Command(('source',)), 'cache-info':Command(('source',)), 'resolve-name':Command(('value',)),
     'rip':Command(('source','output'),('rip',)),
     'texture-tools-status':Command(()), 'setup-texture-tools':Command((),('copy-tools',)),

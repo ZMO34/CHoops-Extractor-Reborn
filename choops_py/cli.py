@@ -15,7 +15,9 @@ def parser():
         s=sub.add_parser(name)
         for field in spec.fields:s.add_argument(field)
         for group in spec.options:
-            if group=='export':
+            if group=='selection':
+                s.add_argument('--index',type=int);s.add_argument('--file')
+            elif group=='export':
                 s.add_argument('--raw',action='store_true');s.add_argument('--dds',action='store_true');s.add_argument('--gtf2dds');s.add_argument('--strict',action='store_true')
             elif group=='import-format':s.add_argument('--same-format-only',action='store_true',required=True);s.add_argument('--dds2gtf')
             elif group=='import-size':s.add_argument('--same-size-only',action='store_true',required=True);s.add_argument('--dds2gtf')
@@ -35,10 +37,20 @@ def parser():
 def execute(a):
     c=a.command
     if c=='gui':
-        from .gui import launch
-        return launch()
+        from .studio import main as launch
+        return launch([])
     sources=[getattr(a,key) for key in ('source','input','cdf','dds_file','mod','modded','edited','patch') if getattr(a,key,None)]
     if hasattr(a,'output'):a.output=safe_output(a.output,sources)
+    if c=='extract-raw':
+        from .studio.services import extract
+        from .archive.usrdir_reader import Archive
+        archive=Archive(a.source);entries=archive.entries
+        if a.index is not None:entries=[e for e in entries if e['index']==a.index]
+        if a.file:entries=[e for e in entries if e['name'] and e['name'].casefold()==a.file.casefold()]
+        return extract(archive,entries,a.output)
+    if c=='stage-folder':
+        from .studio.services import stage_folder
+        return stage_folder(Path(a.source),Path(a.input),Path(a.output))
     if c in ('texture-tools-status','setup-texture-tools','test-texture-tools','configure-texture-tools'):
         from .texture_tools import external_converters as t
         return t.status() if c=='texture-tools-status' else t.setup() if c=='setup-texture-tools' else t.test_tools() if c=='test-texture-tools' else t.configure(a.gtf2dds,a.dds2gtf)

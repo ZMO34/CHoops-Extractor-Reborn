@@ -1,3 +1,9 @@
+# Native rebuild additions
+
+`gui` now launches the PySide6 studio. `python -m choops_py.studio` supports --smoke and --game PATH. The packaged executable also accepts --cli followed by ordinary CLI arguments.
+
+`extract-raw SOURCE OUTPUT [--file NAME | --index INDEX]` uses streaming paired raw extraction; `stage-folder SOURCE EDITED_FOLDER NEW_MOD_OUTPUT` automatically matches canonical filenames and stores original-source hash preconditions. Existing `rip` retains its decoded extraction options.
+
 # Commands
 
 Use `python -m choops_py.cli --help` or `<command> --help` for complete flags. All generated destinations must be within this checkout's output/.

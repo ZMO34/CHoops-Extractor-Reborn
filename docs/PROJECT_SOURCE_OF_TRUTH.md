@@ -1,3 +1,5 @@
+> Rebuild update 2026-10-09: the current native GUI is choops_py.studio (PySide6). Historical Tk/cache/publication statements below describe the baseline. Current evidence and unresolved gates are in rebuild/FEATURE_MATRIX.md and TEST_REPORT.md. Converter execution does not establish redistribution permission.
+
 # Project source of truth
 
 Target: PS3 College Hoops 2K8, Python 3.11+, argparse and Tkinter. This document and MASTER_HANDOFF.md replace reliance on the old JavaScript folders. The handoff is research evidence, not a promise that every historical editor field is validated.

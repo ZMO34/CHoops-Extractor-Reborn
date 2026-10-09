@@ -27,6 +27,16 @@ def inventory(source):
 
 def preflight(source,mod):
     archive=Archive(source);rows=validate(mod);grouped={};patches=[]
+    conditions=Path(mod)/'source_preconditions.json'
+    if conditions.exists():
+        document=json.loads(conditions.read_text(encoding='utf-8'))
+        if document.get('schema')!=1:raise ToolError('invalid_source_preconditions','Unsupported schema')
+        for expected in document['entries']:
+            index=expected['index']
+            if not isinstance(index,int) or not 0<=index<len(archive.entries):raise ToolError('source_version_mismatch','TOC index differs')
+            entry=archive.entries[index]
+            if entry['hash']!=expected['hash'] or digest(archive.read(entry))!=expected['sha256']:
+                raise ToolError('source_version_mismatch','Original archive asset changed since staging')
     for row in rows:grouped.setdefault(row['archive'].lower(),[]).append(row)
     for name,group in grouped.items():
         matches=[e for e in archive.entries if e['name'] and e['name'].lower()==name]
@@ -75,6 +85,36 @@ def patch_parts(archive,directory,entry,data):
         base=end
     if remaining:raise ToolError('incomplete_archive_patch','Split archive write did not consume all data')
 
+def verify_preserved_ranges(source, copied, archive, patches):
+    """Prove every byte outside staged logical extents equals the source."""
+    source=Path(source);copied=Path(copied)
+    ranges={};base=0
+    for part in archive.parts:
+        intervals=[]
+        for entry,data in patches:
+            lo=max(base,entry['offset']);hi=min(base+part['size'],entry['offset']+len(data))
+            if lo<hi:intervals.append((lo-base,hi-base))
+        ranges[str((archive.path/part['name']).relative_to(source))]=intervals
+        base+=part['size']
+    for relative in inventory(source):
+        excluded=ranges.get(relative,[]);position=0
+        with (source/relative).open('rb') as left,(copied/relative).open('rb') as right:
+            while True:
+                old=left.read(1024*1024);new=right.read(1024*1024)
+                if not old:
+                    if new:raise ToolError('build_validation_failed','Copied file grew')
+                    break
+                if len(old)!=len(new):raise ToolError('build_validation_failed','Copied file resized')
+                cursor=0
+                for lo,hi in sorted(excluded):
+                    if lo>=position+len(old) or hi<=position:continue
+                    start=max(0,lo-position);end=min(len(old),hi-position)
+                    if old[cursor:start]!=new[cursor:start]:raise ToolError('build_validation_failed','Untouched bytes changed')
+                    cursor=end
+                if old[cursor:]!=new[cursor:]:raise ToolError('build_validation_failed','Untouched bytes changed')
+                position+=len(old)
+
+
 def build(source,mod,output,overwrite=False,dry_run=False):
     src=jb_root(source);out=safe_output(output,[src,mod])
     if not out.is_relative_to((OUTPUT/'builds').resolve()) or out==(OUTPUT/'builds').resolve():raise ToolError('unsafe_build_output','Build destinations must be output/builds/<build_name>/')
@@ -99,8 +139,9 @@ def build(source,mod,output,overwrite=False,dry_run=False):
         for relative,metadata in before.items():
             path=staging/relative
             if not path.is_file() or path.stat().st_size!=metadata['size']:raise ToolError('build_validation_failed',f'Copied file missing or resized: {relative}')
+        verify_preserved_ranges(src,staging,archive,patches)
         if inventory(src)!=before:raise ToolError('vanilla_changed_during_build','Vanilla source inventory changed during copying; discard build and retry')
-        manifest={'project_kind':'choops-jb-copy','source':str(src),'mod':str(Path(mod).resolve()),'output':str(out),'patches':plan,'file_count':len(before),'vanilla_inventory_unchanged':True,'validation':{'inventory_and_sizes':True,'patched_extents_byte_exact':True,'console_gameplay':'not tested'}}
+        manifest={'project_kind':'choops-jb-copy','source':str(src),'mod':str(Path(mod).resolve()),'output':str(out),'patches':plan,'file_count':len(before),'vanilla_inventory_unchanged':True,'validation':{'inventory_and_sizes':True,'patched_extents_byte_exact':True,'all_unpatched_bytes_exact':True,'console_gameplay':'not tested'}}
         save_json(staging/'build_manifest.json',manifest,[src,mod])
         if out.exists():
             backup=safe_output(out.parent/('.jb_previous_'+uuid.uuid4().hex));out.rename(backup)

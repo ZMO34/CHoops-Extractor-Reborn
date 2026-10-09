@@ -1,0 +1,31 @@
+# Evidence-based feature matrix
+
+Statuses describe this rebuild, not historical proof. “Tested” means structural/local software behavior; no row is in-game verified.
+
+| Feature | Legacy JS | Current Python/native | Evidence | Formats | Access | Risk | Speed | Milestone/status | Blocker |
+|---|---|---|---|---|---|---|---|---|---|
+| New/open/recent project | Path picker | Game picker + remembered path; profiles absent | Qt smoke | JB | Read | Low | Index 0.065s | C: tested partial | Project manifests/profiles/recent list |
+| Split TOC/hash identities | Reader/hash cache | Archive reader + chunk iterator | 3,376-entry real index | 0A–0E | Read | Bounds | 0.065s | B: tested | Persistent SQLite acceleration absent |
+| Archive/nested browser | GUI + reader | Virtual Qt table/search + nested records | Qt model/navigation tests, real ua000 | IFF/CDF | Read | Low | Payload lazy | C: tested partial | Context menus/history/favorites absent |
+| Raw/selective/full extraction | Ripper | Chunked paired raw extraction/cancel | 3,376/3,376 full rip + cancel test | Split archive | Export | Collision preflight | 35.5861s full | B: tested | Resume/retry UI absent |
+| Standard IFF | Reader/writer | Bounded writer + precomputed spans | Real unchanged identity, edited atlas/court | FF3BEF94 | Bounded write | Aliases/capacity | Span index | B: tested | Arbitrary logical growth blocked |
+| CDF pairs | Paired extractor/import | Physical allocation-preserving edit | 520 logo exports + edited pair/build | F0985030/CDF | Bounded write | Compression allocation | 25.5603s logos | B/D: tested | Virtual/physical relocation |
+| H7A/wrappers | Decode/writer | Bounded token reuse + strict wrapper | Synthetic malformed/roundtrip + real compressed edits | H7A/2kTl | Bounded write | Growth/512MiB cap | Measured via export | B: tested | General optimizer not implemented |
+| Texture pipeline/preview | Converters/TXTR | Shared DDS/GTF, native real preview | Actual Windows converter + Qt image smoke | L8/ARGB8/DXT1/3/5 | Read/edit-copy | Layout/mips/capacity | 831 exports | D: tested partial | PNG import, mip regeneration, cubes unsupported |
+| Uniform/atlas | Extract/import | Shared DDS pipeline | ua/uh 9/9; edited jersey atlas/build | Standard IFF TXTR | Edit-copy | Glyph semantics unknown | 3.0413/3.1148s export | D: tested | No automatic glyph layout editing |
+| Team logos | CDF logo workflow | Paired export/import | 520/520, first edit capacity rejection, later edit success | IFF/CDF | Edit-copy | Capacity | 25.5603s | D: tested | Not every pixel edit fits compressed allocation |
+| Court/arena textures | SCNE texture parser | Shared scene-texture route | s000 51/51 and edited copy/build | SCNE/TXTR | Edit-copy | Unknown layouts | 6.652s export | D: tested | No unproven resizing/material changes |
+| Geometry inspection/export/import | Stable wrapper + experimental scorer | SCNE metadata only | 80 actual model parts inspected | SCNE | Read-only | Topology/declarations unvalidated | Unmeasured | D: research/read-only | Validated vertex/UV/material decoder/runtime |
+| Roster player/team/arena/coach | Roster editor | 4 Qt tables + safe forms/undo/redo | 5,685 players; save/reopen/build; undo/redo test | ROST | Known fields only | Pointer aliases | 0.6675s load | D: tested partial | Slot drag/reorder/multi-edit UX |
+| Roster adapters/patches | ROST/decrypted inputs | Adapters + source-hashed JSON patch | Synthetic adapters and real original roster | IFF/ROST/2kTl/USERDATA/ZIP | Edit-copy | Source mismatch rejected | 5.0765s save | D: tested | Encrypted saves unsupported; compare UI absent |
+| Palette/conference/prestige/etc | Experimental raw slots | No safe semantic editors | Historical evidence only | ROST | Read-only | Unknown semantics | Unmeasured | D: research | Controlled comparisons/runtime evidence |
+| Hex/pointer/hash research | Research modules | Bounded hex + CLI hash lookup | Actual inspected IFF raw bytes | Unknown/raw | Read-only | Low | First 4KiB | D: partial | Full offset/pointer/search/byte-diff tooling |
+| Audio/animation/database | Probe/heuristics | Unknown record metadata/raw extraction | Structural type map; no codec claim | AUDO/CDAN/LAYT | Read-only/raw | Unknown codec | Unmeasured | D: research | Codec/animation schemas not verified |
+| Mod workspace/conflicts | Import/revert | Hashed staged overrides + folder preflight | Synthetic + real folder staging | IFF/CDF/DDS | Stage | Source preconditions | 0.0836s stage | E: tested partial | Profiles/conflict/revert UI |
+| Repack/add/delete/relocate | Writer experiments | Existing extents only | Bounds/alias/capacity tests | Archive/IFF/CDF | Conservative | Unproven relocation | Unmeasured | E: limited tested | New/growing entries blocked |
+| Dry run/transactional JB | Build-copy | Original protected, copied patched/unpatched bytes verified | Real copied JB + structural/negative tests | JB split parts | Copy-write | Source safety | 28.8679s initial build | E: tested | Cancellation/free-space UX incomplete |
+| Mod package/folder builder/ISO | Build-copy/ISO ideas | Folder stage/build; patch package absent | Real canonical filename import | IFF/CDF folder | Stage/copy | Copyright/source version | Measured stage | E: partial | Redistributable difference package and validated ISO |
+| Native desktop GUI | Legacy JS/Tk/Web | Functional Qt app + jobs and pickers | Source and packaged window launches; private smoke | Qt Widgets | Contextual | Read/write services | Bounded workers | C/F: tested partial | Remaining complete UX acceptance gaps |
+| Caching/performance/cancel | Cache/profiling ideas | Span index, streaming extraction/cancel | Real timings + synthetic cancel | Archive/IFF | Read/export | Low | See PERFORMANCE | B/F: partial | SQLite cache; parser/build cancel; peak RSS unmeasured |
+| Windows standalone/CI | Old JS package | PyInstaller onedir prototype + safe CI | Actual exe smoke; CI must be observed | Windows x64 ZIP | Distribution | Licensing | Prototype only | F: partial | Binary notices/redistribution/full acceptance |
+| Docs/release/runtime | Historical docs | Current evidence/docs, runtime NOT RUN | This matrix + reports | Documentation | Public source | Truthful limits | N/A | F: release withheld | No v1.0beta until gates pass |
