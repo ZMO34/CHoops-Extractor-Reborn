@@ -38,6 +38,8 @@ def detect_tables(payload):
     result = {}
     for name,(field,bias,stride,limit) in HEADER_TABLES.items():
         count = binary.u32(field)
+        if name == 'uniforms' and count == 0:
+            continue
         delta = struct.unpack('>i',binary.slice(field+4,4))[0]
         start = field+4+delta-bias
         if not 0 < count <= limit:
@@ -75,3 +77,19 @@ SCHOOL_COLOR_CAPTIONS = ('Key Circle Outer', 'Center Line', 'Outer Line',
     'Primary', 'Secondary', 'Tertiary')
 CONFIRMED_PALETTE_CAPTIONS = dict(zip(SCHOOL_COLOR_CONTROL_SLOTS, SCHOOL_COLOR_CAPTIONS))
 PALETTE_HINTS.update(CONFIRMED_PALETTE_CAPTIONS)
+
+# Localized player option arrays, linked to the corresponding packed getters.
+ENUM_CHOICES = {'hand_code': {0:'L',1:'R'}, 'headband_code':{0:'No',1:'Yes'},
+                'home_sock_color_code':{0:'Black',1:'White'}}
+PROPERTY_CHOICES = {'Hand':{0:'L',1:'R'}, 'Build':dict(enumerate(('Skinny','Thin','Normal','Muscles','Thick'))),
+    'Muscle Tone':{0:'Buff',1:'Ripped'}, 'Appearance Color':dict(enumerate(('Darkest','Darker','Dark','Light','Lighter','Lightest'))),
+    'Eye Color':dict(enumerate(('Blue','Brown','Green','Hazel'))), 'Headband':{0:'No',1:'Yes'},
+    'Sock Length':dict(enumerate(('Ankle Socks','Short','Medium','Long'))), 'Home Sock Color':{0:'Black',1:'White'},
+    'T-Shirt':{0:'None',1:'Short Sleeve',2:'Long Sleeve'}}
+PLAYER_SCALARS.update(headband_code=(0x90,4,4,3,0,1), home_sock_color_code=(0x90,4,1,1,0,1))
+EDITABLE['players'] = (*EDITABLE['players'], 'headband_code','home_sock_color_code')
+
+HEADER_TABLES['uniforms'] = (0x70,1,8,8192)
+EDITABLE['uniforms'] = ('uniform_asset_id','jersey_shape_code')
+JERSEY_SHAPES = {0:'U',1:'V',2:'V triangle',3:'Triangle',4:'Wishbone'}
+ENUM_CHOICES['jersey_shape_code'] = JERSEY_SHAPES

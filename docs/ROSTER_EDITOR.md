@@ -40,3 +40,5 @@ Court preview uses a unique matching asset ID in the explicitly loaded roster, i
 Jersey number is the byte at player row +0x1B (name-anchor +0x0B), corroborated by its localized UI increment callback. The adjacent byte at +0x1A contains flags in some records and is preserved by number edits. Jersey-number material/color shader routing remains unresolved.
 
 In Team palette, select a swatch and choose Pick selected color (or double-click it). The picker provides numeric RGB inputs, visual color selection, and an alpha control initialized from the existing value. Accept applies an undoable edit; Cancel leaves the roster unchanged. Hex RGBA remains visible in the palette table.
+
+Uniforms is a separate roster table linked to team asset IDs. Known jersey shapes (U, V, V triangle, triangle, wishbone) and existing uniform asset selectors are editable without changing record count or neighboring bits. Handedness uses L/R dropdowns; headband uses No/Yes and home sock color uses Black/White. Confirmed appearance enums display names; unresolved codes remain explicit. See [the project tracker](projects/README.md) for evidence and remaining research.

@@ -48,7 +48,7 @@ def test_tendency_and_potential_single_byte_writes():
 
 def header_roster():
     data=bytearray(0x6000)
-    starts={'players':0x200,'arenas':0x600,'teams':0x800,'coaches':0x1000,'conferences':0x1100}
+    starts={'players':0x200,'arenas':0x600,'teams':0x800,'coaches':0x1000,'conferences':0x1100,'uniforms':0x5000}
     for name,(field,bias,stride,_) in HEADER_TABLES.items():
         struct.pack_into('>I',data,field,2)
         struct.pack_into('>i',data,field+4,starts[name]+bias-(field+4))
@@ -107,3 +107,33 @@ def test_jersey_number_preserves_adjacent_flag_byte_and_roundtrips():
     assert bytes(model.data) == before
     model.redo()
     assert model.data[offset] == 0x80
+
+
+def test_uniform_shape_and_asset_edits_preserve_packed_neighbors():
+    from choops_py.roster.editor_model import EditorModel
+    from choops_py.roster.adapters import load_bytes
+    import struct
+    data=bytearray(32)
+    first=(4<<22)|(12<<12)|(2<<8)|0x80
+    struct.pack_into('>II',data,8,first,0x48001234)
+    struct.pack_into('>II',data,16,(4<<22)|(13<<12),0x18005678)
+    model=EditorModel(load_bytes(bytes(data)),{'uniforms':(8,2,8)})
+    assert model.rows['uniforms'][0]['team_asset_id']==4
+    assert model.rows['uniforms'][0]['jersey_shape_code']==1
+    model.edit('uniforms',0,'jersey_shape_code',4)
+    assert int.from_bytes(model.data[12:16],'big')&~(7<<27)==0x48001234&~(7<<27)
+    model.edit('uniforms',0,'uniform_asset_id',13)
+    assert int.from_bytes(model.data[8:12],'big')&~(1023<<12)==first&~(1023<<12)
+    assert model.rows['uniforms'][0]['jersey_shape_code']==4
+
+
+def test_labeled_scalar_choices_preserve_neighbor_bits():
+    from choops_py.roster.schema import ENUM_CHOICES
+    model=roster_fixture();off=model.row_offset('players',0)
+    model.data[off+0x90:off+0x94]=bytes.fromhex('AABBCCDD');model.reload()
+    before=int.from_bytes(model.data[off+0x90:off+0x94],'big')
+    model.edit('players',0,'headband_code',1)
+    after=int.from_bytes(model.data[off+0x90:off+0x94],'big')
+    assert after&~(7<<4)==before&~(7<<4)
+    assert ENUM_CHOICES['hand_code']=={0:'L',1:'R'}
+    assert ENUM_CHOICES['headband_code']=={0:'No',1:'Yes'}

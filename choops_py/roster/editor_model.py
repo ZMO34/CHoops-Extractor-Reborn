@@ -65,6 +65,10 @@ class EditorModel:
                     for field,(rel,target,bias) in REFERENCES.items():
                         if target in self.tables:row[field]=self.reference(off+rel,target,bias)
                     row['roster_slots']=[self.reference(off+0x6c+slot*4,'players',0x11,True) for slot in range(16)]
+                elif table=='uniforms':
+                    word0,word1=b.u32(off),b.u32(off+4)
+                    row.update(team_asset_id=(word0>>22)&1023,uniform_asset_id=(word0>>12)&1023,
+                               variant_code=(word0>>8)&7,jersey_shape_code=(word1>>27)&7)
                 elif table=='conferences':
                     row['team_indices'] = []
                     for slot in range(32):
@@ -131,6 +135,18 @@ class EditorModel:
             lo,hi=ranges[field]
             if not lo<=value<=hi:raise ToolError('roster_value_out_of_range',f'{field} must be {lo}..{hi}')
             rel={'jersey_number':0x1b,'height_inches':0x3a,'position_code':0x3b}[field];changes.append((off+rel,bytes([value])))
+        elif table=='uniforms':
+            value=self.integer(value)
+            if field=='jersey_shape_code':
+                if value not in range(5):raise ToolError('invalid_jersey_shape','Choose a known cloth shape')
+                position=off+4;shift=27;bits=3
+            else:
+                if value not in {r['uniform_asset_id'] for r in self.rows['uniforms']}:
+                    raise ToolError('new_uniform_asset_blocked','Choose an existing uniform asset ID')
+                position=off;shift=12;bits=10
+            word=int.from_bytes(self.data[position:position+4],'big')
+            mask=((1<<bits)-1)<<shift
+            changes.append((position,((word&~mask)|(value<<shift)).to_bytes(4,'big')))
         elif field=='asset_id':
             value=self.integer(value)
             if value not in {r['asset_id'] for r in self.rows['teams']}:raise ToolError('new_asset_id_blocked','Select an existing roster asset ID; creating new assets is not validated')
