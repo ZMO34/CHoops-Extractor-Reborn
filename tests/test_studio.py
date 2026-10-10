@@ -262,3 +262,31 @@ def test_report_at_deep_windows_path():
     save_json(output,{'valid':True})
     assert json.loads(output.read_text())['valid']
     assert not list(folder.glob('.r_*.tmp'))
+
+
+@pytest.mark.gui
+def test_explorer_previews_archive_textures_without_manual_export(qtbot, tmp_path):
+    from support import txtr_fixture
+    payload = iff_fixture(txtr_fixture(), [(0x5c369069, [0])])
+    source = game_fixture(tmp_path / 'preview_game', payload)
+    original = (source / 'PS3_GAME' / 'USRDIR' / '0A').read_bytes()
+    window = Window()
+    qtbot.addWidget(window)
+    window.open_game(source)
+    qtbot.waitUntil(lambda: window.active is None, timeout=10000)
+    window.explorer.selectRow(0)
+    window.inspect_selected()
+    qtbot.waitUntil(lambda: not window.explorer_image.pixmap().isNull(), timeout=10000)
+    assert window.explorer_texture.count() == 1
+    assert window.explorer_image._original.width() == 4
+    assert window.explorer_image._original.height() == 4
+    assert window.explorer_image.pixmap().width() <= window.explorer_image.width()
+    assert window.explorer_image.pixmap().height() <= window.explorer_image.height()
+    assert window.pages.currentIndex() == 0
+    assert (source / 'PS3_GAME' / 'USRDIR' / '0A').read_bytes() == original
+    qtbot.waitUntil(lambda: window.active is None, timeout=10000)
+    window.display_asset({'path': window.asset_path, 'records': [], 'textures': [], 'hex': b'', 'warning': ''})
+    assert window.explorer_image.pixmap().isNull()
+    assert not window.explorer_texture.isEnabled()
+    assert 'No supported textures' in window.explorer_image.text()
+    window.close()

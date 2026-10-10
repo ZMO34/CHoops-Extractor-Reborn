@@ -4,12 +4,12 @@ from collections import defaultdict
 from ..formats.binary import Binary
 from ..archive.manifests import digest
 from ..core.errors import ToolError
-from .schema import TABLES,STRING_FIELDS,REFERENCES,EDITABLE,POSITIONS
+from .schema import TABLES,STRING_FIELDS,REFERENCES,EDITABLE,POSITIONS,PALETTE_OFFSET,PALETTE_COUNT,detect_tables,RATING_OFFSET,RATING_COUNT,PLAYER_PROPERTIES,PLAYER_SCALARS,TENDENCY_OFFSET,TENDENCY_NAMES
 from .adapters import load,load_bytes
 
 class EditorModel:
     def __init__(self,source,tables=None):
-        self.source=source;self.tables=dict(tables or TABLES);self.original=source.payload;self.data=bytearray(self.original)
+        self.source=source;self.tables=dict(tables if tables is not None else detect_tables(source.payload));self.original=source.payload;self.data=bytearray(self.original)
         self.edits=[];self.history=[];self.redo_history=[]
         for name,(start,count,size) in self.tables.items():Binary(self.data).slice(start,count*size)
         self.rows={};self.issues=[];self.string_users=defaultdict(list);self.reload()
@@ -52,21 +52,39 @@ class EditorModel:
                 off=start+index*size;row={'index':index,'row_offset':off}
                 for name,rel in STRING_FIELDS.get(table,{}).items():row[name]=self.string(off+rel,(table,index,name))
                 if table=='players':
-                    row.update(jersey_number=b.u16(off+0x1a),height_inches=self.data[off+0x3a],position_code=self.data[off+0x3b]);row['display_name']=(row['first_name']+' '+row['last_name']).strip();row['position']=POSITIONS.get(row['position_code'],'Unknown')
+                    row.update(jersey_number=self.data[off+0x1b],height_inches=self.data[off+0x3a],position_code=self.data[off+0x3b]);row['display_name']=(row['first_name']+' '+row['last_name']).strip();row['position']=POSITIONS.get(row['position_code'],'Unknown')
+                    row['attribute_ratings'] = [max(35,min(99,b.u16(off+RATING_OFFSET+i*2)//100)) for i in range(RATING_COUNT)]
+                    row['shot_tendencies'] = list(b.slice(off+TENDENCY_OFFSET,len(TENDENCY_NAMES)))
+                    row['properties'] = {f['name']:(int.from_bytes(b.slice(off+f['offset'],f['size']),'big')>>f['shift'])&((1<<f['bits'])-1) for f in PLAYER_PROPERTIES}
+                    for name,(rel,field_size,shift,bits,_,_) in PLAYER_SCALARS.items():
+                        row[name]=(int.from_bytes(b.slice(off+rel,field_size),'big')>>shift)&((1<<bits)-1)
                 elif table=='teams':
                     row['asset_id']=b.u16(off+0x18c);row['team_index_check']=b.u16(off+0x18e)
-                    for field,(rel,target,bias) in REFERENCES.items():row[field]=self.reference(off+rel,target,bias)
+                    row['palette_colors'] = ['#'+b.slice(off+PALETTE_OFFSET+i*4,4).hex().upper() for i in range(PALETTE_COUNT)]
+                    row['mascot_asset_id'] = b.u16(off+0x192)
+                    for field,(rel,target,bias) in REFERENCES.items():
+                        if target in self.tables:row[field]=self.reference(off+rel,target,bias)
                     row['roster_slots']=[self.reference(off+0x6c+slot*4,'players',0x11,True) for slot in range(16)]
+                elif table=='conferences':
+                    row['team_indices'] = []
+                    for slot in range(32):
+                        field = off+0x6e0+slot*4
+                        if b.u32(field) in (0,0xffffffff):
+                            break
+                        team_index = self.reference(field,'teams',0x31)
+                        if team_index is None:
+                            break
+                        row['team_indices'].append(team_index)
                 rows.append(row)
             self.rows[table]=rows
     def validate(self):
         self.reload()
-        return {'valid':not self.issues,'issues':self.issues,'source_type':self.source.kind,'counts':{name:len(rows) for name,rows in self.rows.items()},'unsaved_edits':len(self.edits),'read_only_fields':['skin tone','conference','prestige','unknown appearance bytes','long strings','arena/coach strings']}
+        return {'valid':not self.issues,'issues':self.issues,'source_type':self.source.kind,'counts':{name:len(rows) for name,rows in self.rows.items()},'unsaved_edits':len(self.edits),'read_only_fields':['skin tone','conference','prestige','unknown appearance bytes','long strings','unconfirmed palette roles']}
     def edit(self,table,index,field,value,slot=None):
         if field not in EDITABLE.get(table,()):raise ToolError('roster_field_read_only',f'{table}.{field} is not a confirmed writable field')
         off=self.row_offset(table,index);before=bytes(self.data);old_row=self.rows[table][index];old_value=old_row[field]
         changes=[]
-        if table=='players' and field in ('first_name','last_name'):
+        if field in STRING_FIELDS.get(table, {}):
             rel=STRING_FIELDS[table][field];pos=off+rel;delta=struct.unpack_from('>i',self.data,pos)[0]
             if delta in (0,-1):raise ToolError('missing_string_storage','Cannot create a string heap entry')
             target=pos+delta
@@ -80,11 +98,39 @@ class EditorModel:
             if any(target<start+count*size and start<end for start,count,size in self.tables.values()):
                 raise ToolError('invalid_string_storage','Name storage overlaps a fixed roster table')
             changes.append((target,encoded))
+        elif table=='teams' and field=='palette_colors':
+            slot = self.integer(slot)
+            if not 0 <= slot < PALETTE_COUNT:
+                raise ToolError('palette_slot_out_of_range','Palette slot must be 0..30')
+            text = str(value).removeprefix('#')
+            if len(text) != 8 or any(c not in '0123456789abcdefABCDEF' for c in text):
+                raise ToolError('invalid_palette_color','Use #RRGGBBAA with eight hex digits')
+            old_value = old_value[slot]
+            changes.append((off+PALETTE_OFFSET+slot*4,bytes.fromhex(text)))
+        elif table=='players' and field in PLAYER_SCALARS:
+            value=self.integer(value)
+            rel,size,shift,bits,low,high=PLAYER_SCALARS[field]
+            if not low<=value<=high:raise ToolError('roster_value_out_of_range',f'{field} must be {low}..{high}')
+            original=int.from_bytes(Binary(self.data).slice(off+rel,size),'big')
+            mask=((1<<bits)-1)<<shift
+            changes.append((off+rel,((original&~mask)|(value<<shift)).to_bytes(size,'big')))
+        elif table=='players' and field=='shot_tendencies':
+            slot=self.integer(slot);value=self.integer(value)
+            if not 0<=slot<len(TENDENCY_NAMES) or not 0<=value<=99:
+                raise ToolError('tendency_out_of_range','Tendency channel must be 0..3 and value 0..99')
+            old_value=old_value[slot]
+            changes.append((off+TENDENCY_OFFSET+slot,bytes([value])))
+        elif table=='players' and field=='attribute_ratings':
+            slot=self.integer(slot);value=self.integer(value)
+            if not 0 <= slot < RATING_COUNT or not 35 <= value <= 99:
+                raise ToolError('rating_out_of_range','Attribute channel must be 0..29 and rating 35..99')
+            old_value=old_value[slot]
+            changes.append((off+RATING_OFFSET+slot*2,struct.pack('>H',value*100)))
         elif table=='players':
             value=self.integer(value);ranges={'jersey_number':(0,99),'height_inches':(36,100),'position_code':(0,4)}
             lo,hi=ranges[field]
             if not lo<=value<=hi:raise ToolError('roster_value_out_of_range',f'{field} must be {lo}..{hi}')
-            rel={'jersey_number':0x1a,'height_inches':0x3a,'position_code':0x3b}[field];changes.append((off+rel,struct.pack('>H',value) if field=='jersey_number' else bytes([value])))
+            rel={'jersey_number':0x1b,'height_inches':0x3a,'position_code':0x3b}[field];changes.append((off+rel,bytes([value])))
         elif field=='asset_id':
             value=self.integer(value)
             if value not in {r['asset_id'] for r in self.rows['teams']}:raise ToolError('new_asset_id_blocked','Select an existing roster asset ID; creating new assets is not validated')
@@ -146,8 +192,8 @@ class EditorModel:
                         if field not in original:raise ToolError('roster_unknown_field',field)
                         if value==original[field]:continue
                         if field not in EDITABLE.get(table,()):raise ToolError('roster_field_read_only',field)
-                        if field=='roster_slots':
-                            if len(value)!=16:raise ToolError('roster_table_shape_changed','Need exactly 16 slots')
+                        if field in ('roster_slots','palette_colors','attribute_ratings','shot_tendencies'):
+                            if len(value)!=(16 if field=='roster_slots' else PALETTE_COUNT if field=='palette_colors' else RATING_COUNT if field=='attribute_ratings' else len(TENDENCY_NAMES)):raise ToolError('roster_table_shape_changed','List field length changed')
                             for slot,(a,b) in enumerate(zip(original[field],value)):
                                 if a!=b:edits.append((table,index,field,b,slot))
                         else:edits.append((table,index,field,value,None))

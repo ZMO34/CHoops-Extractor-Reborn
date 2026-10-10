@@ -20,10 +20,12 @@ from PySide6.QtCore import (
     QTimer,
     Signal,
 )
-from PySide6.QtGui import QAction, QImage, QPixmap
+from PySide6.QtGui import QAction, QImage, QPixmap, QColor
 from PySide6.QtWidgets import (
     QApplication,
     QComboBox,
+    QCheckBox,
+    QDoubleSpinBox,
     QDialog,
     QDialogButtonBox,
     QDockWidget,
@@ -32,6 +34,7 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QLineEdit,
+    QInputDialog,
     QMainWindow,
     QMessageBox,
     QPlainTextEdit,
@@ -39,6 +42,7 @@ from PySide6.QtWidgets import (
     QPushButton,
     QScrollArea,
     QSplitter,
+    QSizePolicy,
     QStackedWidget,
     QTableView,
     QTabWidget,
@@ -197,6 +201,41 @@ def selected(view):
         proxy.sourceModel().rows[proxy.mapToSource(i).row()]
         for i in view.selectionModel().selectedRows()
     ]
+
+
+class TexturePreview(QLabel):
+    """Keep the entire texture visible as the preview viewport changes size."""
+
+    def __init__(self, text):
+        super().__init__(text)
+        self._original = QPixmap()
+        self.setMinimumSize(1, 120)
+        self.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Ignored)
+        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+    def setPixmap(self, pixmap):
+        self._original = pixmap
+        self._fit()
+
+    def setText(self, text):
+        self._original = QPixmap()
+        super().setText(text)
+
+    def clear(self):
+        self._original = QPixmap()
+        super().clear()
+
+    def _fit(self):
+        if not self._original.isNull():
+            super().setPixmap(self._original.scaled(
+                self.contentsRect().size(),
+                Qt.AspectRatioMode.KeepAspectRatio,
+                Qt.TransformationMode.SmoothTransformation,
+            ))
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        self._fit()
 
 
 class Window(QMainWindow):
@@ -437,6 +476,14 @@ class Window(QMainWindow):
         def loaded(archive):
 
             self.archive = archive
+            # A newly selected JB folder must not inherit another source's roster.
+            self.roster = None
+            for view in self.roster_views.values():
+                view.setModel(None)
+            self.roster_state.setText('No roster loaded; load the current JB folder roster')
+            self.scene_meshes = []
+            self.scene_view.set_meshes([])
+            self.scene_palette_state.setText("No roster associated; load the current JB folder roster")
 
             self.source = path
 
@@ -462,13 +509,13 @@ class Window(QMainWindow):
 
             self.log("Archive index loaded; payloads remain lazy.")
 
-        self.run_job("Index original game", lambda job: Archive(path), loaded)
+        self.run_job("Index JB folder", lambda job: Archive(path), loaded)
 
     def create_explorer(self):
 
         layout = self.page(
             "Archive explorer",
-            "Select an original PS3 JB game. Browse assets without a full rip; double-click to inspect nested records.",
+            "Select a PS3 JB folder, including a modded rebuild. Browse assets without a full rip; double-click an IFF to inspect records and preview its textures.",
         )
 
         self.identity = QLabel("No game selected")
@@ -513,6 +560,17 @@ class Window(QMainWindow):
         self.nested.setColumnWidth(0, 220)
 
         layout.addWidget(self.nested)
+
+        self.explorer_texture = QComboBox()
+        self.explorer_texture.setEnabled(False)
+        self.explorer_texture.activated.connect(self.preview_explorer_texture)
+        layout.addWidget(self.explorer_texture)
+        self.explorer_image = TexturePreview("Open an IFF or double-click an archive entry to preview textures")
+        self.explorer_image.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        preview_scroll = QScrollArea()
+        preview_scroll.setWidgetResizable(True)
+        preview_scroll.setWidget(self.explorer_image)
+        layout.addWidget(preview_scroll)
 
     def extract_selected(self, all_entries=False):
 
@@ -606,6 +664,20 @@ class Window(QMainWindow):
         )
 
         self.image.clear()
+        self.explorer_image.setText(result["warning"] or "No supported textures in this asset")
+        self.explorer_texture.clear()
+        for texture in result["textures"]:
+            if texture["editable"] and "reason" not in texture["metadata"]:
+                info = texture["metadata"]
+                self.explorer_texture.addItem(
+                    f"{texture['name']} — {info.get('width', '?')} × {info.get('height', '?')} {info.get('format', '')}",
+                    texture["name"],
+                )
+        self.explorer_texture.setEnabled(self.explorer_texture.count() > 0)
+        if self.explorer_texture.count():
+            self.explorer_image.setText("Loading texture preview…")
+            # The inspection worker emits finished after its result callback.
+            QTimer.singleShot(0, self.preview_explorer_texture)
 
         self.log(
             f"Inspected {self.asset_path.name}: {len(result['records'])} records, {len(result['textures'])} texture candidates. {result['warning']}"
@@ -638,7 +710,7 @@ class Window(QMainWindow):
 
         layout.addWidget(self.textures)
 
-        self.image = QLabel("DDS previews appear here")
+        self.image = TexturePreview("DDS previews appear here")
 
         self.image.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
@@ -705,6 +777,14 @@ class Window(QMainWindow):
 
         self.run_job("Decode image preview", decode, display)
 
+    def preview_explorer_texture(self, index=None):
+        selector = self.explorer_texture.currentData()
+        if selector and self.asset_path:
+            if self.active:
+                QTimer.singleShot(20, self.preview_explorer_texture)
+                return
+            self.decode_texture_preview(selector, self.explorer_image)
+
     def preview_texture(self):
 
         rows = selected(self.textures)
@@ -712,60 +792,15 @@ class Window(QMainWindow):
         if not self.asset_path or len(rows) != 1:
             return
 
-        source = self.asset_path
+        self.decode_texture_preview(rows[0]["name"], self.image)
 
-        selector = rows[0]["name"]
+    def decode_texture_preview(self, selector, target):
+        source = self.asset_path
+        target.setText("Loading texture preview…")
 
         def decode(job):
-
-            import uuid
-
-            from PIL import Image
-
-            from ..archive.manifests import write_bytes
-            from ..texture_tools.dds import linear_l8
-            from ..texture_tools.external_converters import convert
-            from ..texture_tools.pipeline import Container
-
-            cdf = source.with_suffix(".cdf")
-
-            container = Container(source, cdf if cdf.exists() else None)
-
-            asset = container.select(selector)
-
-            info = asset.texture.info()
-
-            work = OUTPUT / "temp" / ("preview_" + uuid.uuid4().hex)
-
-            gtf = work / "texture.gtf"
-
-            dds = work / "texture.dds"
-
-            write_bytes(gtf, asset.texture.gtf(), [source])
-
-            if info["format"] == "L8" and info["linear"]:
-                write_bytes(
-                    dds,
-                    linear_l8(
-                        info["width"],
-                        info["height"],
-                        info["mip_count"],
-                        asset.texture.image(),
-                    ),
-                    [source],
-                )
-
-            else:
-                convert("gtf2dds", gtf, dds)
-
-            with Image.open(dds) as image:
-                image.load()
-
-                image.thumbnail((2048, 2048))
-
-                image = image.convert("RGBA")
-
-                return image.size, image.tobytes()
+            from .services import decode_texture_preview
+            return decode_texture_preview(source, selector)
 
         def display(result):
 
@@ -773,9 +808,23 @@ class Window(QMainWindow):
 
             image = QImage(raw, w, h, w * 4, QImage.Format.Format_RGBA8888).copy()
 
-            self.image.setPixmap(QPixmap.fromImage(image))
+            if self.asset_path == source:
+                target.setPixmap(QPixmap.fromImage(image))
 
-        self.run_job("Preview selected texture", decode, display)
+        def decode_with_status(job):
+            try:
+                return decode(job)
+            except Exception as error:
+                return str(error)
+
+        def display_with_status(result):
+            if isinstance(result, str):
+                target.setText("Preview unavailable: " + result)
+                self.log("Preview unavailable: " + result)
+            else:
+                display(result)
+
+        self.run_job("Preview selected texture", decode_with_status, display_with_status)
 
     def import_dds(self):
 
@@ -832,6 +881,10 @@ class Window(QMainWindow):
                 ("Open roster…", self.choose_roster),
                 ("Load game roster", self.load_game_roster),
                 ("Edit selected…", self.edit_roster),
+                ("Team palette…", self.show_team_palette),
+                ("Player attributes…", self.show_player_attributes),
+                ("Player properties…", self.show_player_properties),
+                ("Research layout…", self.research_roster),
                 ("Undo", self.undo_roster),
                 ("Redo", self.redo_roster),
                 ("Save copy…", self.save_roster),
@@ -850,12 +903,12 @@ class Window(QMainWindow):
 
         self.roster_views = {}
 
-        for name in ("players", "teams", "arenas", "coaches"):
+        for name in ("players", "teams", "schools", "arenas", "coaches", "conferences"):
             view = table()
 
             self.roster_views[name] = view
 
-            self.roster_tabs.addTab(view, name.title())
+            self.roster_tabs.addTab(view, "Edit Schools" if name=="schools" else name.title())
 
         layout.addWidget(self.roster_tabs)
 
@@ -895,7 +948,7 @@ class Window(QMainWindow):
         from ..roster.editor_model import EditorModel
 
         self.run_job(
-            "Load original game roster",
+            "Load current JB folder roster",
             lambda job: EditorModel.open(materialize(self.archive, matches[0])),
             self.display_roster,
         )
@@ -903,9 +956,11 @@ class Window(QMainWindow):
     def display_roster(self, model):
 
         self.roster = model
+        if getattr(self, "scene_meshes", None):
+            self.select_scene_part()
 
         for name, view in self.roster_views.items():
-            rows = model.rows[name]
+            rows = model.rows.get("teams" if name=="schools" else name, [])
 
             columns = (
                 [
@@ -923,20 +978,131 @@ class Window(QMainWindow):
             f"{len(model.rows['players']):,} players • {len(model.edits)} unsaved edits"
         )
 
+    def show_team_palette(self, team_index=None):
+        if not self.roster:
+            return self.log("Load a roster first.")
+        if team_index is None or isinstance(team_index, bool):
+            view=self.roster_views['schools'] if self.roster_tabs.currentWidget() is self.roster_views.get('schools') else self.roster_views['teams']
+            rows = selected(view)
+            if len(rows) != 1:
+                return self.log("Select one team in the Teams tab.")
+            team_index = rows[0]['index']
+        from ..roster.research import palette_rows
+        team = self.roster.rows['teams'][team_index]
+        dialog = QDialog(self)
+        dialog.setWindowTitle(f"{team['school_name']} • asset {team['asset_id']} • team palette")
+        dialog.resize(760, 700)
+        layout = QVBoxLayout(dialog)
+        layout.addWidget(QLabel("22 Edit Schools captions are verified. Other slot roles remain provisional; court material bindings are supported."))
+        view = QTreeWidget()
+        view.setHeaderLabels(['Palette slot','RGBA','Edit Schools control','Caption / provisional role'])
+        layout.addWidget(view)
+        def refresh():
+            view.clear()
+            for row in palette_rows(self.roster, team_index):
+                item = QTreeWidgetItem(view,[str(row['slot']),row['rgba'],str(row['school_control']) if row['school_control'] is not None else 'Not in color callback list',row['role']])
+                color = bytes.fromhex(row['rgba'][1:])
+                item.setBackground(1,QColor(*color))
+        def edit():
+            items = view.selectedItems()
+            if not items:
+                return
+            slot = int(items[0].text(0))
+            value, ok = QInputDialog.getText(dialog, 'Edit palette RGBA', '#RRGGBBAA (eight hex digits)', text=items[0].text(1))
+            if ok:
+                try:
+                    self.roster.edit('teams',team_index,'palette_colors',value,slot)
+                    refresh()
+                    self.display_roster(self.roster)
+                except ValueError as error:
+                    QMessageBox.warning(dialog,'Palette edit blocked',str(error))
+        button = QPushButton('Edit selected color…');button.clicked.connect(edit);layout.addWidget(button)
+        refresh();dialog.exec()
+
+    def show_player_properties(self):
+        if not self.roster:return
+        rows=selected(self.roster_views['players'])
+        if len(rows)!=1:return self.log("Select one player in the Players tab.")
+        from ..roster.schema import TENDENCY_NAMES
+        row=rows[0];dialog=QDialog(self);dialog.resize(650,650)
+        dialog.setWindowTitle('Player properties • executable-backed storage')
+        layout=QVBoxLayout(dialog)
+        layout.addWidget(QLabel('Appearance values are raw enum codes; their choice labels are still being traced.'))
+        view=QTreeWidget();view.setHeaderLabels(['Property','Value'])
+        for name,value in row['properties'].items():QTreeWidgetItem(view,[name,str(value)])
+        for name,value in zip(TENDENCY_NAMES,row['shot_tendencies']):QTreeWidgetItem(view,[name+' tendency',str(value)])
+        layout.addWidget(view);dialog.exec()
+
+    def show_player_attributes(self):
+        if not self.roster or self.active:
+            return
+        rows = selected(self.roster_views['players'])
+        if len(rows)!=1:
+            return self.log("Select one player in the Players tab.")
+        from ..roster.schema import RATING_HINTS,RATING_OFFSET
+        from ..formats.binary import Binary
+        player_index=rows[0]['index']
+        dialog=QDialog(self);dialog.resize(780,700)
+        dialog.setWindowTitle('Player attributes • executable and UI metadata verified')
+        layout=QVBoxLayout(dialog)
+        layout.addWidget(QLabel('30 named attributes; edits use the game setter encoding (rating × 100).'))
+        view=QTreeWidget();view.setHeaderLabels(['Channel','Row offset','Rating','Stored u16','Attribute'])
+        layout.addWidget(view)
+        def refresh():
+            view.clear();row=self.roster.rows['players'][player_index];binary=Binary(self.roster.data)
+            for i,value in enumerate(row['attribute_ratings']):
+                offset=RATING_OFFSET+i*2
+                QTreeWidgetItem(view,[str(i),hex(offset),str(value),str(binary.u16(row['row_offset']+offset)),RATING_HINTS.get(i,'Unassigned attribute')])
+        def edit():
+            items=view.selectedItems()
+            if not items:return
+            channel=int(items[0].text(0))
+            value,ok=QInputDialog.getInt(dialog,'Edit attribute channel','Rating',int(items[0].text(2)),35,99)
+            if ok:
+                try:
+                    self.roster.edit('players',player_index,'attribute_ratings',value,channel)
+                    self.display_roster(self.roster);refresh()
+                except ValueError as error:QMessageBox.warning(dialog,'Rating edit blocked',str(error))
+        button=QPushButton('Edit selected channel…');button.clicked.connect(edit);layout.addWidget(button)
+        refresh();dialog.exec()
+
+    def scene_team_palette(self):
+        import re
+        if not self.roster or not hasattr(self, 'scene_source'):
+            return self.log("Load the game roster in Roster Editor, then open a stadium scene.")
+        match = re.fullmatch(r's(\d+)', self.scene_source.stem, re.IGNORECASE)
+        teams = [t for t in self.roster.rows['teams'] if match and t['asset_id'] == int(match[1])]
+        if len(teams) != 1:
+            return self.log("Stadium asset ID has no unique team match in the loaded roster.")
+        self.show_team_palette(teams[0]['index'])
+
+    def research_roster(self):
+        if not self.roster:
+            return self.log("Load a roster first.")
+        from ..roster.research import analyze
+        from ..core.reports import save_json
+        import uuid
+        path = OUTPUT / 'reports' / ('roster_layout_'+uuid.uuid4().hex+'.json')
+        def research(job):
+            report = analyze(self.roster)
+            save_json(path,report)
+            return {'report':str(path),'semantic_mapping_complete':False}
+        self.run_job('Profile roster fields and unresolved regions',research)
+
     def edit_roster(self):
 
         if not self.roster or self.active:
             return
 
-        name = self.roster_tabs.tabText(self.roster_tabs.currentIndex()).lower()
+        view = self.roster_tabs.currentWidget()
+        name = next(key for key,value in self.roster_views.items() if value is view)
+        name = 'teams' if name == 'schools' else name
 
-        rows = selected(self.roster_views[name])
+        rows = selected(view)
 
         if len(rows) != 1:
             return self.log("Select exactly one roster row.")
 
-        if name not in ("players", "teams"):
-            return self.log("Arena and coach records are read-only.")
 
         from ..roster.schema import EDITABLE, POSITIONS, REFERENCES
 
@@ -969,7 +1135,13 @@ class Window(QMainWindow):
             menu = reference or key == "position_code"
             value.setVisible(not menu)
             choices.setVisible(menu)
-            slot.setVisible(key == "roster_slots")
+            needed = 31 if key == 'palette_colors' else 30 if key == 'attribute_ratings' else 4 if key=='shot_tendencies' else 16
+            if slot.count() != needed:
+                slot.blockSignals(True)
+                slot.clear()
+                slot.addItems([str(i) for i in range(needed)])
+                slot.blockSignals(False)
+            slot.setVisible(key in ('roster_slots','palette_colors','attribute_ratings','shot_tendencies'))
             choices.clear()
             if key == "position_code":
                 for code, label in POSITIONS.items():
@@ -996,16 +1168,16 @@ class Window(QMainWindow):
                 )
                 choices.setCurrentIndex(max(0, choices.findData(current)))
             else:
-                value.setText(str(row.get(key, "")))
+                value.setText(str(row[key][int(slot.currentText())]) if key in ('palette_colors','attribute_ratings','shot_tendencies') else str(row.get(key, "")))
 
         slot.currentTextChanged.connect(lambda value: changed(field.currentText()))
-        form.addRow("Confirmed field", field)
+        form.addRow("Field (see palette dialog for verified captions)", field)
 
         form.addRow("Value", value)
 
         form.addRow("Reference", choices)
 
-        form.addRow("Roster slot", slot)
+        form.addRow("Roster / palette slot", slot)
 
         field.currentTextChanged.connect(changed)
 
@@ -1037,7 +1209,7 @@ class Window(QMainWindow):
                     row["index"],
                     key,
                     new,
-                    int(slot.currentText()) if key == "roster_slots" else None,
+                    int(slot.currentText()) if key in ("roster_slots", "palette_colors", "attribute_ratings", "shot_tendencies") else None,
                 )
 
                 return self.roster
@@ -1088,52 +1260,121 @@ class Window(QMainWindow):
             )
 
     def create_models(self):
-
         layout = self.page(
-            "Models / Courts • read-only geometry",
-            "SCNE part metadata is inspectable. Geometry export/import remains unavailable until vertex declarations and topology are validated. Court texture edits use the Texture Editor.",
+            "Models / Courts • 3D preview",
+            "Select a SCNE record in Explorer, then Preview scene. Drag to orbit; wheel to zoom. Material textures load automatically. Use cutaway to see inside; game shader effects are not reproduced.",
         )
-
-        self.buttons(layout, [("Inspect selected SCNE record", self.inspect_scene)])
-
+        self.buttons(layout, [("Preview selected SCNE", self.inspect_scene)])
+        self.scene_complete = QCheckBox("Include all SCNE sections (arena and court)")
+        self.scene_complete.setChecked(True)
+        layout.addWidget(self.scene_complete)
+        self.scene_cutaway = QCheckBox("Cutaway: hide roof and light-effect meshes")
+        self.scene_cutaway.setChecked(True)
+        self.scene_cutaway.toggled.connect(self.select_scene_part)
+        layout.addWidget(self.scene_cutaway)
+        self.scene_lift = QCheckBox("Lift court in preview")
+        self.scene_lift.setChecked(True)
+        self.scene_lift.toggled.connect(self.select_scene_part)
+        layout.addWidget(self.scene_lift)
+        self.scene_lift_amount = QDoubleSpinBox()
+        self.scene_lift_amount.setRange(0., 100.)
+        self.scene_lift_amount.setValue(10.)
+        self.scene_lift_amount.setSuffix(" scene units")
+        self.scene_lift_amount.valueChanged.connect(self.select_scene_part)
+        layout.addWidget(self.scene_lift_amount)
+        self.scene_parts = QComboBox()
+        self.scene_parts.activated.connect(self.select_scene_part)
+        layout.addWidget(self.scene_parts)
+        self.scene_textures = QComboBox()
+        self.scene_textures.activated.connect(self.select_scene_texture)
+        layout.addWidget(self.scene_textures)
+        from .scene_view import SceneView
+        self.scene_view = SceneView()
+        layout.addWidget(self.scene_view, 1)
+        self.buttons(layout, [("Fit camera", self.scene_view.fit_camera), ("Linked roster palette…", self.scene_team_palette)])
         self.model_details = QPlainTextEdit()
-
         self.model_details.setReadOnly(True)
-
+        self.model_details.setMaximumHeight(120)
         layout.addWidget(self.model_details)
+        self.scene_meshes = []
+        self.scene_palette_state = QLabel('No roster associated; embedded material textures only')
+        layout.addWidget(self.scene_palette_state)
 
     def inspect_scene(self):
-
         if not self.asset_path:
-            return self.log("Open a standard IFF in Explorer first.")
-
+            return self.log("Open a stadium IFF in Explorer first.")
         items = self.nested.selectedItems()
-
-        if not items or items[0].text(1) != "SCNE":
+        if items and items[0].text(1) == "SCNE":
+            index = int(items[0].text(2))
+        elif self.asset_path.suffix.lower() == '.scne':
+            index = 0
+        else:
             return self.log("Select a SCNE record in the Explorer nested list.")
+        source = self.asset_path
+        self.navigation.setCurrentItem(self.navigation.topLevelItem(3))
+        self.scene_meshes = []
+        self.scene_view.set_meshes([])
+        self.scene_view.set_material_images({})
+        self.scene_view.set_image(None)
+        self.scene_parts.clear()
+        self.scene_textures.clear()
+        self.model_details.setPlainText("Loading scene…")
+        from .services import inspect_scene_preview
+        def display(result):
+            self.scene_source = source
+            self.scene_meshes = result['meshes']
+            self.scene_parts.addItem('All supported parts', -1)
+            for i, mesh in enumerate(self.scene_meshes):
+                self.scene_parts.addItem(mesh['name'], i)
+            self.scene_textures.addItem('Automatic material textures', '__automatic__')
+            self.scene_textures.addItem('Untextured', None)
+            for name in result['textures']:
+                self.scene_textures.addItem(name, name)
+            images = {}
+            for name, ((w,h), raw) in result['images'].items():
+                images[name] = QImage(raw,w,h,w*4,QImage.Format.Format_RGBA8888).copy()
+            self.scene_view.automatic = True
+            self.scene_view.set_material_images(images)
+            self.select_scene_part()
+            self.model_details.setPlainText(
+                f"{len(self.scene_meshes)} supported parts; {sum(len(m['vertices'])//3 for m in self.scene_meshes)} triangles. {len(result['images'])} material textures loaded; use dropdown for overrides.\n"
+                + '\n'.join(result['warnings'])
+            )
+        include_all = self.scene_complete.isChecked()
+        self.run_job('Decode scene geometry and textures', lambda job: inspect_scene_preview(source, index, include_all, job), display, cancellable=True)
 
-        index = int(items[0].text(2))
+    def select_scene_part(self, index=None):
+        part = self.scene_parts.currentData()
+        meshes = self.scene_meshes if part == -1 else [self.scene_meshes[part]] if part is not None else []
+        if part == -1 and self.scene_cutaway.isChecked():
+            meshes = [m for m in meshes if not m.get('hidden_by_default')]
+        if self.scene_lift.isChecked():
+            meshes = [{**mesh, 'vertices': [(v[0], v[1]+self.scene_lift_amount.value(), *v[2:]) for v in mesh['vertices']]}
+                      if mesh['name'].split('/')[0].lower() == 'floor' else mesh for mesh in meshes]
+        from ..formats.scene_palette import associate_palette
+        import re
+        match = re.fullmatch(r's(\d+)', self.scene_source.stem, re.IGNORECASE) if hasattr(self, 'scene_source') else None
+        teams = [team for team in self.roster.rows['teams'] if match and team['asset_id'] == int(match[1])] if self.roster else []
+        colors = teams[0]['palette_colors'] if len(teams) == 1 else None
+        meshes = associate_palette(meshes, colors)
+        if colors is not None:
+            count = sum(batch['palette_tint'] is not None for mesh in meshes for batch in mesh['batches'])
+            self.scene_palette_state.setText(f"Associated roster: {self.roster.source.source_path or 'current JB folder roster'}; {teams[0]['school_name']}; {count} court color bindings. Arena shader masks are unresolved.")
+        else:
+            self.scene_palette_state.setText('No unique roster/team association; embedded material textures only. Use Associate roster to select a matching roster.')
+        self.scene_view.set_meshes(meshes)
 
-        def inspect(job):
-
-            from ..formats.scne import inspect
-            from ..formats.standard_iff import StandardIFF
-            from ..formats.standard_iff_writer import record_blocks
-            from ..formats.tool_wrapper import wrap
-
-            iff = StandardIFF(self.asset_path.read_bytes())
-
-            blocks = [b[3] for b in record_blocks(iff, iff.records[index])]
-
-            return inspect(wrap(2, blocks))
-
-        self.run_job(
-            "Inspect scene parts",
-            inspect,
-            lambda result: self.model_details.setPlainText(
-                json.dumps(result, indent=2)
-            ),
-        )
+    def select_scene_texture(self, index=None):
+        name = self.scene_textures.currentData()
+        self.scene_view.automatic = name == '__automatic__'
+        self.scene_view.set_image(None)
+        if name is None or name == '__automatic__':
+            return
+        from .services import decode_texture_preview
+        def display(result):
+            (w, h), raw = result
+            self.scene_view.set_image(QImage(raw, w, h, w*4, QImage.Format.Format_RGBA8888).copy())
+        self.run_job('Decode scene texture', lambda job: decode_texture_preview(self.scene_source, name), display)
 
     def create_builder(self):
 
@@ -1337,7 +1578,7 @@ def main(argv=None):
 
     window = Window()
 
-    window.show()
+    window.showMaximized()
 
     if args.game:
         window.open_game(args.game)

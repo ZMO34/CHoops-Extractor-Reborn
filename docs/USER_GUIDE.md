@@ -24,3 +24,21 @@ DDS tools are separately supplied until redistribution licensing is settled; see
 Mod Builder also exports/imports .chpatch ZIP packages of XOR differences. They contain source/result SHA-256 preconditions and no original or unchanged game bytes. Import validates every identity, size and checksum before publishing a new staged workspace. Limit: 128 MiB per extent and 512 MiB total. Share only changes you are authorized to distribute. Never distribute copied JB game folders.
 
 Open extracted asset also accepts an individual 0A part and routes it to the archive index. Interactive asset decode is capped at 128 MiB; larger files retain a bounded raw inspection and remain stream-exportable.
+
+### Archive texture previews
+
+In Explorer, double-click an archive entry or use Preview selected to inspect its IFF and automatically preview the first supported texture. Use the texture dropdown below the nested records to browse additional textures. Open IFF opens a standalone extracted container in the same preview panel. Reading and decoding run in the background and use scratch copies under output/temp; originals remain unchanged. Paired CDF data is included when available. Most formats require the configured gtf2dds converter; linear L8 decodes directly. Unsupported layouts, missing converters, and containers without textures show a message. The existing 128 MiB interactive decode limit still applies.
+
+### Stadium 3D preview
+
+Open a stadium sXXX IFF in Explorer, select a SCNE nested record (such as arena or floor), and click Preview 3D scene. Models / Courts displays supported mesh parts. Drag with the left mouse button to orbit, use the wheel to zoom, and click Fit camera to reset framing. Material textures now load automatically for individual draw groups. Include all SCNE sections combines arena and court by default. Cutaway hides roof and light-effect meshes so the interior is visible; turn it off or select an individual part to inspect those meshes. Use the texture dropdown for an explicit override or Untextured for neutral geometry.
+
+The viewer is read-only. This initial preview supports declared big-endian float positions, half-float, float or signed-normalized UVs, instance transforms, a single vertex stream, and 16-bit triangle strips with restart markers. Unsupported parts are listed in the details panel. Automatic material previews use declared shader sampler semantics and parameter offsets to resolve embedded base-color textures. Bump, normal and gloss slots are excluded; missing base color stays neutral instead of falling back to another sampler. Unknown or external texture references remain neutral. Overrides apply to all displayed parts. Simple preview lighting helps distinguish faces; game shader effects, animation, exact material colors, and geometry editing are not implemented. OpenGL 2.0 and the existing texture converters are required for textured rendering (linear L8 and non-power-of-two DXT base-level previews use native decoding). The existing interactive container size limit applies.
+
+The Lift court toggle raises only the displayed floor SCNE section by 10 scene units by default, adjustable from 0 to 100 in the scene controls to avoid overlap with the arena bottom. Disable it to inspect original placement. It never changes extracted data or archive geometry.
+
+### Expanded roster tools
+
+Player attributes edits the 30 executable-backed named rating channels. Player properties displays recovered appearance/equipment codes; Edit selected additionally supports weight, potential, handedness and shot tendency channels. Edit Schools shows school records and links to their 31-slot palette. The palette dialog identifies the 22 color-control indices found in the game's Edit Schools callback arrays. Conferences displays names and member-team links; conference assignment is currently read-only.
+
+For a standalone stadium archive, choose Associate roster in Models / Courts to load the matching roster. For a modded JB folder, Load game roster reads that folder’s current roster. A unique stadium asset ID match enables verified court color bindings; missing or ambiguous matches retain embedded textures and display an association message. There is no vanilla palette fallback. Arena mask-channel routing is still under investigation.

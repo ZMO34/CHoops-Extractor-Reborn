@@ -233,3 +233,92 @@ def stage_folder(source: Path, folder: Path, mod: Path) -> dict:
         if work.exists():
             shutil.rmtree(work)
         raise
+
+
+def decode_texture_preview(source: Path, selector: str):
+    from ..texture_tools.pipeline import Container
+    cdf = source.with_suffix('.cdf')
+    asset = Container(source, cdf if cdf.exists() else None).select(selector)
+    return decode_preview_asset(asset)
+
+
+def decode_preview_asset(asset, max_size=2048):
+    import shutil
+    from PIL import Image
+    from ..texture_tools.dds import linear_l8, compressed_preview
+    from ..texture_tools.external_converters import convert
+    info = asset.texture.info()
+    work = OUTPUT / 'temp' / ('preview_' + uuid.uuid4().hex)
+    work.mkdir(parents=True)
+    try:
+        dds = work / 'texture.dds'
+        if info['format'] in ('DXT1','DXT3','DXT5') and (info['width'] & (info['width']-1) or info['height'] & (info['height']-1)):
+            dds.write_bytes(compressed_preview(info['width'],info['height'],info['format'],asset.texture.image()))
+        elif info['format'] == 'L8' and info['linear']:
+            dds.write_bytes(linear_l8(info['width'], info['height'], info['mip_count'], asset.texture.image()))
+        else:
+            gtf = work / 'texture.gtf'
+            gtf.write_bytes(asset.texture.gtf())
+            convert('gtf2dds', gtf, dds)
+        with Image.open(dds) as image:
+            image.load()
+            image.thumbnail((max_size, max_size))
+            image = image.convert('RGBA')
+            return image.size, image.tobytes()
+    finally:
+        shutil.rmtree(work)
+
+
+def inspect_scene_preview(source: Path, record_index: int, include_all=False, job=None):
+    from ..texture_tools.pipeline import Container
+    from ..formats.standard_iff_writer import record_blocks
+    from ..formats.compression import decode
+    from ..formats.tool_wrapper import unwrap
+    from ..formats.scne import preview_meshes
+    job = job or JobContext()
+    if source.stat().st_size > 128 * 1024 * 1024:
+        raise ValueError('Interactive scene decode limit is 128 MiB')
+    cdf = source.with_suffix('.cdf')
+    container = Container(source, cdf if cdf.exists() else None)
+    records = container.iff.records if container.iff else container.pair.records if container.pair else []
+    scenes = [r for r in records if r['type'] == 'SCNE' and (include_all or r['index'] == record_index)]
+    if not scenes and container.wrapper_type == 2:
+        scenes = [{'index': 0, 'name': source.stem}]
+    if not scenes:
+        raise ValueError('Select a SCNE record in an IFF or open a SCNE wrapper')
+    result = {'meshes': [], 'warnings': [], 'textures': [], 'images': {}}
+    for rec in scenes:
+        job.check()
+        if container.iff:
+            blocks = [b[3] for b in record_blocks(container.iff, rec)]
+        elif container.pair:
+            blocks = [decode(container.pair.cdf[rec[k+'_offset']:rec[k+'_offset']+rec[k+'_length']]) for k in ('header','payload')]
+        else:
+            blocks = unwrap(container.raw)[1]
+        scene = preview_meshes(blocks)
+        assets = [a for a in container.assets if (a.record_index == rec['index'] or container.wrapper_type == 2) and a.texture]
+        by_index = {a.package_index: a.name for a in assets}
+        result['textures'].extend(a.name for a in assets)
+        for mesh in scene['meshes']:
+            mesh['name'] = rec['name'] + '/' + mesh['name']
+            for batch in mesh['batches']:
+                batch['texture'] = by_index.get(batch['texture_index'])
+        result['meshes'].extend(scene['meshes'])
+        result['warnings'].extend(scene['warnings'])
+    needed = {batch['texture'] for mesh in result['meshes'] for batch in mesh['batches'] if batch['texture']}
+    assets = {a.name:a for a in container.assets if a.texture}
+    decoded_bytes = 0
+    for i, name in enumerate(sorted(needed)):
+        job.check()
+        job.progress(i, len(needed), 'Loading material texture ' + name)
+        try:
+            image = decode_preview_asset(assets[name], max_size=1024)
+            decoded_bytes += len(image[1])
+            if decoded_bytes > 128 * 1024 * 1024:
+                result['warnings'].append('Scene texture memory limit reached')
+                break
+            result['images'][name] = image
+        except ValueError as error:
+            result['warnings'].append(name + ': ' + str(error))
+    job.progress(len(needed), len(needed), 'Scene loaded')
+    return result

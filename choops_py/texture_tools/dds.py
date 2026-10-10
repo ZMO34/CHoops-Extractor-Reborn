@@ -37,3 +37,19 @@ def linear_l8(width,height,mips,payload):
     header=bytearray(128);header[:4]=b'DDS '
     for offset,value in {4:124,8:0x2100f,12:height,16:width,20:width,28:mips,76:32,80:0x20000,88:8,92:255,108:0x401008 if mips>1 else 0x1000}.items():struct.pack_into('<I',header,offset,value)
     result=bytes(header)+payload;inspect(result);return result
+
+
+def compressed_preview(width, height, fmt, payload):
+    """Wrap the base level of block-compressed PS3 textures for read-only viewing."""
+    if fmt not in ('DXT1','DXT3','DXT5'):
+        raise ToolError('unsupported_texture_format', fmt)
+    size = image_size(width,height,fmt)
+    if len(payload) < size:
+        raise ToolError('payload_size_mismatch','Compressed base mip is incomplete')
+    header = bytearray(128);header[:4]=b'DDS '
+    for offset,value in {4:124,8:0x81007,12:height,16:width,20:size,28:1,76:32,80:4,108:0x1000}.items():
+        struct.pack_into('<I',header,offset,value)
+    header[84:88]=fmt.encode('ascii')
+    result=bytes(header)+payload[:size]
+    inspect(result)
+    return result
