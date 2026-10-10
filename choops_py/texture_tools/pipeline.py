@@ -64,6 +64,8 @@ class Container:
             self.wrapper_type,blocks=unwrap(self.raw)
             self.kind='tool-wrapper'
             self._add(self.source.stem,0,'SCNE' if self.wrapper_type==2 else 'TXTR',blocks)
+        elif self.source.suffix.lower()=='.scne' and self.raw[:4]==bytes.fromhex('00010b1d'):
+            self.kind='raw-scne';self._add(self.source.stem,0,'SCNE',[self.raw])
         else:
             self.kind='raw-txtr';self._add(self.source.stem,0,'TXTR',[self.raw])
     def _add(self,name,index,typ,blocks,record_index=None):

@@ -46,7 +46,7 @@ def test_bad_declaration_and_truncated_payload_are_reported():
     modified = bytearray(head); modified[412:416] = b'BAD!'
     assert not preview_meshes([bytes(modified),data])['meshes']
     assert not preview_meshes([head,data[:-1]])['meshes']
-    with pytest.raises(ValueError): preview_meshes([head])
+    assert not preview_meshes([head])['meshes']
 
 
 def test_instance_matrix_places_geometry_without_changing_uv():
@@ -132,3 +132,39 @@ def test_camera_keyboard_travels_in_view_direction(qtbot):
     assert view.center == QVector3D(10,0,-2.5)
     qtbot.keyClick(view, Qt.Key.Key_E)
     assert view.center == QVector3D(10,2.5,-2.5)
+
+
+def embedded_scene_fixture():
+    head, payload = scene_fixture()
+    head = bytearray(head)+bytearray(128)
+    head[:4] = bytes.fromhex("00010b1d")
+    def u(off,value):struct.pack_into('>I',head,off,value)
+    def ptr(field,target):u(field,target-field+1)
+    u(320,2)
+    u(332,12);u(336,48);ptr(340,1040)
+    u(344,0);u(348,4);u(352,16);ptr(356,1088)
+    head[408:416] = bytes.fromhex('2000000002030000')
+    head[472:480] = bytes.fromhex('2000010003020800')
+    u(0x54+0xa4,0x10);ptr(0x54+0xac,1024)
+    head[1024:1032] = payload[:8]
+    for i in range(4):
+        head[1040+i*12:1052+i*12] = payload[8+i*16:20+i*16]
+        head[1088+i*4:1092+i*4] = payload[20+i*16:24+i*16]
+    return bytes(head)
+
+
+def test_embedded_multistream_matches_two_block_geometry():
+    result = preview_meshes([embedded_scene_fixture()])
+    assert not result['warnings']
+    assert result['meshes'][0]['vertices'] == preview_meshes(scene_fixture())['meshes'][0]['vertices']
+
+
+def test_standalone_embedded_scne_preview(tmp_path):
+    from choops_py.studio.services import inspect_scene_preview
+    from choops_py.formats.tool_wrapper import wrap
+    raw = embedded_scene_fixture()
+    for name,data in [('cloth.scne',raw),('cloth_wrapped.scne',wrap(2,[raw]))]:
+        source=tmp_path/name;source.write_bytes(data)
+        result=inspect_scene_preview(source,0)
+        assert len(result['meshes']) == 1
+        assert len(result['meshes'][0]['vertices']) == 6

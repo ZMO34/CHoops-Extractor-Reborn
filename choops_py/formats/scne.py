@@ -12,9 +12,11 @@ def preview_meshes(blocks):
     """Decode bounded, declared float-position/half-UV triangle strips read-only."""
     import math
     import struct
-    if len(blocks) != 2:
-        raise ValueError("3D preview requires a two-block SCNE package")
-    head, payload = map(Binary, blocks)
+    if len(blocks) not in (1,2):
+        raise ValueError("3D preview requires one or two SCNE blocks")
+    embedded = len(blocks) == 1
+    head = Binary(blocks[0])
+    payload = head if embedded else Binary(blocks[1])
     head.slice(0, 0x54)
     count = head.u32(0x44)
     if count > 4096:
@@ -110,49 +112,62 @@ def preview_meshes(blocks):
             descriptor = head.relative(off + 0x88)
             head.slice(descriptor, 44)
             vertices = head.u32(descriptor + 16)
-            stride = head.u32(descriptor + 32)
-            length = head.u32(descriptor + 36)
-            start = head.u32(descriptor + 40) - 1
-            if not 1 <= vertices <= 250000 or not 12 <= stride <= 256 or length != vertices * stride:
-                raise ValueError("invalid vertex buffer dimensions")
-            data = payload.slice(start, length)
+            stream_count = head.u32(descriptor+20) or 1
+            if not 1 <= stream_count <= 16 or not 1 <= vertices <= 250000:
+                raise ValueError('invalid vertex stream dimensions')
+            streams = []
+            for stream in range(stream_count):
+                entry = descriptor+28+stream*16
+                head.slice(entry,16)
+                stride, length = head.u32(entry+4), head.u32(entry+8)
+                if not 1 <= stride <= 256 or length != vertices*stride:
+                    raise ValueError('invalid vertex buffer dimensions')
+                start = head.relative(entry+12) if embedded else head.u32(entry+12)-1
+                streams.append((stride, payload.slice(start,length)))
             declaration_count = head.u32(off + 0x94)
             if not 1 <= declaration_count <= 16:
                 raise ValueError("unsupported vertex declaration count")
             declaration = head.relative(off + 0x9c)
             head.slice(declaration, declaration_count * 64)
             position, uv, uv_format = None, None, None
+            position_stream = uv_stream = 0
             for j in range(declaration_count):
                 code = head.slice(declaration + j * 64 + 8, 8)
-                if code[0] != 0x20 or code[2:4] != b'\0\0':
+                if code[0] != 0x20 or code[2] >= stream_count or code[3] != 0:
                     continue
                 if code[4:] == bytes.fromhex('02030000'):
-                    position = code[1]
+                    position, position_stream = code[1], code[2]
                 elif code[4:] == bytes.fromhex('03020800'):
+                    uv_stream = code[2]
                     uv, uv_format = code[1], '>2e'
                 elif code[4:] == bytes.fromhex('01020800'):
+                    uv_stream = code[2]
                     uv, uv_format = code[1], '>2h'
                 elif code[4:] == bytes.fromhex('02020800'):
+                    uv_stream = code[2]
                     uv, uv_format = code[1], '>2f'
-            if position is None or position + 12 > stride:
+            position_stride, position_data = streams[position_stream]
+            uv_stride, uv_data = streams[uv_stream]
+            if position is None or position + 12 > position_stride:
                 raise ValueError("position declaration is unsupported")
-            if uv is None or uv + struct.calcsize(uv_format) > stride:
+            if uv is None or uv + struct.calcsize(uv_format) > uv_stride:
                 raise ValueError("UV declaration is unsupported")
             points = []
             for v in range(vertices):
-                xyz = struct.unpack_from('>3f', data, v * stride + position)
-                tex = struct.unpack_from(uv_format, data, v * stride + uv)
+                xyz = struct.unpack_from('>3f', position_data, v * position_stride + position)
+                tex = struct.unpack_from(uv_format, uv_data, v * uv_stride + uv)
                 if uv_format == '>2h':
                     tex = tuple(max(-1., x/32767.) for x in tex)
                 if not all(math.isfinite(x) and abs(x) < 1e8 for x in xyz + tex):
                     raise ValueError("non-finite or excessive vertex values")
                 points.append(xyz + tex)
-            if head.u32(off + 0xa4) != 0x20000010:
+            if head.u32(off + 0xa4) != (0x10 if embedded else 0x20000010):
                 raise ValueError("index format is unsupported")
             index_count = head.u32(off + 0xa8)
             if index_count > 2000000:
                 raise ValueError("index count exceeds preview limit")
-            index_data = payload.slice(head.u32(off + 0xac) - 1, index_count * 2)
+            index_start = head.relative(off+0xac) if embedded else head.u32(off+0xac)-1
+            index_data = payload.slice(index_start, index_count*2)
             indices = struct.unpack('>' + str(index_count) + 'H', index_data)
             runs = head.u32(off + 0x7c)
             if not 1 <= runs <= 10000:

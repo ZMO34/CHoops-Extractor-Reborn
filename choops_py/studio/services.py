@@ -282,7 +282,7 @@ def inspect_scene_preview(source: Path, record_index: int, include_all=False, jo
     container = Container(source, cdf if cdf.exists() else None)
     records = container.iff.records if container.iff else container.pair.records if container.pair else []
     scenes = [r for r in records if r['type'] == 'SCNE' and (include_all or r['index'] == record_index)]
-    if not scenes and container.wrapper_type == 2:
+    if not scenes and (container.wrapper_type == 2 or container.kind == "raw-scne"):
         scenes = [{'index': 0, 'name': source.stem}]
     if not scenes:
         raise ValueError('Select a SCNE record in an IFF or open a SCNE wrapper')
@@ -294,9 +294,11 @@ def inspect_scene_preview(source: Path, record_index: int, include_all=False, jo
         elif container.pair:
             blocks = [decode(container.pair.cdf[rec[k+'_offset']:rec[k+'_offset']+rec[k+'_length']]) for k in ('header','payload')]
         else:
-            blocks = unwrap(container.raw)[1]
+            blocks = [container.raw] if container.kind == "raw-scne" else unwrap(container.raw)[1]
         scene = preview_meshes(blocks)
-        assets = [a for a in container.assets if (a.record_index == rec['index'] or container.wrapper_type == 2) and a.texture]
+        if len(blocks) == 1 and scene['meshes']:
+            scene['warnings'].append('Static rest-pose preview: runtime skinning, cloth simulation and external material textures are not reproduced')
+        assets = [a for a in container.assets if (a.record_index == rec['index'] or container.wrapper_type == 2 or container.kind == 'raw-scne') and a.texture]
         by_index = {a.package_index: a.name for a in assets}
         result['textures'].extend(a.name for a in assets)
         for mesh in scene['meshes']:
