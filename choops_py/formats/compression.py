@@ -42,9 +42,10 @@ def decode(raw, expected=None):
     return bytes(out)
 
 def encode_like(original, replacement):
-    """Reuse every valid old token; expand only backreferences invalidated by edits.
+    """Prefer valid old tokens; recompress edited streams when literal expansion grows them.
 
-    Token lengths and descriptor groups are fully recomputed. The wrapper's
+    Token lengths and descriptor groups are fully recomputed. A bounded
+    recompressor competes with literal expansion on growth. The wrapper's
     unknown and shift fields remain unchanged. Unmodified streams are byte exact.
     """
     old = decode(original)
@@ -64,5 +65,51 @@ def encode_like(original, replacement):
         for _,value in group: body.extend(value)
     header = bytearray(original[:20]);struct.pack_into('>I',header,8,20+len(body))
     result = bytes(header)+body
+    if len(result) > len(original):
+        recompressed = encode_greedy(original, replacement)
+        if len(recompressed) < len(result):result = recompressed
     if decode(result) != replacement: raise ToolError('compression_verification_failed','Encoder round trip mismatch')
     return result
+
+
+def encode_greedy(original, replacement):
+    """Bounded-window H7A recompression; preserve wrapper metadata and bit order."""
+    from collections import deque
+    shift=Binary(original).u32(16)
+    max_distance=(1<<shift)-1
+    max_length=(0xffff>>shift)+3
+    positions={};body=bytearray();offset=0;bit=8;group=0
+    def key(at):return replacement[at:at+3]
+    def remember(at):
+        expired=at-max_distance-1
+        if expired >= 0:
+            old=key(expired);chain=positions.get(old)
+            if chain:
+                while chain and chain[0] <= expired:chain.popleft()
+                if not chain:positions.pop(old,None)
+        if at+3 <= len(replacement):
+            positions.setdefault(key(at),deque(maxlen=32)).append(at)
+    while offset < len(replacement):
+        if bit == 8:group=len(body);body.append(0);bit=0
+        best_length=0;best_distance=0
+        candidates=positions.get(key(offset),()) if offset+3 <= len(replacement) else ()
+        limit=min(max_length,len(replacement)-offset)
+        for previous in reversed(candidates):
+            distance=offset-previous
+            if distance > max_distance:break
+            length=3
+            while length < limit and replacement[offset+length] == replacement[offset+length-distance]:length+=1
+            if length>best_length:best_length,best_distance=length,distance
+            if length==limit:break
+        if best_length >= 3:
+            body[group] |= 1<<bit
+            body.extend(struct.pack('>H',((best_length-3)<<shift)|best_distance))
+            length=best_length
+        else:
+            body.append(replacement[offset]);length=1
+        for at in range(offset,offset+length):remember(at)
+        offset+=length;bit+=1
+    header=bytearray(original[:20])
+    struct.pack_into('>I',header,4,len(replacement))
+    struct.pack_into('>I',header,8,20+len(body))
+    return bytes(header)+body
