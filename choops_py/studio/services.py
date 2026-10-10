@@ -281,7 +281,14 @@ def inspect_scene_preview(source: Path, record_index: int, include_all=False, jo
     cdf = source.with_suffix('.cdf')
     container = Container(source, cdf if cdf.exists() else None)
     records = container.iff.records if container.iff else container.pair.records if container.pair else []
-    scenes = [r for r in records if r['type'] == 'SCNE' and (include_all or r['index'] == record_index)]
+    scene_records = [r for r in records if r['type'] == 'SCNE']
+    # Same-name records in cloth packages are alternative rest-pose/LOD
+    # sections, not separate arena/floor components to superimpose.
+    if len(scene_records)>1 and len({r['name'] for r in scene_records})==1:
+        selected_record=next((r for r in scene_records if r['index']==record_index),scene_records[0])
+        scenes=[selected_record]
+    else:
+        scenes=[r for r in scene_records if include_all or r['index']==record_index]
     if not scenes and (container.wrapper_type == 2 or container.kind == "raw-scne"):
         scenes = [{'index': 0, 'name': source.stem}]
     if not scenes:
@@ -302,6 +309,7 @@ def inspect_scene_preview(source: Path, record_index: int, include_all=False, jo
         by_index = {a.package_index: a.name for a in assets}
         result['textures'].extend(a.name for a in assets)
         for mesh in scene['meshes']:
+            mesh['uniform_surface'] = 'shorts' if 'short' in rec['name'].lower() or 'short' in source.stem.lower() else 'jersey' if 'jersey' in rec['name'].lower() or source.stem.lower().startswith('cloth') else None
             mesh['court_surface'] = rec['name'].lower() == 'floor'
             mesh['name'] = rec['name'] + '/' + mesh['name']
             for batch in mesh['batches']:
@@ -330,3 +338,28 @@ def inspect_scene_preview(source: Path, record_index: int, include_all=False, jo
             result['warnings'].append(name + ': ' + str(error))
     job.progress(len(needed), len(needed), 'Scene loaded')
     return result
+
+
+def inspect_uniform_preview(source, job=None):
+    """Render authored uniform RGB artwork; normal/number atlases stay separate."""
+    from ..texture_tools.pipeline import Container
+    source = Path(source)
+    if source.stat().st_size > 128*1024*1024:
+        raise ValueError('Interactive uniform decode limit is 128 MiB')
+    cdf=source.with_suffix('.cdf')
+    container=Container(source,cdf if cdf.exists() else None)
+    images={}
+    for role,names in (('jersey',('unifregion','unif')),('shorts',('shortregion','short'))):
+        for record_name in names:
+            candidates=[a for a in container.assets if a.name==record_name and a.texture]
+            if len(candidates)>1:raise ValueError('Uniform artwork identity is ambiguous: '+record_name)
+            if candidates:
+                if job:job.check()
+                size,raw=decode_preview_asset(candidates[0],max_size=1024)
+                # Uniform artwork alpha also carries material information. A
+                # cloth rest-pose preview uses opaque RGB, not cutout holes.
+                rgba=bytearray(raw);rgba[3::4]=b'\xff'*(len(rgba)//4)
+                images[role]=(size,bytes(rgba))
+                break
+    if not images:raise ValueError('Uniform has no supported jersey or shorts artwork')
+    return images

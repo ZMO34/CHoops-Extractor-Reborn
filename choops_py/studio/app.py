@@ -95,6 +95,9 @@ class Rows(QAbstractTableModel):
             return f"{value:08X}"
         if key == "name" and not value:
             return f"hash_{self.rows[index.row()].get('hash', 0):08x}"
+        from ..roster.schema import ENUM_CHOICES
+        if key in ENUM_CHOICES:
+            return ENUM_CHOICES[key].get(value, f'Unknown ({value})')
         if isinstance(value, (list, dict)):
             labels = {'palette_colors':'colors; use Team palette',
                       'attribute_ratings':'ratings; use Player attributes',
@@ -490,8 +493,10 @@ class Window(QMainWindow):
         def loaded(archive):
 
             self.archive = archive
+            self.scene_uniform_images = {}
             # A newly selected JB folder must not inherit another source's roster.
             self.roster = None
+            self.refresh_uniform_list()
             for view in self.roster_views.values():
                 view.setModel(None)
             self.roster_state.setText('No roster loaded; load the current JB folder roster')
@@ -917,7 +922,7 @@ class Window(QMainWindow):
 
         self.roster_views = {}
 
-        for name in ("players", "teams", "schools", "arenas", "coaches", "conferences"):
+        for name in ("players", "teams", "schools", "arenas", "coaches", "conferences", "uniforms"):
             view = table()
 
             self.roster_views[name] = view
@@ -972,6 +977,7 @@ class Window(QMainWindow):
     def display_roster(self, model):
 
         self.roster = model
+        self.refresh_uniform_list()
         if getattr(self, "scene_meshes", None):
             self.select_scene_part()
 
@@ -1058,9 +1064,10 @@ class Window(QMainWindow):
         row=rows[0];dialog=QDialog(self);dialog.resize(650,650)
         dialog.setWindowTitle('Player properties • executable-backed storage')
         layout=QVBoxLayout(dialog)
-        layout.addWidget(QLabel('Appearance values are raw enum codes; their choice labels are still being traced.'))
+        layout.addWidget(QLabel('Confirmed choices use readable labels; unresolved appearance enums retain their raw codes.'))
         view=QTreeWidget();view.setHeaderLabels(['Property','Value'])
-        for name,value in row['properties'].items():QTreeWidgetItem(view,[name,str(value)])
+        from ..roster.schema import PROPERTY_CHOICES
+        for name,value in row['properties'].items():QTreeWidgetItem(view,[name,PROPERTY_CHOICES.get(name,{}).get(value,str(value))])
         for name,value in zip(TENDENCY_NAMES,row['shot_tendencies']):QTreeWidgetItem(view,[name+' tendency',str(value)])
         layout.addWidget(view);dialog.exec()
 
@@ -1135,7 +1142,7 @@ class Window(QMainWindow):
             return self.log("Select exactly one roster row.")
 
 
-        from ..roster.schema import EDITABLE, POSITIONS, REFERENCES
+        from ..roster.schema import EDITABLE, POSITIONS, REFERENCES, ENUM_CHOICES
 
         row = rows[0]
 
@@ -1170,7 +1177,7 @@ class Window(QMainWindow):
         def changed(key):
             rgb_button.setVisible(key == 'palette_colors')
             reference = key == "roster_slots" or key in REFERENCES
-            menu = reference or key == "position_code"
+            menu = reference or key == "position_code" or key in ENUM_CHOICES
             value.setVisible(not menu)
             choices.setVisible(menu)
             needed = 31 if key == 'palette_colors' else 30 if key == 'attribute_ratings' else 4 if key=='shot_tendencies' else 16
@@ -1181,7 +1188,10 @@ class Window(QMainWindow):
                 slot.blockSignals(False)
             slot.setVisible(key in ('roster_slots','palette_colors','attribute_ratings','shot_tendencies'))
             choices.clear()
-            if key == "position_code":
+            if key in ENUM_CHOICES:
+                for code,label in ENUM_CHOICES[key].items():choices.addItem(label,code)
+                choices.setCurrentIndex(choices.findData(row[key]))
+            elif key == "position_code":
                 for code, label in POSITIONS.items():
                     choices.addItem(label, code)
                 choices.setCurrentIndex(choices.findData(row[key]))
@@ -1237,7 +1247,7 @@ class Window(QMainWindow):
 
             new = (
                 choices.currentData()
-                if key == "roster_slots" or key in REFERENCES or key == "position_code"
+                if key == "roster_slots" or key in REFERENCES or key == "position_code" or key in ENUM_CHOICES
                 else value.text()
             )
 
@@ -1332,8 +1342,68 @@ class Window(QMainWindow):
         self.model_details.setMaximumHeight(120)
         layout.addWidget(self.model_details)
         self.scene_meshes = []
+        self.scene_base_images = {}
+        self.scene_uniform_images = {}
+        self.scene_uniforms = QComboBox()
+        self.scene_uniforms.setEditable(True)
+        self.scene_uniforms.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
+        self.scene_uniforms.completer().setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
+        self.scene_uniforms.completer().setFilterMode(Qt.MatchFlag.MatchContains)
+        self.scene_uniforms.activated.connect(self.select_scene_uniform)
+        layout.addWidget(self.scene_uniforms)
+        self.buttons(layout, [('Open uniform IFF…', self.choose_scene_uniform_file)])
+        self.refresh_uniform_list()
         self.scene_palette_state = QLabel('No roster associated; embedded material textures only')
         layout.addWidget(self.scene_palette_state)
+
+    def refresh_uniform_list(self):
+        import re
+        selected_id = self.scene_uniforms.currentData()
+        self.scene_uniforms.clear()
+        self.scene_uniforms.addItem('Choose a uniform from the loaded JB folder', None)
+        teams = {}
+        if self.roster:
+            for team in self.roster.rows['teams']:
+                teams.setdefault(team['asset_id'], []).append(team['school_name'])
+        if self.archive:
+            for entry in sorted(self.archive.entries, key=lambda e:e['name'] or ''):
+                match=re.fullmatch(r'u([hax])(\d+)\.iff',entry['name'] or '',re.IGNORECASE)
+                if not match:continue
+                names=teams.get(int(match[2]),[])
+                label=(names[0]+' - ') if len(names)==1 else ''
+                label += {'h':'Home','a':'Away','x':'Alternate'}[match[1].lower()]+' - '+entry['name']
+                self.scene_uniforms.addItem(label,entry['index'])
+        self.scene_uniforms.setCurrentIndex(max(0,self.scene_uniforms.findData(selected_id)))
+
+    def choose_scene_uniform_file(self):
+        path,_=QFileDialog.getOpenFileName(self,'Select uniform IFF','','Uniform containers (*.iff);;All files (*)')
+        if path:self.load_scene_uniform(Path(path))
+
+    def select_scene_uniform(self, index=None):
+        entry_index=self.scene_uniforms.currentData()
+        if entry_index is None or not self.archive:return
+        entry=self.archive.entries[entry_index]
+        self.load_scene_uniform(None,entry)
+
+    def load_scene_uniform(self, source, entry=None):
+        if not any(m.get('uniform_surface') for m in self.scene_meshes):
+            return self.log('Preview a cloth jersey or shorts scene first.')
+        from .services import inspect_uniform_preview
+        def work(job):
+            path=materialize(self.archive,entry) if entry is not None else source
+            return inspect_uniform_preview(path,job)
+        def display(images):
+            self.scene_uniform_images={role:QImage(raw,w,h,w*4,QImage.Format.Format_RGBA8888).copy()
+                                       for role,((w,h),raw) in images.items()}
+            material_images=dict(self.scene_base_images)
+            material_images.update({'__uniform_'+role:image for role,image in self.scene_uniform_images.items()})
+            self.scene_view.set_material_images(material_images)
+            self.scene_textures.setCurrentIndex(0)
+            self.scene_view.automatic=True
+            self.scene_view.set_image(None)
+            self.select_scene_part()
+            self.log('Uniform preview loaded: '+(entry['name'] if entry is not None else source.name)+'. Authored uniform RGB is shown opaque; runtime material effects and player name/number overlays are not composited.')
+        self.run_job('Load uniform preview textures',work,display)
 
     def inspect_scene(self):
         if not self.asset_path:
@@ -1368,6 +1438,8 @@ class Window(QMainWindow):
             images = {}
             for name, ((w,h), raw) in result['images'].items():
                 images[name] = QImage(raw,w,h,w*4,QImage.Format.Format_RGBA8888).copy()
+            self.scene_base_images = images
+            self.scene_uniform_images = {}
             self.scene_view.automatic = True
             self.scene_view.set_material_images(images)
             self.select_scene_part()
@@ -1389,6 +1461,10 @@ class Window(QMainWindow):
         teams = [team for team in self.roster.rows['teams'] if match and team['asset_id'] == int(match[1])] if self.roster else []
         colors = teams[0]['palette_colors'] if len(teams) == 1 else None
         meshes = associate_palette(meshes, colors)
+        if self.scene_uniform_images:
+            meshes = [{**mesh,'batches':[{**batch,'texture':'__uniform_'+mesh['uniform_surface'], 'palette_tint':None}
+                                        for batch in mesh['batches']]}
+                      if mesh.get('uniform_surface') in self.scene_uniform_images else mesh for mesh in meshes]
         if colors is not None:
             count = sum(batch['palette_tint'] is not None for mesh in meshes for batch in mesh['batches'])
             self.scene_palette_state.setText(f"Associated roster: {self.roster.source.source_path or 'current JB folder roster'}; {teams[0]['school_name']}; {count} court color bindings. Arena shader masks are unresolved.")

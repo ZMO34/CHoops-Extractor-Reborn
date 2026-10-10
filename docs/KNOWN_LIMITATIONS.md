@@ -12,3 +12,5 @@
 - Existing output files are refused for import/export. Build --overwrite only replaces an owned generated build, transactionally.
 
 The 3D preview supports verified court material-to-roster DiffuseColor bindings with simplified lighting. Arena channel masks and jersey-number color/material routing are not yet decoded. Opening a different JB folder clears the previous roster and scene; rebuilt folders use their current archive contents.
+
+Uniform rest-pose previews can apply selected authored jersey/shorts art. The roster uniform table supports existing asset selector and known cloth-shape edits, but uniform count growth, new archive assets, complete bank/unlock routing, runtime name/number overlays and the remaining nine team palette captions are unresolved. H7A recompression can reduce edited-block growth; fixed-capacity checks still refuse content that cannot fit.

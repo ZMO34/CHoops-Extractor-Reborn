@@ -48,3 +48,5 @@ Camera exploration: click the 3D view to focus it. Left-drag orbits; right-drag 
 Roster tables display bounded summaries for palette/ratings/property lists rather than expanding them into enormous columns. Names appear first, and opening a table resets its horizontal scroll position. Both Team palette and Edit selected palette fields provide the RGB picker.
 
 Non-arena SCNE preview also supports single-block scenes with embedded relative buffers and separate vertex streams for positions and UVs. Open an extracted raw or 2kTl-wrapped `.scne`, or select a SCNE record in a cloth IFF. Cloth jerseys and shorts display their stored rest-pose meshes; skinning, cloth simulation and runtime-injected uniform textures are not reproduced. Use a texture override when appropriate. Unsupported declarations remain explicitly reported.
+
+To preview a uniform: open a cloth jersey/shorts SCNE, then choose a searchable uniform from the Models / Courts uniform list, or use Open uniform IFF for a standalone package. The selected source’s authored RGB artwork is applied to the corresponding cloth mesh. The preview does not synthesize player names/numbers or full material shading.
