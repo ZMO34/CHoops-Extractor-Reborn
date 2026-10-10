@@ -24,6 +24,7 @@ from PySide6.QtGui import QAction, QImage, QPixmap, QColor
 from PySide6.QtWidgets import (
     QApplication,
     QComboBox,
+    QColorDialog,
     QCheckBox,
     QDoubleSpinBox,
     QDialog,
@@ -166,6 +167,10 @@ def table():
     view.setSortingEnabled(True)
 
     view.setAlternatingRowColors(True)
+    view.horizontalHeader().setVisible(True)
+    view.horizontalHeader().setMinimumHeight(28)
+    view.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+    view.setVerticalScrollMode(QTableView.ScrollMode.ScrollPerPixel)
 
     return view
 
@@ -910,7 +915,9 @@ class Window(QMainWindow):
 
             self.roster_tabs.addTab(view, "Edit Schools" if name=="schools" else name.title())
 
-        layout.addWidget(self.roster_tabs)
+        # Keep category tabs outside the row-scrolling viewports.
+        self.roster_tabs.tabBar().setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        layout.addWidget(self.roster_tabs, 1)
 
         self.roster_state = QLabel("No roster loaded")
 
@@ -1008,15 +1015,26 @@ class Window(QMainWindow):
             if not items:
                 return
             slot = int(items[0].text(0))
-            value, ok = QInputDialog.getText(dialog, 'Edit palette RGBA', '#RRGGBBAA (eight hex digits)', text=items[0].text(1))
-            if ok:
+            rgba = bytes.fromhex(items[0].text(1)[1:])
+            picker = QColorDialog(QColor(*rgba), dialog)
+            picker.setWindowTitle(f"Palette slot {slot} • {items[0].text(3)}")
+            picker.setOptions(QColorDialog.ColorDialogOption.DontUseNativeDialog |
+                              QColorDialog.ColorDialogOption.ShowAlphaChannel)
+            for control in picker.findChildren(QPushButton):
+                if "screen" in control.text().casefold():
+                    control.hide()
+            if picker.exec() == QDialog.DialogCode.Accepted:
+                color = picker.currentColor()
+                value = f'#{color.red():02X}{color.green():02X}{color.blue():02X}{color.alpha():02X}'
+
                 try:
                     self.roster.edit('teams',team_index,'palette_colors',value,slot)
                     refresh()
                     self.display_roster(self.roster)
                 except ValueError as error:
                     QMessageBox.warning(dialog,'Palette edit blocked',str(error))
-        button = QPushButton('Edit selected color…');button.clicked.connect(edit);layout.addWidget(button)
+        button = QPushButton('Pick selected color…');button.clicked.connect(edit);layout.addWidget(button)
+        view.itemDoubleClicked.connect(lambda *_: edit())
         refresh();dialog.exec()
 
     def show_player_properties(self):

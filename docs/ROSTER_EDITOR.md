@@ -38,3 +38,5 @@ Confirmed control captions in order: Key Circle Outer, Center Line, Outer Line, 
 Court preview uses a unique matching asset ID in the explicitly loaded roster, including unsaved edits. Verified RGB values are converted from sRGB to linear color; the runtime gray sentinel (RGB 190/190/190) leaves the authored preview unchanged. This reproduces the color binding with simplified preview lighting, not the full game shader.
 
 Jersey number is the byte at player row +0x1B (name-anchor +0x0B), corroborated by its localized UI increment callback. The adjacent byte at +0x1A contains flags in some records and is preserved by number edits. Jersey-number material/color shader routing remains unresolved.
+
+In Team palette, select a swatch and choose Pick selected color (or double-click it). The picker provides numeric RGB inputs, visual color selection, and an alpha control initialized from the existing value. Accept applies an undoable edit; Cancel leaves the roster unchanged. Hex RGBA remains visible in the palette table.
