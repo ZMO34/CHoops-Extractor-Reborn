@@ -138,7 +138,9 @@ class SceneView(QOpenGLWidget):
             if image is None:
                 image = QImage(1, 1, QImage.Format.Format_RGBA8888)
                 image.fill(Qt.GlobalColor.lightGray)
-            self.texture = QOpenGLTexture(image.mirrored(False, True))
+            # SCNE UVs address the decoded image rows directly; flipping the
+            # upload reverses signs, logos and any explicit texture override.
+            self.texture = QOpenGLTexture(image)
             self.texture.setWrapMode(QOpenGLTexture.WrapMode.Repeat)
             self.texture.setMinificationFilter(QOpenGLTexture.Filter.Linear)
             self.texture.setMagnificationFilter(QOpenGLTexture.Filter.Linear)
@@ -146,7 +148,7 @@ class SceneView(QOpenGLWidget):
                 texture.destroy()
             self.gl_textures = {}
             for name, material_image in self.material_images.items():
-                texture = QOpenGLTexture(material_image.mirrored(False, True))
+                texture = QOpenGLTexture(material_image)
                 texture.setWrapMode(QOpenGLTexture.WrapMode.Repeat)
                 texture.setMinificationFilter(QOpenGLTexture.Filter.Linear)
                 self.gl_textures[name] = texture
