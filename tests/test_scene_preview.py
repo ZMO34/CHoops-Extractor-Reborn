@@ -107,19 +107,28 @@ def test_non_power_of_two_compressed_texture_preview():
 
 
 @pytest.mark.gui
-def test_floor_lift_is_preview_only_and_toggleable(qtbot, monkeypatch):
-    from choops_py.studio.app import Window
-    window = Window();qtbot.addWidget(window)
+def test_court_layers_preserve_geometry_and_do_not_bias_arena(qtbot):
+    from choops_py.studio.scene_view import SceneView
+    view = SceneView();qtbot.addWidget(view)
     original = [(0.,0.,0.,0.,0.)]*3
-    window.scene_meshes = [{'name':'floor/court','vertices':original}, {'name':'arena/bottom','vertices':original}]
-    window.scene_parts.addItem('All',-1)
-    displayed=[]
-    monkeypatch.setattr(window.scene_view,'set_meshes',lambda meshes:displayed.append(meshes))
-    window.select_scene_part()
-    assert displayed[-1][0]['vertices'][0][1] == 10.
-    window.scene_lift_amount.setValue(20.)
-    assert displayed[-1][0]['vertices'][0][1] == 20.
-    assert displayed[-1][1]['vertices'][0][1] == 0.
-    assert window.scene_meshes[0]['vertices'] == original
-    window.scene_lift.setChecked(False)
-    assert displayed[-1][0]['vertices'][0][1] == 0.
+    meshes = [{'name':'floor/'+name, 'court_surface':True, 'vertices':original}
+              for name in ('floor','paint','|centerlogo','lines')]
+    meshes.append({'name':'arena/floor','vertices':original})
+    view.set_meshes(meshes)
+    assert [b['court_layer'] for b in view.batches] == [1,2,3,4,0]
+    assert view.vertices == original*5
+
+
+@pytest.mark.gui
+def test_camera_keyboard_travels_in_view_direction(qtbot):
+    from PySide6.QtCore import Qt
+    from PySide6.QtGui import QVector3D
+    from choops_py.studio.scene_view import SceneView
+    view = SceneView();qtbot.addWidget(view)
+    view.yaw = 0.;view.pitch = 0.;view.radius = 100.
+    qtbot.keyClick(view, Qt.Key.Key_W)
+    assert view.center == QVector3D(0,0,-2.5)
+    qtbot.keyClick(view, Qt.Key.Key_D, modifier=Qt.KeyboardModifier.ShiftModifier)
+    assert view.center == QVector3D(10,0,-2.5)
+    qtbot.keyClick(view, Qt.Key.Key_E)
+    assert view.center == QVector3D(10,2.5,-2.5)

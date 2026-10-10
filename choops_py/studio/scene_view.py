@@ -25,6 +25,8 @@ class SceneView(QOpenGLWidget):
         self.yaw, self.pitch, self.distance = 35., 25., 3.
         self.center = QVector3D()
         self.radius = 1.
+        self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+        self.movement_speed = 1.
         self.last = None
         self.program = None
         self.texture = None
@@ -36,7 +38,8 @@ class SceneView(QOpenGLWidget):
         for mesh in meshes:
             start = len(self.vertices)
             self.vertices.extend(mesh['vertices'])
-            self.batches.extend({**b, 'first':b['first']+start} for b in mesh.get('batches', [{'first':0,'count':len(mesh['vertices']), 'texture':None}]))
+            layer = {'floor':1, 'paint':2, '|centerlogo':3, 'centerlogo':3, 'lines':4}.get(mesh['name'].split('/')[-1].lower(), 2) if mesh.get('court_surface') else 0
+            self.batches.extend({**b, 'court_layer':layer, 'first':b['first']+start} for b in mesh.get('batches', [{'first':0,'count':len(mesh['vertices']), 'texture':None}]))
         self.fit_camera()
         self.dirty = True
         self.update()
@@ -155,7 +158,11 @@ class SceneView(QOpenGLWidget):
         view = QMatrix4x4()
         view.lookAt(self.center + direction * (self.radius*self.distance), self.center, QVector3D(0,1,0))
         projection = QMatrix4x4()
-        projection.perspective(45., max(self.width(),1)/max(self.height(),1), self.radius*.001, self.radius*100.)
+        # Tight clipping planes retain depth precision for the court's coplanar layers.
+        eye_distance = self.radius*self.distance
+        near = max(self.radius*.0005 if self.distance < 1.5 else self.radius*.02, eye_distance-self.radius*1.5)
+        far = eye_distance+self.radius*1.5
+        projection.perspective(45., max(self.width(),1)/max(self.height(),1), near, far)
         self.program.bind()
         self.program.setUniformValue('mvp', projection * view)
         self.program.setUniformValue('diffuse', 0)
@@ -165,6 +172,14 @@ class SceneView(QOpenGLWidget):
             self.program.enableAttributeArray(name)
             self.program.setAttributeBuffer(name, 0x1406, offset, size, 32)
         for batch in self.batches:
+            if batch.get('omit_preview'):
+                continue
+            layer = batch.get('court_layer', 0)
+            if layer:
+                gl.glEnable(0x8037)  # GL_POLYGON_OFFSET_FILL
+                gl.glPolygonOffset(-float(layer), -8.*layer)
+            else:
+                gl.glDisable(0x8037)
             texture = self.gl_textures.get(batch.get('texture'), self.texture) if self.automatic else self.texture
             texture.bind(0)
             tint = batch.get('palette_tint') if self.automatic else None
@@ -172,21 +187,55 @@ class SceneView(QOpenGLWidget):
             self.program.setUniformValue('paletteTint', QVector4D(*(tint or (1.,1.,1.,1.))))
             gl.glDrawArrays(0x0004, batch['first'], batch['count'])
             texture.release()
+        gl.glDisable(0x8037)
         self.buffer.release()
         self.texture.release()
         self.program.release()
 
+    def camera_basis(self):
+        angle, elevation = math.radians(self.yaw), math.radians(self.pitch)
+        direction = QVector3D(math.cos(elevation)*math.sin(angle), math.sin(elevation), math.cos(elevation)*math.cos(angle))
+        right = QVector3D.crossProduct(QVector3D(0,1,0), direction).normalized()
+        up = QVector3D.crossProduct(direction, right).normalized()
+        return direction, right, up
+
     def mousePressEvent(self, event):
+        self.setFocus()
         self.last = event.position()
 
     def mouseMoveEvent(self, event):
-        if self.last is not None and event.buttons() & Qt.MouseButton.LeftButton:
+        if self.last is not None:
             delta = event.position() - self.last
-            self.yaw += delta.x()*.5
-            self.pitch = max(-89., min(89., self.pitch + delta.y()*.5))
+            direction, right, up = self.camera_basis()
+            buttons = event.buttons()
+            if buttons & Qt.MouseButton.MiddleButton or (buttons & Qt.MouseButton.LeftButton and event.modifiers() & Qt.KeyboardModifier.ShiftModifier):
+                scale = self.radius*self.distance*2*math.tan(math.radians(22.5))/max(self.height(),1)
+                self.center += (-right*delta.x()+up*delta.y())*scale
+            elif buttons & (Qt.MouseButton.LeftButton | Qt.MouseButton.RightButton):
+                eye = self.center+direction*(self.radius*self.distance)
+                self.yaw += delta.x()*.3
+                self.pitch = max(-89., min(89., self.pitch + delta.y()*.3))
+                if buttons & Qt.MouseButton.RightButton:
+                    new_direction, _, _ = self.camera_basis()
+                    self.center = eye-new_direction*(self.radius*self.distance)
             self.update()
         self.last = event.position()
 
+    def keyPressEvent(self, event):
+        direction, right, _ = self.camera_basis()
+        vectors = {Qt.Key.Key_W:-direction, Qt.Key.Key_S:direction,
+                   Qt.Key.Key_A:-right, Qt.Key.Key_D:right,
+                   Qt.Key.Key_Q:QVector3D(0,-1,0), Qt.Key.Key_E:QVector3D(0,1,0)}
+        if event.key() == Qt.Key.Key_F:
+            self.fit_camera();event.accept();return
+        if event.key() not in vectors:
+            return super().keyPressEvent(event)
+        speed = self.radius*.025*self.movement_speed
+        if event.modifiers() & Qt.KeyboardModifier.ShiftModifier:speed *= 4
+        if event.modifiers() & Qt.KeyboardModifier.ControlModifier:speed *= .2
+        self.center += vectors[event.key()]*speed
+        self.update();event.accept()
+
     def wheelEvent(self, event):
-        self.distance = max(1.05, min(40., self.distance * math.exp(-event.angleDelta().y()/1200)))
+        self.distance = max(.01, min(100., self.distance * math.exp(-event.angleDelta().y()/1200)))
         self.update()

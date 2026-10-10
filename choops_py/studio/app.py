@@ -25,8 +25,8 @@ from PySide6.QtWidgets import (
     QApplication,
     QComboBox,
     QColorDialog,
-    QCheckBox,
     QDoubleSpinBox,
+    QCheckBox,
     QDialog,
     QDialogButtonBox,
     QDockWidget,
@@ -95,6 +95,12 @@ class Rows(QAbstractTableModel):
             return f"{value:08X}"
         if key == "name" and not value:
             return f"hash_{self.rows[index.row()].get('hash', 0):08x}"
+        if isinstance(value, (list, dict)):
+            labels = {'palette_colors':'colors; use Team palette',
+                      'attribute_ratings':'ratings; use Player attributes',
+                      'properties':'properties; use Player properties',
+                      'roster_slots':'player slots; use Edit selected'}
+            return f"{len(value)} {labels.get(key, 'entries')}"
         return str(value if value is not None else "")
 
     def headerData(self, section, orientation, role=Qt.ItemDataRole.DisplayRole):
@@ -191,6 +197,9 @@ def set_rows(view, rows, columns, query=""):
     view.setModel(proxy)
 
     view.resizeColumnsToContents()
+    for column in range(len(columns)):
+        view.setColumnWidth(column, min(240, max(80, view.columnWidth(column))))
+    view.horizontalScrollBar().setValue(0)
 
     return proxy
 
@@ -979,11 +988,25 @@ class Window(QMainWindow):
                 else []
             )
 
+            identity = 'display_name' if name=='players' else 'school_name' if name in ('teams','schools') else 'arena_name' if name=='arenas' else 'coach_name' if name=='coaches' else 'conference_name'
+            columns.sort(key=lambda col: (0 if col[0]==identity else 1 if col[0]=='index' else 2))
             set_rows(view, rows, columns, self.roster_search.text())
 
         self.roster_state.setText(
             f"{len(model.rows['players']):,} players • {len(model.edits)} unsaved edits"
         )
+
+    def pick_rgba(self, value, parent):
+        rgba = bytes.fromhex(value.removeprefix('#'))
+        picker = QColorDialog(QColor(*rgba), parent)
+        picker.setWindowTitle('Choose palette RGB color')
+        picker.setOptions(QColorDialog.ColorDialogOption.DontUseNativeDialog |
+                          QColorDialog.ColorDialogOption.ShowAlphaChannel)
+        for control in picker.findChildren(QPushButton):
+            if 'screen' in control.text().casefold():control.hide()
+        if picker.exec() != QDialog.DialogCode.Accepted:return None
+        color = picker.currentColor()
+        return f'#{color.red():02X}{color.green():02X}{color.blue():02X}{color.alpha():02X}'
 
     def show_team_palette(self, team_index=None):
         if not self.roster:
@@ -1015,18 +1038,8 @@ class Window(QMainWindow):
             if not items:
                 return
             slot = int(items[0].text(0))
-            rgba = bytes.fromhex(items[0].text(1)[1:])
-            picker = QColorDialog(QColor(*rgba), dialog)
-            picker.setWindowTitle(f"Palette slot {slot} • {items[0].text(3)}")
-            picker.setOptions(QColorDialog.ColorDialogOption.DontUseNativeDialog |
-                              QColorDialog.ColorDialogOption.ShowAlphaChannel)
-            for control in picker.findChildren(QPushButton):
-                if "screen" in control.text().casefold():
-                    control.hide()
-            if picker.exec() == QDialog.DialogCode.Accepted:
-                color = picker.currentColor()
-                value = f'#{color.red():02X}{color.green():02X}{color.blue():02X}{color.alpha():02X}'
-
+            value = self.pick_rgba(items[0].text(1), dialog)
+            if value is not None:
                 try:
                     self.roster.edit('teams',team_index,'palette_colors',value,slot)
                     refresh()
@@ -1148,7 +1161,14 @@ class Window(QMainWindow):
 
         choices.setEditable(False)
 
+        rgb_button = QPushButton('Choose RGB color…')
+        def pick_color():
+            chosen = self.pick_rgba(value.text(), dialog)
+            if chosen is not None:value.setText(chosen)
+        rgb_button.clicked.connect(pick_color)
+
         def changed(key):
+            rgb_button.setVisible(key == 'palette_colors')
             reference = key == "roster_slots" or key in REFERENCES
             menu = reference or key == "position_code"
             value.setVisible(not menu)
@@ -1192,6 +1212,7 @@ class Window(QMainWindow):
         form.addRow("Field (see palette dialog for verified captions)", field)
 
         form.addRow("Value", value)
+        form.addRow(rgb_button)
 
         form.addRow("Reference", choices)
 
@@ -1280,7 +1301,7 @@ class Window(QMainWindow):
     def create_models(self):
         layout = self.page(
             "Models / Courts • 3D preview",
-            "Select a SCNE record in Explorer, then Preview scene. Drag to orbit; wheel to zoom. Material textures load automatically. Use cutaway to see inside; game shader effects are not reproduced.",
+            "Select a SCNE record in Explorer, then Preview scene. Left-drag: orbit; right-drag: look around; middle-drag or Shift-drag: pan. WASD: move; Q/E: down/up; Shift: faster; Ctrl: slower; wheel: zoom; F: fit. Material textures load automatically. Use cutaway to see inside; game shader effects are not reproduced.",
         )
         self.buttons(layout, [("Preview selected SCNE", self.inspect_scene)])
         self.scene_complete = QCheckBox("Include all SCNE sections (arena and court)")
@@ -1290,16 +1311,6 @@ class Window(QMainWindow):
         self.scene_cutaway.setChecked(True)
         self.scene_cutaway.toggled.connect(self.select_scene_part)
         layout.addWidget(self.scene_cutaway)
-        self.scene_lift = QCheckBox("Lift court in preview")
-        self.scene_lift.setChecked(True)
-        self.scene_lift.toggled.connect(self.select_scene_part)
-        layout.addWidget(self.scene_lift)
-        self.scene_lift_amount = QDoubleSpinBox()
-        self.scene_lift_amount.setRange(0., 100.)
-        self.scene_lift_amount.setValue(10.)
-        self.scene_lift_amount.setSuffix(" scene units")
-        self.scene_lift_amount.valueChanged.connect(self.select_scene_part)
-        layout.addWidget(self.scene_lift_amount)
         self.scene_parts = QComboBox()
         self.scene_parts.activated.connect(self.select_scene_part)
         layout.addWidget(self.scene_parts)
@@ -1309,6 +1320,12 @@ class Window(QMainWindow):
         from .scene_view import SceneView
         self.scene_view = SceneView()
         layout.addWidget(self.scene_view, 1)
+        camera_speed = QDoubleSpinBox()
+        camera_speed.setRange(.05, 10.)
+        camera_speed.setValue(1.)
+        camera_speed.setPrefix('Camera movement speed: ')
+        camera_speed.valueChanged.connect(lambda value: setattr(self.scene_view, 'movement_speed', value))
+        layout.addWidget(camera_speed)
         self.buttons(layout, [("Fit camera", self.scene_view.fit_camera), ("Linked roster palette…", self.scene_team_palette)])
         self.model_details = QPlainTextEdit()
         self.model_details.setReadOnly(True)
@@ -1366,9 +1383,6 @@ class Window(QMainWindow):
         meshes = self.scene_meshes if part == -1 else [self.scene_meshes[part]] if part is not None else []
         if part == -1 and self.scene_cutaway.isChecked():
             meshes = [m for m in meshes if not m.get('hidden_by_default')]
-        if self.scene_lift.isChecked():
-            meshes = [{**mesh, 'vertices': [(v[0], v[1]+self.scene_lift_amount.value(), *v[2:]) for v in mesh['vertices']]}
-                      if mesh['name'].split('/')[0].lower() == 'floor' else mesh for mesh in meshes]
         from ..formats.scene_palette import associate_palette
         import re
         match = re.fullmatch(r's(\d+)', self.scene_source.stem, re.IGNORECASE) if hasattr(self, 'scene_source') else None

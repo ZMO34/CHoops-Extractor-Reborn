@@ -300,9 +300,15 @@ def inspect_scene_preview(source: Path, record_index: int, include_all=False, jo
         by_index = {a.package_index: a.name for a in assets}
         result['textures'].extend(a.name for a in assets)
         for mesh in scene['meshes']:
+            mesh['court_surface'] = rec['name'].lower() == 'floor'
             mesh['name'] = rec['name'] + '/' + mesh['name']
             for batch in mesh['batches']:
                 batch['texture'] = by_index.get(batch['texture_index'])
+                # This runtime-injected court pass repeats the wood geometry;
+                # a neutral diffuse fallback would cover every court decal.
+                if mesh['court_surface'] and batch.get('material_hash') == 0xe16ecb73 and batch['texture'] is None:
+                    batch['omit_preview'] = True
+                    scene['warnings'].append('Court runtime-only material 0xe16ecb73 omitted from color preview')
         result['meshes'].extend(scene['meshes'])
         result['warnings'].extend(scene['warnings'])
     needed = {batch['texture'] for mesh in result['meshes'] for batch in mesh['batches'] if batch['texture']}
