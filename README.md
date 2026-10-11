@@ -15,7 +15,7 @@ Open the original JB/USRDIR in Explorer, double-click an asset, inspect/preview 
 
 Local verification exercised read-only real inputs and separate generated outputs; environment-specific measurements are excluded from public documentation. Unknown formats stay read-only/unavailable, and runtime testing is NOT RUN.
 
-The existing converter executables work locally, but their public redistribution grant has not been established. Packaging excludes them until resolved; [provenance](docs/rebuild/CONVERTER_PROVENANCE.md). The local prototype is a development build, not a released beta.
+DDS import, export and texture previews use built-in conversion; separate converter executables are unnecessary. Historical converters are used only for optional local comparisons and are excluded from Windows packages; [provenance](docs/rebuild/CONVERTER_PROVENANCE.md).
 
 See [user guide](docs/USER_GUIDE.md), [development](docs/DEVELOPER_GUIDE.md), [format evidence](docs/FORMAT_SPECIFICATIONS.md), [performance](docs/PERFORMANCE.md), [architecture](docs/rebuild/ARCHITECTURE.md) and [acceptance gates](docs/rebuild/ACCEPTANCE_TESTS.md). Historical tags/docs remain preserved and must not be read as current proof.
 

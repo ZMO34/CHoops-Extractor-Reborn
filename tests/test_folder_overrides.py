@@ -247,3 +247,78 @@ def test_bad_dds_never_falls_back_to_raw_txtr(tmp_path):
     with pytest.raises(ValueError):stage_folder(source,folder,mod)
     assert not mod.exists()
     archive=Archive(source);assert archive.read(archive.entries[0]).startswith(payload)
+
+
+def scene_fixture():
+    head=bytearray(0x54)+bytearray(txtr_header())
+    struct.pack_into('>II',head,0x20,1,0x54-0x24+1)
+    return [bytes(head),b'oldimageGEOMETRY']
+
+
+def test_old_numeric_txtr_folder_uses_local_record_index(tmp_path):
+    payload=named_iff([txtr_header(),b'oldimage'],[(0x5c369069,[0,0])],[('unif','TXTR')])
+    source=game_fixture(tmp_path/'game',payload);folder=tmp_path/'ua000'/'_0.txtr';folder.mkdir(parents=True)
+    (folder/'0.dds').write_bytes(dds.compressed_preview(8,8,'DXT5',bytes(range(64))))
+    arc=Archive(source);plan=discover(arc,folder.parent)
+    assert list(plan['groups'][0]['dds'])==['unif']
+    result,_=compile_group(arc,plan['groups'][0]);iff=StandardIFF(result)
+    assert TXTR([x[3] for x in record_blocks(iff,iff.records[0])]).image()==bytes(range(64))
+
+
+def test_uniquely_misfiled_scene_routes_to_correct_archive(tmp_path):
+    from choops_py.archive.hash_names import hash_name
+    proper=named_iff(scene_fixture(),[(0xe26c9b5d,[0,0])],[('tile_background','SCNE')])
+    other=named_iff([b'layout'],[(0x86a1ac9e,[0])],[('loading','LAYT')])
+    source=game_fixture(tmp_path/'game',proper);bank=source/'PS3_GAME'/'USRDIR'/'0A'
+    data=bytearray(6144);struct.pack_into('>6I',data,0,0xaa00b3bf,2048,1,0,2,0)
+    struct.pack_into('>II8s',data,24,3,0,'0A\0\0'.encode('utf-16-be'))
+    struct.pack_into('>4I',data,40,hash_name('ua000.iff'),1,0,len(proper));struct.pack_into('>4I',data,56,hash_name('loading.iff'),2,0,len(other))
+    data[2048:2048+len(proper)]=proper;data[4096:4096+len(other)]=other;bank.write_bytes(data)
+    folder=tmp_path/'loading'/'_tile_background.scne';folder.mkdir(parents=True)
+    (folder/'030.dds').write_bytes(dds.compressed_preview(8,8,'DXT5',bytes(range(64))))
+    arc=Archive(source);plan=discover(arc,folder.parent)
+    assert plan['groups'][0]['name']=='ua000.iff'
+    result,imports=compile_group(arc,plan['groups'][0]);iff=StandardIFF(result)
+    assert imports[0]['selector']=='tile_background/texture_0'
+    from choops_py.formats.package import textures
+    item=textures([x[3] for x in record_blocks(iff,iff.records[0])])[0]
+    assert TXTR([item.header,item.payload]).image()==bytes(range(64))
+
+
+def test_absent_scene_slots_are_reported_while_valid_artwork_imports(tmp_path):
+    payload=named_iff(scene_fixture(),[(0xe26c9b5d,[0,0])],[('floor','SCNE')])
+    source=game_fixture(tmp_path/'game',payload);folder=tmp_path/'ua000'/'_floor.scne';folder.mkdir(parents=True)
+    image=bytes(range(64))
+    for name in ('texture_0.dds','texture_10.dds'):(folder/name).write_bytes(dds.compressed_preview(8,8,'DXT5',image))
+    mod=OUTPUT/'builds'/('missing_slot_'+uuid.uuid4().hex)
+    report=stage_folder(source,folder.parent,mod)
+    assert report['staged']==1
+    assert report['unapplied_overrides'][0]['selector']=='floor/texture_10'
+    assert 'matching replacement SCNE' in report['unapplied_overrides'][0]['reason']
+    from choops_py.archive.build_copy import build
+    plan=build(source,mod,OUTPUT/'builds'/('missing_slot_build_'+uuid.uuid4().hex),dry_run=True)
+    assert plan['import_summary']['applied_dds']==1 and plan['import_summary']['unapplied_count']==1
+
+
+def test_windows_copy_suffix_does_not_create_a_second_scene_texture(tmp_path):
+    payload=named_iff(scene_fixture(),[(0xe26c9b5d,[0,0])],[('floor','SCNE')])
+    source=game_fixture(tmp_path/'game',payload);folder=tmp_path/'ua000'/'_floor.scne';folder.mkdir(parents=True)
+    chosen=bytes(range(64))
+    (folder/'texture_0.dds').write_bytes(dds.compressed_preview(8,8,'DXT5',chosen))
+    (folder/'texture_0(1).dds').write_bytes(dds.compressed_preview(8,8,'DXT5',b'Z'*64))
+    arc=Archive(source);plan=discover(arc,folder.parent)
+    assert list(plan['groups'][0]['dds'])==['floor/texture_0']
+    assert plan['shadowed_dds'][0].endswith('texture_0(1).dds')
+    result,_=compile_group(arc,plan['groups'][0]);iff=StandardIFF(result)
+    from choops_py.formats.package import textures
+    item=textures([x[3] for x in record_blocks(iff,iff.records[0])])[0]
+    assert TXTR([item.header,item.payload]).image()==chosen
+
+
+def test_internal_record_index_cannot_collide_with_another_numeric_name():
+    payload=named_iff([txtr_header()*2,b'AAAAAAAA'+b'BBBBBBBB'],[(0x5c369069,[0,0]),(0x5c369069,[176,8])],[('1','TXTR'),('unif','TXTR')])
+    iff=StandardIFF(payload)
+    result=replace_records_expanding(iff,{1:[txtr_header(),b'newimage']})
+    check=StandardIFF(result)
+    assert record_blocks(check,check.records[0])[1][3].startswith(b'AAAAAAAA')
+    assert record_blocks(check,check.records[1])[1][3].startswith(b'newimage')

@@ -1809,7 +1809,7 @@ class Window(QMainWindow):
 
         layout = self.page(
             "Diagnostics",
-            "Converter execution checks and synthetic round trips use generated files. Execution success does not establish redistribution rights or console compatibility.",
+            "Check built-in DDS import/export using generated textures. Game files remain unchanged.",
         )
 
         from ..texture_tools.external_converters import status, test_tools
@@ -1818,13 +1818,13 @@ class Window(QMainWindow):
             layout,
             [
                 (
-                    "Converter status",
-                    lambda: self.run_job("Check converters", lambda job: status()),
+                    "Texture conversion status",
+                    lambda: self.run_job("Check built-in texture conversion", lambda job: status()),
                 ),
                 (
-                    "Test converters",
+                    "Test texture conversion",
                     lambda: self.run_job(
-                        "Run generated converter round trip", lambda job: test_tools()
+                        "Run built-in texture round trip", lambda job: test_tools()
                     ),
                 ),
             ],

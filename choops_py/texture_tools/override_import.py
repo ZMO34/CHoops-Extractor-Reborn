@@ -33,13 +33,10 @@ def apply_dds(parts,kind,selector,source,job=None,converter=None):
             if info[key]!=meta[key]:raise ValueError('DDS converter changed '+key)
         # A converter may select linear storage for a texture that cannot be
         # swizzled. Its returned descriptor describes the actual pixel layout.
-        if len(image)!=info['image_size'] and info['linear'] and info['format']=='L8':
-            packed=bytearray();position=0;width=info['width'];height=info['height'];pitch=info['pitch']
-            for _ in range(info['mip_count']):
-                for row in range(height):packed+=Binary(image).slice(position+row*pitch,width)
-                position+=height*pitch;width=max(1,width//2);height=max(1,height//2)
-            if position!=len(image) or bytes(packed)!=bytes(normalized[128:]):raise ValueError('Unvalidated linear L8 row padding')
-            image=bytes(packed)
+        if len(image)!=info['image_size'] and info['linear'] and info['format'] in ('L8','ARGB8','RGBA16F'):
+            from .builtin_converter import compact_linear,to_dds
+            if to_dds(converted.read_bytes())[128:]!=normalized[128:]:raise ValueError('Unvalidated linear texture padding')
+            image=compact_linear(descriptor,image)
         if len(image)!=info['image_size']:
             # GTF aligns the final storage extent, while TXTR uses exact image
             # bytes. Strip only identified zero padding, preserving all mips.

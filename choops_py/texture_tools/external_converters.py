@@ -1,4 +1,4 @@
-"""Bundled converter discovery, readiness checks, execution and reporting."""
+"""Built-in conversion, with optional explicit external reference-tool checks."""
 import hashlib
 import json
 import shutil
@@ -43,10 +43,11 @@ def status(check=True):
     result={}
     for name in TOOLS:
         bundled=ROOT/'tools'/(name+'.exe');path=find(name)
-        health=executable_check(path) if check and path else {'ready':False,'reason':'converter_missing' if check else 'not_checked'}
-        result[name]={'bundled_found':bundled.is_file(),'bundled_path':str(bundled),'selected_path':str(path) if path else None,**health}
+        result[name]={'backend':'builtin-python','ready':True,'reason':'built_in','bundled_found':bundled.is_file(),'bundled_path':str(bundled),'selected_path':'builtin-python','external_available':path is not None,'external_path':str(path) if path else None}
     result['export_dds_ready']=result['gtf2dds']['ready']
     result['import_dds_ready']=result['dds2gtf']['ready']
+    from ..formats.native_codec import library
+    result['archive_codec']={'backend':'native-in-process' if library() is not None else 'python','ready':True}
     previous=OUTPUT/'reports'/'texture_tools_test.json'
     result['test_conversion_result']=json.loads(previous.read_text(encoding='utf-8')).get('status') if previous.exists() else 'not_run'
     return result
@@ -61,18 +62,24 @@ def configure(gtf2dds=None,dds2gtf=None):
     save_json(CONFIG,config);return status()
 
 def setup():
-    # Installation is the one intentional write to the tracked tools directory.
-    from ..archive.manifests import digest
-    sources=[ROOT.parent/'UNFINISHEDBPHIT CHoops-Extractor-master'/'2k-tools'/'lib', ROOT.parent/'CHoops-Extractor-Reborn-master'/'2k-tools'/'lib', ROOT.parent/'CHoops-Extractor-Reborn-master'/'CHoops-Extractor-Reborn-master'/'2k-tools'/'lib']
-    (ROOT/'tools').mkdir(exist_ok=True)
-    for name in TOOLS:
-        dest=ROOT/'tools'/(name+'.exe');found=next((p/(name+'.exe') for p in sources if (p/(name+'.exe')).is_file()),None)
-        if not found:raise ToolError('converter_missing',f'No old-source copy of {name}.exe found')
-        if dest.exists() and digest(dest.read_bytes())!=digest(found.read_bytes()):raise ToolError('converter_conflict',f'Refusing to overwrite a different bundled {name}')
-        if not dest.exists():shutil.copyfile(found,dest)
+    # Conversion is included in the application; installation is unnecessary.
     return status()
 
 def convert(name,input_path,output_path,override=None,swizzle=False):
+    if name not in TOOLS:raise ToolError('unknown_converter',name)
+    if override:return _convert_external(name,input_path,output_path,override,swizzle)
+    from .builtin_converter import to_gtf,to_dds
+    output_path=safe_output(output_path,[input_path])
+    if output_path.exists():raise ToolError('output_exists',str(output_path))
+    source=Path(input_path).read_bytes()
+    converted=to_gtf(source,swizzle) if name=='dds2gtf' else to_dds(source)
+    write_bytes(output_path,converted,[input_path])
+    result={'backend':'builtin-python','status':'success','returncode':0,'stdout':'','stderr':'','input':str(input_path),'output':str(output_path)}
+    save_json(output_path.with_suffix(output_path.suffix+'.conversion.json'),result,[input_path])
+    return result
+
+
+def _convert_external(name,input_path,output_path,override=None,swizzle=False):
     exe=find(name,override)
     if not exe:raise ToolError('converter_missing',f'DDS editing requires bundled tools/{name}.exe')
     output_path=safe_output(output_path,[input_path]);output_path.parent.mkdir(parents=True,exist_ok=True)

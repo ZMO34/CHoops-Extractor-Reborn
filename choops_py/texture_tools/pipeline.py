@@ -125,7 +125,6 @@ def export(source,output,cdf=None,want_dds=True,converter=None,strict=False,scop
             gtf_path=out/(name+'.gtf');write_bytes(gtf_path,asset.texture.gtf(),sources);entry['gtf_output_path']=str(gtf_path)
             entry['import_eligibility']={'eligible':True,'reason':'same_format_dimensions_mips_only; compressed growth must fit original extent'}
             if want_dds:
-                if not converters.find('gtf2dds',converter):raise ToolError('converter_missing','DDS export requires bundled tools/gtf2dds.exe')
                 dds_path=out/(name+'.dds')
                 try:
                     converters.convert('gtf2dds',gtf_path,dds_path,converter)
@@ -157,7 +156,6 @@ def validate_layout(original,replacement):
         if original[key]!=replacement[key]:raise ToolError('texture_'+key+'_mismatch',f"Original {key}={original[key]}, replacement {replacement[key]}")
 
 def imported_image(asset,dds_file,converter=None):
-    if not converters.find('dds2gtf',converter):raise ToolError('converter_missing','DDS import requires bundled tools/dds2gtf.exe')
     original=asset.texture.info();data=Path(dds_file).read_bytes();meta=dds.inspect(data);validate_layout(original,meta)
     temp=OUTPUT/'temp';temp.mkdir(parents=True,exist_ok=True)
     work=temp/('dds_import_'+uuid.uuid4().hex);work.mkdir();result=converters.convert('dds2gtf',dds_file,work/'converted.gtf',converter,swizzle=not original['linear'])

@@ -34,11 +34,34 @@ def decode(raw, expected=None):
         return raw
     declared = Binary(raw).u32(4)
     if expected is not None and declared != expected: raise ToolError('block_size_mismatch','Wrapper/table logical sizes differ')
-    out = bytearray()
-    for offset, length, distance, literal in tokens(raw):
-        if distance:
-            for _ in range(length): out.append(out[-distance])
-        else: out.append(literal)
+    # Bulk literal runs and backreference slices avoid one generator/Binary
+    # allocation per byte when importing thousands of texture archives.
+    b=Binary(raw);stored,shift=b.u32(8),b.u32(16)
+    if stored!=len(raw) or declared>MAX_LOGICAL or not 1<=shift<=16:raise ToolError('invalid_h7a','Invalid wrapper sizes or shift')
+    from . import native_codec
+    accelerated=native_codec.decode(raw,declared)
+    if accelerated is not None:return accelerated
+    out=bytearray();position=20;mask=(1<<shift)-1
+    while len(out)<declared:
+        if position>=len(raw):raise ToolError('invalid_h7a','Truncated flag byte')
+        flags=raw[position];position+=1
+        if not flags:
+            count=min(8,declared-len(out))
+            if position+count>len(raw):raise ToolError('invalid_h7a','Truncated literal run')
+            out.extend(raw[position:position+count]);position+=count
+            continue
+        for bit in range(8):
+            if len(out)==declared:break
+            if flags&(1<<bit):
+                if position+2>len(raw):raise ToolError('invalid_h7a','Truncated backreference')
+                token=(raw[position]<<8)|raw[position+1];position+=2
+                distance=token&mask;length=min((token>>shift)+3,declared-len(out))
+                if not distance or distance>len(out):raise ToolError('invalid_h7a','Backreference outside decoded data')
+                start=len(out)-distance;chunk=out[start:start+min(distance,length)]
+                out.extend((chunk*((length+len(chunk)-1)//len(chunk)))[:length])
+            else:
+                if position>=len(raw):raise ToolError('invalid_h7a','Truncated literal')
+                out.append(raw[position]);position+=1
     return bytes(out)
 
 def encode_like(original, replacement):
@@ -76,6 +99,14 @@ def encode_greedy(original, replacement):
     """Bounded-window H7A recompression; preserve wrapper metadata and bit order."""
     from collections import deque
     shift=Binary(original).u32(16)
+    if not 1<=shift<=16 or len(replacement)>MAX_LOGICAL:raise ToolError('invalid_h7a','Invalid encoder size or shift')
+    from . import native_codec
+    accelerated=native_codec.encode(replacement,shift)
+    if accelerated is not None:
+        header=bytearray(original[:20]);struct.pack_into('>II',header,4,len(replacement),20+len(accelerated))
+        result=bytes(header)+accelerated
+        if decode(result)!=replacement:raise ToolError('compression_verification_failed','Native encoder round trip differs')
+        return result
     max_distance=(1<<shift)-1
     max_length=(0xffff>>shift)+3
     positions={};body=bytearray();offset=0;bit=8;group=0

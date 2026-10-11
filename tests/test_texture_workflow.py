@@ -25,13 +25,14 @@ class TextureTests(WorkspaceTest):
         with self.assertRaises(ToolError):dds.inspect(data[:-1])
         broken=bytearray(data);struct.pack_into('<I',broken,16,8)
         with self.assertRaises(ToolError):dds.inspect(bytes(broken))
-    def test_missing_converter_preserves_raw_and_gtf(self):
+    def test_builtin_conversion_works_without_external_executables(self):
         source=self.work/'input.txtr';source.write_bytes(txtr_fixture()[0])
         with patch('choops_py.texture_tools.external_converters.find',return_value=None):
-            result=export(source,self.work/'export');entry=result['textures'][0];self.assertEqual(entry['converter_status'],'converter_missing');self.assertTrue(Path(entry['raw_output_path']).exists());self.assertTrue(Path(entry['gtf_output_path']).exists());self.assertIsNone(entry['dds_output_path'])
+            result=export(source,self.work/'export');entry=result['textures'][0];self.assertEqual(entry['converter_status'],'success');self.assertTrue(Path(entry['raw_output_path']).exists());self.assertTrue(Path(entry['gtf_output_path']).exists());self.assertTrue(Path(entry['dds_output_path']).exists())
             replacement=self.work/'input.dds';replacement.write_bytes(dds.linear_l8(4,4,1,b'X'*16))
-            with self.assertRaises(ToolError):import_texture(source,'input',replacement,self.work/'result.txtr')
-            self.assertFalse((self.work/'result.txtr').exists())
+            imported=import_texture(source,'input',replacement,self.work/'result.txtr')
+            self.assertEqual(imported['status'],'success')
+            self.assertEqual(TXTR.from_bytes((self.work/'result.txtr').read_bytes()).image(),b'X'*16)
     def test_converter_failure_preserves_raw(self):
         source=self.work/'input.txtr';source.write_bytes(txtr_fixture(format=0x86)[0])
         with patch('choops_py.texture_tools.external_converters.convert',side_effect=ToolError('conversion_failed','test failure')):

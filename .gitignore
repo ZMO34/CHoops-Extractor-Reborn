@@ -12,3 +12,7 @@ __pycache__/
 /.mypy_cache/
 /.ruff_cache/
 /*.spec
+/choops_py/formats/_h7a.dll
+/choops_py/formats/_h7a.lib
+/choops_py/formats/_h7a.pdb
+/choops_py/formats/h7a.lib

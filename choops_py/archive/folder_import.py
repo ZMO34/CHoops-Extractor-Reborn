@@ -107,14 +107,16 @@ def discover(archive,folder,job=None):
             add(group,'records',(file.stem,RECORD_TYPES[ext]),file)
         else:
             formats.add('legacy-record-folders')
+            duplicate=re.fullmatch(r'(.+?)\s*\([0-9]+\)',file.stem)
+            texture_stem=duplicate[1].rstrip() if duplicate else file.stem
             context=next((p for p in file.parents if p.suffix.lower() in RECORD_TYPES),None)
             if context:
                 record_name=context.stem.removeprefix('_');typ=RECORD_TYPES[context.suffix.lower()]
-                if typ=='SCNE':selector=record_name+'/'+file.stem
+                if typ=='SCNE':selector=record_name+'/'+texture_stem
                 elif typ=='TXTR':selector=record_name
                 else:ignored+=1;continue
-            else:selector=file.stem
-            rank=2 if context else 1
+            else:selector=texture_stem
+            rank=(2 if context else 1)-(1 if duplicate else 0)
             previous=group['dds'].get(selector)
             if previous:
                 old_rank=group['dds_rank'][selector]
@@ -125,8 +127,82 @@ def discover(archive,folder,job=None):
             else:group['dds'][selector]=file;group['dds_rank'][selector]=rank
     if issues:raise ValueError('Override discovery failed: '+'; '.join(issues[:8]))
     if not groups:raise ValueError('Folder and subfolders contain no supported replacements or DDS textures')
-    return dict(groups=list(groups.values()),detected_formats=sorted(formats),scanned_files=len(files),ignored_files=ignored,shadowed_dds=shadowed,
+    result=dict(groups=list(groups.values()),detected_formats=sorted(formats),scanned_files=len(files),ignored_files=ignored,shadowed_dds=shadowed,
                 dds_files=sum(len(g['dds']) for g in groups.values()),binary_records=sum(len(g['records'])+len(g['package_records']) for g in groups.values()))
+    resolve_legacy_targets(archive,result,folder,job)
+    return result
+
+
+def resolve_legacy_targets(archive,discovery,folder,job=None):
+    """Resolve old record ordinals and uniquely misplaced named scene folders.
+
+    Canonical archive folders win over relocated duplicate artwork. Explicit
+    Python manifest selectors remain authoritative and are never guessed.
+    """
+    from ..formats.standard_iff import names,TYPES,StandardIFF
+    from ..formats.binary import Binary
+    groups={g['entry']['hash']:g for g in discovery['groups']};labels={};catalog=None
+    discovery['resolved_targets']=[]
+    def records(entry):
+        key=entry['hash']
+        if key in labels:return labels[key]
+        group=groups.get(key)
+        if group and group['whole']:
+            data=group['whole'].read_bytes()
+            result=[(r['name'],r['type']) for r in StandardIFF(data).records] if data[:4]==bytes.fromhex('ff3bef94') else []
+        else:
+            head=archive.read({**entry,'size':32});b=Binary(head);result=[]
+            if head[:4]==bytes.fromhex('ff3bef94'):
+                end,count=b.u32(8),b.u32(24)
+                if end>entry['size']:raise ValueError('Invalid archive metadata: '+str(entry['name']))
+                result=names(archive.read({**entry,'offset':entry['offset']+end,'size':entry['size']-end}),0,count)
+                if len(result)<count:
+                    header=Binary(archive.read({**entry,'size':b.u32(4)}));start=32+b.u32(16)*32
+                    result += [(str(i),TYPES.get(header.u32(header.relative(start+i*4)+4),'UNKNOWN')) for i in range(len(result),count)]
+        labels[key]=result;return result
+    def global_matches(name,typ):
+        nonlocal catalog
+        if catalog is None:
+            catalog=defaultdict(list)
+            for entry in archive.entries:
+                if job:job.check()
+                for index,(label,kind) in enumerate(records(entry)):catalog[label.casefold(),kind].append((entry,index))
+        return catalog.get((name.casefold(),typ),[])
+    errors=[]
+    for group in list(groups.values()):
+        local=records(group['entry'])
+        for selector,file in list(group['dds'].items()):
+            if group['dds_rank'][selector]>=3:continue
+            name,_,texture=selector.partition('/');typ='SCNE' if texture else 'TXTR'
+            matches=[i for i,(label,kind) in enumerate(local) if label.casefold()==name.casefold() and kind==typ]
+            target=group;canonical=name
+            if not matches and name.isdigit() and int(name)<len(local) and local[int(name)][1]==typ:
+                canonical=local[int(name)][0];matches=[int(name)]
+            if not matches:
+                candidates=global_matches(name,typ)
+                if len(candidates)!=1:
+                    errors.append(group['name']+'/'+selector+' has no unique archive record');continue
+                entry,index=candidates[0]
+                target=groups.get(entry['hash'])
+                if target is None:
+                    target={'whole':None,'records':{},'dds':{},'dds_rank':{},'package_records':{},'entry':entry,'name':entry['name'] or f"hash_{entry['hash']:08x}.iff"}
+                    groups[entry['hash']]=target
+                canonical=records(entry)[index][0]
+            normalized=canonical+('/'+texture if texture else '')
+            if target is group and normalized==selector:continue
+            group['dds'].pop(selector);rank=group['dds_rank'].pop(selector)
+            if target is not group:rank=0
+            if normalized in target['dds']:
+                previous_rank=target['dds_rank'][normalized]
+                if rank==previous_rank:errors.append('Duplicate resolved DDS: '+normalized);continue
+                if rank<previous_rank:discovery['shadowed_dds'].append(str(file.relative_to(folder)))
+                else:
+                    discovery['shadowed_dds'].append(str(target['dds'][normalized].relative_to(folder)))
+                    target['dds'][normalized]=file;target['dds_rank'][normalized]=rank
+            else:target['dds'][normalized]=file;target['dds_rank'][normalized]=rank
+            discovery['resolved_targets'].append({'input':str(file.relative_to(folder)),'archive':target['name'],'selector':normalized})
+    if errors:raise ValueError('Override target validation failed: '+'; '.join(errors[:12]))
+    discovery['groups']=[g for g in groups.values() if g['whole'] or g['records'] or g['dds'] or g['package_records']]
 
 
 
@@ -166,10 +242,33 @@ def compile_group(archive,group,job=None):
         changes[rec['index']]=apply_raw_texture(parts(rec),texture,replacement)
     for i,(selector,file) in enumerate(group['dds'].items()):
         if job:job.check();job.progress(i,len(group['dds']),'DDS priority: '+group['name']+'/'+selector)
-        if '/' in selector:name,texture=selector.split('/',1);rec=find(name,'SCNE')
+        if '/' in selector:
+            name,texture=selector.split('/',1);rec=find(name,'SCNE')
+            from ..formats.package import textures as package_textures
+            items=package_textures(parts(rec))
+            if texture.startswith('texture_') and texture[8:].isdigit() and int(texture[8:])>=len(items):
+                from ..texture_tools import dds
+                dds.inspect(file.read_bytes())
+                details.append(dict(selector=selector,status='unmatched',input_file=str(file),reason=f'Scene has {len(items)} texture slots; supply the matching replacement SCNE to import this texture'))
+                continue
+            if not texture.startswith('texture_'):
+                used={int(s.split('/texture_',1)[1]) for s in group['dds'] if s.startswith(name+'/texture_') and s.split('/texture_',1)[1].isdigit()}
+                available=[t.index for t in items if t.index not in used]
+                if len(items)==1:index=0
+                elif texture.isdigit() and int(texture)<len(items):index=int(texture)
+                elif len(available)==1:
+                    from ..formats.txtr import TXTR
+                    from ..texture_tools import dds
+                    candidate=items[available[0]];layout=TXTR([candidate.header,candidate.payload]).info();incoming=dds.inspect(file.read_bytes())
+                    if any(layout[key]!=incoming[key] for key in ('width','height','format')):raise ValueError('Unmatched legacy scene texture '+selector)
+                    index=available[0]
+                else:raise ValueError('Ambiguous legacy scene texture '+selector)
+                texture='texture_'+str(index)
+                if name+'/'+texture in group['dds']:
+                    details.append(dict(selector=selector,status='shadowed',reason='canonical scene texture filename has priority'));continue
         else:texture=selector;rec=find(selector,'TXTR')
         try:changed,info=apply_dds(parts(rec),rec['type'],texture,file,job)
         except (ValueError,OSError) as error:raise ValueError(selector+': '+str(error)) from error
         changes[rec['index']]=changed
-        details.append(dict(selector=selector,**info))
+        details.append(dict(selector=(name+'/'+texture if '/' in selector else selector),input_selector=selector,**info))
     return replace_records_expanding(iff,changes),details

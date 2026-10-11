@@ -6,6 +6,10 @@ from .binary import Binary
 from ..core.errors import ToolError
 
 def record(iff, selector, expected_type=None):
+    if isinstance(selector,int):
+        candidates=[r for r in iff.records if r['index']==selector and (not expected_type or r['type']==expected_type)]
+        if len(candidates)!=1:raise ToolError('ambiguous_subfile','Select a unique record index and type')
+        return candidates[0]
     selector = str(selector)
     candidates = [r for r in iff.records if (str(r['index'])==selector or r['name']==selector or f"{r['name']}.{r['type'].lower()}"==selector) and (not expected_type or r['type']==expected_type)]
     if len(candidates)!=1: raise ToolError('ambiguous_subfile','Select a unique name/index and type')

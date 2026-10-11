@@ -23,3 +23,30 @@ def test_greedy_distance_overlap_and_incompressible_tail():
         data=bytes(range(256))*3+b'ABC'*101+b'last'
         result=encode_greedy(literal(data,shift),data)
         assert decode(result)==data
+
+
+def test_native_and_python_decoders_agree_on_random_and_overlapping_streams(monkeypatch):
+    import random
+    from choops_py.formats import native_codec
+    rng=random.Random(734)
+    cases=[bytes(rng.randrange(256) for _ in range(50000)),b'AB'*50000,b'\0'*150000,bytes(range(256))*300]
+    for shift in (4,8,12,16):
+        for data in cases:
+            encoded=encode_greedy(literal(data,shift),data)
+            accelerated=decode(encoded)
+            with monkeypatch.context() as context:
+                context.setattr(native_codec,'library',lambda:None)
+                portable=decode(encoded)
+            assert accelerated==portable==data
+            assert encoded[12:20]==literal(data,shift)[12:20]
+
+
+def test_truncated_and_invalid_backreferences_are_rejected_by_both_decoders(monkeypatch):
+    import pytest
+    from choops_py.formats import native_codec
+    from choops_py.core.errors import ToolError
+    bad=struct.pack('>5I',MAGIC,10,23,0,8)+bytes([1,0,1])
+    for native in (True,False):
+        with monkeypatch.context() as context:
+            if not native:context.setattr(native_codec,'library',lambda:None)
+            with pytest.raises(ToolError):decode(bad)

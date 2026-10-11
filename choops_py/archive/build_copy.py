@@ -25,6 +25,15 @@ def jb_root(source):
 def inventory(source):
     return {str(p.relative_to(source)):{'size':p.stat().st_size,'mtime_ns':p.stat().st_mtime_ns} for p in source.rglob('*') if p.is_file()}
 
+
+def import_summary(mod):
+    path=Path(mod)/'folder_import_report.json'
+    if not path.is_file():return {}
+    report=json.loads(path.read_text(encoding='utf-8'))
+    unapplied=report.get('unapplied_overrides',[])
+    return {'staged_archives':report.get('staged'),'applied_dds':sum('width' in item for group in report.get('imports',[]) for item in group['dds_imports']),
+            'unapplied_count':len(unapplied),'unapplied_overrides':unapplied,'report':str(path.resolve())}
+
 def preflight(source,mod):
     archive=Archive(source);rows=validate(mod);grouped={};patches=[]
     options=Path(mod)/'import_options.json'
@@ -139,13 +148,14 @@ def build(source,mod,output,overwrite=False,dry_run=False,job=None):
         reject_links(out)
     archive,patches=preflight(src,mod);plan=[{'archive':e['name'],'index':e['index'],'size':len(data),'sha256':digest(data)} for e,data in patches]
     growing=any(len(data)>e['size'] for e,data in patches)
-    if dry_run:return {'dry_run':True,'source':str(src),'output':str(out),'patches':plan,'archive_relocation_required':growing}
+    summary=import_summary(mod)
+    if dry_run:return {'dry_run':True,'source':str(src),'output':str(out),'import_summary':summary,'patches':plan,'archive_relocation_required':growing}
     if growing:
         from .add_assets import build as relocated_build
         staging=safe_output(out.parent/('.jb_build_'+uuid.uuid4().hex),[src,mod]);backup=None
         try:
             result=relocated_build(src,{},staging,{e['name']:data for e,data in patches},job)
-            manifest={'project_kind':'choops-jb-copy','source':str(src),'mod':str(Path(mod).resolve()),'output':str(out),'patches':plan,'archive_relocation_required':True,'validation':result}
+            manifest={'project_kind':'choops-jb-copy','source':str(src),'mod':str(Path(mod).resolve()),'output':str(out),'import_summary':summary,'patches':plan,'archive_relocation_required':True,'validation':result}
             save_json(staging/'build_manifest.json',manifest,[src,mod])
             if out.exists():
                 backup=safe_output(out.parent/('.jb_previous_'+uuid.uuid4().hex));out.rename(backup)
@@ -186,7 +196,7 @@ def build(source,mod,output,overwrite=False,dry_run=False,job=None):
             if not path.is_file() or path.stat().st_size!=metadata['size']:raise ToolError('build_validation_failed',f'Copied file missing or resized: {relative}')
         verify_preserved_ranges(src,staging,archive,patches,job)
         if inventory(src)!=before:raise ToolError('vanilla_changed_during_build','Vanilla source inventory changed during copying; discard build and retry')
-        manifest={'project_kind':'choops-jb-copy','source':str(src),'mod':str(Path(mod).resolve()),'output':str(out),'patches':plan,'file_count':len(before),'vanilla_inventory_unchanged':True,'validation':{'inventory_and_sizes':True,'patched_extents_byte_exact':True,'all_unpatched_bytes_exact':True,'console_gameplay':'not tested'}}
+        manifest={'project_kind':'choops-jb-copy','source':str(src),'mod':str(Path(mod).resolve()),'output':str(out),'import_summary':summary,'patches':plan,'file_count':len(before),'vanilla_inventory_unchanged':True,'validation':{'inventory_and_sizes':True,'patched_extents_byte_exact':True,'all_unpatched_bytes_exact':True,'console_gameplay':'not tested'}}
         save_json(staging/'build_manifest.json',manifest,[src,mod])
         if out.exists():
             backup=safe_output(out.parent/('.jb_previous_'+uuid.uuid4().hex));out.rename(backup)

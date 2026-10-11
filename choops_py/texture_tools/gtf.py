@@ -21,7 +21,7 @@ def descriptor_info(descriptor):
         size=0;mip_height=height
         for _ in range(mips):
             size+=pitch*max(1,(mip_height+3)//4);mip_height=max(1,mip_height//2)
-    if cubemap:size=((size+127)&~127)*5+size
+    if cubemap:size=size*6 if code&0x20 else ((size+127)&~127)*5+size
     return dict(remap=b.u32(4),width=width,height=height,format=fmt,mip_count=mips,image_size=size,ps3_format=code,linear=bool(code&0x20),pitch=pitch,cubemap=cubemap)
 
 def make(descriptor,payload):

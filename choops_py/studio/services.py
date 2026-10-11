@@ -188,13 +188,14 @@ def stage_folder(source: Path, folder: Path, mod: Path, job=None) -> dict:
     if mod.exists():raise ValueError('Choose a new mod directory')
     job=job or JobContext();discovery=discover(archive,folder,job)
     work=mod.parent/('.mod_'+uuid.uuid4().hex);rows=[];conditions=[];growth=[];unchanged=0
-    details=[]
+    details=[];unapplied=[]
     try:
         for i,group in enumerate(discovery['groups']):
             job.check();job.progress(i,len(discovery['groups']),'Compile override '+group['name'])
             original=archive.read(group['entry'])
             try:data,imports=compile_group(archive,group,job)
             except (ValueError,OSError) as error:raise ValueError(group['name']+': '+str(error)) from error
+            unapplied.extend(dict(archive=group['name'],**item) for item in imports if item.get('status')=='unmatched')
             if data==original and group['whole'] is None:unchanged+=1;continue
             target=f'assets/{len(rows):04d}.bin';write_bytes(work/target,data,[source,folder])
             rows.append(dict(archive=group['name'],subfile=None,kind='archive',original_name=group['name'],path=target,sha256=hashlib.sha256(data).hexdigest(),size=len(data)))
@@ -205,7 +206,7 @@ def stage_folder(source: Path, folder: Path, mod: Path, job=None) -> dict:
         save_json(work/'overrides.json',rows,[source,folder])
         save_json(work/'source_preconditions.json',dict(schema=1,entries=conditions),[source,folder])
         save_json(work/'import_options.json',dict(schema=1,allow_archive_growth=True,dds_priority=True,scne_priority=True),[source,folder])
-        report=dict(staged=len(rows),mod=str(mod),detected_formats=discovery['detected_formats'],scanned_files=discovery['scanned_files'],dds_files=discovery['dds_files'],binary_records=discovery['binary_records'],ignored_files=discovery['ignored_files'],shadowed_dds=discovery['shadowed_dds'],unchanged_archives=unchanged,growing_archives=growth,dds_priority=True,scne_priority=True,imports=details)
+        report=dict(staged=len(rows),mod=str(mod),detected_formats=discovery['detected_formats'],scanned_files=discovery['scanned_files'],dds_files=discovery['dds_files'],binary_records=discovery['binary_records'],ignored_files=discovery['ignored_files'],shadowed_dds=discovery['shadowed_dds'],resolved_targets=discovery['resolved_targets'],unapplied_overrides=unapplied,unchanged_archives=unchanged,growing_archives=growth,dds_priority=True,scne_priority=True,imports=details)
         save_json(work/'folder_import_report.json',report,[source,folder])
         _,patches=preflight(source,work)
         work.rename(mod)
@@ -225,21 +226,15 @@ def decode_texture_preview(source: Path, selector: str):
 def decode_preview_asset(asset, max_size=2048):
     import shutil
     from PIL import Image
-    from ..texture_tools.dds import linear_l8, compressed_preview
     from ..texture_tools.external_converters import convert
     info = asset.texture.info()
     work = OUTPUT / 'temp' / ('preview_' + uuid.uuid4().hex)
     work.mkdir(parents=True)
     try:
         dds = work / 'texture.dds'
-        if info['format'] in ('DXT1','DXT3','DXT5') and (info['width'] & (info['width']-1) or info['height'] & (info['height']-1)):
-            dds.write_bytes(compressed_preview(info['width'],info['height'],info['format'],asset.texture.image()))
-        elif info['format'] == 'L8' and info['linear']:
-            dds.write_bytes(linear_l8(info['width'], info['height'], info['mip_count'], asset.texture.image()))
-        else:
-            gtf = work / 'texture.gtf'
-            gtf.write_bytes(asset.texture.gtf())
-            convert('gtf2dds', gtf, dds)
+        gtf = work / 'texture.gtf'
+        gtf.write_bytes(asset.texture.gtf())
+        convert('gtf2dds', gtf, dds)
         with Image.open(dds) as image:
             image.load()
             image.thumbnail((max_size, max_size))
