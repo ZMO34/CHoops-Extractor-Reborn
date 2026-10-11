@@ -8,7 +8,7 @@ import struct
 import uuid
 from pathlib import Path
 from .usrdir_reader import Archive
-from .hash_names import hash_name
+from .hash_names import hash_name,replacement_hash
 from .manifests import safe_output,OUTPUT
 from .build_copy import jb_root,inventory
 from .add_assets import meaningful_iff,validate_payload,checksum,asset_payload
@@ -31,7 +31,7 @@ def plan(source, additions, replacements=None, job=None):
     for position,(name,data) in enumerate(supplied.items()):
         if job:job.check();job.progress(position,len(supplied),"Validating added archive assets")
         if not re.fullmatch(r'[A-Za-z0-9_-]+\.(?:iff|cdf)',name,re.IGNORECASE):raise ValueError('Unsupported asset name')
-        h=hash_name(name)
+        h=replacement_hash(name) if name in replacements else hash_name(name)
         if (name in additions and h in by_hash) or (name in replacements and h not in by_hash):raise ValueError('New/replacement asset identity conflict')
         if h in contents:raise ValueError('Duplicate asset hash')
         cache=trimmed.get(id(data))
@@ -119,15 +119,15 @@ def build(source, additions, output, replacements=None, job=None):
             if job:job.check()
             write(offset,data)
         result=Archive(usr);new_hash={e['hash']:e for e in result.entries}
-        replacement_hash={hash_name(name) for name in (replacements or {})}
+        replaced_hashes={replacement_hash(name) for name in (replacements or {})}
         for i,e in enumerate(arc.entries):
             if job:job.check();job.progress(i,len(arc.entries),'Verifying repacked archive entries')
             new=new_hash[e['hash']]
-            if e['hash'] not in replacement_hash:
+            if e['hash'] not in replaced_hashes:
                 if new['offset']!=e['offset']+delta or new['size']!=e['size'] or checksum(arc.chunks(e))!=checksum(result.chunks(new)):
                     raise ValueError('Repacked entry preservation failed')
         for offset,data,name in appended:
-            new=new_hash[hash_name(name)]
+            new=new_hash[replacement_hash(name) if name in (replacements or {}) else hash_name(name)]
             if new['content_size']!=len(data) or result.read(new)[:len(data)]!=data:raise ValueError('Added/replaced entry verification failed')
         if inventory(root)!=before:raise ValueError('Source changed during repack')
         report={'schema':1,'method':'repack','added_assets':list(additions),'replaced_assets':list(replacements or {}),

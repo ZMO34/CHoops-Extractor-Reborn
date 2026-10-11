@@ -8,11 +8,21 @@ def descriptor_info(descriptor):
     code=descriptor[0];fmt=FORMATS.get(code&0x9f)
     if not fmt:raise ToolError('unsupported_texture_format',f'PS3 format 0x{code:02x}')
     width,height,mips=b.u16(8),b.u16(10),descriptor[1]
-    if descriptor[2]!=2 or descriptor[3] or b.u16(12)!=1:raise ToolError('unsupported_texture_layout','Only single 2D non-cube textures are writable')
+    if descriptor[2]!=2 or descriptor[3] not in (0,1) or b.u16(12)!=1:raise ToolError('unsupported_texture_layout','Only 2D textures and complete cubemaps are writable')
+    cubemap=bool(descriptor[3])
+    if cubemap and width!=height:raise ToolError('unsupported_texture_layout','Cubemap faces must be square')
     size=image_size(width,height,fmt,mips)
     pitch=b.u32(16)
     if code&0x20 and fmt in ('L8','ARGB8') and pitch!=width*(1 if fmt=='L8' else 4):raise ToolError('unsupported_texture_pitch',f'Padded pitch {pitch} is not validated')
-    return dict(remap=b.u32(4),width=width,height=height,format=fmt,mip_count=mips,image_size=size,ps3_format=code,linear=bool(code&0x20),pitch=pitch)
+    if code&0x20 and fmt in ('DXT1','DXT3','DXT5'):
+        block_bytes=8 if fmt=='DXT1' else 16
+        if pitch<max(1,(width+3)//4)*block_bytes:raise ToolError('unsupported_texture_pitch','Compressed row pitch is smaller than a block row')
+        # RSX linear mip levels retain the top-level block-row pitch.
+        size=0;mip_height=height
+        for _ in range(mips):
+            size+=pitch*max(1,(mip_height+3)//4);mip_height=max(1,mip_height//2)
+    if cubemap:size=((size+127)&~127)*5+size
+    return dict(remap=b.u32(4),width=width,height=height,format=fmt,mip_count=mips,image_size=size,ps3_format=code,linear=bool(code&0x20),pitch=pitch,cubemap=cubemap)
 
 def make(descriptor,payload):
     descriptor_info(descriptor)

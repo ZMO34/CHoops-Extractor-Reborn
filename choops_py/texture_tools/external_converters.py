@@ -43,7 +43,7 @@ def status(check=True):
     result={}
     for name in TOOLS:
         bundled=ROOT/'tools'/(name+'.exe');path=find(name)
-        health=executable_check(bundled) if check else {'ready':False,'reason':'not_checked'}
+        health=executable_check(path) if check and path else {'ready':False,'reason':'converter_missing' if check else 'not_checked'}
         result[name]={'bundled_found':bundled.is_file(),'bundled_path':str(bundled),'selected_path':str(path) if path else None,**health}
     result['export_dds_ready']=result['gtf2dds']['ready']
     result['import_dds_ready']=result['dds2gtf']['ready']

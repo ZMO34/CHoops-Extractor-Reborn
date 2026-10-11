@@ -27,6 +27,12 @@ def inventory(source):
 
 def preflight(source,mod):
     archive=Archive(source);rows=validate(mod);grouped={};patches=[]
+    options=Path(mod)/'import_options.json'
+    allow_growth=False
+    if options.exists():
+        policy=json.loads(options.read_text(encoding='utf8'))
+        if policy.get('schema')!=1:raise ToolError('invalid_import_options','Unsupported import options')
+        allow_growth=policy.get('allow_archive_growth') is True
     conditions=Path(mod)/'source_preconditions.json'
     if conditions.exists():
         document=json.loads(conditions.read_text(encoding='utf-8'))
@@ -40,6 +46,10 @@ def preflight(source,mod):
     for row in rows:grouped.setdefault(row['archive'].lower(),[]).append(row)
     for name,group in grouped.items():
         matches=[e for e in archive.entries if e['name'] and e['name'].lower()==name]
+        if not matches:
+            from .hash_names import replacement_hash as hash_name
+            matches=[e for e in archive.entries if e['hash']==hash_name(name) and e['name'] is None]
+            if len(matches)==1:matches[0]={**matches[0],'name':name}
         if len(matches)!=1:raise ToolError('unresolved_archive_identity',name)
         entry=matches[0];original=archive.read(entry);data=original
         for row in group:
@@ -56,7 +66,7 @@ def preflight(source,mod):
                 parts=unwrap(replacement)[1] if replacement[:4]==b'2kTl' else [replacement]
                 data=replace_records(iff,{rec['index']:parts})
             else:data=replacement
-        if len(data)>len(original):raise ToolError('archive_extent_capacity_exceeded',f'{name} needs {len(data)} bytes; allocation {len(original)}')
+        if len(data)>len(original) and not allow_growth:raise ToolError('archive_extent_capacity_exceeded',f'{name} needs {len(data)} bytes; allocation {len(original)}')
         if len(data)<len(original):
             if data[:4]!=bytes.fromhex('ff3bef94'):raise ToolError('archive_size_change_blocked',name)
             StandardIFF(data);data+=b'\0'*(len(original)-len(data))
@@ -128,7 +138,24 @@ def build(source,mod,output,overwrite=False,dry_run=False,job=None):
         if not marker.is_file() or json.loads(marker.read_text(encoding='utf-8')).get('project_kind')!='choops-jb-copy':raise ToolError('unowned_build_output',"Refusing to overwrite a folder without this tool's build manifest")
         reject_links(out)
     archive,patches=preflight(src,mod);plan=[{'archive':e['name'],'index':e['index'],'size':len(data),'sha256':digest(data)} for e,data in patches]
-    if dry_run:return {'dry_run':True,'source':str(src),'output':str(out),'patches':plan}
+    growing=any(len(data)>e['size'] for e,data in patches)
+    if dry_run:return {'dry_run':True,'source':str(src),'output':str(out),'patches':plan,'archive_relocation_required':growing}
+    if growing:
+        from .add_assets import build as relocated_build
+        staging=safe_output(out.parent/('.jb_build_'+uuid.uuid4().hex),[src,mod]);backup=None
+        try:
+            result=relocated_build(src,{},staging,{e['name']:data for e,data in patches},job)
+            manifest={'project_kind':'choops-jb-copy','source':str(src),'mod':str(Path(mod).resolve()),'output':str(out),'patches':plan,'archive_relocation_required':True,'validation':result}
+            save_json(staging/'build_manifest.json',manifest,[src,mod])
+            if out.exists():
+                backup=safe_output(out.parent/('.jb_previous_'+uuid.uuid4().hex));out.rename(backup)
+            staging.rename(out)
+            if backup:shutil.rmtree(backup)
+            return manifest
+        except BaseException:
+            if staging.exists():shutil.rmtree(safe_output(staging))
+            if backup and backup.exists() and not out.exists():backup.rename(out)
+            raise
     before=inventory(src);out.parent.mkdir(parents=True,exist_ok=True)
     staging=safe_output(out.parent/('.jb_build_'+uuid.uuid4().hex),[src,mod]);backup=None
     print('Copying vanilla JB into a separate output build...',flush=True)

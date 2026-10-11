@@ -178,60 +178,40 @@ def inspect_asset(path: Path) -> dict:
     }
 
 
-def stage_folder(source: Path, folder: Path, mod: Path) -> dict:
-    """Match extracted filenames to TOC identities, then preflight paired edits."""
+def stage_folder(source: Path, folder: Path, mod: Path, job=None) -> dict:
+    """Compile recursive records first, then overlay DDS artwork atomically."""
     import shutil
-
+    from ..archive.folder_import import discover,compile_group
     from ..archive.build_copy import preflight
-    from ..archive.importer import stage
-
-    archive = Archive(source)
-    folder = folder.resolve()
-    mod = safe_output(mod, [source, folder])
-    if mod.exists():
-        raise ValueError("Choose a new mod directory")
-    files = [
-        p for p in folder.iterdir() if p.suffix.lower() in (".iff", ".cdf", ".bin")
-    ]
-    if not files:
-        raise ValueError("Folder contains no IFF/CDF/BIN replacements")
-    matches = []
-    for file in files:
-        if file.is_symlink() or (hasattr(file, "is_junction") and file.is_junction()):
-            raise ValueError("Linked replacements are blocked")
-        candidates = [
-            e
-            for e in archive.entries
-            if e["name"] and e["name"].casefold() == file.name.casefold()
-        ]
-        if len(candidates) != 1:
-            raise ValueError(f"Unknown or ambiguous archive filename: {file.name}")
-        matches.append((file, candidates[0]))
-    work = mod.parent / (".mod_" + uuid.uuid4().hex)
+    from ..archive.manifests import write_bytes
+    archive=Archive(source);folder=Path(folder);mod=safe_output(mod,[source,folder])
+    if mod.exists():raise ValueError('Choose a new mod directory')
+    job=job or JobContext();discovery=discover(archive,folder,job)
+    work=mod.parent/('.mod_'+uuid.uuid4().hex);rows=[];conditions=[];growth=[];unchanged=0
+    details=[]
     try:
-        for file, entry in matches:
-            stage(work, file, entry["name"])
-        _, patches = preflight(source, work)
-        # Store source preconditions beside the established override format.
-        save_json(
-            work / "source_preconditions.json",
-            {
-                "schema": 1,
-                "entries": [
-                    {
-                        "index": e["index"],
-                        "hash": e["hash"],
-                        "sha256": hashlib.sha256(archive.read(e)).hexdigest(),
-                    }
-                    for _, e in matches
-                ],
-            },
-        )
+        for i,group in enumerate(discovery['groups']):
+            job.check();job.progress(i,len(discovery['groups']),'Compile override '+group['name'])
+            original=archive.read(group['entry'])
+            try:data,imports=compile_group(archive,group,job)
+            except (ValueError,OSError) as error:raise ValueError(group['name']+': '+str(error)) from error
+            if data==original and group['whole'] is None:unchanged+=1;continue
+            target=f'assets/{len(rows):04d}.bin';write_bytes(work/target,data,[source,folder])
+            rows.append(dict(archive=group['name'],subfile=None,kind='archive',original_name=group['name'],path=target,sha256=hashlib.sha256(data).hexdigest(),size=len(data)))
+            conditions.append(dict(index=group['entry']['index'],hash=group['entry']['hash'],sha256=hashlib.sha256(original).hexdigest()))
+            details.append(dict(archive=group['name'],binary_records=len(group['records']),dds_imports=imports))
+            if len(data)>len(original):growth.append(dict(archive=group['name'],old_bytes=len(original),new_bytes=len(data)))
+        if not rows:raise ValueError('All discovered overrides match the selected game; no changes to stage')
+        save_json(work/'overrides.json',rows,[source,folder])
+        save_json(work/'source_preconditions.json',dict(schema=1,entries=conditions),[source,folder])
+        save_json(work/'import_options.json',dict(schema=1,allow_archive_growth=True,dds_priority=True,scne_priority=True),[source,folder])
+        report=dict(staged=len(rows),mod=str(mod),detected_formats=discovery['detected_formats'],scanned_files=discovery['scanned_files'],dds_files=discovery['dds_files'],binary_records=discovery['binary_records'],ignored_files=discovery['ignored_files'],shadowed_dds=discovery['shadowed_dds'],unchanged_archives=unchanged,growing_archives=growth,dds_priority=True,scne_priority=True,imports=details)
+        save_json(work/'folder_import_report.json',report,[source,folder])
+        _,patches=preflight(source,work)
         work.rename(mod)
-        return {"staged": len(patches), "mod": str(mod)}
-    except Exception:
-        if work.exists():
-            shutil.rmtree(work)
+        return {key:value for key,value in report.items() if key!='imports'}
+    except BaseException:
+        if work.exists() and work.resolve().is_relative_to(OUTPUT.resolve()):shutil.rmtree(work)
         raise
 
 

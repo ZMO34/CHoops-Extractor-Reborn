@@ -2,6 +2,12 @@ import json,zlib
 from pathlib import Path
 from functools import lru_cache
 def hash_name(name): return zlib.crc32(name.upper().encode('ascii')) & 0xffffffff
+
+def replacement_hash(name):
+    """Resolve a canonical filename or the Python ripper's explicit hash label."""
+    import re
+    match=re.fullmatch(r'hash_([0-9a-f]{8})\.(?:iff|bin|cdf)',name,re.IGNORECASE)
+    return int(match[1],16) if match else hash_name(name)
 def namespace():
     banks='frontend frontend_sync global gamedata gamedataextra loading legalpage loc fonts online playercreate playeditor teamselectlogo arenapics overlaycache jukebox roster_english streetdata studio studio_preview studio_pontiac dornas crowd sfx_inside facegen ababall basket chantcreate chantcreate_drums chantcreate_sounds gameintro gameintro_cameras gameintro_drums gameintro_playerspeech halftimeadjustments legacy powerbar reelmanual weeklyshow tutorial drilldata shrine shrine_trophies statefarm kellogg gumbel Director'.split()
     for name in banks:

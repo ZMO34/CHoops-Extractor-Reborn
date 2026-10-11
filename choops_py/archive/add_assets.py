@@ -7,7 +7,7 @@ import uuid
 import hashlib
 from pathlib import Path
 from .usrdir_reader import Archive
-from .hash_names import hash_name
+from .hash_names import hash_name,replacement_hash
 from .manifests import safe_output, OUTPUT
 from .build_copy import jb_root, inventory
 from ..core.paths import reject_links
@@ -85,7 +85,7 @@ def plan(source, additions, replacements=None):
         records.append([h,cursor//archive.alignment,0,len(data)])
         appended.append((cursor,data,name));cursor=(cursor+len(data)+archive.alignment-1)//archive.alignment*archive.alignment
     for name,data in replacements.items():
-        h=hash_name(name);e=by_hash.get(h)
+        h=replacement_hash(name);e=by_hash.get(h)
         if e is None:raise ValueError('Replacement asset missing: '+name)
         data=asset_payload(name,data,{**additions,**replacements})
         row=next(row for row in records if row[0]==h)
@@ -166,19 +166,19 @@ def build(source, additions, output, replacements=None, job=None):
         for i,e in enumerate(archive.entries):
             if job:job.check();job.progress(i,len(archive.entries),'Verifying preserved archive entries')
             new=new_by_hash[e['hash']]
-            replacement=next((v for n,v in (replacements or {}).items() if hash_name(n)==e['hash']),None)
+            replacement=next((v for n,v in (replacements or {}).items() if replacement_hash(n)==e['hash']),None)
             if replacement is None:
                 if new['offset']!=e['offset'] or new['size']!=e['size'] or checksum(result.chunks(new))!=checksum(archive.chunks(e)):
                     raise ValueError('Existing entry verification failed')
             else:
-                replacement_name=next(n for n in replacements if hash_name(n)==e['hash'])
+                replacement_name=next(n for n in replacements if replacement_hash(n)==e['hash'])
                 content=replacement if replacement_name.lower().endswith('.cdf') else meaningful_iff(replacement)
                 span=e['size'] if new['offset']==e['offset'] else new['size']
                 expected=hashlib.sha256(content+b'\0'*(span-len(content))).hexdigest()
                 if checksum(result.chunks({**new,'size':span}))!=expected:
                     raise ValueError('Replacement verification failed')
         for offset,data,name in appended:
-            e=new_by_hash[hash_name(name)]
+            e=new_by_hash[replacement_hash(name) if name in (replacements or {}) else hash_name(name)]
             if e['content_size']!=len(data) or result.read(e)[:len(data)]!=data:raise ValueError('New asset verification failed')
         if inventory(root)!=before:raise ValueError('Source changed during build')
         report={'schema':1,'added_assets':list(additions),'replaced_assets':list(replacements or {}),

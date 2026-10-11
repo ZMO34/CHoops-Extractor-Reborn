@@ -177,12 +177,32 @@ def imported_image(asset,dds_file,converter=None):
     if len(payload)!=original['image_size']:raise ToolError('payload_size_mismatch',f"Converted GTF has {len(payload)} bytes; expected {original['image_size']}")
     return payload,result
 
-def import_texture(source,selector,dds_file,output,cdf=None,converter=None):
+def import_texture(source,selector,dds_file,output,cdf=None,converter=None,dynamic=False):
     sources=[source,dds_file]+([cdf] if cdf else []);out=safe_output(output,sources)
     report={'source':str(source),'texture':str(selector),'dds_file':str(dds_file),'output':str(out),'status':'blocked'}
     try:
-        container=Container(source,cdf);asset=container.select(selector);image,conversion=imported_image(asset,dds_file,converter)
-        result=container.replacement(asset,image)
+        container=Container(source,cdf);asset=container.select(selector)
+        if dynamic and not container.pair:
+            from .override_import import apply_dds
+            from ..formats.standard_iff_writer import replace_records_expanding
+            if container.iff:
+                rec=container.iff.records[asset.record_index]
+                parts=[span[3] for span in record_blocks(container.iff,rec)]
+                kind=rec['type'];texture_selector='texture_'+str(asset.package_index) if asset.package_index is not None else str(selector)
+            else:
+                parts=asset.package_blocks if asset.package_index is not None else asset.texture.blocks
+                kind='SCNE' if asset.package_index is not None else 'TXTR'
+                texture_selector='texture_'+str(asset.package_index) if asset.package_index is not None else str(selector)
+            changed,layout=apply_dds(parts,kind,texture_selector,dds_file,converter=converter)
+            if container.iff:result=replace_records_expanding(container.iff,{asset.record_index:changed})
+            elif container.wrapper_type is not None:result=wrap(container.wrapper_type,changed)
+            else:
+                if len(changed)!=1:raise ToolError('raw_package_layout_not_supported','Raw multiblock input requires a wrapper')
+                result=changed[0]
+            conversion={'dynamic_layout':True,'dds_layout':layout}
+        else:
+            image,conversion=imported_image(asset,dds_file,converter)
+            result=container.replacement(asset,image)
         if cdf:
             CDFPair(container.raw,result);out.mkdir(parents=True,exist_ok=True)
             write_bytes(out/Path(source).name,container.raw,sources);write_bytes(out/Path(cdf).name,result,sources)

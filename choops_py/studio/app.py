@@ -875,7 +875,7 @@ class Window(QMainWindow):
             return self.log("Select one texture row first.")
 
         dds, _ = QFileDialog.getOpenFileName(
-            self, "Edited DDS with unchanged layout", str(OUTPUT), "DDS (*.dds)"
+            self, "Edited DDS (dimensions, format and mip count may change)", str(OUTPUT), "DDS (*.dds)"
         )
 
         if not dds:
@@ -905,7 +905,7 @@ class Window(QMainWindow):
             self.run_job(
                 "Validate and import texture",
                 lambda job: import_texture(
-                    source, rows[0]["name"], dds, output, cdf if cdf.exists() else None
+                    source, rows[0]["name"], dds, output, cdf if cdf.exists() else None, dynamic=True
                 ),
             )
 
@@ -1675,7 +1675,7 @@ class Window(QMainWindow):
 
         layout = self.page(
             "Mod builder",
-            "Stage existing compatible IFF/CDF replacements, preflight them, and build a separate JB copy. Growth and new archive entries are blocked.",
+            "Scan nested overrides, import SCNEs first and apply DDS textures with priority over TXTRs. Dry run checks the resulting archives; build writes a separate JB copy.",
         )
 
         form = QFormLayout()
@@ -1713,7 +1713,7 @@ class Window(QMainWindow):
             return self.log("Open a game first.")
 
         path = QFileDialog.getExistingDirectory(
-            self, "Edited extracted IFF/CDF folder", str(OUTPUT)
+            self, "Overrides folder (includes subfolders and DDS textures)", str(OUTPUT)
         )
 
         if path:
@@ -1721,10 +1721,11 @@ class Window(QMainWindow):
 
             self.run_job(
                 "Stage and preflight replacement folder",
-                lambda job: stage_folder(self.source, Path(path), mod),
+                lambda job: stage_folder(self.source, Path(path), mod, job),
                 lambda result: self.build_details.setPlainText(
                     json.dumps(result, indent=2)
                 ),
+                cancellable=True,
             )
 
     def export_mod_patch(self):

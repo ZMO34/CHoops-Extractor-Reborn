@@ -73,3 +73,63 @@ def replace_records(iff, changes):
         b=rebuilt.blocks[index]
         if decode(result[b['start']:b['start']+b['size']],b['logical_size'])!=bytes(logical):raise ToolError('writer_validation_failed','Rebuilt logical block mismatch')
     return result
+
+
+
+def replace_records_expanding(iff,changes):
+    """Keep original logical addresses; append only enlarged or aliased slices.
+
+    Complete TXTR/SCNE slices carry their own local relative pointers. Unchanged
+    records, heap bytes and unknown ranges remain at their original addresses.
+    """
+    from .compression import encode_greedy
+    original_blocks={b['index']:decode(iff.raw[b['start']:b['start']+b['size']],b['logical_size']) for b in iff.blocks}
+    mutable={i:bytearray(data) for i,data in original_blocks.items()};offset_updates={};expected={}
+    for index,parts in changes.items():
+        rec=record(iff,index);spans=list(iff.spans(rec))
+        if len(spans)!=len(parts):raise ToolError('block_count_mismatch',rec['name'])
+        for (block,start,end),new in zip(spans,parts):
+            old=original_blocks[block][start:end]
+            if new==old:continue
+            shared=any(other['index']!=index and any(b==block and start<e and s<end for b,s,e in iff.spans(other)) for other in iff.records)
+            if len(new)>len(old) or shared:
+                if rec['type'] not in ('TXTR','SCNE','NAME','CDAN','LAYT','ROST'):raise ToolError('unsupported_record_growth',rec['name']+'.'+rec['type'])
+                target=(len(mutable[block])+15)&~15
+                mutable[block]+=b'\0'*(target-len(mutable[block]));mutable[block]+=new
+                offset_updates[index,block]=target
+            else:
+                mutable[block][start:start+len(new)]=new
+                # Unreferenced tail remains intact; no unrelated bytes are erased.
+            expected[index,block]=bytes(new)
+    if not expected:return iff.raw
+    header=bytearray(iff.raw[:iff.header_size]);b=Binary(header)
+    for (index,block),target in offset_updates.items():
+        field=32+len(iff.blocks)*32+index*4;descriptor=b.relative(field)
+        struct.pack_into('>I',header,descriptor+12+block*4,target)
+    payload=bytearray();cursor=iff.header_size
+    for block in sorted(iff.blocks,key=lambda b:b['start']):
+        if len(mutable[block['index']])>512*1024*1024:raise ToolError('oversized_logical_block','Expanded logical block exceeds limit')
+        payload+=iff.raw[cursor:block['start']]
+        logical=bytes(mutable[block['index']]);old=original_blocks[block['index']]
+        stored=iff.raw[block['start']:block['start']+block['size']]
+        if logical!=old:stored=encode_greedy(stored,logical) if block['compressed'] else logical
+        entry=32+block['index']*32
+        struct.pack_into('>I',header,entry+12,len(logical));struct.pack_into('>II',header,entry+20,iff.header_size+len(payload),len(stored))
+        payload+=stored;cursor=block['start']+block['size']
+    payload+=iff.raw[cursor:iff.file_length];end=iff.header_size+len(payload)
+    struct.pack_into('>I',header,8,end)
+    trailer=iff.raw[iff.file_length:];meaningful=0
+    if trailer[:4]==bytes.fromhex('aa171516'):meaningful=8+Binary(trailer).u32(4,'<')
+    elif any(trailer):raise ToolError('unknown_trailer','Unclassified IFF trailer')
+    if meaningful>len(trailer) or any(trailer[meaningful:]):raise ToolError('unknown_trailer','Unclassified name-table padding')
+    result=bytes(header)+bytes(payload)+trailer[:meaningful]
+    if len(result)<len(iff.raw):result+=b'\0'*(len(iff.raw)-len(result))
+    check=StandardIFF(result)
+    checked_blocks={b['index']:decode(result[b['start']:b['start']+b['size']],b['logical_size']) for b in check.blocks}
+    for rec in iff.records:
+        old_spans=list(iff.spans(rec));new_spans=list(check.spans(check.records[rec['index']]))
+        for (block,start,stop),(new_block,new_start,new_stop) in zip(old_spans,new_spans):
+            wanted=expected.get((rec['index'],block),original_blocks[block][start:stop])
+            raw=checked_blocks[new_block]
+            if raw[new_start:new_start+len(wanted)]!=wanted:raise ToolError('writer_validation_failed','Record bytes differ after expansion')
+    return result
