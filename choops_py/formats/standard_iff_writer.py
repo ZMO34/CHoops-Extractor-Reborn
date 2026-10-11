@@ -98,7 +98,8 @@ def replace_records_expanding(iff,changes):
             shared=any(other['index']!=index and any(b==block and start<e and s<end for b,s,e in iff.spans(other)) for other in iff.records)
             if len(new)>len(old) or shared:
                 if rec['type'] not in ('TXTR','SCNE','NAME','CDAN','LAYT','ROST'):raise ToolError('unsupported_record_growth',rec['name']+'.'+rec['type'])
-                target=(len(mutable[block])+15)&~15
+                alignment=128 if iff.blocks[block]['fields'][0]==0x411536D5 else 16
+                target=(len(mutable[block])+alignment-1)&~(alignment-1)
                 mutable[block]+=b'\0'*(target-len(mutable[block]));mutable[block]+=new
                 offset_updates[index,block]=target
             else:
@@ -106,6 +107,30 @@ def replace_records_expanding(iff,changes):
                 # Unreferenced tail remains intact; no unrelated bytes are erased.
             expected[index,block]=bytes(new)
     if not expected:return iff.raw
+    # GPU resources are relocatable slices, but their RSX base addresses must
+    # remain 128-byte aligned. Repack them once instead of retaining obsolete
+    # images followed by an appended replacement for every resized texture.
+    # Unknown records pin the prefix: their internal pointer semantics are not
+    # established and their addresses must not change.
+    for block in iff.blocks:
+        bi=block['index']
+        if block['fields'][0]!=0x411536D5 or not any(b==bi for _,b in expected):continue
+        spans=[(rec,start,end) for rec in iff.records for b,start,end in iff.spans(rec) if b==bi]
+        if not spans:continue
+        pinned=max([end for rec,start,end in spans if rec['type'] not in ('TXTR','SCNE')]+[min(start for _,start,_ in spans)])
+        packed=bytearray(original_blocks[bi][:pinned]);aliases={}
+        for rec,start,end in sorted(spans,key=lambda row:(row[1],row[0]['index'])):
+            key=(rec['index'],bi);wanted=expected.get(key,original_blocks[bi][start:end])
+            if end<=pinned and len(wanted)<=end-start:
+                target=start;packed[start:start+len(wanted)]=wanted
+            else:
+                alias=(start,wanted)
+                if alias in aliases:target=aliases[alias]
+                else:
+                    target=(len(packed)+127)&~127
+                    packed+=b'\0'*(target-len(packed))+wanted;aliases[alias]=target
+            offset_updates[key]=target
+        mutable[bi]=packed
     header=bytearray(iff.raw[:iff.header_size]);b=Binary(header)
     for (index,block),target in offset_updates.items():
         field=32+len(iff.blocks)*32+index*4;descriptor=b.relative(field)
@@ -137,3 +162,28 @@ def replace_records_expanding(iff,changes):
             raw=checked_blocks[new_block]
             if raw[new_start:new_start+len(wanted)]!=wanted:raise ToolError('writer_validation_failed','Record bytes differ after expansion')
     return result
+
+
+def repair_compression(iff):
+    """Repair old tool streams while retaining every decoded byte and offset."""
+    from .compression import game_compatible,encode_greedy
+    header=bytearray(iff.raw[:iff.header_size]);payload=bytearray();cursor=iff.header_size;expected={};repaired=[]
+    for block in sorted(iff.blocks,key=lambda b:b['start']):
+        payload+=iff.raw[cursor:block['start']]
+        stored=iff.raw[block['start']:block['start']+block['size']]
+        if block['compressed'] and not game_compatible(stored):
+            logical=decode(stored,block['logical_size']);expected[block['index']]=logical
+            stored=encode_greedy(stored,logical)
+            if not game_compatible(stored):raise ToolError('compression_verification_failed','Repaired stream is not game compatible')
+            repaired.append(block['index'])
+        entry=32+block['index']*32
+        struct.pack_into('>II',header,entry+20,iff.header_size+len(payload),len(stored))
+        payload+=stored;cursor=block['start']+block['size']
+    if not repaired:return iff.raw,[]
+    payload+=iff.raw[cursor:iff.file_length];end=iff.header_size+len(payload);struct.pack_into('>I',header,8,end)
+    result=bytes(header)+bytes(payload)+iff.raw[iff.file_length:]
+    check=StandardIFF(result)
+    for index,wanted in expected.items():
+        b=check.blocks[index]
+        if decode(result[b['start']:b['start']+b['size']],b['logical_size'])!=wanted:raise ToolError('writer_validation_failed','Compression repair changed decoded bytes')
+    return result,repaired

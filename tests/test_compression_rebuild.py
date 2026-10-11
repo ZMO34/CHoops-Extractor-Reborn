@@ -50,3 +50,15 @@ def test_truncated_and_invalid_backreferences_are_rejected_by_both_decoders(monk
         with monkeypatch.context() as context:
             if not native:context.setattr(native_codec,'library',lambda:None)
             with pytest.raises(ToolError):decode(bad)
+
+
+def test_encoded_backreferences_do_not_overlap_their_source_for_game_compatibility(monkeypatch):
+    from choops_py.formats.compression import tokens
+    from choops_py.formats import native_codec
+    data=b'\0'*120000+b'ABCD'*20000+bytes(range(256))*100
+    for native in (True,False):
+        with monkeypatch.context() as context:
+            if not native:context.setattr(native_codec,'library',lambda:None)
+            encoded=encode_greedy(literal(data,13),data)
+            assert decode(encoded)==data
+            assert all(not distance or length<=distance for _,length,distance,_ in tokens(encoded))

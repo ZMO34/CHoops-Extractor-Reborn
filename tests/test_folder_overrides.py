@@ -64,6 +64,33 @@ def test_expanding_record_preserves_other_records():
     assert rebuilt.records[1]['offsets']==iff.records[1]['offsets']
 
 
+def test_gpu_growth_compacts_obsolete_images_and_aligns_live_resources():
+    payload=bytearray(named_iff([txtr_header()*2,b'A'*128+b'B'*128],
+        [(0x5c369069,[0,0]),(0x5c369069,[176,128])],[('one','TXTR'),('two','TXTR')]))
+    struct.pack_into('>I',payload,64,0x411536d5)
+    struct.pack_into('>I',payload,72,128)
+    original=StandardIFF(bytes(payload))
+    grown=b'new pixels'*51
+    result=StandardIFF(replace_records_expanding(original,{0:[txtr_header(),grown]}))
+    assert all(r['offsets'][1]%128==0 for r in result.records)
+    assert result.blocks[1]['logical_size']==512+128
+    assert record_blocks(result,result.records[0])[1][3].startswith(grown)
+    assert record_blocks(result,result.records[1])[1][3]==b'B'*128
+
+
+def test_gpu_compaction_keeps_unknown_resource_addresses_and_bytes():
+    payload=bytearray(named_iff([b'A'*128+b'UNKNOWN'+b'\0'*121+b'B'*128],
+        [(0x5c369069,[0]),(0x12345678,[128]),(0xe26c9b5d,[256])],
+        [('one','TXTR'),('marker','UNKNOWN'),('scene','SCNE')]))
+    struct.pack_into('>I',payload,32,0x411536d5)
+    original=StandardIFF(bytes(payload))
+    result=StandardIFF(replace_records_expanding(original,{2:[b'C'*257]}))
+    assert result.records[1]['offsets']==[128]
+    assert record_blocks(result,result.records[1])[0][3]==b'UNKNOWN'+b'\0'*121
+    assert result.records[2]['offsets'][0]%128==0
+    assert record_blocks(result,result.records[2])[0][3]==b'C'*257
+
+
 def test_dynamic_dds_changes_descriptor_and_preserves_original_input(tmp_path,monkeypatch):
     image=bytes(range(64));data=bytearray(dds.compressed_preview(8,8,'DXT5',image))
     struct.pack_into('<I',data,24,1)
@@ -73,8 +100,10 @@ def test_dynamic_dds_changes_descriptor_and_preserves_original_input(tmp_path,mo
         desc=struct.pack('>4BI3HBBII',0x88,1,2,0,0xaae4,8,8,1,0,0,32,0)
         Path(output_path).write_bytes(gtf.make(desc,image))
     monkeypatch.setattr(override_import.external_converters,'convert',convert)
-    changed,info=override_import.apply_dds([txtr_header(),b'oldimage'],'TXTR','unif',source)
+    header=bytearray(txtr_header());struct.pack_into('>3H',header,0x90,4,4,1)
+    changed,info=override_import.apply_dds([bytes(header),b'oldimage'],'TXTR','unif',source)
     assert TXTR(changed).image()==image and info['width']==8 and info['format']=='DXT5'
+    assert struct.unpack_from('>3H',changed[0],0x90)==(4,4,1)
     assert source.read_bytes()==bytes(data)
 
 

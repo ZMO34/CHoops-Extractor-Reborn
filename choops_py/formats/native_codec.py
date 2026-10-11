@@ -13,10 +13,15 @@ def library():
     if not path.is_file():return None
     try:lib=ctypes.CDLL(str(path))
     except OSError:return None
+    if not hasattr(lib,'h7a_version'):return None
+    lib.h7a_version.restype=ctypes.c_uint32
+    if lib.h7a_version()!=2:return None
     lib.h7a_decode.argtypes=[ctypes.c_char_p,ctypes.c_size_t,ctypes.c_void_p,ctypes.c_size_t]
     lib.h7a_decode.restype=ctypes.c_size_t
     lib.h7a_encode.argtypes=[ctypes.c_char_p,ctypes.c_size_t,ctypes.c_uint32,ctypes.c_void_p,ctypes.c_size_t]
     lib.h7a_encode.restype=ctypes.c_size_t
+    lib.h7a_game_compatible.argtypes=[ctypes.c_char_p,ctypes.c_size_t]
+    lib.h7a_game_compatible.restype=ctypes.c_uint32
     return lib
 
 
@@ -37,3 +42,8 @@ def encode(data,shift):
     count=lib.h7a_encode(data,len(data),shift,out,capacity)
     if count>capacity:raise ToolError('compression_verification_failed','Native encoder rejected input')
     return out.raw[:count]
+
+
+def game_compatible(raw):
+    lib=library()
+    return None if lib is None else bool(lib.h7a_game_compatible(raw,len(raw)))

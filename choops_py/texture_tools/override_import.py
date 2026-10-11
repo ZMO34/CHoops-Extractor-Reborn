@@ -56,9 +56,9 @@ def apply_dds(parts,kind,selector,source,job=None,converter=None):
                 if int.from_bytes(buffer[base+field:base+field+4],'big')==old_key:
                     buffer[base+field:base+field+4]=new_key.to_bytes(4,'big')
             buffer[base+0x58:base+0x70]=descriptor
-            # The resource also stores its image extent outside the GCM
-            # descriptor; keep both sets of dimensions in agreement.
-            buffer[base+0x90:base+0x96]=descriptor[8:14]
+            # +0x90/+0x92 are also consumed by sprite sizing in the game.
+            # Preserve the authored extent when replacing artwork at a higher
+            # resolution; the RSX descriptor carries the actual image size.
         if kind=='SCNE':
             item=items[index];update_header(result[0],item.header_offset)
             shared=any(t.index!=index and t.payload_offset==item.payload_offset for t in items)
@@ -107,7 +107,7 @@ def apply_raw_texture(parts,selector,replacement):
         if int.from_bytes(result[0][base+field:base+field+4],'big')==old_key:
             result[0][base+field:base+field+4]=new_key.to_bytes(4,'big')
     result[0][base+0x58:base+0x70]=descriptor
-    result[0][base+0x90:base+0x96]=descriptor[8:14]
+    # Keep the destination scene's authored extent and layout.
     target=(len(result[1])+127)&~127;result[1]+=b'\0'*(target-len(result[1]))+image
     struct.pack_into('>I',result[0],base+0xa4,target+1)
     updated=textures(result)[index]

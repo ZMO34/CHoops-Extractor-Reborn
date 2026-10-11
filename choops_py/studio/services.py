@@ -196,12 +196,21 @@ def stage_folder(source: Path, folder: Path, mod: Path, job=None) -> dict:
             try:data,imports=compile_group(archive,group,job)
             except (ValueError,OSError) as error:raise ValueError(group['name']+': '+str(error)) from error
             unapplied.extend(dict(archive=group['name'],**item) for item in imports if item.get('status')=='unmatched')
-            if data==original and group['whole'] is None:unchanged+=1;continue
+            if data==original and group['whole'] is None and not group.get('compiled_companion'):unchanged+=1;continue
             target=f'assets/{len(rows):04d}.bin';write_bytes(work/target,data,[source,folder])
             rows.append(dict(archive=group['name'],subfile=None,kind='archive',original_name=group['name'],path=target,sha256=hashlib.sha256(data).hexdigest(),size=len(data)))
             conditions.append(dict(index=group['entry']['index'],hash=group['entry']['hash'],sha256=hashlib.sha256(original).hexdigest()))
             details.append(dict(archive=group['name'],binary_records=len(group['records']),dds_imports=imports))
             if len(data)>len(original):growth.append(dict(archive=group['name'],old_bytes=len(original),new_bytes=len(data)))
+            if group.get('compiled_companion'):
+                entry,name,payload=group['compiled_companion'];target=f'assets/{len(rows):04d}.bin'
+                write_bytes(work/target,payload,[source,folder])
+                rows.append(dict(archive=name,subfile=None,kind='archive',original_name=name,path=target,sha256=hashlib.sha256(payload).hexdigest(),size=len(payload)))
+                before=archive.read(entry)
+                conditions.append(dict(index=entry['index'],hash=entry['hash'],sha256=hashlib.sha256(before).hexdigest()))
+                if len(payload)>len(before):growth.append(dict(archive=name,old_bytes=len(before),new_bytes=len(payload)))
+        names=[row['archive'].casefold() for row in rows]
+        if len(names)!=len(set(names)):raise ValueError('A paired CDF texture import conflicts with a complete CDF replacement')
         if not rows:raise ValueError('All discovered overrides match the selected game; no changes to stage')
         save_json(work/'overrides.json',rows,[source,folder])
         save_json(work/'source_preconditions.json',dict(schema=1,entries=conditions),[source,folder])

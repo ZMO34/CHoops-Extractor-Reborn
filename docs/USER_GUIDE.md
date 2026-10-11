@@ -59,3 +59,11 @@ To preview a uniform: open a cloth jersey/shorts SCNE, then choose a searchable 
 In Models / Courts, choose a shoe artwork package and click **Preview selected shoes**. The current JB folder supplies both the standalone shoe mesh and selected upper/sole textures. In the roster editor, select one player or school and use **Preview assigned shoes…** to choose Home or Away. Player rows show their current assignment; school rows show team defaults. These shoe fields are read-only. Previewing another package does not edit roster assignments.
 
 Explorer's **Identify unnamed assets** adds internal-record descriptions beside unresolved hashes. **Match filename list…** checks a UTF-8 candidate list against TOC CRC32 values. Confirmed matches become names; descriptive hints retain the original hash identity. Results are cached per JB source and invalidated when its banks change.
+
+### Artwork resolution and menu logos
+
+Higher-resolution DDS artwork updates GPU image dimensions while preserving the destination texture's authored display extent. This keeps menu widgets at their intended size. Replacement SCNEs supply their own geometry and authored layout. Enlarged GPU records retain 128-byte alignment; obsolete outer record copies are removed when their relocation semantics are known. Unknown resources remain at their original addresses.
+
+Team selection logos live in `teamselectlogo.iff` and its paired `teamselectlogo.cdf`. Put named DDS replacements under `teamselectlogo/_logoNNN.txtr/logoNNN.dds`, using the actual record name shown in Explorer. Recursive staging updates both files together and supports larger logo artwork. Uniform selection files such as `seluhNNN` contain different assets and do not replace this menu logo bank. A folder without menu logo artwork leaves those logos unchanged.
+
+Rebuild existing mods with the corrected importer. Build preflight repairs old incompatible compressed streams while retaining their decoded bytes; repairing compression alone does not correct artwork sizing or alignment from an older import. Python checks validate byte preservation, addresses, descriptors, paired bank metadata and compression. They do not establish gameplay compatibility.

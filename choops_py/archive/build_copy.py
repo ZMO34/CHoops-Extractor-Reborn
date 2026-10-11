@@ -75,10 +75,14 @@ def preflight(source,mod):
                 parts=unwrap(replacement)[1] if replacement[:4]==b'2kTl' else [replacement]
                 data=replace_records(iff,{rec['index']:parts})
             else:data=replacement
+        if data[:4]==bytes.fromhex('ff3bef94'):
+            from ..formats.standard_iff_writer import repair_compression
+            data,_=repair_compression(StandardIFF(data))
         if len(data)>len(original) and not allow_growth:raise ToolError('archive_extent_capacity_exceeded',f'{name} needs {len(data)} bytes; allocation {len(original)}')
         if len(data)<len(original):
-            if data[:4]!=bytes.fromhex('ff3bef94'):raise ToolError('archive_size_change_blocked',name)
-            StandardIFF(data);data+=b'\0'*(len(original)-len(data))
+            if data[:4]!=bytes.fromhex('ff3bef94') and not name.endswith('.cdf'):raise ToolError('archive_size_change_blocked',name)
+            if data[:4]==bytes.fromhex('ff3bef94'):StandardIFF(data)
+            data+=b'\0'*(len(original)-len(data))
         if data[:4]==bytes.fromhex('ff3bef94'):StandardIFF(data)
         patches.append((entry,data))
     final={e['name'].lower():data for e,data in patches if e['name']}

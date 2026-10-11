@@ -76,7 +76,7 @@ def encode_like(original, replacement):
     if old == replacement: return original
     shift = Binary(original).u32(16); encoded = []; max_distance = (1 << shift)-1
     for offset,length,distance,literal in tokens(original):
-        if distance and all(replacement[offset+i] == replacement[offset+i-distance] for i in range(length)):
+        if distance>=length and all(replacement[offset+i] == replacement[offset+i-distance] for i in range(length)):
             encoded.append((1,struct.pack('>H', ((length-3)<<shift)|distance)))
         else:
             # Keeping original token boundaries prevents broad recompression drift.
@@ -128,8 +128,10 @@ def encode_greedy(original, replacement):
         for previous in reversed(candidates):
             distance=offset-previous
             if distance > max_distance:break
+            candidate_limit=min(limit,distance)
+            if candidate_limit<3:continue
             length=3
-            while length < limit and replacement[offset+length] == replacement[offset+length-distance]:length+=1
+            while length < candidate_limit and replacement[offset+length] == replacement[offset+length-distance]:length+=1
             if length>best_length:best_length,best_distance=length,distance
             if length==limit:break
         if best_length >= 3:
@@ -144,3 +146,13 @@ def encode_greedy(original, replacement):
     struct.pack_into('>I',header,4,len(replacement))
     struct.pack_into('>I',header,8,20+len(body))
     return bytes(header)+body
+
+
+def game_compatible(raw):
+    """CH2K8's bulk-copy decoder requires non-overlapping backreferences."""
+    if raw[:4]!=struct.pack('>I',MAGIC):return True
+    from . import native_codec
+    accelerated=native_codec.game_compatible(raw)
+    if accelerated is not None:return accelerated
+    try:return all(not distance or length<=distance for _,length,distance,_ in tokens(raw))
+    except ToolError:return False

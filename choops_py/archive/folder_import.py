@@ -143,13 +143,22 @@ def resolve_legacy_targets(archive,discovery,folder,job=None):
     from ..formats.binary import Binary
     groups={g['entry']['hash']:g for g in discovery['groups']};labels={};catalog=None
     discovery['resolved_targets']=[]
+    def cdf_records(entry,data):
+        from ..formats.cdf_backed_iff import CDFPair
+        metadata=Binary(data)
+        partner=hash_name(Path(metadata.utf16(metadata.relative(36),'be')).name)
+        match=next((e for e in archive.entries if e['hash']==partner),None)
+        if match is None:raise ValueError('CDF companion is missing')
+        replacement=groups.get(partner,{}).get('whole')
+        pair=CDFPair(data,replacement.read_bytes() if replacement else archive.read(match))
+        return [(r['name'],r['type']) for r in pair.records]
     def records(entry):
         key=entry['hash']
         if key in labels:return labels[key]
         group=groups.get(key)
         if group and group['whole']:
             data=group['whole'].read_bytes()
-            result=[(r['name'],r['type']) for r in StandardIFF(data).records] if data[:4]==bytes.fromhex('ff3bef94') else []
+            result=[(r['name'],r['type']) for r in StandardIFF(data).records] if data[:4]==bytes.fromhex('ff3bef94') else cdf_records(entry,data) if data[:4]==bytes.fromhex('f0985030') else []
         else:
             head=archive.read({**entry,'size':32});b=Binary(head);result=[]
             if head[:4]==bytes.fromhex('ff3bef94'):
@@ -159,6 +168,8 @@ def resolve_legacy_targets(archive,discovery,folder,job=None):
                 if len(result)<count:
                     header=Binary(archive.read({**entry,'size':b.u32(4)}));start=32+b.u32(16)*32
                     result += [(str(i),TYPES.get(header.u32(header.relative(start+i*4)+4),'UNKNOWN')) for i in range(len(result),count)]
+            elif head[:4]==bytes.fromhex('f0985030'):
+                result=cdf_records(entry,archive.read(entry))
         labels[key]=result;return result
     def global_matches(name,typ):
         nonlocal catalog
@@ -202,6 +213,11 @@ def resolve_legacy_targets(archive,discovery,folder,job=None):
             else:target['dds'][normalized]=file;target['dds_rank'][normalized]=rank
             discovery['resolved_targets'].append({'input':str(file.relative_to(folder)),'archive':target['name'],'selector':normalized})
     if errors:raise ValueError('Override target validation failed: '+'; '.join(errors[:12]))
+    for group in list(groups.values()):
+        if not (group['records'] or group['dds'] or group['package_records']):continue
+        partner=groups.get(hash_name(group['name'][:-4]+'.cdf'))
+        if partner and partner['whole'] and not (partner['records'] or partner['dds'] or partner['package_records']):
+            group['cdf_whole']=partner['whole'];partner['whole']=None
     discovery['groups']=[g for g in groups.values() if g['whole'] or g['records'] or g['dds'] or g['package_records']]
 
 
@@ -215,6 +231,7 @@ def compile_group(archive,group,job=None):
     original=archive.read(group['entry'])
     data=group['whole'].read_bytes() if group['whole'] else original
     if not group['records'] and not group['dds'] and not group['package_records']:return data,[]
+    if data[:4]==bytes.fromhex('f0985030'):return compile_cdf_group(archive,group,data,job)
     iff=StandardIFF(data);decoded={};changes={};details=[]
     def find(name,typ=None):
         matches=[r for r in iff.records if r['name'].casefold()==name.casefold() and (typ is None or r['type']==typ)]
@@ -272,3 +289,33 @@ def compile_group(archive,group,job=None):
         changes[rec['index']]=changed
         details.append(dict(selector=(name+'/'+texture if '/' in selector else selector),input_selector=selector,**info))
     return replace_records_expanding(iff,changes),details
+
+
+def compile_cdf_group(archive,group,data,job=None):
+    from ..formats.cdf_backed_iff import CDFPair
+    from ..formats.cdf_backed_iff_writer import replace_texture_records
+    from ..formats.compression import decode
+    from ..formats.tool_wrapper import unwrap
+    from ..texture_tools.override_import import apply_dds
+    companion=group['name'][:-4]+'.cdf'
+    entry=next((e for e in archive.entries if e['hash']==hash_name(companion)),None)
+    if entry is None:raise ValueError('CDF companion is missing: '+companion)
+    cdf=group['cdf_whole'].read_bytes() if group.get('cdf_whole') else archive.read(entry)
+    pair=CDFPair(data,cdf);changes={};details=[]
+    def find(name):
+        matches=[r for r in pair.records if r['name'].casefold()==name.casefold() and r['type']=='TXTR']
+        if len(matches)!=1:raise ValueError('Unknown/ambiguous CDF texture '+name)
+        return matches[0]
+    def parts(rec):
+        return changes.get(rec['index']) or [decode(cdf[rec[k+'_offset']:rec[k+'_offset']+rec[k+'_length']]) for k in ('header','payload')]
+    if group['package_records']:raise ValueError('CDF logo banks do not contain SCNE textures')
+    for (name,kind),file in group['records'].items():
+        if kind!='TXTR':raise ValueError('CDF logo banks require TXTR records')
+        rec=find(name);raw=file.read_bytes();changes[rec['index']]=unwrap(raw)[1] if raw[:4]==b'2kTl' else [raw]
+    for name,file in group['dds'].items():
+        if job:job.check()
+        rec=find(name);changed,info=apply_dds(parts(rec),'TXTR',name,file,job)
+        changes[rec['index']]=changed;details.append(dict(selector=name,**info))
+    rebuilt,payload=replace_texture_records(data,cdf,changes)
+    group['compiled_companion']=(entry,companion,payload)
+    return rebuilt,details
