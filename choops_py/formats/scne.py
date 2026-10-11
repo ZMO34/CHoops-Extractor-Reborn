@@ -27,6 +27,7 @@ def preview_meshes(blocks):
     total_vertices = 0
     material_textures = {}
     material_hashes = {}
+    material_names = {}
     diffuse_materials = set()
     transforms = {}
     instance_count = head.u32(0x3c)
@@ -49,10 +50,20 @@ def preview_meshes(blocks):
             raise ValueError('material table exceeds limits')
         texture_table = head.relative(0x24) if texture_count else 0
         shader_table = head.relative(0x2c) if shader_count else 0
-        material_table = head.relative(0x38) if material_count else 0
+        external_materials = embedded and material_count and not head.u32(0x38) and head.u32(0x34)
+        if external_materials:
+            external_table=head.relative(0x34)
+            head.slice(external_table,material_count*60)
+            for j in range(material_count):
+                entry=external_table+j*60
+                material_hashes[j]=head.u32(entry+40)
+                material_names[j]=head.utf16(head.relative(entry+36),'be')
+            material_table=0
+        else:
+            material_table = head.relative(0x38) if material_count else 0
         head.slice(texture_table, texture_count * 176)
         head.slice(shader_table, shader_count * 48)
-        head.slice(material_table, material_count * 40)
+        if not external_materials:head.slice(material_table, material_count * 40)
         textures = {}
         for j in range(texture_count):
             textures.setdefault(head.u32(texture_table+j*176), []).append(j)
@@ -60,7 +71,7 @@ def preview_meshes(blocks):
         # Sampler semantics, rather than parameter order, select base color.
         # Bump/normal and gloss samplers must never become a diffuse fallback.
         color_semantics = (0xb6e7ae40, 0x49412c54, 0x87d6e6f6)
-        for j in range(material_count):
+        for j in range(0 if external_materials else material_count):
             material = material_table+j*40
             material_hashes[j] = head.u32(material)
             shader = shaders.get(head.u32(material+8))
@@ -130,12 +141,24 @@ def preview_meshes(blocks):
             declaration = head.relative(off + 0x9c)
             head.slice(declaration, declaration_count * 64)
             position, uv, uv_format = None, None, None
+            position_format = ">3f"
+            position_transform = uv_transform = None
             position_stream = uv_stream = 0
             for j in range(declaration_count):
                 code = head.slice(declaration + j * 64 + 8, 8)
-                if code[0] != 0x20 or code[2] >= stream_count or code[3] != 0:
+                if code[0] not in (0x20,0x30) or code[2] >= stream_count or code[3] != 0:
                     continue
-                if code[4:] == bytes.fromhex('02030000'):
+                quantized = code[0] == 0x30
+                transform = None
+                if quantized:
+                    bias=struct.unpack('>4f',head.slice(declaration+j*64+16,16))
+                    scale=struct.unpack('>4f',head.slice(declaration+j*64+32,16))
+                    if not all(math.isfinite(x) and abs(x)<1e8 for x in bias+scale):raise ValueError('Invalid quantized vertex transform')
+                    transform=(bias,scale)
+                if quantized and code[4:] == bytes.fromhex('01040000'):
+                    position,position_stream=code[1],code[2]
+                    position_format='>4h';position_transform=transform
+                elif not quantized and code[4:] == bytes.fromhex('02030000'):
                     position, position_stream = code[1], code[2]
                 elif code[4:] == bytes.fromhex('03020800'):
                     uv_stream = code[2]
@@ -143,21 +166,28 @@ def preview_meshes(blocks):
                 elif code[4:] == bytes.fromhex('01020800'):
                     uv_stream = code[2]
                     uv, uv_format = code[1], '>2h'
+                    uv_transform=transform
                 elif code[4:] == bytes.fromhex('02020800'):
                     uv_stream = code[2]
                     uv, uv_format = code[1], '>2f'
             position_stride, position_data = streams[position_stream]
             uv_stride, uv_data = streams[uv_stream]
-            if position is None or position + 12 > position_stride:
+            if position is None or position + struct.calcsize(position_format) > position_stride:
                 raise ValueError("position declaration is unsupported")
             if uv is None or uv + struct.calcsize(uv_format) > uv_stride:
                 raise ValueError("UV declaration is unsupported")
             points = []
             for v in range(vertices):
-                xyz = struct.unpack_from('>3f', position_data, v * position_stride + position)
+                xyz = struct.unpack_from(position_format, position_data, v * position_stride + position)[:3]
+                if position_transform:
+                    bias,scale=position_transform
+                    xyz=tuple(max(-1.,x/32767.)*scale[k]+bias[k] for k,x in enumerate(xyz))
                 tex = struct.unpack_from(uv_format, uv_data, v * uv_stride + uv)
                 if uv_format == '>2h':
                     tex = tuple(max(-1., x/32767.) for x in tex)
+                    if uv_transform:
+                        bias,scale=uv_transform
+                        tex=tuple(x*scale[k]+bias[k] for k,x in enumerate(tex))
                 if not all(math.isfinite(x) and abs(x) < 1e8 for x in xyz + tex):
                     raise ValueError("non-finite or excessive vertex values")
                 points.append(xyz + tex)
@@ -199,6 +229,8 @@ def preview_meshes(blocks):
                 if len(triangles) > batch_start:
                     batches.append({'first': batch_start, 'count': len(triangles)-batch_start,
                                     'texture_index': material_textures.get(head.u32(run+32)),
+                                    'material_index': head.u32(run+32),
+                                    'material_name': material_names.get(head.u32(run+32)),
                                     'material_hash': material_hashes.get(head.u32(run+32)),
                                     'supports_diffuse_color': head.u32(run+32) in diffuse_materials})
                 if total_vertices + len(triangles) > 1500000:

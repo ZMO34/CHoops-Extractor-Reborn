@@ -12,7 +12,7 @@ def descriptor_info(descriptor):
     size=image_size(width,height,fmt,mips)
     pitch=b.u32(16)
     if code&0x20 and fmt in ('L8','ARGB8') and pitch!=width*(1 if fmt=='L8' else 4):raise ToolError('unsupported_texture_pitch',f'Padded pitch {pitch} is not validated')
-    return dict(width=width,height=height,format=fmt,mip_count=mips,image_size=size,ps3_format=code,linear=bool(code&0x20),pitch=pitch)
+    return dict(remap=b.u32(4),width=width,height=height,format=fmt,mip_count=mips,image_size=size,ps3_format=code,linear=bool(code&0x20),pitch=pitch)
 
 def make(descriptor,payload):
     descriptor_info(descriptor)
@@ -25,3 +25,19 @@ def parse(data):
     if offset<48 or offset+size>len(data):raise ToolError('invalid_gtf','Invalid GTF payload range')
     info=descriptor_info(data[24:48]);info.update(payload_offset=offset,payload_size=size)
     return info,data[24:48],payload
+
+
+def remap_preview(image,remap):
+    """Apply RSX A/R/G/B selectors and ZERO/ONE/REMAP output controls."""
+    from PIL import Image
+    if remap==0xaae4:return image
+    if remap>>16:raise ValueError('Unsupported RSX texture remap order')
+    red,green,blue,alpha=image.convert('RGBA').split()
+    sources=(alpha,red,green,blue);outputs=[]
+    for index in range(4):
+        operation=(remap>>(8+index*2))&3
+        if operation==0:outputs.append(Image.new('L',image.size,0))
+        elif operation==1:outputs.append(Image.new('L',image.size,255))
+        elif operation==2:outputs.append(sources[(remap>>(index*2))&3])
+        else:raise ValueError('Reserved RSX texture remap operation')
+    return Image.merge('RGBA',(outputs[1],outputs[2],outputs[3],outputs[0]))

@@ -50,3 +50,10 @@ Roster tables display bounded summaries for palette/ratings/property lists rathe
 Non-arena SCNE preview also supports single-block scenes with embedded relative buffers and separate vertex streams for positions and UVs. Open an extracted raw or 2kTl-wrapped `.scne`, or select a SCNE record in a cloth IFF. Cloth jerseys and shorts display their stored rest-pose meshes; skinning, cloth simulation and runtime-injected uniform textures are not reproduced. Use a texture override when appropriate. Unsupported declarations remain explicitly reported.
 
 To preview a uniform: open a cloth jersey/shorts SCNE, then choose a searchable uniform from the Models / Courts uniform list, or use Open uniform IFF for a standalone package. The selected source’s authored RGB artwork is applied to the corresponding cloth mesh. The preview does not synthesize player names/numbers or full material shading.
+
+
+### Shoe previews and file identities
+
+In Models / Courts, choose a shoe artwork package and click **Preview selected shoes**. The current JB folder supplies both the standalone shoe mesh and selected upper/sole textures. In the roster editor, select one player or school and use **Preview assigned shoes…** to choose Home or Away. Player rows show their current assignment; school rows show team defaults. These shoe fields are read-only. Previewing another package does not edit roster assignments.
+
+Explorer's **Identify unnamed assets** adds internal-record descriptions beside unresolved hashes. **Match filename list…** checks a UTF-8 candidate list against TOC CRC32 values. Confirmed matches become names; descriptive hints retain the original hash identity. Results are cached per JB source and invalidated when its banks change.

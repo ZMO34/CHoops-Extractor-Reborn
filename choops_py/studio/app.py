@@ -88,6 +88,8 @@ class Rows(QAbstractTableModel):
             return None
         key = self.columns[index.column()][0]
         value = self.rows[index.row()].get(key, "")
+        if role == Qt.ItemDataRole.UserRole and key=="name":
+            return value or self.rows[index.row()].get("name_hint") or f"hash_{self.rows[index.row()].get('hash',0):08x}"
         if role == Qt.ItemDataRole.UserRole:
             return value if isinstance(value, (int, float)) else str(value or "")
         if role != Qt.ItemDataRole.DisplayRole:
@@ -95,6 +97,8 @@ class Rows(QAbstractTableModel):
         if key == "hash":
             return f"{value:08X}"
         if key == "name" and not value:
+            hint=self.rows[index.row()].get("name_hint")
+            if hint:return hint+f" [hash {self.rows[index.row()].get('hash',0):08X}]"
             return f"hash_{self.rows[index.row()].get('hash', 0):08x}"
         from ..roster.schema import ENUM_CHOICES
         if key in ENUM_CHOICES:
@@ -491,6 +495,7 @@ class Window(QMainWindow):
             # A newly selected JB folder must not inherit another source's roster.
             self.roster = None
             self.refresh_uniform_list()
+            self.refresh_shoe_list()
             for view in self.roster_views.values():
                 view.setModel(None)
             self.roster_state.setText('No roster loaded; load the current JB folder roster')
@@ -524,6 +529,27 @@ class Window(QMainWindow):
 
         self.run_job("Index JB folder", lambda job: Archive(path), loaded)
 
+    def identify_asset_names(self, candidates=()):
+        if isinstance(candidates,bool):candidates=()
+        if self.active or not self.archive:return
+        from ..archive.identity import recover,apply
+        def display(result):
+            apply(self.archive,result['identities'])
+            self.explorer.model().sourceModel().layoutChanged.emit()
+            self.refresh_uniform_list();self.refresh_shoe_list()
+            self.log(f"{result['matched_names']} canonical filenames verified by CRC32; {result['internal_labels']} internal-record labels. Labels preserve original hash identities.")
+        self.run_job('Recover archive identities',lambda job:recover(self.archive,candidates,job),display,cancellable=True)
+
+    def match_asset_names(self):
+        if self.active or not self.archive:return
+        path,_=QFileDialog.getOpenFileName(self,'Candidate filenames, one per line','','Text lists (*.txt);;All files (*)')
+        if not path:return
+        try:
+            if Path(path).stat().st_size>2*1024*1024:raise ValueError('Filename list exceeds 2 MiB')
+            candidates=Path(path).read_text(encoding='utf-8-sig').splitlines()
+            self.identify_asset_names(candidates)
+        except (ValueError,OSError) as error:QMessageBox.warning(self,'Filename list blocked',str(error))
+
     def create_explorer(self):
 
         layout = self.page(
@@ -541,6 +567,8 @@ class Window(QMainWindow):
                 ("Open game…", self.choose_game),
                 ("Extract selected…", self.extract_selected),
                 ("Extract all raw…", lambda: self.extract_selected(True)),
+                ("Identify unnamed assets", self.identify_asset_names),
+                ("Match filename list…", self.match_asset_names),
             ],
         )
 
@@ -899,6 +927,7 @@ class Window(QMainWindow):
                 ("Give schools five jerseys…", self.fill_five_uniforms),
                 ("Move school / convert to D1…", self.move_school),
                 ("Enable alternates…", self.edit_alternate_availability),
+                ("Preview assigned shoes…", self.preview_assigned_shoes),
                 ("Give school independent assets…", self.declone_school_assets),
                 ("Player attributes…", self.show_player_attributes),
                 ("Player properties…", self.show_player_properties),
@@ -1452,8 +1481,57 @@ class Window(QMainWindow):
         layout.addWidget(self.scene_uniforms)
         self.buttons(layout, [('Open uniform IFF…', self.choose_scene_uniform_file)])
         self.refresh_uniform_list()
+        self.scene_shoes=QComboBox()
+        self.scene_shoes.setEditable(True);self.scene_shoes.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
+        self.scene_shoes.completer().setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
+        self.scene_shoes.completer().setFilterMode(Qt.MatchFlag.MatchContains)
+        layout.addWidget(self.scene_shoes)
+        self.buttons(layout,[('Preview selected shoes',self.preview_shoes)])
+        self.refresh_shoe_list()
         self.scene_palette_state = QLabel('No roster associated; embedded material textures only')
         layout.addWidget(self.scene_palette_state)
+
+    def preview_assigned_shoes(self):
+        if self.active or not self.archive or not self.roster:return self.log('Load a JB folder and its roster first.')
+        view=self.roster_tabs.currentWidget()
+        if view not in (self.roster_views['players'],self.roster_views['teams'],self.roster_views['schools']):return self.log('Select one player or school.')
+        rows=selected(view)
+        if len(rows)!=1:return self.log('Select exactly one player or school.')
+        choice,ok=QInputDialog.getItem(self,'Assigned shoes','Uniform side',['Home','Away'],0,False)
+        if not ok:return
+        name=rows[0].get('home_shoe_texture' if choice=='Home' else 'away_shoe_texture')
+        entry=next((e for e in self.archive.entries if name and e['name']==name),None)
+        if entry is None:return self.log('Assigned shoe package is missing or the shoe fields are unsupported.')
+        self.scene_shoes.setCurrentIndex(self.scene_shoes.findData(entry['index']))
+        self.preview_shoes()
+
+    def refresh_shoe_list(self):
+        import re
+        self.scene_shoes.clear()
+        self.scene_shoes.addItem('Choose shoe artwork from the loaded JB folder',None)
+        if not self.archive:return
+        from ..roster.shoes import BRANDS,COLORS
+        for entry in sorted(self.archive.entries,key=lambda e:e['name'] or ''):
+            name=entry['name'] or ''
+            match=re.fullmatch(r'shoe_(\d+)(?:_(\d{2}))?\.iff',name,re.I)
+            if not match:continue
+            family=int(match[1]);color=match[2]
+            brand=0 if color is None else {1:1,2:2,3:3,5:4}.get(family//100)
+            label=BRANDS.get(brand,'Shoe')+' — '+COLORS.get(int(color) if color else family,'Color '+str(color))+' — '+name
+            self.scene_shoes.addItem(label,entry['index'])
+
+    def preview_shoes(self):
+        if self.active or not self.archive:return
+        index=self.scene_shoes.currentData()
+        if index is None:return self.log('Choose a shoe texture package first.')
+        from .services import inspect_shoe_preview
+        def display(value):
+            source,result=value
+            self.navigation.setCurrentItem(self.navigation.topLevelItem(3))
+            self.scene_view.set_meshes([]);self.scene_view.set_image(None)
+            self.scene_parts.clear();self.scene_textures.clear()
+            self.show_scene_preview(result,source)
+        self.run_job('Preview shoe geometry and artwork',lambda job:inspect_shoe_preview(self.archive,self.archive.entries[index],job),display,cancellable=True)
 
     def refresh_uniform_list(self):
         import re
@@ -1531,30 +1609,31 @@ class Window(QMainWindow):
         self.scene_textures.clear()
         self.model_details.setPlainText("Loading scene…")
         from .services import inspect_scene_preview
-        def display(result):
-            self.scene_source = source
-            self.scene_meshes = result['meshes']
-            self.scene_parts.addItem('All supported parts', -1)
-            for i, mesh in enumerate(self.scene_meshes):
-                self.scene_parts.addItem(mesh['name'], i)
-            self.scene_textures.addItem('Automatic material textures', '__automatic__')
-            self.scene_textures.addItem('Untextured', None)
-            for name in result['textures']:
-                self.scene_textures.addItem(name, name)
-            images = {}
-            for name, ((w,h), raw) in result['images'].items():
-                images[name] = QImage(raw,w,h,w*4,QImage.Format.Format_RGBA8888).copy()
-            self.scene_base_images = images
-            self.scene_uniform_images = {}
-            self.scene_view.automatic = True
-            self.scene_view.set_material_images(images)
-            self.select_scene_part()
-            self.model_details.setPlainText(
-                f"{len(self.scene_meshes)} supported parts; {sum(len(m['vertices'])//3 for m in self.scene_meshes)} triangles. {len(result['images'])} material textures loaded; use dropdown for overrides.\n"
-                + '\n'.join(result['warnings'])
-            )
         include_all = self.scene_complete.isChecked()
-        self.run_job('Decode scene geometry and textures', lambda job: inspect_scene_preview(source, index, include_all, job), display, cancellable=True)
+        self.run_job('Decode scene geometry and textures', lambda job: inspect_scene_preview(source, index, include_all, job), lambda result:self.show_scene_preview(result,source), cancellable=True)
+
+    def show_scene_preview(self,result,source):
+        self.scene_source = source
+        self.scene_meshes = result['meshes']
+        self.scene_parts.addItem('All supported parts', -1)
+        for i, mesh in enumerate(self.scene_meshes):
+            self.scene_parts.addItem(mesh['name'], i)
+        self.scene_textures.addItem('Automatic material textures', '__automatic__')
+        self.scene_textures.addItem('Untextured', None)
+        for name in result['textures']:
+            self.scene_textures.addItem(name, name)
+        images = {}
+        for name, ((w,h), raw) in result['images'].items():
+            images[name] = QImage(raw,w,h,w*4,QImage.Format.Format_RGBA8888).copy()
+        self.scene_base_images = images
+        self.scene_uniform_images = {}
+        self.scene_view.automatic = True
+        self.scene_view.set_material_images(images)
+        self.select_scene_part()
+        self.model_details.setPlainText(
+            f"{len(self.scene_meshes)} supported parts; {sum(len(m['vertices'])//3 for m in self.scene_meshes)} triangles. {len(result['images'])} material textures loaded; use dropdown for overrides.\n"
+            + '\n'.join(result['warnings'])
+        )
 
     def select_scene_part(self, index=None):
         part = self.scene_parts.currentData()
@@ -1584,6 +1663,8 @@ class Window(QMainWindow):
         self.scene_view.set_image(None)
         if name is None or name == '__automatic__':
             return
+        if name in self.scene_base_images:
+            self.scene_view.set_image(self.scene_base_images[name]);return
         from .services import decode_texture_preview
         def display(result):
             (w, h), raw = result

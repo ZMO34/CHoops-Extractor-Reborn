@@ -323,3 +323,17 @@ def test_alternate_checkboxes_and_opt_in_d1(qtbot,monkeypatch):
         return QDialog.DialogCode.Rejected
     monkeypatch.setattr(QDialog,'exec',inspect_conversion)
     window.move_school();window.close()
+
+
+@pytest.mark.gui
+def test_shoe_picker_names_colors_and_scene_display(qtbot):
+    window=Window();qtbot.addWidget(window)
+    from types import SimpleNamespace
+    window.archive=SimpleNamespace(entries=[{'index':0,'name':'shoe_100_00.iff'},{'index':1,'name':'shoe_300_09.iff'}])
+    window.refresh_shoe_list()
+    assert window.scene_shoes.count()==3
+    assert 'Nike' in window.scene_shoes.itemText(1) and 'White' in window.scene_shoes.itemText(1)
+    assert 'Adidas' in window.scene_shoes.itemText(2) and 'Black / Black' in window.scene_shoes.itemText(2)
+    window.show_scene_preview({'meshes':[],'images':{},'textures':[],'warnings':[]},Path('shoe_mesh.iff'))
+    assert window.scene_parts.count()==1
+    window.close()

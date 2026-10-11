@@ -55,6 +55,8 @@ class EditorModel:
                 off=start+index*size;row={'index':index,'row_offset':off}
                 for name,rel in STRING_FIELDS.get(table,{}).items():row[name]=self.string(off+rel,(table,index,name))
                 if table=='players':
+                    from .shoes import player_fields
+                    row.update(player_fields(b,off))
                     row.update(jersey_number=self.data[off+0x1b],height_inches=self.data[off+0x3a],position_code=self.data[off+0x3b]);row['display_name']=(row['first_name']+' '+row['last_name']).strip();row['position']=POSITIONS.get(row['position_code'],'Unknown')
                     row['attribute_ratings'] = [max(35,min(99,b.u16(off+RATING_OFFSET+i*2)//100)) for i in range(RATING_COUNT)]
                     row['shot_tendencies'] = list(b.slice(off+TENDENCY_OFFSET,len(TENDENCY_NAMES)))
@@ -62,6 +64,8 @@ class EditorModel:
                     for name,(rel,field_size,shift,bits,_,_) in PLAYER_SCALARS.items():
                         row[name]=(int.from_bytes(b.slice(off+rel,field_size),'big')>>shift)&((1<<bits)-1)
                 elif table=='teams':
+                    from .shoes import team_fields
+                    row.update(team_fields(b,off))
                     row['asset_id']=b.u16(off+0x18c);row['team_index_check']=b.u16(off+0x18e)
                     row['palette_colors'] = ['#'+b.slice(off+PALETTE_OFFSET+i*4,4).hex().upper() for i in range(PALETTE_COUNT)]
                     row['mascot_asset_id'] = b.u16(off+0x192)

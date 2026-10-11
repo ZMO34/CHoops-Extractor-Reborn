@@ -10,10 +10,19 @@ def namespace():
         for i in range(10000 if prefix=='h' else 1024 if prefix=='s' or prefix.startswith(('u','selu')) else 1000):
             for ext in ('.iff','.cdf','.bin'):yield f"{prefix}{i:0{4 if prefix=='h' else 3}d}{ext}"
     for i in range(1024):yield f's{i:03d}n.iff'
+    for shape in ('u','v','vtri','tri','wishbone'):
+        for build in ('thin','reg','fat'):yield f'cloth_{shape}_{build}.iff'
+    for i in range(2):yield f'shoe_{i}.iff'
+    for base,styles,colors in ((100,3,16),(200,1,16),(300,1,16),(500,4,2)):
+        for style in range(styles):
+            for color in range(colors):yield f'shoe_{base+style}_{color:02d}.iff'
+
 @lru_cache
 def lookup():
     result={hash_name(n):n for n in namespace()}
-    result.update({int(k):v for k,v in json.loads(Path(__file__).with_name('names.json').read_text()).items()});return result
+    result.update({int(k):v for k,v in json.loads(Path(__file__).with_name('names.json').read_text()).items()})
+    result.update({int(k):v for k,v in json.loads(Path(__file__).with_name('verified_names.json').read_text(encoding='utf8')).items()})
+    return result
 def resolve(value):
     try:h=int(value,0)
     except ValueError:h=hash_name(value)

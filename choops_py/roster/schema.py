@@ -107,3 +107,8 @@ EDITABLE['teams']=(*EDITABLE['teams'],'team_type_code')
 CONFERENCE_MEMBERS=0x6e0
 CONFERENCE_MEMBER_COUNT=0x870
 CONFERENCE_MEMBER_CAPACITY=100
+
+from .shoes import BRANDS,COLORS
+ENUM_CHOICES['shoe_brand_code']=BRANDS
+ENUM_CHOICES['home_shoe_color_code']=COLORS
+ENUM_CHOICES['away_shoe_color_code']=COLORS

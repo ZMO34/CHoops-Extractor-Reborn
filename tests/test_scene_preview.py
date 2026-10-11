@@ -168,3 +168,34 @@ def test_standalone_embedded_scne_preview(tmp_path):
         result=inspect_scene_preview(source,0)
         assert len(result['meshes']) == 1
         assert len(result['meshes'][0]['vertices']) == 6
+
+
+def test_quantized_shoe_positions_and_uv_transform():
+    head,data=scene_fixture();head=bytearray(head)
+    head[408:416]=bytes.fromhex('3000000001040000')
+    head[472:480]=bytes.fromhex('3008000001020800')
+    struct.pack_into('>4f',head,416,10,20,30,0);struct.pack_into('>4f',head,432,2,3,4,1)
+    struct.pack_into('>4f',head,480,.5,.5,0,0);struct.pack_into('>4f',head,496,.5,.5,1,1)
+    packed=[(-32768,0,-32768,32767,-32768,-32768),(32767,0,-32768,32767,32767,-32768),
+            (-32768,0,32767,32767,-32768,32767),(32767,0,32767,32767,32767,32767)]
+    data=data[:8]+b''.join(struct.pack('>6hI',*v,0) for v in packed)
+    result=preview_meshes([bytes(head),data])
+    assert not result['warnings']
+    vertices=result['meshes'][0]['vertices']
+    assert vertices[0]==(8.,20.,26.,0.,0.) and vertices[1]==(12.,20.,26.,1.,0.)
+    struct.pack_into('>f',head,432,float('nan'))
+    assert not preview_meshes([bytes(head),data])['meshes']
+
+
+def test_embedded_external_material_names_are_decoded():
+    head,data=scene_fixture();head=bytearray(head)
+    struct.pack_into('>I',head,0x30,1);struct.pack_into('>I',head,0x34,700-0x34+1)
+    struct.pack_into('>I',head,736,780-736+1)
+    head[780:798]='sole_mat\0'.encode('utf-16-be')
+    off=0x54
+    struct.pack_into('>I',head,340,1032-340+1)
+    struct.pack_into('>I',head,off+0xa4,0x10)
+    struct.pack_into('>I',head,off+0xac,1024-(off+0xac)+1)
+    result=preview_meshes([bytes(head)+data])
+    assert not result['warnings']
+    assert result['meshes'][0]['batches'][0]['material_name']=='sole_mat'

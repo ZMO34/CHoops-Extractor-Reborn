@@ -39,6 +39,8 @@ class Archive:
             else:
                 e['content_size']=e['stored_size']
                 e['size']=min(capacity,(e['stored_size']+self.alignment-1)//self.alignment*self.alignment)
+        from .identity import load_cached
+        load_cached(self)
     def read(self,entry):
         start=entry['offset'];remaining=entry['size'];chunks=[];base=0
         for part in self.parts:

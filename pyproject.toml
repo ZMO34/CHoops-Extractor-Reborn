@@ -16,7 +16,7 @@ choops-studio = "choops_py.studio:main"
 [tool.setuptools.packages.find]
 include = ["choops_py*"]
 [tool.setuptools.package-data]
-choops_py = ["archive/names.json"]
+choops_py = ["archive/names.json", "archive/verified_names.json"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 

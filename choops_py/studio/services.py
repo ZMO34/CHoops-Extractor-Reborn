@@ -264,6 +264,8 @@ def decode_preview_asset(asset, max_size=2048):
             image.load()
             image.thumbnail((max_size, max_size))
             image = image.convert('RGBA')
+            from ..texture_tools.gtf import remap_preview
+            image=remap_preview(image,info['remap'])
             return image.size, image.tobytes()
     finally:
         shutil.rmtree(work)
@@ -363,3 +365,51 @@ def inspect_uniform_preview(source, job=None):
                 break
     if not images:raise ValueError('Uniform has no supported jersey or shorts artwork')
     return images
+
+
+def inspect_shoe_preview(archive,texture_entry,job=None):
+    """Preview the standalone shoe mesh with named upper/sole artwork."""
+    import re
+    from ..formats.standard_iff import StandardIFF
+    from ..texture_tools.pipeline import Container
+    job=job or JobContext()
+    # This hash identifies the stock standalone hi_shoe1 container. Verify its
+    # contents on each source; modded JB archives retain their original hashes.
+    candidates=sorted(archive.entries,key=lambda e:e['hash']!=4175903001)
+    chosen=None
+    for entry in candidates:
+        if entry['hash']!=4175903001 and entry.get('name') and not re.search('shoe',entry['name'],re.I):continue
+        if entry['size']>2*1024*1024:continue
+        job.check()
+        try:
+            raw=archive.read(entry)
+            if raw[:4]!=bytes.fromhex('ff3bef94'):continue
+            iff=StandardIFF(raw)
+            record=next((r for r in iff.records if r['type']=='SCNE' and re.fullmatch(r'(?:hi_|lo_)?shoe\d*',r['name'],re.I)),None)
+            if record:chosen=(entry,record['index']);break
+        except ValueError:continue
+    if chosen is None:raise ValueError('No standalone shoe SCNE mesh found in this JB folder')
+    source=materialize(archive,chosen[0])
+    result=inspect_scene_preview(source,chosen[1],False,job)
+    if not result['meshes']:raise ValueError('Shoe SCNE contains no supported geometry')
+    texture_path=materialize(archive,texture_entry)
+    container=Container(texture_path)
+    images={}
+    for role in ('shoe_upper','shoe_sole'):
+        assets=[a for a in container.assets if a.texture and a.name==role]
+        if len(assets)!=1:raise ValueError('Shoe artwork requires one named '+role+' texture')
+        job.check();size,raw=decode_preview_asset(assets[0],max_size=1024)
+        # Shoe alpha carries material data, rather than preview transparency.
+        opaque=bytearray(raw);opaque[3::4]=b'\xff'*(len(raw)//4)
+        images[role]=(size,bytes(opaque))
+    upper={'fastener_mat','midsole_mat','toe_mat','heel_mat','logo_mat','hitop_mat','upper_mat'}
+    for mesh in result['meshes']:
+        mesh['uniform_surface']=None
+        for batch in mesh['batches']:
+            material=batch.get('material_name')
+            if material=='sole_mat':batch['texture']='shoe_sole'
+            elif material in upper:batch['texture']='shoe_upper'
+            else:result['warnings'].append('Unmapped shoe material: '+str(material))
+    result['images'].update(images);result['textures']=list(images)
+    result['warnings'].append('Standalone shoe rest pose; texture family does not change the authored shoe silhouette')
+    return source,result
