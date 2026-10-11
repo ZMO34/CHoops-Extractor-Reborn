@@ -295,6 +295,7 @@ def compile_group(archive,group,job=None):
         except (ValueError,OSError) as error:raise ValueError(selector+': '+str(error)) from error
         changes[rec['index']]=changed
         details.append(dict(selector=(name+'/'+texture if '/' in selector else selector),input_selector=selector,**info))
+    if job:job.check();job.progress(0,1,'Rebuilding and compressing '+group['name'])
     return replace_records_expanding(iff,changes),details
 
 
@@ -323,6 +324,7 @@ def compile_cdf_group(archive,group,data,job=None):
         if job:job.check()
         rec=find(name);changed,info=apply_dds(parts(rec),'TXTR',name,file,job)
         changes[rec['index']]=changed;details.append(dict(selector=name,**info))
+    if job:job.check();job.progress(0,1,'Rebuilding paired texture bank '+group['name'])
     rebuilt,payload=replace_texture_records(data,cdf,changes)
     group['compiled_companion']=(entry,companion,payload)
     return rebuilt,details

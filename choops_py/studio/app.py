@@ -1722,9 +1722,7 @@ class Window(QMainWindow):
             self.run_job(
                 "Stage and preflight replacement folder",
                 lambda job: stage_folder(self.source, Path(path), mod, job),
-                lambda result: self.build_details.setPlainText(
-                    json.dumps(result, indent=2)
-                ),
+                lambda result: self.builder_completed(result, "staging"),
                 cancellable=True,
             )
 
@@ -1784,11 +1782,27 @@ class Window(QMainWindow):
         self.run_job(
             "Preflight mod" if dry_run else "Build separate JB copy",
             lambda job: build(self.source, mod, output, dry_run=dry_run, job=job),
-            lambda result: self.build_details.setPlainText(
-                json.dumps(result, indent=2)
-            ),
+            lambda result: self.builder_completed(result, "preflight" if dry_run else "build"),
             cancellable=True,
         )
+
+    def builder_completed(self, result, operation):
+        self.build_details.setPlainText(json.dumps(result, indent=2))
+        if result.get("status") == "cancelled" or operation == "preflight":
+            return
+        if operation == "staging":
+            title = "DDS prioritization complete"
+            message = "Override staging and DDS prioritization are complete.\n\n"
+            message += f"Staged archives: {result.get('staged', 0)}\nWorkspace: {result.get('mod', '')}"
+            unapplied = len(result.get("unapplied_overrides", []))
+            if unapplied:
+                message += f"\n\n{unapplied} overrides could not be applied. Review the details before building."
+            else:
+                message += "\n\nYou can now build the JB folder."
+        else:
+            title = "JB build complete"
+            message = f"The JB folder was built successfully.\n\nOutput: {result.get('output', '')}"
+        QMessageBox.information(self, title, message)
 
     def create_research(self):
 

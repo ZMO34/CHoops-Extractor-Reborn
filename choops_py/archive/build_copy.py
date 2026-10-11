@@ -34,7 +34,7 @@ def import_summary(mod):
     return {'staged_archives':report.get('staged'),'applied_dds':sum('width' in item for group in report.get('imports',[]) for item in group['dds_imports']),
             'unapplied_count':len(unapplied),'unapplied_overrides':unapplied,'report':str(path.resolve())}
 
-def preflight(source,mod):
+def preflight(source,mod,job=None):
     archive=Archive(source);rows=validate(mod);grouped={};patches=[]
     options=Path(mod)/'import_options.json'
     allow_growth=False
@@ -46,14 +46,16 @@ def preflight(source,mod):
     if conditions.exists():
         document=json.loads(conditions.read_text(encoding='utf-8'))
         if document.get('schema')!=1:raise ToolError('invalid_source_preconditions','Unsupported schema')
-        for expected in document['entries']:
+        for i,expected in enumerate(document['entries']):
+            if job:job.check();job.progress(i,len(document['entries']),'Validating original asset '+str(expected['index']))
             index=expected['index']
             if not isinstance(index,int) or not 0<=index<len(archive.entries):raise ToolError('source_version_mismatch','TOC index differs')
             entry=archive.entries[index]
             if entry['hash']!=expected['hash'] or digest(archive.read(entry))!=expected['sha256']:
                 raise ToolError('source_version_mismatch','Original archive asset changed since staging')
     for row in rows:grouped.setdefault(row['archive'].lower(),[]).append(row)
-    for name,group in grouped.items():
+    for i,(name,group) in enumerate(grouped.items()):
+        if job:job.check();job.progress(i,len(grouped),'Preflight staged archive '+name)
         matches=[e for e in archive.entries if e['name'] and e['name'].lower()==name]
         if not matches:
             from .hash_names import replacement_hash as hash_name
@@ -150,7 +152,7 @@ def build(source,mod,output,overwrite=False,dry_run=False,job=None):
         if not overwrite:raise ToolError('output_exists','Use --overwrite for an existing generated JB build')
         if not marker.is_file() or json.loads(marker.read_text(encoding='utf-8')).get('project_kind')!='choops-jb-copy':raise ToolError('unowned_build_output',"Refusing to overwrite a folder without this tool's build manifest")
         reject_links(out)
-    archive,patches=preflight(src,mod);plan=[{'archive':e['name'],'index':e['index'],'size':len(data),'sha256':digest(data)} for e,data in patches]
+    archive,patches=preflight(src,mod,job);plan=[{'archive':e['name'],'index':e['index'],'size':len(data),'sha256':digest(data)} for e,data in patches]
     growing=any(len(data)>e['size'] for e,data in patches)
     summary=import_summary(mod)
     if dry_run:return {'dry_run':True,'source':str(src),'output':str(out),'import_summary':summary,'patches':plan,'archive_relocation_required':growing}

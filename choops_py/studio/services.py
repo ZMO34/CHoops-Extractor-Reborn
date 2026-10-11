@@ -217,7 +217,8 @@ def stage_folder(source: Path, folder: Path, mod: Path, job=None) -> dict:
         save_json(work/'import_options.json',dict(schema=1,allow_archive_growth=True,dds_priority=True,scne_priority=True),[source,folder])
         report=dict(staged=len(rows),mod=str(mod),detected_formats=discovery['detected_formats'],scanned_files=discovery['scanned_files'],dds_files=discovery['dds_files'],binary_records=discovery['binary_records'],ignored_files=discovery['ignored_files'],shadowed_dds=discovery['shadowed_dds'],resolved_targets=discovery['resolved_targets'],unapplied_overrides=unapplied,unchanged_archives=unchanged,growing_archives=growth,dds_priority=True,scne_priority=True,imports=details)
         save_json(work/'folder_import_report.json',report,[source,folder])
-        _,patches=preflight(source,work)
+        job.check();job.progress(0,1,'Validating staged overrides')
+        _,patches=preflight(source,work,job)
         work.rename(mod)
         return {key:value for key,value in report.items() if key!='imports'}
     except BaseException:
