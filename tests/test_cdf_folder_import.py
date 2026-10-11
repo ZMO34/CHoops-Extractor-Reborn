@@ -58,3 +58,24 @@ def test_cdf_writer_preserves_unchanged_record_content():
     for old,new in zip(before.records,after.records):
         for k in ('header','payload'):
             assert decode(payload[old[k+'_offset']:old[k+'_offset']+old[k+'_length']])==decode(cdf[new[k+'_offset']:new[k+'_offset']+new[k+'_length']])
+
+
+def test_legacy_cdf_record_folder_resolves_generic_artwork_name(tmp_path):
+    metadata,payload=logo_pair()
+    class MemoryArchive:
+        entries=[dict(hash=hash_name('logos.iff'),name='logos.iff',size=len(metadata),offset=0),
+                 dict(hash=hash_name('logos.cdf'),name='logos.cdf',size=len(payload),offset=0)]
+        def read(self,entry):
+            data=metadata if entry['name']=='logos.iff' else payload
+            return data[entry.get('offset',0):entry.get('offset',0)+entry['size']]
+        def chunks(self,entry,size):yield self.read(entry)[:size]
+    folder=tmp_path/'logos'/'TXTR'/'logo001';folder.mkdir(parents=True)
+    image=b'\x12'*64
+    (folder/'logo.dds').write_bytes(compressed_preview(8,8,'DXT5',image))
+    archive=MemoryArchive();group=discover(archive,tmp_path)['groups'][0]
+    assert list(group['dds'])==['logo001']
+    rebuilt,details=compile_group(archive,group)
+    assert details[0]['selector']=='logo001'
+    _,_,cdf=group['compiled_companion'];rec=CDFPair(rebuilt,cdf).records[0]
+    blocks=[decode(cdf[rec[k+'_offset']:rec[k+'_offset']+rec[k+'_length']]) for k in ('header','payload')]
+    assert TXTR(blocks).image()==image

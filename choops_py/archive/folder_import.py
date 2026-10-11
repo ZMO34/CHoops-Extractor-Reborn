@@ -110,13 +110,20 @@ def discover(archive,folder,job=None):
             duplicate=re.fullmatch(r'(.+?)\s*\([0-9]+\)',file.stem)
             texture_stem=duplicate[1].rstrip() if duplicate else file.stem
             context=next((p for p in file.parents if p.suffix.lower() in RECORD_TYPES),None)
+            category=next((p for p in file.parents if p.parent.name.upper() in ('TXTR','SCNE') and p.is_relative_to(folder)),None)
             if context:
                 record_name=context.stem.removeprefix('_');typ=RECORD_TYPES[context.suffix.lower()]
                 if typ=='SCNE':selector=record_name+'/'+texture_stem
                 elif typ=='TXTR':selector=record_name
                 else:ignored+=1;continue
+            elif category:
+                # Older exports use TXTR/record/artwork.dds rather than a
+                # record.txtr directory. The record folder is authoritative;
+                # artwork may have a generic name such as logo.dds.
+                record_name=category.name.removeprefix('_')
+                selector=record_name+'/'+texture_stem if category.parent.name.upper()=='SCNE' else record_name
             else:selector=texture_stem
-            rank=(2 if context else 1)-(1 if duplicate else 0)
+            rank=(2 if context or category else 1)-(1 if duplicate else 0)
             previous=group['dds'].get(selector)
             if previous:
                 old_rank=group['dds_rank'][selector]
