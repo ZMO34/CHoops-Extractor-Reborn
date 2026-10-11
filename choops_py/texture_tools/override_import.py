@@ -9,7 +9,7 @@ from ..formats.binary import Binary
 from . import dds,gtf,external_converters
 
 
-def apply_dds(parts,kind,selector,source,job=None,converter=None):
+def apply_dds(parts,kind,selector,source,job=None,converter=None,preserve_layout=False):
     source=Path(source);meta=dds.inspect(source.read_bytes())
     index=None
     if kind=='TXTR':texture=TXTR(parts)
@@ -25,7 +25,11 @@ def apply_dds(parts,kind,selector,source,job=None,converter=None):
         converted=work/'converted.gtf'
         # Legacy exports use depth=1 for ordinary 2D DDS files. The native
         # converter incorrectly treats that header as a 3D texture.
-        normalized=dds.normalized_2d(source.read_bytes())
+        normalized=dds.normalized_2d(source.read_bytes());input_meta=meta;conformed=False
+        if preserve_layout:
+            from .runtime_layout import conform
+            normalized,conformed=conform(normalized,old,job)
+            meta=dds.inspect(normalized)
         conversion_source=work/'input.dds';conversion_source.write_bytes(normalized)
         external_converters.convert('dds2gtf',conversion_source,converted,override=converter,swizzle=not old['linear'])
         info,descriptor,image=gtf.parse(converted.read_bytes())
@@ -47,6 +51,8 @@ def apply_dds(parts,kind,selector,source,job=None,converter=None):
         descriptor=bytearray(descriptor)
         descriptor[4:8]=texture.blocks[0][0x5c:0x60]
         descriptor[20:24]=texture.blocks[0][0x6c:0x70]
+        if preserve_layout:
+            descriptor=bytearray(texture.blocks[0][0x58:0x70])
         result=[bytearray(p) for p in parts]
         def update_header(buffer,base):
             old_descriptor=texture.blocks[0][0x58:0x70]
@@ -86,7 +92,9 @@ def apply_dds(parts,kind,selector,source,job=None,converter=None):
                 else:result[0][target:target+len(image)]=image
             check=TXTR(result)
         if check.image()!=image:raise ValueError('DDS override failed texture round-trip')
-        return [bytes(p) for p in result],{key:meta[key] for key in ('width','height','format','mip_count')}
+        report={key:meta[key] for key in ('width','height','format','mip_count')}
+        if preserve_layout:report.update(storage_layout_preserved=True,artwork_resampled=conformed,input_layout=input_meta)
+        return [bytes(p) for p in result],report
     finally:
         if work.resolve().is_relative_to((OUTPUT/'temp').resolve()):shutil.rmtree(work)
 

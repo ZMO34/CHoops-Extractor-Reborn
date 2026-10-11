@@ -291,7 +291,8 @@ def compile_group(archive,group,job=None):
                 if name+'/'+texture in group['dds']:
                     details.append(dict(selector=selector,status='shadowed',reason='canonical scene texture filename has priority'));continue
         else:texture=selector;rec=find(selector,'TXTR')
-        try:changed,info=apply_dds(parts(rec),rec['type'],texture,file,job)
+        options={'preserve_layout':True} if group['entry']['hash']==hash_name('gamedata.iff') else {}
+        try:changed,info=apply_dds(parts(rec),rec['type'],texture,file,job,**options)
         except (ValueError,OSError) as error:raise ValueError(selector+': '+str(error)) from error
         changes[rec['index']]=changed
         details.append(dict(selector=(name+'/'+texture if '/' in selector else selector),input_selector=selector,**info))

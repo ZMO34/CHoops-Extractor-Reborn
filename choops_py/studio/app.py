@@ -149,7 +149,7 @@ class Worker(QRunnable):
 
         now = time.monotonic()
 
-        if now - self.last_progress > 0.1 or done == total:
+        if now - self.last_progress > 0.1 or done == total or done == 0:
             self.last_progress = now
 
             # Qt int is 32-bit: normalize large archive counts before emitting.
