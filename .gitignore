@@ -16,3 +16,5 @@ __pycache__/
 /choops_py/formats/_h7a.lib
 /choops_py/formats/_h7a.pdb
 /choops_py/formats/h7a.lib
+/tools/dds2gtf.exe
+/tools/gtf2dds.exe

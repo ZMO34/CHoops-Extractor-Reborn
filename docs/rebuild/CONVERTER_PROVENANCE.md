@@ -21,7 +21,8 @@ are bundled in Windows releases.
 
 ## Historical binaries
 
-Existing repository binaries are preserved, not replaced:
+Historical binaries can remain as optional local reference tools, but are not
+distributed in the current source tree or Windows package:
 
 | File | Bytes | SHA-256 |
 |---|---:|---|
