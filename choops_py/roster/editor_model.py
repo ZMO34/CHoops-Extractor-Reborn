@@ -4,7 +4,7 @@ from collections import defaultdict
 from ..formats.binary import Binary
 from ..archive.manifests import digest
 from ..core.errors import ToolError
-from .schema import TABLES,STRING_FIELDS,REFERENCES,EDITABLE,POSITIONS,PALETTE_OFFSET,PALETTE_COUNT,detect_tables,RATING_OFFSET,RATING_COUNT,PLAYER_PROPERTIES,PLAYER_SCALARS,TENDENCY_OFFSET,TENDENCY_NAMES
+from .schema import TABLES,STRING_FIELDS,REFERENCES,EDITABLE,POSITIONS,PALETTE_OFFSET,PALETTE_COUNT,detect_tables,RATING_OFFSET,RATING_COUNT,PLAYER_PROPERTIES,PLAYER_SCALARS,TENDENCY_OFFSET,TENDENCY_NAMES,TEAM_TYPE_OFFSET,TEAM_TYPES,CONFERENCE_MEMBER_CAPACITY,CONFERENCE_MEMBER_COUNT
 from .adapters import load,load_bytes
 
 class EditorModel:
@@ -44,6 +44,9 @@ class EditorModel:
             self.issues.append({'kind':'invalid_table_pointer','field_offset':field,'target':target,'table':table,'expected_bias':bias});return None
         return None if empty_player and index==0 else index
     def reload(self):
+        if "uniforms" in self.tables and len(self.data)>=0x78:
+            b=Binary(self.data)
+            self.tables["uniforms"]=(b.relative(0x74),b.u32(0x70),8)
         self.rows={};self.issues=[];self.string_users=defaultdict(list);self.string_ranges={}
         b=Binary(self.data)
         for table,(start,count,size) in self.tables.items():
@@ -62,16 +65,21 @@ class EditorModel:
                     row['asset_id']=b.u16(off+0x18c);row['team_index_check']=b.u16(off+0x18e)
                     row['palette_colors'] = ['#'+b.slice(off+PALETTE_OFFSET+i*4,4).hex().upper() for i in range(PALETTE_COUNT)]
                     row['mascot_asset_id'] = b.u16(off+0x192)
+                    row['uniform_owner_id']=b.u16(off+0x190)
+                    row['menu_logo_id']=b.u16(off+0x194)
+                    row['team_type_code']=(b.u32(off+TEAM_TYPE_OFFSET)>>15)&7 if off+TEAM_TYPE_OFFSET+4<=len(self.data) else None
                     for field,(rel,target,bias) in REFERENCES.items():
                         if target in self.tables:row[field]=self.reference(off+rel,target,bias)
                     row['roster_slots']=[self.reference(off+0x6c+slot*4,'players',0x11,True) for slot in range(16)]
                 elif table=='uniforms':
                     word0,word1=b.u32(off),b.u32(off+4)
                     row.update(team_asset_id=(word0>>22)&1023,uniform_asset_id=(word0>>12)&1023,
-                               variant_code=(word0>>8)&7,jersey_shape_code=(word1>>27)&7)
+                               variant_code=(word0>>8)&7,jersey_shape_code=(word1>>27)&7,unlock_id=word0&127)
                 elif table=='conferences':
                     row['team_indices'] = []
-                    for slot in range(32):
+                    member_count=b.u16(off+CONFERENCE_MEMBER_COUNT)
+                    if member_count>CONFERENCE_MEMBER_CAPACITY:raise ToolError('invalid_conference_count','Conference member count exceeds capacity')
+                    for slot in range(member_count):
                         field = off+0x6e0+slot*4
                         if b.u32(field) in (0,0xffffffff):
                             break
@@ -83,7 +91,7 @@ class EditorModel:
             self.rows[table]=rows
     def validate(self):
         self.reload()
-        return {'valid':not self.issues,'issues':self.issues,'source_type':self.source.kind,'counts':{name:len(rows) for name,rows in self.rows.items()},'unsaved_edits':len(self.edits),'read_only_fields':['skin tone','conference','prestige','unknown appearance bytes','long strings','unconfirmed palette roles']}
+        return {'valid':not self.issues,'issues':self.issues,'source_type':self.source.kind,'counts':{name:len(rows) for name,rows in self.rows.items()},'unsaved_edits':len(self.edits),'read_only_fields':['skin tone','prestige','unknown appearance bytes','long strings','unconfirmed palette roles']}
     def edit(self,table,index,field,value,slot=None):
         if field not in EDITABLE.get(table,()):raise ToolError('roster_field_read_only',f'{table}.{field} is not a confirmed writable field')
         off=self.row_offset(table,index);before=bytes(self.data);old_row=self.rows[table][index];old_value=old_row[field]
@@ -147,6 +155,12 @@ class EditorModel:
             word=int.from_bytes(self.data[position:position+4],'big')
             mask=((1<<bits)-1)<<shift
             changes.append((position,((word&~mask)|(value<<shift)).to_bytes(4,'big')))
+        elif table=='teams' and field=='team_type_code':
+            value=self.integer(value)
+            if value not in TEAM_TYPES:raise ToolError('invalid_team_type','Choose a confirmed team type')
+            position=off+TEAM_TYPE_OFFSET
+            word=Binary(self.data).u32(position);mask=7<<15
+            changes.append((position,((word&~mask)|(value<<15)).to_bytes(4,'big')))
         elif field=='asset_id':
             value=self.integer(value)
             if value not in {r['asset_id'] for r in self.rows['teams']}:raise ToolError('new_asset_id_blocked','Select an existing roster asset ID; creating new assets is not validated')
@@ -172,6 +186,56 @@ class EditorModel:
             self.data=bytearray(before);self.reload();raise ToolError('roster_validation_failed',str(result['issues'][:5]))
         if self.data==before:return
         self.redo_history=[];self.history.append((before,list(self.edits)));self.edits.append({'table':table,'index':index,'field':field,'slot':slot,'old':old_value,'value':value})
+    def set_alternate_enabled(self, team_index, variant, enabled):
+        from .uniforms import set_alternate_enabled
+        before=bytes(self.data);edits=list(self.edits)
+        owner=self.rows['teams'][team_index]['uniform_owner_id']
+        updated=set_alternate_enabled(before,owner,variant,bool(enabled))
+        if updated==before:return
+        try:
+            self.data=bytearray(updated)
+            if not self.validate()['valid']:raise ValueError('Alternate edit failed roster validation')
+        except Exception:
+            self.data=bytearray(before);self.reload();raise
+        self.history.append((before,edits));self.redo_history=[]
+        self.edits.append({'table':'teams','index':team_index,'field':'alternate_enabled','slot':variant,'value':bool(enabled)})
+
+    def move_team_to_conference(self, team_index, conference_index, make_d1=False):
+        before=bytes(self.data);old_edits=list(self.edits)
+        team=self.rows['teams'][team_index];old=team.get('conference_index')
+        if old is None:raise ToolError('missing_conference','Team has no verified source conference')
+        if not 0<=conference_index<len(self.rows['conferences']):raise ToolError('invalid_conference','Select an existing conference')
+        if make_d1 and conference_index>=33:raise ToolError('non_d1_conference','Choose a current D1 conference')
+        try:
+            if old!=conference_index:
+                groups={old:list(self.rows['conferences'][old]['team_indices']),conference_index:list(self.rows['conferences'][conference_index]['team_indices'])}
+                if groups[old].count(team_index)!=1 or team_index in groups[conference_index]:raise ToolError('conference_link_mismatch','Membership is missing or ambiguous')
+                groups[old].remove(team_index);groups[conference_index].append(team_index)
+                for index,members in groups.items():
+                    if len(members)>CONFERENCE_MEMBER_CAPACITY:raise ToolError('conference_full','Conference member table is full')
+                    off=self.row_offset('conferences',index)
+                    data=bytearray(CONFERENCE_MEMBER_CAPACITY*4)
+                    for slot,member in enumerate(members):
+                        field=off+0x6e0+slot*4
+                        struct.pack_into('>i',data,slot*4,self.row_offset('teams',member)+0x31-field)
+                    self.data[off+0x6e0:off+0x870]=data
+                    struct.pack_into('>H',self.data,off+CONFERENCE_MEMBER_COUNT,len(members))
+                field=self.row_offset('teams',team_index)+0x48
+                struct.pack_into('>i',self.data,field,self.row_offset('conferences',conference_index)+1-field)
+            if make_d1:
+                field=self.row_offset('teams',team_index)+TEAM_TYPE_OFFSET
+                struct.pack_into('>I',self.data,field,Binary(self.data).u32(field)&~(7<<15))
+            self.reload()
+            if self.issues:raise ToolError('roster_validation_failed',str(self.issues[:5]))
+            for conf in self.rows['conferences']:
+                for member in conf['team_indices']:
+                    if self.rows['teams'][member]['conference_index']!=conf['index']:raise ToolError('conference_backlink_mismatch','Reciprocal conference links disagree')
+        except Exception:
+            self.data=bytearray(before);self.reload();raise
+        if self.data==before:return
+        self.history.append((before,old_edits));self.redo_history=[]
+        self.edits.append({'table':'teams','index':team_index,'field':'conference_membership','old':old,'value':conference_index,'make_d1':make_d1})
+
     @staticmethod
     def integer(value):
         if isinstance(value,bool):raise ToolError('invalid_roster_value','Expected integer')
@@ -197,7 +261,10 @@ class EditorModel:
     def _apply_document(self,document):
         if document.get('source_sha256')!=digest(self.source.original):raise ToolError('roster_source_mismatch','Patch must include the original source SHA256')
         if 'edits' in document:
-            for e in document['edits']:self.edit(e['table'],int(e['index']),e['field'],e['value'],e.get('slot'))
+            for e in document['edits']:
+                if e['field']=='alternate_enabled':self.set_alternate_enabled(int(e['index']),int(e['slot']),e['value'])
+                elif e['field']=='conference_membership':self.move_team_to_conference(int(e['index']),int(e['value']),e.get('make_d1',False))
+                else:self.edit(e['table'],int(e['index']),e['field'],e['value'],e.get('slot'))
         elif 'tables' in document:
             edits=[]
             for table,rows in document['tables'].items():

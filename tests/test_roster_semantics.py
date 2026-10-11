@@ -57,6 +57,7 @@ def header_roster():
     struct.pack_into('>i',data,field,starts['conferences']+1-field)
     field=starts['conferences']+0x6e0
     struct.pack_into('>i',data,field,starts['teams']+0x31-field)
+    struct.pack_into('>H',data,starts['conferences']+0x870,1)
     return data,starts
 
 
@@ -137,3 +138,56 @@ def test_labeled_scalar_choices_preserve_neighbor_bits():
     assert after&~(7<<4)==before&~(7<<4)
     assert ENUM_CHOICES['hand_code']=={0:'L',1:'R'}
     assert ENUM_CHOICES['headband_code']=={0:'No',1:'Yes'}
+
+
+def test_d1_conversion_updates_type_and_reciprocal_membership_with_undo():
+    data,starts=header_roster()
+    field=starts['teams']+0x2ec;struct.pack_into('>I',data,field,0xA5A5A5A5)
+    model=EditorModel(load_bytes(bytes(data)));before=bytes(model.data)
+    model.move_team_to_conference(0,1,make_d1=True)
+    assert model.rows['teams'][0]['conference_index']==1
+    assert model.rows['teams'][0]['team_type_code']==0
+    assert model.rows['conferences'][0]['team_indices']==[]
+    assert model.rows['conferences'][1]['team_indices']==[0]
+    assert int.from_bytes(model.data[field:field+4],'big')&~(7<<15)==0xA5A5A5A5&~(7<<15)
+    model.undo();assert bytes(model.data)==before
+
+
+def test_alternate_model_undo_redo_and_replay():
+    data,starts=header_roster()
+    struct.pack_into('>II',data,starts['uniforms'],(12<<12)|(2<<8)|95,0x18005678)
+    struct.pack_into('>II',data,starts['uniforms']+8,(13<<12)|(1<<8),0x48001234)
+    model=EditorModel(load_bytes(bytes(data)))
+    model.set_alternate_enabled(0,2,False)
+    assert len(model.rows['uniforms'])==1
+    patch={'source_sha256':model.document()['source_sha256'],'edits':list(model.edits)}
+    saved=model.source.encode(bytes(model.data))
+    reopened=EditorModel(load_bytes(saved));reopened.set_alternate_enabled(0,2,True)
+    row=next(r for r in reopened.rows['uniforms'] if r['variant_code']==2)
+    assert row['uniform_asset_id']==12 and row['unlock_id']==95 and row['jersey_shape_code']==3
+    model.undo();assert bytes(model.data)==bytes(data)
+    model.redo();assert len(model.rows['uniforms'])==1
+    replay=EditorModel(load_bytes(bytes(data)));replay.apply_document(patch)
+    assert bytes(replay.data)==bytes(model.data)
+
+
+def test_independent_arena_rebases_strings_and_only_selected_team_link():
+    from choops_py.modding.declone import append_independent_arena
+    data,starts=header_roster()
+    field=starts['teams']+0x44
+    struct.pack_into('>i',data,field,starts['arenas']+25-field)
+    field=starts['teams']+704+0x44
+    struct.pack_into('>i',data,field,starts['arenas']+25-field)
+    for relative,text in ((24,'Old Arena'),(28,'Town'),(32,'123')):
+        field=starts['arenas']+relative;target=len(data)+1
+        data+=b'\0'+text.encode('utf-16-le')+b'\0\0'
+        struct.pack_into('>i',data,field,target-field)
+    model=EditorModel(load_bytes(bytes(data)))
+    result=append_independent_arena(model,bytearray(data),0,0,'1001')
+    check=EditorModel(load_bytes(bytes(result)))
+    assert check.validate()['valid']
+    assert check.rows['teams'][0]['arena_index']==2 and check.rows['teams'][1]['arena_index']==0
+    assert check.rows['arenas'][0]['arena_code']=='123'
+    assert check.rows['arenas'][2]['arena_code']=='1001'
+    assert check.rows['arenas'][2]['arena_name']=='Old Arena'
+    assert check.rows['arenas'][2]['arena_city']=='Town'

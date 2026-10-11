@@ -220,7 +220,7 @@ def test_cross_part_stream_and_patch_preserve_original(tmp_path):
     struct.pack_into('>6I',left,0,0xaa00b3bf,512,2,0,1,0)
     for i,name in enumerate(('0A','0B')):
         struct.pack_into('>II8s',left,24+i*16,1,0,(name+'\0\0').encode('utf-16-be'))
-    struct.pack_into('>4I',left,56,hash_name('frontend.bin'),3,0,2)
+    struct.pack_into('>4I',left,56,hash_name('frontend.bin'),3,0,1024)
     left[1536:]=b'X'*512;right[:512]=b'Y'*512
     (usr/'0A').write_bytes(left);(usr/'0B').write_bytes(right)
     archive=Archive(source);entry=archive.entries[0]
@@ -290,3 +290,36 @@ def test_explorer_previews_archive_textures_without_manual_export(qtbot, tmp_pat
     assert not window.explorer_texture.isEnabled()
     assert 'No supported textures' in window.explorer_image.text()
     window.close()
+
+
+@pytest.mark.gui
+def test_alternate_checkboxes_and_opt_in_d1(qtbot,monkeypatch):
+    from PySide6.QtWidgets import QDialog,QCheckBox
+    from test_roster_semantics import header_roster
+    from choops_py.roster.editor_model import EditorModel
+    from choops_py.roster.adapters import load_bytes
+    import struct
+    data,starts=header_roster()
+    struct.pack_into('>II',data,starts['uniforms'],(12<<12)|(2<<8),0)
+    struct.pack_into('>II',data,starts['uniforms']+8,(13<<12)|(1<<8),0)
+    window=Window();qtbot.addWidget(window)
+    window.display_roster(EditorModel(load_bytes(bytes(data))))
+    window.roster_tabs.setCurrentWidget(window.roster_views['teams'])
+    window.roster_views['teams'].selectRow(0)
+    def inspect_alternates(dialog):
+        boxes=dialog.findChildren(QCheckBox)
+        assert [b.text() for b in boxes]==['Alternate 1','Alternate 2','Alternate 3']
+        assert boxes[0].isChecked() and boxes[0].isEnabled()
+        assert not boxes[1].isChecked() and not boxes[1].isEnabled()
+        boxes[0].setChecked(False)
+        return QDialog.DialogCode.Accepted
+    monkeypatch.setattr(QDialog,'exec',inspect_alternates)
+    window.edit_alternate_availability()
+    assert len(window.roster.rows['uniforms'])==1
+    window.roster_views['teams'].selectRow(0)
+    def inspect_conversion(dialog):
+        box=dialog.findChildren(QCheckBox)[0]
+        assert not box.isChecked()
+        return QDialog.DialogCode.Rejected
+    monkeypatch.setattr(QDialog,'exec',inspect_conversion)
+    window.move_school();window.close()

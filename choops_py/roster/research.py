@@ -1,14 +1,14 @@
 """Read-only structural coverage and contextual palette research."""
 import struct
 from collections import Counter
-from .schema import STRING_FIELDS, REFERENCES, PALETTE_OFFSET, PALETTE_COUNT, PALETTE_HINTS, CONFIRMED_PALETTE_CAPTIONS, SCHOOL_COLOR_CONTROL_SLOTS, RATING_NAMES, RATING_OFFSET, RATING_COUNT
+from .schema import STRING_FIELDS, REFERENCES, PALETTE_OFFSET, PALETTE_COUNT, PALETTE_HINTS, CONFIRMED_PALETTE_ROLES, CONFIRMED_PALETTE_CAPTIONS, SCHOOL_COLOR_CONTROL_SLOTS, RATING_NAMES, RATING_OFFSET, RATING_COUNT
 
 
 def palette_rows(model, team_index):
     team = model.rows['teams'][team_index]
     return [{'slot': i, 'offset': PALETTE_OFFSET+i*4, 'rgba': value,
              'role': PALETTE_HINTS.get(i,'Unassigned palette candidate'),
-             'confidence': 'Exact English menu caption and RGBA getter/setter verified' if i in CONFIRMED_PALETTE_CAPTIONS else 'RGBA storage verified; role unresolved',
+             'confidence': 'Exact English menu caption and RGBA getter/setter verified' if i in CONFIRMED_PALETTE_CAPTIONS else 'Runtime/material role verified; no Edit Schools caption' if i in CONFIRMED_PALETTE_ROLES else 'RGBA storage verified; role unresolved',
              'school_control': SCHOOL_COLOR_CONTROL_SLOTS.index(i) if i in SCHOOL_COLOR_CONTROL_SLOTS else None}
             for i,value in enumerate(team['palette_colors'])]
 

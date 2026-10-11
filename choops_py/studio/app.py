@@ -33,6 +33,7 @@ from PySide6.QtWidgets import (
     QFileDialog,
     QFormLayout,
     QHBoxLayout,
+    QGridLayout,
     QLabel,
     QLineEdit,
     QInputDialog,
@@ -403,18 +404,11 @@ class Window(QMainWindow):
         return layout
 
     def buttons(self, layout, items):
-
-        row = QHBoxLayout()
-
-        for label, handler in items:
-            button = QPushButton(label)
-
-            button.clicked.connect(handler)
-
-            row.addWidget(button)
-
-        row.addStretch()
-
+        row=QGridLayout()
+        for index,(label,handler) in enumerate(items):
+            button=QPushButton(label);button.clicked.connect(handler)
+            row.addWidget(button,index//4,index%4)
+        for column in range(4):row.setColumnStretch(column,1)
         layout.addLayout(row)
 
     def run_job(self, label, function, callback=None, cancellable=False):
@@ -901,6 +895,11 @@ class Window(QMainWindow):
                 ("Load game roster", self.load_game_roster),
                 ("Edit selected…", self.edit_roster),
                 ("Team palette…", self.show_team_palette),
+                ("Add alternate to JB copy…", self.add_uniform_alternate),
+                ("Give schools five jerseys…", self.fill_five_uniforms),
+                ("Move school / convert to D1…", self.move_school),
+                ("Enable alternates…", self.edit_alternate_availability),
+                ("Give school independent assets…", self.declone_school_assets),
                 ("Player attributes…", self.show_player_attributes),
                 ("Player properties…", self.show_player_properties),
                 ("Research layout…", self.research_roster),
@@ -1013,6 +1012,106 @@ class Window(QMainWindow):
         if picker.exec() != QDialog.DialogCode.Accepted:return None
         color = picker.currentColor()
         return f'#{color.red():02X}{color.green():02X}{color.blue():02X}{color.alpha():02X}'
+
+    def fill_five_uniforms(self):
+        if self.active or not self.archive or not self.roster:return self.log('Load the current JB folder and roster first.')
+        output,_=QFileDialog.getSaveFileName(self,'New JB folder with five jerseys per playable school',str(OUTPUT/'builds'/'five_uniforms'))
+        if not output:return
+        from ..modding.add_alternate import fill_five
+        payload=bytes(self.roster.data)
+        self.run_job('Build five-bank school uniforms',lambda job:fill_five(self.source,output,job,payload),
+                     lambda report:self.log(json.dumps(report,indent=2)),cancellable=True)
+
+    def declone_school_assets(self):
+        if self.active or not self.roster or not self.archive:return self.log('Load the current JB folder and roster first.')
+        view=self.roster_tabs.currentWidget()
+        if view not in (self.roster_views['teams'],self.roster_views['schools']):return self.log('Select a school in Teams or Edit Schools.')
+        rows=selected(view)
+        if len(rows)!=1:return self.log('Select exactly one school.')
+        asset,ok=QInputDialog.getInt(self,'Independent school assets','New stadium, uniform owner and menu-logo ID',1000,0,1023)
+        if not ok:return
+        output,_=QFileDialog.getSaveFileName(self,'New JB folder with independent school assets',str(OUTPUT/'builds'/'independent_school'))
+        if not output:return
+        from ..modding.declone import declone
+        payload=bytes(self.roster.data)
+        self.run_job('Copy independent school assets',lambda job:declone(self.source,rows[0]['index'],asset,output,job,payload),
+                     lambda report:self.log(json.dumps(report,indent=2)),cancellable=True)
+
+    def edit_alternate_availability(self):
+        if not self.roster or self.active:return
+        view=self.roster_tabs.currentWidget()
+        if view not in (self.roster_views['teams'],self.roster_views['schools']):return self.log('Select a school in Teams or Edit Schools.')
+        rows=selected(view)
+        if len(rows)!=1:return self.log('Select exactly one school.')
+        from ..roster.uniforms import disabled_uniforms
+        row=rows[0];owner=row['uniform_owner_id']
+        active={r['variant_code'] for r in self.roster.rows['uniforms'] if r['team_asset_id']==owner}
+        dormant={a>>8&7 for a,_ in disabled_uniforms(bytes(self.roster.data)) if a>>22&1023==owner}
+        dialog=QDialog(self);dialog.setWindowTitle('Alternate availability')
+        form=QFormLayout(dialog);checks={}
+        for variant in (2,3,4):
+            box=QCheckBox('Alternate '+str(variant-1));box.setChecked(variant in active)
+            box.setEnabled(variant in active or variant in dormant)
+            if not box.isEnabled():box.setToolTip('Add this alternate and its assets to a JB copy first.')
+            checks[variant]=box;form.addRow(box)
+        buttons=QDialogButtonBox(QDialogButtonBox.StandardButton.Ok|QDialogButtonBox.StandardButton.Cancel)
+        buttons.accepted.connect(dialog.accept);buttons.rejected.connect(dialog.reject);form.addRow(buttons)
+        if dialog.exec()!=QDialog.DialogCode.Accepted:return
+        before=bytes(self.roster.data);history=list(self.roster.history);edits=list(self.roster.edits);redo=list(self.roster.redo_history)
+        try:
+            for variant,box in checks.items():
+                if box.isEnabled():self.roster.set_alternate_enabled(row['index'],variant,box.isChecked())
+            self.display_roster(self.roster)
+        except ValueError as error:
+            self.roster.data=bytearray(before);self.roster.history=history;self.roster.edits=edits;self.roster.redo_history=redo;self.roster.reload()
+            QMessageBox.warning(self,'Alternate edit blocked',str(error))
+
+    def move_school(self):
+        if not self.roster or self.active:return
+        view=self.roster_tabs.currentWidget()
+        if view not in (self.roster_views['teams'],self.roster_views['schools']):return self.log('Select a school in Teams or Edit Schools.')
+        rows=selected(view)
+        if len(rows)!=1:return self.log('Select exactly one school.')
+        row=rows[0];conferences=self.roster.rows.get('conferences',[])
+        dialog=QDialog(self);dialog.setWindowTitle('Conference membership / optional D1 conversion')
+        form=QFormLayout(dialog);choices=QComboBox()
+        for conf in conferences:choices.addItem(str(conf['index'])+': '+conf['conference_name'],conf['index'])
+        choices.setCurrentIndex(max(0,choices.findData(row.get('conference_index'))))
+        convert=QCheckBox('Convert this slot to Current D1 classification')
+        convert.setChecked(False)
+        form.addRow('Destination conference',choices);form.addRow(convert)
+        buttons=QDialogButtonBox(QDialogButtonBox.StandardButton.Ok|QDialogButtonBox.StandardButton.Cancel)
+        buttons.accepted.connect(dialog.accept);buttons.rejected.connect(dialog.reject);form.addRow(buttons)
+        if dialog.exec()!=QDialog.DialogCode.Accepted:return
+        try:
+            self.roster.move_team_to_conference(row['index'],choices.currentData(),make_d1=convert.isChecked())
+            self.display_roster(self.roster)
+        except ValueError as error:QMessageBox.warning(self,'School move blocked',str(error))
+
+    def add_uniform_alternate(self):
+        if self.active or not self.roster or not self.archive:
+            return self.log('Load the current JB folder and roster first.')
+        if self.roster_tabs.currentWidget() is not self.roster_views['uniforms']:
+            return self.log('Select the template record in the Uniforms roster tab.')
+        rows=selected(self.roster_views['uniforms'])
+        if len(rows)!=1:return self.log('Select exactly one uniform template.')
+        row=rows[0]
+        occupied={r['variant_code'] for r in self.roster.rows['uniforms'] if r['team_asset_id']==row['team_asset_id']}
+        available=[v for v in (2,3,4) if v not in occupied]
+        if not available:return self.log('This team already uses all three supported alternate banks.')
+        from ..roster.uniforms import VARIANT_NAMES
+        label,ok=QInputDialog.getItem(self,'New alternate bank','Choose an unused bank',[VARIANT_NAMES[v] for v in available],0,False)
+        if not ok:return
+        variant=next(v for v in available if VARIANT_NAMES[v]==label)
+        asset,ok=QInputDialog.getInt(self,'New alternate asset','Asset selector (0–1023)',row['uniform_asset_id'],0,1023)
+        if not ok:return
+        output,_=QFileDialog.getSaveFileName(self,'New copied JB folder path',str(OUTPUT/'builds'/'new_alternate'))
+        if not output:return
+        from ..modding.add_alternate import add
+        payload=bytes(self.roster.data)
+        self.run_job('Build copied JB with new alternate',
+                     lambda job:add(self.source,row['index'],asset,variant,output,job,payload),
+                     lambda report:self.log(json.dumps(report,indent=2)),cancellable=True)
 
     def show_team_palette(self, team_index=None):
         if not self.roster:
@@ -1365,13 +1464,20 @@ class Window(QMainWindow):
         if self.roster:
             for team in self.roster.rows['teams']:
                 teams.setdefault(team['asset_id'], []).append(team['school_name'])
+        linked_names = {}
+        if self.roster:
+            from ..roster.uniforms import asset_name
+            for row in self.roster.rows.get('uniforms', []):
+                try:name=asset_name(row)
+                except ValueError:continue
+                linked_names.setdefault(name,set()).update(teams.get(row['team_asset_id'],[]))
         if self.archive:
             for entry in sorted(self.archive.entries, key=lambda e:e['name'] or ''):
-                match=re.fullmatch(r'u([hax])(\d+)\.iff',entry['name'] or '',re.IGNORECASE)
+                match=re.fullmatch(r'u([haxyz])(\d+)\.iff',entry['name'] or '',re.IGNORECASE)
                 if not match:continue
-                names=teams.get(int(match[2]),[])
+                names=sorted(linked_names.get(entry['name'],teams.get(int(match[2]),[])))
                 label=(names[0]+' - ') if len(names)==1 else ''
-                label += {'h':'Home','a':'Away','x':'Alternate'}[match[1].lower()]+' - '+entry['name']
+                label += {'h':'Home','a':'Away','x':'Alternate 1','y':'Alternate 2','z':'Alternate 3'}[match[1].lower()]+' - '+entry['name']
                 self.scene_uniforms.addItem(label,entry['index'])
         self.scene_uniforms.setCurrentIndex(max(0,self.scene_uniforms.findData(selected_id)))
 

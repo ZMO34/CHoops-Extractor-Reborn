@@ -22,7 +22,12 @@ class RosterSource:
     zip_member: str | None = None
     inner: object = None
     def encode(self,payload):
-        if len(payload)!=len(self.payload):raise ToolError('roster_size_change_blocked','Long string heap rebuilding is not implemented')
+        if len(payload)!=len(self.payload):
+            if self.kind=='standard-iff':
+                from .uniforms import encode_roster_iff
+                return encode_roster_iff(self.original,payload)
+            if self.kind=='raw-rost':return payload
+            raise ToolError('roster_size_change_blocked','Expanded alternate tables require a raw or single-record ROST IFF')
         if payload==self.payload:return self.original
         if self.kind=='raw-rost':return payload
         if self.kind=='userdata':return self.original[:4]+payload

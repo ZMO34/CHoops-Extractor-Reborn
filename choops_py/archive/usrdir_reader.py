@@ -23,14 +23,22 @@ class Archive:
                 self.parts.append(dict(name=name,size=size))
             toc=Binary(f.read(nf*16));self.entries=[]
             for i in range(nf):
-                h=toc.u32(i*16);off=toc.u32(i*16+4)*self.alignment;size=toc.u32(i*16+12)*self.alignment
-                self.entries.append(dict(index=i,hash=h,name=lookup().get(h),offset=off,stored_size=size,size=size))
+                h=toc.u32(i*16);off=toc.u32(i*16+4)*self.alignment;size=toc.u32(i*16+12)
+                self.entries.append(dict(index=i,hash=h,name=lookup().get(h),offset=off,stored_size=size,size=size,toc_flags=toc.u32(i*16+8)))
         ordered=sorted(self.entries,key=lambda e:e['offset']);total=sum(p['size'] for p in self.parts)
         if ordered[0]['offset']<24+na*16+nf*16:raise ValueError('Archive entry overlaps header/TOC')
         for i,e in enumerate(ordered):
             boundary=ordered[i+1]['offset'] if i+1<len(ordered) else total
             if not 0<=e['offset']<boundary<=total:raise ValueError("Invalid TOC ordering/range")
-            if not 0<e['size']<=boundary-e['offset']:e['size']=boundary-e['offset'];e['size_derived']=True
+            capacity=boundary-e['offset']
+            e['allocation_size']=capacity
+            if not 0<e['stored_size']<=capacity:
+                e['size_derived']=True
+                e['content_size']=None
+                e['size']=capacity
+            else:
+                e['content_size']=e['stored_size']
+                e['size']=min(capacity,(e['stored_size']+self.alignment-1)//self.alignment*self.alignment)
     def read(self,entry):
         start=entry['offset'];remaining=entry['size'];chunks=[];base=0
         for part in self.parts:

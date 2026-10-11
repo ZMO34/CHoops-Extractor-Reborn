@@ -50,7 +50,7 @@ def pair_fixture():
 def game_fixture(path,payload):
     from choops_py.archive.hash_names import hash_name
     usr=path/'PS3_GAME'/'USRDIR';usr.mkdir(parents=True);data=bytearray(4096)
-    struct.pack_into('>6I',data,0,0xaa00b3bf,2048,1,0,1,0);struct.pack_into('>II8s',data,24,2,0,'0A\0\0'.encode('utf-16-be'));struct.pack_into('>4I',data,40,hash_name('ua000.iff'),1,0,1);data[2048:2048+len(payload)]=payload;(usr/'0A').write_bytes(data);(path/'PS3_DISC.SFB').write_bytes(b'disc metadata')
+    struct.pack_into('>6I',data,0,0xaa00b3bf,2048,1,0,1,0);struct.pack_into('>II8s',data,24,2,0,'0A\0\0'.encode('utf-16-be'));struct.pack_into('>4I',data,40,hash_name('ua000.iff'),1,0,len(payload));data[2048:2048+len(payload)]=payload;(usr/'0A').write_bytes(data);(path/'PS3_DISC.SFB').write_bytes(b'disc metadata')
     return path
 
 def roster_fixture():

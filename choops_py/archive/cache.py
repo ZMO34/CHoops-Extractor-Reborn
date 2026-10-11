@@ -6,10 +6,11 @@ def fingerprint(a):return [{'name':p['name'],'size':p['size'],'mtime_ns':(a.path
 def build(path):
     a=Archive(path);p=safe_output(cache_path(path),[a.path])
     if p.exists():p.unlink()
-    report(p,dict(schema=1,source=str(a.path),fingerprint=fingerprint(a),entries=a.entries),[a.path]);return p
+    report(p,dict(schema=2,source=str(a.path),fingerprint=fingerprint(a),entries=a.entries),[a.path]);return p
 def info(path):
     a=Archive(path);p=safe_output(cache_path(path),[a.path])
     if not p.exists():raise ValueError("Cache missing; run build-cache")
     data=json.loads(p.read_text())
+    if data.get('schema')!=2:raise ValueError('Outdated archive cache; run build-cache')
     if data['fingerprint']!=fingerprint(a):raise ValueError("Stale cache")
     return data

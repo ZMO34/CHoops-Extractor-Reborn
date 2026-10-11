@@ -6,9 +6,10 @@ def namespace():
     banks='frontend frontend_sync global gamedata gamedataextra loading legalpage loc fonts online playercreate playeditor teamselectlogo arenapics overlaycache jukebox roster_english streetdata studio studio_preview studio_pontiac dornas crowd sfx_inside facegen ababall basket chantcreate chantcreate_drums chantcreate_sounds gameintro gameintro_cameras gameintro_drums gameintro_playerspeech halftimeadjustments legacy powerbar reelmanual weeklyshow tutorial drilldata shrine shrine_trophies statefarm kellogg gumbel Director'.split()
     for name in banks:
         for ext in ('.iff','.cdf','.bin'): yield name+ext
-    for prefix in ('ua','uh','ux','selua','seluh','selux','s','m','p','coach','h'):
-        for i in range(10000 if prefix=='h' else 1000):
+    for prefix in ('ua','uh','ux','uy','uz','selua','seluh','selux','seluy','seluz','s','m','p','coach','h'):
+        for i in range(10000 if prefix=='h' else 1024 if prefix=='s' or prefix.startswith(('u','selu')) else 1000):
             for ext in ('.iff','.cdf','.bin'):yield f"{prefix}{i:0{4 if prefix=='h' else 3}d}{ext}"
+    for i in range(1024):yield f's{i:03d}n.iff'
 @lru_cache
 def lookup():
     result={hash_name(n):n for n in namespace()}

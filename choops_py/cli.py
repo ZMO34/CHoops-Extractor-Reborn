@@ -41,6 +41,18 @@ def execute(a):
         return launch([])
     sources=[getattr(a,key) for key in ('source','input','cdf','dds_file','mod','modded','edited','patch') if getattr(a,key,None)]
     if hasattr(a,'output'):a.output=safe_output(a.output,sources)
+    if c=='fill-five-uniforms':
+        from .modding.add_alternate import fill_five
+        return fill_five(a.source,a.output)
+    if c=='add-archive-assets':
+        from .archive.add_assets import build
+        from .core.paths import reject_links
+        folder=Path(a.input);reject_links(folder)
+        additions={p.name:p.read_bytes() for p in folder.glob('*.iff') if p.is_file()}
+        return build(a.source,additions,a.output)
+    if c=='add-uniform-alternate':
+        from .modding.add_alternate import add
+        return add(a.source,int(a.template),int(a.asset),int(a.variant),a.output)
     if c in ('export-mod-patch','import-mod-patch'):
         from .modding.patch_package import export_patch,import_patch
         return export_patch(Path(a.source),Path(a.mod),Path(a.output)) if c=='export-mod-patch' else import_patch(Path(a.source),Path(a.input),Path(a.output))

@@ -1,6 +1,6 @@
 """Confirmed PS3 ROST tables and writable fields; no generic byte editor."""
 TABLES={'players':(0x0271AC,5685,308),'arenas':(0x1D5C84,379,28),'teams':(0x1D85E0,443,704),'coaches':(0x23F7B8,1373,44),'conferences':(0x345978,39,0xb94)}
-STRING_FIELDS={'players':{'last_name':0x10,'first_name':0x14},'teams':{'short_name':0x30,'abbreviation':0x34,'school_name':0x38,'mascot_plural':0x3c,'mascot_name':0x40},'arenas':{'arena_code':4,'arena_name':0x18},'coaches':{'coach_name':0x14,'abbreviation':0x18}}
+STRING_FIELDS={'players':{'last_name':0x10,'first_name':0x14},'teams':{'short_name':0x30,'abbreviation':0x34,'school_name':0x38,'mascot_plural':0x3c,'mascot_name':0x40},'arenas':{'arena_code':0x20,'arena_name':0x18,'arena_city':0x1c},'coaches':{'coach_name':0x14,'abbreviation':0x18}}
 # ROST reference targets point inside a row, not to the row's start.
 # Canonical biases are corroborated across the vanilla table and old schema.
 REFERENCES={'arena_index':(0x44,'arenas',0x19),'rival1_index':(0x4c,'teams',0x31),'rival2_index':(0x50,'teams',0x31),'rival3_index':(0x54,'teams',0x31),'coach_index':(0x60,'coaches',0x15),'assistant1_index':(0x64,'coaches',0x15),'assistant2_index':(0x68,'coaches',0x15)}
@@ -93,3 +93,17 @@ HEADER_TABLES['uniforms'] = (0x70,1,8,8192)
 EDITABLE['uniforms'] = ('uniform_asset_id','jersey_shape_code')
 JERSEY_SHAPES = {0:'U',1:'V',2:'V triangle',3:'Triangle',4:'Wishbone'}
 ENUM_CHOICES['jersey_shape_code'] = JERSEY_SHAPES
+
+ENUM_CHOICES['variant_code'] = {0:'Home (h)',1:'Away (a)',2:'Alternate 1 (x)',3:'Alternate 2 (y)',4:'Alternate 3 (z)'}
+
+# These are verified runtime/material roles, not extra Edit Schools captions.
+CONFIRMED_PALETTE_ROLES = {0:'Home team equipment color',1:'Non-home team equipment color',11:'Key Circle Inner'}
+PALETTE_HINTS.update(CONFIRMED_PALETTE_ROLES)
+
+TEAM_TYPE_OFFSET=0x2ec  # Name-anchor +0x2BC, the final word of the physical row.
+TEAM_TYPES={0:'Current D1',1:'Classic / All-Time',2:'Created',4:'Special'}
+ENUM_CHOICES['team_type_code']=TEAM_TYPES
+EDITABLE['teams']=(*EDITABLE['teams'],'team_type_code')
+CONFERENCE_MEMBERS=0x6e0
+CONFERENCE_MEMBER_COUNT=0x870
+CONFERENCE_MEMBER_CAPACITY=100
