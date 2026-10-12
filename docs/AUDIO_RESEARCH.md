@@ -101,9 +101,9 @@ project dependencies.
   `946fcce07b6dcd0331c8cc609192aeff5e1924f8` (the peeled commit of the annotated
   `n9.0.2` tag), built as a separate CLI with GPL,
   nonfree and autodetected components disabled. Only the PCM formats, WAV/RF64
-  demuxers, raw PCM muxers, ATRAC3 decoder and file/pipe protocols used by the
-  workflow are enabled. The exact build script and corresponding FFmpeg source
-  archive ship beside the app.
+  demuxer, raw PCM muxers, ATRAC3 decoder, audio resampling/format filters and
+  file/pipe protocols used by the workflow are enabled. The exact build script
+  and corresponding FFmpeg source archive ship beside the app.
 - Do not bundle the default PyAV Windows wheel for this project: the PyAV FFmpeg
   build configuration enables x264/x265, which enables FFmpeg's GPL options.
   See [PyAV's FFmpeg build](https://github.com/PyAV-Org/pyav-ffmpeg/blob/master/scripts/build-ffmpeg.py)

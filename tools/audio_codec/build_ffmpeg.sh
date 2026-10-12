@@ -54,6 +54,7 @@ cd "$BUILD"
     --enable-muxer=pcm_s16le,pcm_f32le \
     --enable-decoder=atrac3,pcm_u8,pcm_s8,pcm_u16le,pcm_u16be,pcm_s16le,pcm_s16be,pcm_s24le,pcm_s24be,pcm_s32le,pcm_s32be,pcm_f32le,pcm_f32be,pcm_f64le,pcm_f64be \
     --enable-encoder=pcm_s16le,pcm_f32le \
+    --enable-filter=aresample,aformat \
     --disable-parsers
 make -j"${NUMBER_OF_PROCESSORS:-4}" ffmpeg.exe
 cp ffmpeg.exe "$BIN"
@@ -66,6 +67,9 @@ fi
 grep -q -- '--disable-gpl' <<<"$buildconf"
 grep -q -- '--disable-nonfree' <<<"$buildconf"
 "$BIN" -decoders 2>&1 | grep -q ' atrac3 '
+filters="$("$BIN" -filters 2>&1)"
+grep -q ' aresample ' <<<"$filters"
+grep -q ' aformat ' <<<"$filters"
 formats="$("$BIN" -formats 2>&1)"
 grep -q ' wav ' <<<"$formats"
 grep -q ' s16le ' <<<"$formats"

@@ -15,10 +15,11 @@ then invalid FFmpeg component names / a missing MSYS2 `cmp` utility. The current
 follow-up pins the peeled source commit reported by
 `git rev-parse 'n9.0.2^{commit}'`, uses FFmpeg's `pcm_s16le`/`pcm_f32le` muxer
 component names and `ffmpeg.exe` make target, and installs `diffutils`. The
-corrected pin was confirmed in a local source checkout. The Windows CI for the
-previous head built both helpers and passed the package smoke; this follow-up
-adds an explicit conversion round trip through the frozen executable so the
-bundled helper lookup is tested in frozen mode.
+corrected pin was confirmed in a local source checkout. Windows CI built both
+helpers and passed the GUI package smoke, then the explicit audio round trip
+revealed that resampling/format filters were missing from the restricted FFmpeg
+build. The latest follow-up enables only `aresample` and `aformat`; Windows CI
+must validate the frozen conversion round trip on that head.
 
 ## Independent PR #5 review and continuation — 2026-10-12
 
