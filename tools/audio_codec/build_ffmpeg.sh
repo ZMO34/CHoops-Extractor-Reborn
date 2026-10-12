@@ -3,7 +3,7 @@ set -euo pipefail
 
 # Build the narrow, LGPL-only FFmpeg CLI used by the standalone Audio workspace.
 # Run from an MSYS2 MINGW64 shell with mingw-w64-x86_64-toolchain, make, git,
-# and pkgconf installed. No external codec libraries are autodetected.
+# pkgconf and diffutils installed. No external codec libraries are autodetected.
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd -W)"
 VERSION='n9.0.2'
@@ -51,11 +51,11 @@ cd "$BUILD"
     --enable-swresample \
     --enable-protocol=file,pipe \
     --enable-demuxer=wav \
-    --enable-muxer=s16le,f32le \
+    --enable-muxer=pcm_s16le,pcm_f32le \
     --enable-decoder=atrac3,pcm_u8,pcm_s8,pcm_u16le,pcm_u16be,pcm_s16le,pcm_s16be,pcm_s24le,pcm_s24be,pcm_s32le,pcm_s32be,pcm_f32le,pcm_f32be,pcm_f64le,pcm_f64be \
     --enable-encoder=pcm_s16le,pcm_f32le \
-    --enable-parser=atrac3
-make -j"${NUMBER_OF_PROCESSORS:-4}" ffmpeg
+    --disable-parsers
+make -j"${NUMBER_OF_PROCESSORS:-4}" ffmpeg.exe
 cp ffmpeg.exe "$BIN"
 
 buildconf="$($BIN -buildconf 2>&1)"
@@ -66,6 +66,9 @@ fi
 grep -q -- '--disable-gpl' <<<"$buildconf"
 grep -q -- '--disable-nonfree' <<<"$buildconf"
 "$BIN" -decoders 2>&1 | grep -q ' atrac3 '
-"$BIN" -formats 2>&1 | grep -q ' wav '
+formats="$("$BIN" -formats 2>&1)"
+grep -q ' wav ' <<<"$formats"
+grep -q ' s16le ' <<<"$formats"
+grep -q ' f32le ' <<<"$formats"
 
 echo "Built $BIN from FFmpeg $VERSION ($REVISION), with GPL/nonfree disabled."

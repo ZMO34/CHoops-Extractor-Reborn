@@ -5,8 +5,8 @@ ATRAC3 conversion plus the existing AtracDEnc-based ATRAC3 encoder helper. The
 FFmpeg build is deliberately restricted to the formats used by the audio
 workflow and disables GPL/nonfree components and autodetection.
 
-On Windows, install MSYS2 and the MINGW64 toolchain packages `mingw-w64-x86_64-toolchain`,
-`make`, `git` and `pkgconf`. Then, from an MSYS2 MINGW64 shell at the repository
+On Windows, install MSYS2 and the MINGW64 toolchain packages
+`mingw-w64-x86_64-toolchain`, `make`, `git`, `pkgconf` and `diffutils`. Then, from an MSYS2 MINGW64 shell at the repository
 root, run:
 
 ```bash

@@ -31,7 +31,7 @@ jobs:
         with:
           msystem: MINGW64
           update: true
-          install: mingw-w64-x86_64-toolchain make git pkgconf
+          install: mingw-w64-x86_64-toolchain make git pkgconf diffutils
       - name: Build LGPL audio helpers
         if: runner.os == 'Windows'
         shell: msys2 {0}
