@@ -2,11 +2,11 @@
 
 Native PySide6 desktop tools for PS3 College Hoops 2K8: lazy archive/nested-record browsing, raw extraction, DDS preview/export/import, confirmed roster fields, replacement-folder staging and separate JB builds. The source game remains read-only.
 
-**The full v1.0beta mandate is not complete; no v1.0beta release/tag has been published.** Current evidence and remaining acceptance gaps: [feature matrix](docs/rebuild/FEATURE_MATRIX.md), [test report](docs/TEST_REPORT.md), [risks](docs/rebuild/RISKS.md).
+The full mandate remains incomplete. Start with [current status](docs/CURRENT_STATUS.md), [secondary Codex prompt](docs/SECONDARY_CODEX_PROMPT.md), [collaboration](docs/COLLABORATION.md), and [test report](docs/TEST_REPORT.md). Development releases use the v1.0x train; check GitHub for the latest tag.
 
 ```powershell
 python -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -e ".[dev]"
+python tools/dev/setup.py
 .\.venv\Scripts\python.exe -m choops_py.studio
 .\.venv\Scripts\python.exe -m choops_py.cli --help
 ```
@@ -22,3 +22,10 @@ Recursive staging automatically restores non-stadium artwork to the selected bas
 See [user guide](docs/USER_GUIDE.md), [development](docs/DEVELOPER_GUIDE.md), [format evidence](docs/FORMAT_SPECIFICATIONS.md), [performance](docs/PERFORMANCE.md), [architecture](docs/rebuild/ARCHITECTURE.md) and [acceptance gates](docs/rebuild/ACCEPTANCE_TESTS.md). Historical tags/docs remain preserved and must not be read as current proof.
 
 ![Actual native archive explorer](docs/rebuild/screenshots/explorer.png)
+
+The experimental [audio CLI](docs/AUDIO_WORKFLOW.md) exports licensed music/fight
+songs to WAV and prepares audio/artwork replacements. No Audio GUI yet; name
+editing is disabled and EBOOT remains read-only. The v1.08 development bundle
+provides a Python audio-workspace alongside the established Windows GUI.
+Both Codex instances maintain documentation and submit each update through a PR;
+[AGENTS.md](AGENTS.md) defines the shared rules.

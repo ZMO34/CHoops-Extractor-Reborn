@@ -4,6 +4,11 @@ This public handoff contains portable development guidance. Personal context, se
 
 ## Current references
 
+- [Secondary Codex master prompt](SECONDARY_CODEX_PROMPT.md): full portable startup instructions.
+- [Current status](CURRENT_STATUS.md): living capabilities, tasks and provenance.
+- [Collaboration](COLLABORATION.md): two-account PRs, bug review and documentation duties.
+- [Audio research](AUDIO_RESEARCH.md) and [audio CLI](AUDIO_WORKFLOW.md): experimental audio evidence/commands.
+
 - [Project source of truth](PROJECT_SOURCE_OF_TRUTH.md): established format contracts and confidence notes.
 - [Format notes](FORMAT_NOTES.md) and [specification index](FORMAT_SPECIFICATIONS.md): parser/writer reference points.
 - [Architecture](rebuild/ARCHITECTURE.md): application services and GUI boundaries.

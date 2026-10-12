@@ -1,9 +1,18 @@
-# GUI
+# Native GUI
 
-Launch `python -m choops_py.cli gui`. The twelve focused panels cover Project Setup, Texture Tool Setup, DDS Export, DDS Import, Uniforms, Court/SCNE Textures, Team Logo/CDF Textures, Mod Staging, Build JB Folder, Roster Editor, Validate Build and Logs/Reports.
+Launch `python -m choops_py.studio` or CHoops-Studio.exe. PySide6 provides Explorer,
+Texture Editor, Roster Editor, Models/Courts, Mod Builder, Research and Diagnostics.
+No Tkinter, Node or browser server is required. Long jobs run in bounded workers;
+widgets update on the Qt main thread through signals.
 
-Project Setup provides vanilla JB, mod, rip, build and report folder pickers and converter file pickers. Outputs default under output/. Texture Tool Setup shows each bundled converter found/missing, export/import readiness and the last test conversion result.
+Explorer opens read-only JB/PS3_GAME/USRDIR, searches hashes/names and nested IFF
+records. Texture Editor previews/exports supported TXTR/SCNE artwork with built-in
+conversion. Roster Editor exposes confirmed fields, RGB color picker, ratings,
+player/team shoes, save-copy/export, undo/redo and alternate controls. Models/Courts
+previews supported arena/cloth/shoe geometry and selected material artwork, with
+orbit/look/pan/keyboard movement. Mod Builder stages recursive overrides and builds
+only on the user's explicit action. Research/Diagnostics support bounded inspection.
 
-Commands show a preview before running. Long commands run in a background subprocess with live logs; logs can be saved under output/reports. The roster editor uses the same validated backend as the CLI, with row editing, search, roster slots, validation, undo/revert and save-copy/export actions.
-
-Build controls are Select Vanilla JB Folder, Select Mod Folder, Select Output Build Folder, Build JB Folder and Validate Build. Builds go under output/builds/<name>/. Existing generated builds require --overwrite; folders without this tool's manifest are refused. Output equal to or inside vanilla is always rejected.
+See USER_GUIDE.md for controls. Audio is currently Python CLI only; separate
+licensed/fight GUI subsections remain future work. No song-name/EBOOT editing.
+Agents do not open RPCS3 or trigger full testing JB builds.

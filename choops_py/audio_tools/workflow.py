@@ -65,6 +65,7 @@ def _stream(archive,row):
 
 def export_track(archive,row,output,job=None):
     out=safe_output(output,[archive.path]);out.parent.mkdir(parents=True,exist_ok=True)
+    if out.exists() or out.with_suffix('.audio.json').exists():raise ValueError('Choose a new WAV output filename')
     temporary=out.with_name('.'+out.name+'.'+uuid.uuid4().hex+'.wav')
     try:
         result=export_wav(_stream(archive,row),row['channels'],row['sample_rate'],temporary,row['samples'],job)
@@ -76,13 +77,15 @@ def export_track(archive,row,output,job=None):
 
 
 def export_tracks(archive,rows,output,job=None):
-    out=safe_output(output,[archive.path]);out.mkdir(parents=True,exist_ok=True)
+    out=safe_output(output,[archive.path])
+    if out.exists():raise ValueError('Choose a new audio export folder')
+    out.mkdir(parents=True)
     manifest=[]
     for i,row in enumerate(rows):
         if job:job.check();job.progress(i,len(rows),'Exporting '+row['title'])
-        filename=f'{row["index"]:03d}_'+safe_name(row['artist']+' - '+row['title'])+'.wav'
+        filename=safe_name(row['bank'])+f'_{row["index"]:03d}_'+safe_name(row['artist']+' - '+row['title'])+'.wav'
         export_track(archive,row,out/filename,job)
-        manifest.append(dict(bank=row['bank'],index=row['index'],file=filename,title=row['title'],artist=row['artist']))
+        manifest.append(dict(bank=row['bank'],index=row['index'],file=filename,title=row['title'],artist=row['artist'],sha256=digest((out/filename).read_bytes())))
     save_json(out/'audio_manifest.json',dict(schema=1,tracks=manifest))
     return dict(output=str(out),exported=len(manifest),format='PCM16 WAV',manifest=str(out/'audio_manifest.json'))
 
@@ -135,6 +138,7 @@ def import_wav_folder(archive,folder,output,job=None):
         relative=Path(item['file']);path=(folder/relative).resolve()
         if relative.is_absolute() or not path.is_relative_to(folder):raise ValueError('Audio manifest path leaves the selected folder')
         if not path.is_file():continue
+        if item.get('sha256')==digest(path.read_bytes()):continue
         key=(item['bank'],item['index'])
         if key not in tracks:raise ValueError('Audio manifest target does not exist in the loaded JB')
         replacements.append((tracks[key],path))
@@ -152,7 +156,15 @@ def read_audo(path):
 
 def export_audo(source,output,job=None):
     parts,_=read_audo(source);metadata=audio.info(parts);out=safe_output(output,[source]);out.parent.mkdir(parents=True,exist_ok=True)
-    return dict(export_wav(parts[1][:metadata['encoded_bytes']],metadata['channels'],metadata['sample_rate'],out,metadata['samples'],job),output=str(out))
+    if out.exists():raise ValueError('Choose a new WAV output filename')
+    split=audio.parts_from_bytes(parts[0]) if len(parts)==1 else parts
+    temporary=out.with_name('.'+out.name+'.'+uuid.uuid4().hex+'.wav')
+    try:
+        result=export_wav(split[1][:metadata['encoded_bytes']],metadata['channels'],metadata['sample_rate'],temporary,metadata['samples'],job)
+        temporary.replace(out)
+    finally:
+        if temporary.exists():temporary.unlink()
+    return dict(result,output=str(out))
 
 
 def replace_audo(source,wav,output,job=None):

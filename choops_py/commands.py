@@ -6,6 +6,14 @@ class Command:
     options: tuple = ()
     output_file: bool = False
 COMMANDS={
+    'audio-catalog':Command(('source','output'),(),True),
+    'export-soundtrack':Command(('source','output'),('audio-category',)),
+    'replace-song':Command(('source','bank','index','wav_file','output')),
+    'import-audio-folder':Command(('source','input','output')),
+    'export-audo':Command(('input','output'),(),True),
+    'replace-audo':Command(('input','wav_file','output'),(),True),
+    'export-jukebox-art':Command(('source','record','output'),(),True),
+    'replace-jukebox-art':Command(('source','record','image','output'),(),True),
     'prepare-court-template':Command(('input','output')),
     'export-mod-patch':Command(('source','mod','output'),(),True),
     'import-mod-patch':Command(('source','input','output')),

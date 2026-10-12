@@ -28,9 +28,9 @@ def named_iff(blocks,records,names):
 
 
 def test_recursive_whole_archives_and_duplicate_targets(tmp_path):
-    source=game_fixture(tmp_path/'game',iff_fixture())
+    source=game_fixture(tmp_path/'game',iff_fixture(records=[(0xa7701f00,[0])]))
     folder=tmp_path/'overrides';nested=folder/'textures'/'courts';nested.mkdir(parents=True)
-    (nested/'ua000.iff').write_bytes(iff_fixture([b'new!']))
+    (nested/'ua000.iff').write_bytes(iff_fixture([b'new!'],[(0xa7701f00,[0])]))
     (folder/'design.psd').write_bytes(b'ignored')
     mod=OUTPUT/'builds'/('nested_import_test_'+uuid.uuid4().hex)
     report=stage_folder(source,folder,mod)

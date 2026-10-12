@@ -2,6 +2,12 @@
 
 Native launch, synthetic parser/writer contracts, Windows converter execution, private real-game operations, source preservation and standalone smoke have local evidence. Environment-specific details are excluded from public documentation. CI status must be read from the actual proposed head.
 
-Public release remains withheld: finish mandatory product/UX acceptance, resolve converter redistribution and complete binary notices/source compliance. Geometry/unknown roster/audio/relocation remain research or unsupported with explicit reasons. Runtime PS3/RPCS3: NOT RUN.
+Development releases exist, while the full feature mandate remains incomplete.
+Validated previews/relocation/roster edits and experimental audio are described in
+../CURRENT_STATUS.md. Legacy converters are unnecessary and excluded. Added
+native components require notices/corresponding sources. Runtime: NOT RUN.
 
-Manual runtime checklist: boot a separate copied JB, inspect edited assets and roster behavior, play with affected teams, review logs and record the legitimately configured environment. Never modify the original JB. Do not treat structural equality as gameplay proof.
+Agents must NEVER open RPCS3 or create testing JB folders. Users build/test copies
+manually. Python/Qt/readonly archive checks must record exact commands, results,
+untouched-byte evidence and skips; structural checks do not establish gameplay.
+Independent PR review tests the exact submitted SHA in an isolated checkout.

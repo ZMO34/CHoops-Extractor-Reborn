@@ -1,5 +1,10 @@
 # Native studio user guide (development build)
 
+Current release/limits: [CURRENT_STATUS.md](CURRENT_STATUS.md). Experimental audio
+uses the [Python audio CLI](AUDIO_WORKFLOW.md), with licensed/fight song exports
+separate. There is no Audio GUI tab or song-name/artist editing yet. Users manually
+stage/build their JB; agents do not create testing JB folders or launch RPCS3.
+
 Install Python 3.11+ and project desktop dependencies, or run the local onedir prototype. No Node/browser server is used.
 
 ```powershell

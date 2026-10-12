@@ -1,8 +1,15 @@
-> Rebuild update 2026-10-09: the current native GUI is choops_py.studio (PySide6). Historical Tk/cache/publication statements below describe the baseline. Current evidence and unresolved gates are in rebuild/FEATURE_MATRIX.md and TEST_REPORT.md. Converter execution does not establish redistribution permission.
+> Updated 2026-10-11: choops_py.studio is PySide6. CURRENT_STATUS.md and the project
+> notes govern current editing support. The format contracts below retain some
+> inherited observations; table offsets are stock evidence, not universal hardcodes.
+> Supported growth and optional roster operations supersede older fixed-capacity
+> restrictions. Texture conversion is built in; audio is experimental Python CLI.
 
 # Project source of truth
 
-Target: PS3 College Hoops 2K8, Python 3.11+, argparse and Tkinter. This document and MASTER_HANDOFF.md replace reliance on the old JavaScript folders. The handoff is research evidence, not a promise that every historical editor field is validated.
+Target: PS3 College Hoops 2K8, Python 3.11+, argparse and PySide6. Read
+CURRENT_STATUS.md, COLLABORATION.md and SECONDARY_CODEX_PROMPT.md first. This
+technical baseline preserves inherited evidence; newer project-specific docs and
+tested code supersede older conservative restrictions. No JavaScript runtime.
 
 ## Provenance and confidence
 
@@ -52,16 +59,34 @@ SCNE package header is 0x54 bytes. +20 texture count; +24 relative texture point
 
 ## Roster and development direction
 
+Current corrections: jersey number is byte +0x1B, preserving adjacent flags at
++0x1A. Tables/counts derive from the header. Verified ratings, equipment/shoes,
+appearance choices, optional conference/D1 updates and alternate links are
+editable through declared masks. The older restricted-field paragraph below is
+historical; ROSTER_EDITOR.md and projects/ define current scope. Six palette words
+remain unresolved; long string rebuilding and unknown fields remain blocked.
+
 Roster adapters support standard IFF ROST, raw ROST, type-21 wrapper, decrypted USERDATA with 4-byte prefix, and one-USERDATA decrypted ZIP. No encrypted-save decryption is provided. Known tables: players 0x0271AC/5685/308, arenas 0x1D5C84/379/28, teams 0x1D85E0/443/704, coaches 0x23F78C/1373/44.
 
 ROST pointers are field + signed delta (no standard-IFF minus one). Player last/first pointers +0x10/+0x14 use UTF-16LE; odd addresses are valid. Jersey is u16 +0x1A (preserve high ID +0x18), height +0x3A, position +0x3B. Team roster references +0x6C, 16 slots, point to player row +0x11. Team arena +0x44 targets arena row +0x19, coaches +0x60/+0x64/+0x68 target coach row +0x15, rivals +0x4C/+0x50/+0x54 target team row +0x31. Asset IDs are high u16 at +0x18C/+0x190/+0x194; preserve low words and require consistent existing IDs. Conference/prestige/appearance are not safe editable fields. Names require same UTF-16 byte length and unshared storage.
 
-Current TXTR descriptor +0x58 contains format, mips, dimension, cube, remap, width/height/depth, pitch. GTF wraps the descriptor/image in a 0x30-byte header. DDS2GTF uses -v -z and -s for swizzled sources; -z is verbose, not swizzling. Validated formats are L8, ARGB8, DXT1/3/5. Linear L8 atlas exports use a proven native DDS fallback for converter Bad-format failures. Reimport uses DDS2GTF and strips only verified per-mip row padding. SCNE package textures share the same TXTR reader/writer while geometry is preserved. CDF header and image payload may each be H7A compressed; sideline_items contains SCNE records, not direct TXTR records.
+Current TXTR descriptor +0x58 contains format, mips, dimension, cube, remap,
+width/height/depth and pitch. GTF wraps descriptor/image in a 0x30-byte header.
+Conversion is built-in Python for L8, ARGB8, DXT1/3/5 and RGBA16F, mips/cubes.
+Historical converter switches are reference evidence only. Non-stadium imports
+normalize to the selected base layout; stadiums allow supported dynamic sizes.
+SCNE textures share the TXTR pipeline while geometry is preserved. CDF headers
+and images may each be H7A compressed; sideline_items contains SCNE records.
 
 Future development should extend validated texture variants and bounded writers, add meaningful regression fixtures, and verify console behavior. Do not expose speculative roster fields or geometry modifications as safe.
 
 ## Current safety contract and evidence
 
-All outputs, including mod staging and logs, are restricted to project output/{rips,builds,reports,cache,temp,tools,config,smoke_tests}. Reject resolved paths inside vanilla/JB source, source overwrite, path traversal and linked build trees. Builds preflight every override before copying and patch only same-size extents in the copy. --overwrite is supported only for owned generated builds, using transactional replacement. CLI and 12-panel focused Tkinter GUI share a command registry/backend; worker subprocesses stream logs without touching Tk from worker threads.
+Generated outputs live under project output/. Reject source overwrite/overlap,
+traversal and linked builds. Supported record/archive growth uses validated
+relocation; unknown offsets/aliases remain blocked. Manual builds are transactional
+and source-bound; agents must not create testing game copies or launch RPCS3.
+PySide6 GUI and CLI share services; workers use signals rather than widget writes.
+Experimental AUSB/AUDO evidence is in AUDIO_RESEARCH.md. EBOOT stays read-only.
 
 Validation procedures are documented in TEST_REPORT.md and rebuild/ACCEPTANCE_TESTS.md. Public documentation excludes fixture fingerprints, extraction measurements, session records and environment-specific results. Do not infer current capability from historical smoke observations or command registration.

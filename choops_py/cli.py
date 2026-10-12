@@ -15,7 +15,9 @@ def parser():
         s=sub.add_parser(name)
         for field in spec.fields:s.add_argument(field)
         for group in spec.options:
-            if group=='selection':
+            if group=='audio-category':
+                s.add_argument('--category',choices=['soundtrack','fight-songs','all'],default='soundtrack')
+            elif group=='selection':
                 s.add_argument('--index',type=int);s.add_argument('--file')
             elif group=='export':
                 s.add_argument('--raw',action='store_true');s.add_argument('--dds',action='store_true');s.add_argument('--gtf2dds');s.add_argument('--strict',action='store_true')
@@ -39,8 +41,26 @@ def execute(a):
     if c=='gui':
         from .studio import main as launch
         return launch([])
-    sources=[getattr(a,key) for key in ('source','input','cdf','dds_file','mod','modded','edited','patch') if getattr(a,key,None)]
+    sources=[getattr(a,key) for key in ('source','input','cdf','dds_file','wav_file','image','mod','modded','edited','patch') if getattr(a,key,None)]
     if hasattr(a,'output'):a.output=safe_output(a.output,sources)
+    if c in ('audio-catalog','export-soundtrack','replace-song','import-audio-folder','export-audo','replace-audo','export-jukebox-art','replace-jukebox-art'):
+        from .audio_tools import workflow as audio
+        if c=='export-audo':return audio.export_audo(a.input,a.output)
+        if c=='replace-audo':return audio.replace_audo(a.input,a.wav_file,a.output)
+        from .archive.usrdir_reader import Archive
+        archive=Archive(a.source)
+        if c=='export-jukebox-art':return audio.export_cover(archive,a.record,a.output)
+        if c=='replace-jukebox-art':return audio.replace_cover(archive,a.record,a.image,a.output)
+        if c=='import-audio-folder':return audio.import_wav_folder(archive,a.input,a.output)
+        catalog=audio.catalog(archive)
+        if c=='audio-catalog':save_json(a.output,catalog,sources);return catalog
+        if c=='export-soundtrack':
+            category={'soundtrack':'Soundtrack','fight-songs':'Fight song'}.get(a.category)
+            rows=[r for r in catalog['tracks'] if category is None or r['category']==category]
+            return audio.export_tracks(archive,rows,a.output)
+        rows=[r for r in catalog['tracks'] if r['bank']==a.bank and r['index']==int(a.index)]
+        if len(rows)!=1:raise ValueError('Audio stream target is missing or ambiguous')
+        return audio.replace_tracks(archive,[(rows[0],a.wav_file)],a.output)
     if c=='prepare-court-template':
         from .modding.court_template import prepare
         return prepare(a.input,a.output)

@@ -26,6 +26,8 @@ def info(parts):
 
 def replace(parts,encoded,samples):
     inline=len(parts)==1;source=parts_from_bytes(parts[0]) if inline else parts;metadata=info(source)
+    physical=playback_samples(len(encoded),metadata['channels'],metadata['sample_rate'])
+    if not isinstance(samples,int) or not 0<samples<=physical:raise ValueError('Invalid AUDO replacement sample extent')
     if metadata['flags'] or metadata['loop_start'] or metadata['loop_end']:
         raise ValueError('Looped AUDO replacement requires confirmed loop routing; export is supported')
     head=bytearray(source[0]);struct.pack_into('>I',head,12,samples);struct.pack_into('>I',head,24,len(encoded))

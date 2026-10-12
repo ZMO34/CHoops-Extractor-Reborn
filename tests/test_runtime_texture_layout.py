@@ -116,7 +116,7 @@ def test_court_zip_cannot_escape_the_output_folder(tmp_path):
     from choops_py.modding.court_template import prepare
     source=tmp_path/'court.zip'
     with zipfile.ZipFile(source,'w') as archive:archive.writestr('../floor.scne',b'not a scene')
-    with pytest.raises(ValueError,match='stadium sNNN'):prepare(source,tmp_path/'result')
+    with pytest.raises(ValueError,match='All outputs must be under project output'):prepare(source,tmp_path/'result')
     assert not (tmp_path/'floor.scne').exists()
 
 

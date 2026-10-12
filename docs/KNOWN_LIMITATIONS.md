@@ -1,16 +1,27 @@
-> Native rebuild acceptance gaps and publication blockers: [rebuild/RISKS.md](rebuild/RISKS.md). Geometry remains read-only, converters are not cleared for public bundling, and runtime testing is NOT RUN.
+# Current limitations
 
-# Known limitations
+Updated 2026-10-11. CURRENT_STATUS.md and TEST_REPORT.md are the living evidence.
 
-- Bundled DDS converters require Windows. Raw extraction works without converters; DDS export/import requires bundled converter tools.
-- Unknown TXTR layouts, unsupported DDS formats (including DX10/cubes) and unvalidated pixel transformations are blocked. Manifest warnings describe per-texture export failures.
-- Standard IFF changes must preserve logical slice sizes and fit the original file extent. Unchanged compressed blocks remain byte-identical; modified blocks preserve unknown fields and original token choices where possible. Invalid/shared slices and insufficient capacity are blocked.
-- CDF imports must fit original physical allocations; virtual-to-physical layout relocation is not implemented. Segment headers and metadata are preserved.
-- Roster names require equal encoded length and unshared string storage. Appearance, skin tone, conference, prestige, and long-string rebuilding are read-only. Encrypted saves require external decryption. Team references use confirmed internal row biases, not guessed row starts.
-- SCNE texture edits preserve geometry. A read-only 3D preview supports a subset of declared mesh layouts with manually selected texture overlays. Geometry/material/UV editing, audio decoding and broad research scans are outside the focused UI.
-- JB builds support existing archive extents and staged safe edits; adding archive entries or increasing allocated file sizes is blocked. Validation checks files/structure, not console gameplay.
-- Existing output files are refused for import/export. Build --overwrite only replaces an owned generated build, transactionally.
-
-The 3D preview supports verified court material-to-roster DiffuseColor bindings with simplified lighting. Arena channel masks and jersey-number color/material routing are not yet decoded. Opening a different JB folder clears the previous roster and scene; rebuilt folders use their current archive contents.
-
-Uniform rest-pose previews can apply selected authored jersey/shorts art. The roster uniform table supports existing asset selector and known cloth-shape edits, but uniform count growth, new archive assets, complete bank/unlock routing, runtime name/number overlays and the remaining nine team palette captions are unresolved. H7A recompression can reduce edited-block growth; fixed-capacity checks still refuse content that cannot fit.
+- Python/Qt checks do not establish game behavior. Agents never open RPCS3 or
+  create testing JB folders; users build/test their own copies.
+- DDS/GTF conversion is built in. Unknown TXTR layouts, DX10 and true volumes
+  remain unsupported. Unused stored depth on declared 2D/cubes is tolerated.
+- Validated standard IFF/TXTR/SCNE growth and archive relocation exist. Unknown
+  pointers and aliases remain blocked; general CDF virtual/physical growth is
+  unresolved. Do not apply obsolete same-size rules to every supported writer.
+- Six team palette words and full arena shader masks remain unresolved. Preview
+  lighting, cloth/skinning, jersey glyphs and material effects are simplified.
+- Roster names generally need equal encoded length/unshared storage. Encrypted
+  saves need external decryption. Community wrappers are preserved; invalid
+  pointers/new corruption remain fatal. Unchanged bad name characters are warnings.
+- Alternate/linking operations and optional D1 conversion exist, but complete
+  game/profile unlock behavior and independent decloned IDs need validation.
+- Shoe editing uses verified brand/style/color ranges and artwork IDs; commercial
+  style names and the exact special-family manufacturer caption are unresolved.
+- 4096 is a court texture dimension ceiling, not a tested safe GPU allocation.
+  Floor template preparation disables only extra floor draws, preserving arena.
+- Audio is experimental Python/CLI: no Audio GUI yet, archive-only title/artist
+  override route unproven, EBOOT writes prohibited. Unknown AUDO loops are blocked;
+  CDF audio growth and self-contained native packaging remain pending.
+- Outputs are constrained to output/. Game assets, exported music/art, private
+  paths, logs, fixtures and EBOOT are not supplied publicly.
