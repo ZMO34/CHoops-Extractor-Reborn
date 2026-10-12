@@ -41,7 +41,7 @@ def main():
     if not args.check:
         run([executable, "-m", "pip", "install", "-e", ".[dev]"])
     probe = (
-        "import PySide6,PIL,av,pytest,pytestqt,ruff,mypy,psutil,PyInstaller; "
+        "import PySide6,PIL,pytest,pytestqt,ruff,mypy,psutil,PyInstaller; "
         "print('Desktop/development dependencies import successfully')"
     )
     run([executable, "-c", probe])

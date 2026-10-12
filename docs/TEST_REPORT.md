@@ -1,5 +1,16 @@
 # Development verification
 
+## LGPL audio packaging branch — portable checks
+
+`python tools/dev/verify.py`: 250 passed, 1 skipped, 2 deselected. The skip is
+the optional native codec round trip because the local checkout has not built
+the helpers; deselections are the private game/runtime checks and the optional
+legacy native comparison defined by the runner. CLI help and Qt startup smoke,
+scoped Ruff, studio/service mypy, handoff snapshot, compileall and
+`git diff --check` passed. The restricted FFmpeg build, Windows package smoke
+and packaged WAV round trip remain pending Windows CI; local MSYS2 is unavailable.
+An added synthetic regression rejects a non-RIFF/RF64 WAV before codec lookup.
+
 ## Independent PR #5 review and continuation — 2026-10-12
 
 Reviewed submitted head 6603d24f4d32f70abfd25e3f6770939b86f4594b in an isolated

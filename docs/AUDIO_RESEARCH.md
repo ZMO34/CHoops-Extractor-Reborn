@@ -97,10 +97,23 @@ project dependencies.
 - [AtracDEnc](https://github.com/dcherednik/atracdenc), revision
   `cb170709f836cb43dc0312455188c791159d81dc`, LGPL-2.1-or-later. Thin frontend and
   build instructions are in tools/audio_encoder. No Sony SDK executable is used.
-- PyAV 16.1.0 supplies the decoder in local Python development. The inspected
-  Windows FFmpeg DLL reports **LGPL version 3 or later**, with shared libraries
-  and multiple optional codecs. Do not infer the license from DLL names alone.
-  Native redistribution needs matching notices/corresponding sources for shipped
-  components; dependency installation by the user is separate from bundling them.
+- The standalone app's LGPL packaging uses FFmpeg 9.0.2 at revision
+  `ce8f11b9fac4cd7ccfb41ca7c01bc17f5cda8cc3`, built as a separate CLI with GPL,
+  nonfree and autodetected components disabled. Only the PCM formats, WAV/RF64
+  demuxers, raw PCM muxers, ATRAC3 decoder and file/pipe protocols used by the
+  workflow are enabled. The exact build script and corresponding FFmpeg source
+  archive ship beside the app.
+- Do not bundle the default PyAV Windows wheel for this project: the PyAV FFmpeg
+  build configuration enables x264/x265, which enables FFmpeg's GPL options.
+  See [PyAV's FFmpeg build](https://github.com/PyAV-Org/pyav-ffmpeg/blob/master/scripts/build-ffmpeg.py)
+  and [the PyAV wheel licensing discussion](https://github.com/PyAV-Org/PyAV/issues/2270).
+  The package instead uses separately executable FFmpeg built from the official
+  [FFmpeg source](https://github.com/FFmpeg/FFmpeg) with a pinned revision and
+  corresponding source archive.
+- The packaging implementation is awaiting exact Windows CI and a packaged WAV
+  round trip. Until those pass, this is a build plan rather than verified release
+  evidence. The build script pins the tag and commit, checks its build options,
+  and packages the corresponding source and license files; CI must verify those
+  commands against the target Windows toolchain.
 
 See CURRENT_STATUS.md and each PR's exact verification for the latest evidence.

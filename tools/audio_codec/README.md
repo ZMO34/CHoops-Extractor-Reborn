@@ -1,0 +1,23 @@
+# LGPL audio helper
+
+The standalone Windows app uses a small FFmpeg command-line helper for WAV and
+ATRAC3 conversion plus the existing AtracDEnc-based ATRAC3 encoder helper. The
+FFmpeg build is deliberately restricted to the formats used by the audio
+workflow and disables GPL/nonfree components and autodetection.
+
+On Windows, install MSYS2 and the MINGW64 toolchain packages `mingw-w64-x86_64-toolchain`,
+`make`, `git` and `pkgconf`. Then, from an MSYS2 MINGW64 shell at the repository
+root, run:
+
+```bash
+bash tools/audio_codec/build_ffmpeg.sh
+```
+
+Build the encoder separately with `python tools/dev/setup.py --audio-encoder`.
+The package script requires both helpers and includes their pinned source
+archives, license texts and build scripts under `THIRD-PARTY-SOURCES`.
+
+The build fetches FFmpeg 9.0.2 at commit
+`ce8f11b9fac4cd7ccfb41ca7c01bc17f5cda8cc3`. The compiled helper is written to
+the ignored `choops_py/audio_tools/bin/` directory. The executable's build
+configuration is checked to ensure GPL and nonfree options are absent.

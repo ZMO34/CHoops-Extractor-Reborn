@@ -1,0 +1,19 @@
+Audio helper third-party notices
+
+FFmpeg 9.0.2
+Source revision: ce8f11b9fac4cd7ccfb41ca7c01bc17f5cda8cc3
+License: GNU LGPL version 2.1 or later. This build disables GPL and nonfree
+components, autodetection, network support and all codecs except the PCM formats
+and ATRAC3 decoder required by the Audio workspace. It is a separate executable,
+not linked into CHoops Studio. The packaged corresponding source archive,
+FFmpeg's COPYING.LGPLv2.1, and the exact build script are in
+THIRD-PARTY-SOURCES.
+
+AtracDEnc
+Source revision: cb170709f836cb43dc0312455188c791159d81dc
+License: GNU LGPL version 2.1 or later. The standalone ATRAC3 encoder helper
+includes the project's thin PCM frontend and this pinned upstream encoder. Its
+corresponding source archive, frontend, build script, README and license are in
+THIRD-PARTY-SOURCES.
+
+No PyAV wheel or FFmpeg GPL codec is distributed with CHoops Studio.

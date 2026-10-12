@@ -1,8 +1,7 @@
 # ATRAC3 encoder development helper
 
-This helper supplies the experimental audio backend. Audio GUI integration and
-release packaging are still in progress; this commit does not enable song-name
-editing or modify EBOOT.
+This helper supplies ATRAC3 encoding for the audio backend and standalone
+Windows package. It does not enable song-name editing or modify EBOOT.
 
 The frontend is in `encoder.cpp`. It builds against AtracDEnc revision
 `cb170709f836cb43dc0312455188c791159d81dc`:
@@ -20,6 +19,6 @@ by Git. The upstream encoder and this frontend use LGPL 2.1 or later; see
 `LICENSE.txt`. Distributing a compiled helper requires the corresponding source
 and applicable license notices. Game audio and other game assets are not included.
 
-The backend decodes through PyAV, available with the `desktop` dependency extra.
-Its initial verification covers a synthetic WAV encode/decode round trip; game
-playback validation has not been performed.
+The paired LGPL FFmpeg helper handles WAV conversion and ATRAC3 decoding. The
+Windows app includes both helpers with corresponding source archives and notices.
+Game playback validation has not been performed.

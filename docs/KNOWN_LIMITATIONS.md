@@ -23,7 +23,8 @@ Updated 2026-10-11. CURRENT_STATUS.md and TEST_REPORT.md are the living evidence
 - Audio has an experimental Python backend/CLI and a shared-backend Qt workspace
   for Licensed Music, Fight Songs, WAV workflows and mapped cover art. Title/artist
   editing remains unavailable because archive-only routing is unproven; EBOOT
-  writes are prohibited. Unknown AUDO loops are blocked; CDF audio growth and
-  self-contained codec packaging remain pending.
+  writes are prohibited. Unknown AUDO loops are blocked and CDF audio growth is
+  unsupported. LGPL helper packaging is in review and remains unverified until
+  Windows CI builds and smoke-tests the exact PR head.
 - Outputs are constrained to output/. Game assets, exported music/art, private
   paths, logs, fixtures and EBOOT are not supplied publicly.

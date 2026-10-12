@@ -18,19 +18,24 @@ the same Python backend; no emulator or gameplay check is part of these flows.
 
 Launch the studio with `python -m choops_py.studio`, then choose **Audio** in the
 left navigation. Open a JB from Explorer first, then use **Load / refresh
-catalog**. WAV decoding requires PyAV; WAV replacement also requires the helper
-built by `python tools/dev/setup.py --audio-encoder`.
+catalog**. WAV export needs the LGPL FFmpeg helper. WAV replacement also needs
+the LGPL ATRAC3 encoder helper.
 
 From a checkout or the release's **audio-workspace** directory:
 
 ```powershell
-python tools/dev/setup.py --audio-encoder
+python tools/dev/setup.py
 .\.venv\Scripts\python.exe -m choops_py.cli --help
 ```
 
-Python 3.12 x64 and Git must already be available. Setup installs the Python
-prerequisites, fetches pinned LGPL AtracDEnc sources into ignored .private/vendor,
-and builds the helper with Zig. Decoder-only exports need PyAV, not the encoder.
+Python 3.12 x64 and Git must already be available. Setup installs the desktop
+and development dependencies. On Windows, install MSYS2 with its MINGW64 toolchain,
+`make`, `git` and `pkgconf`, then run `bash tools/audio_codec/build_ffmpeg.sh`
+from an MSYS2 MINGW64 shell at the repository root. This builds FFmpeg 9.0.2
+from pinned upstream source with GPL/nonfree components disabled. Build the
+separate ATRAC3 encoder with `python tools/dev/setup.py --audio-encoder`; this
+fetches pinned LGPL AtracDEnc source and builds the helper with Zig. WAV export
+needs FFmpeg; WAV replacement needs both helpers.
 
 ```powershell
 .\.venv\Scripts\python.exe -m choops_py.cli audio-catalog "YOUR_JB_ROOT" output/reports/audio.json
@@ -61,8 +66,9 @@ Cover replacement outputs complete jukebox.iff for manual staging. Record 021 is
 shared by all fight songs; 002 by both Strange Fruit tracks. DDS or Pillow-readable
 artwork such as PNG is normalized to the selected JB's base texture layout.
 
-The v1.08 development bundle includes the established standalone Windows GUI
-and a Python **audio-workspace**. Audio commands run from that workspace, not the
-GUI executable. PyAV/encoder build dependencies are installed by setup, not
-distributed as native codec DLLs. Self-contained audio GUI packaging is pending.
-See AUDIO_RESEARCH.md for evidence and limits.
+The Windows standalone GUI includes the restricted LGPL FFmpeg and ATRAC3 helper
+executables. Their exact source archives, license texts and build instructions
+are distributed in `THIRD-PARTY-SOURCES`. The default PyAV wheel is not bundled.
+When building locally, both helpers must be present before running
+`tools/rebuild/package_windows.ps1`. See AUDIO_RESEARCH.md for evidence and
+format limits.

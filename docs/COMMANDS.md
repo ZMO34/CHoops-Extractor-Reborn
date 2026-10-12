@@ -3,8 +3,9 @@
 Experimental audio examples: [AUDIO_WORKFLOW.md](AUDIO_WORKFLOW.md). Commands:
 audio-catalog, export-soundtrack, replace-song, import-audio-folder, export-audo,
 replace-audo, export-jukebox-art, replace-jukebox-art. The Qt Audio workspace
-uses the same Python services. Python audio dependencies are required; title
-editing is unavailable. These commands create asset copies, not JB builds. Agents
+uses the same Python services. The LGPL FFmpeg helper handles WAV conversion;
+WAV replacement also needs the ATRAC3 encoder. Title editing is unavailable.
+These commands create asset copies, not JB builds. Agents
 must not use the manual build examples below.
 
 `gui` now launches the PySide6 studio. `python -m choops_py.studio` supports --smoke and --game PATH. The packaged executable also accepts --cli followed by ordinary CLI arguments.

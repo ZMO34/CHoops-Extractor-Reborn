@@ -14,8 +14,10 @@ python tools/dev/verify.py
 ```
 
 Setup installs .[dev]; the encoder option installs Zig 0.13.0 and fetches pinned
-LGPL sources. Decoder development uses PyAV 16.x. No other PC's credentials,
-environment or paths are copied. Versions go into ignored dev-setup.txt.
+LGPL sources. Audio conversion uses the restricted LGPL FFmpeg helper built from
+`tools/audio_codec/build_ffmpeg.sh` and the optional ATRAC3 encoder. No PyAV
+wheel is required or packaged. No other PC's credentials, environment or paths
+are copied. Versions go into ignored dev-setup.txt.
 requirements-windows-dev.txt is an old environment snapshot; pyproject/setup
 are the portable dependency contract.
 
@@ -34,8 +36,9 @@ audio_tools. Qt workers return signals/data, never manipulate widgets. Writers
 reparse output, preserve unknown bytes/bits and reject ambiguous shared ranges.
 Generated outputs live under output/ and originals remain immutable.
 
-tools/rebuild/package_windows.ps1 packages the Windows GUI. The Audio workspace
-uses PyAV and an optional ATRAC3 helper built from pinned LGPL source; native
-codec dependencies are not self-contained in the GUI package yet. Check licenses
-and corresponding sources for shipped native components; no proprietary
-converters/game assets. See AUDIO_WORKFLOW.md and the encoder README.
+`tools/rebuild/package_windows.ps1` packages the Windows GUI and audio helpers.
+The FFmpeg helper is configured without GPL/nonfree components and uses only the
+PCM formats and ATRAC3 decoder needed for WAV/audio operations. Its FFmpeg and
+AtracDEnc source archives and applicable notices accompany the package. Confirm
+the exact configuration and packaged smoke on Windows; no proprietary converters
+or game assets are included. See AUDIO_WORKFLOW.md and the encoder README.

@@ -6,6 +6,13 @@ Fix scene/shoe navigation after Audio insertion; clean-clone converter tests use
 synthetic fixtures. Batch WAV exports publish atomically and remove incomplete
 batches on cancellation/failure.
 
+## Unreleased — LGPL audio package
+
+Build a restricted FFmpeg CLI from pinned upstream source with GPL/nonfree
+components disabled, ship corresponding FFmpeg/AtracDEnc sources and notices,
+and include both audio helpers in the standalone Windows GUI. Exact Windows
+package and audio round-trip verification is pending.
+
 ## v1.08 audio development bundle
 
 Experimental WAV/audio-bank/AUDO/jukebox-art CLI, unchanged-WAV checksum skipping,

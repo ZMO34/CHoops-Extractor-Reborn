@@ -1,10 +1,10 @@
 """ATRAC3 decoding and encoding with open-source codec components."""
-import io
 import math
 import os
 import shutil
 import struct
 import subprocess
+import sys
 import time
 import uuid
 import wave
@@ -17,12 +17,32 @@ GAME_DELAY=2048
 ENCODER_DELAY=1162
 
 
-def decoder_module():
-    try:
-        import av
-    except ImportError as error:
-        raise ValueError('Audio decoding needs PyAV; run audio commands from the Python audio-workspace after tools/dev/setup.py') from error
-    return av
+def ffmpeg_path():
+    name='choops_ffmpeg.exe' if os.name=='nt' else 'choops_ffmpeg'
+    bundled=Path(__file__).parent/'bin'/name
+    if bundled.is_file():return bundled
+    if getattr(sys,'frozen',False):raise ValueError('The bundled LGPL audio helper is missing; reinstall the Windows package')
+    found=shutil.which(name) or shutil.which('ffmpeg')
+    if found:return Path(found)
+    raise ValueError('The LGPL audio helper is missing; build it with tools/audio_codec/build_ffmpeg.sh in an MSYS2 MINGW64 shell')
+
+
+def _run_ffmpeg(args,work,job,label,timeout=1800):
+    log_path=work/'ffmpeg.log'
+    with log_path.open('wb') as log:
+        process=subprocess.Popen([str(ffmpeg_path()),'-nostdin','-hide_banner','-loglevel','error','-y',*map(str,args)],
+                                 stdin=subprocess.DEVNULL,stdout=log,stderr=log,
+                                 creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
+        try:
+            deadline=time.monotonic()+timeout
+            while process.poll() is None:
+                if job:job.check()
+                if time.monotonic()>deadline:raise ValueError('Audio conversion timed out')
+                time.sleep(.1)
+        finally:
+            if process.poll() is None:process.kill();process.wait()
+    if process.returncode:
+        raise ValueError(label+' failed: '+log_path.read_text(errors='replace')[-500:])
 
 
 def atrac_riff(data,channels,rate):
@@ -36,20 +56,30 @@ def atrac_riff(data,channels,rate):
 
 
 def export_wav(data,channels,rate,output,samples=None,job=None):
-    av=decoder_module()
-    converter=av.AudioResampler(format='s16',layout='mono' if channels==1 else 'stereo',rate=rate)
-    skip=GAME_DELAY;written=0
-    with av.open(io.BytesIO(atrac_riff(data,channels,rate))) as source,wave.open(str(output),'wb') as target:
-        target.setnchannels(channels);target.setsampwidth(2);target.setframerate(rate)
-        for frame in source.decode(audio=0):
-            if job:job.check()
-            for pcm in converter.resample(frame):
-                start=min(skip,pcm.samples);skip-=start;count=pcm.samples-start
-                if samples is not None:count=min(count,max(0,samples-written))
-                target.writeframesraw(bytes(pcm.planes[0])[start*channels*2:(start+count)*channels*2]);written+=count
-        if samples is not None and written!=samples:raise ValueError('Decoded audio is shorter than its declared sample range')
-    if not written:raise ValueError('Audio stream has no samples after decoder priming')
-    return dict(channels=channels,sample_rate=rate,samples=written,seconds=written/rate,format='PCM16 WAV')
+    if channels not in (1,2) or not 8000<=rate<=192000:raise ValueError('Unsupported ATRAC3 channel/rate configuration')
+    work=OUTPUT/'temp'/('audio_decode_'+uuid.uuid4().hex);work.mkdir(parents=True)
+    raw_path=work/'decoded.s16le';input_path=work/'input.wav';written=0;skip=GAME_DELAY
+    try:
+        input_path.write_bytes(atrac_riff(data,channels,rate))
+        _run_ffmpeg(['-i',input_path,'-map','0:a:0','-vn','-acodec','pcm_s16le','-f','s16le','-ac',channels,'-ar',rate,raw_path],work,job,'ATRAC3 decode')
+        frame_bytes=channels*2;raw_size=raw_path.stat().st_size
+        if raw_size%frame_bytes:raise ValueError('Decoded PCM ended inside a sample frame')
+        available=raw_size//frame_bytes-skip
+        count=available if samples is None else min(available,samples)
+        if count<=0:raise ValueError('Audio stream has no samples after decoder priming')
+        if samples is not None and available<samples:raise ValueError('Decoded audio is shorter than its declared sample range')
+        with raw_path.open('rb') as raw,wave.open(str(output),'wb') as target:
+            target.setnchannels(channels);target.setsampwidth(2);target.setframerate(rate)
+            raw.seek(skip*frame_bytes);remaining=count*frame_bytes
+            while remaining:
+                if job:job.check()
+                block=raw.read(min(1024*1024,remaining))
+                if not block:break
+                target.writeframesraw(block);written+=len(block)//frame_bytes;remaining-=len(block)
+        if written!=count:raise ValueError('Decoded audio ended before the requested sample range')
+        return dict(channels=channels,sample_rate=rate,samples=written,seconds=written/rate,format='PCM16 WAV')
+    finally:
+        if work.resolve().is_relative_to((OUTPUT/'temp').resolve()):shutil.rmtree(work)
 
 
 def encoder_path():
@@ -60,22 +90,30 @@ def encoder_path():
 
 def encode_wav(source,channels,rate,job=None):
     if channels not in (1,2) or not 8000<=rate<=192000:raise ValueError('Unsupported ATRAC3 channel/rate configuration')
-    av=decoder_module()
-    work=OUTPUT/'temp'/('audio_encode_'+uuid.uuid4().hex);work.mkdir(parents=True)
-    pcm_path=work/'input.f32';encoded=work/'output.at3';samples=0
+    source=Path(source).resolve()
     try:
-        converter=av.AudioResampler(format='flt',layout='mono' if channels==1 else 'stereo',rate=rate)
-        with av.open(str(Path(source).resolve())) as media,pcm_path.open('wb') as pcm:
-            if media.format.name!='wav' or len(media.streams.audio)!=1:raise ValueError('Choose one WAV audio stream')
-            pcm.write(b'\0'*((GAME_DELAY-ENCODER_DELAY)*channels*4))
-            for frame in media.decode(audio=0):
-                if job:job.check()
-                for output in converter.resample(frame):
-                    pcm.write(bytes(output.planes[0])[:output.samples*channels*4]);samples+=output.samples
-                    if samples>rate*1800:raise ValueError('A replacement track may not exceed 30 minutes')
-            for output in converter.resample(None):
-                pcm.write(bytes(output.planes[0])[:output.samples*channels*4]);samples+=output.samples
+        with source.open('rb') as audio:
+            header=audio.read(12)
+        if len(header)!=12 or header[:4] not in (b'RIFF',b'RF64') or header[8:]!=b'WAVE':
+            raise ValueError('Replacement audio must be a RIFF or RF64 WAV file')
+    except OSError as exc:
+        raise ValueError('Replacement WAV could not be opened') from exc
+    work=OUTPUT/'temp'/('audio_encode_'+uuid.uuid4().hex);work.mkdir(parents=True)
+    pcm_path=work/'input.f32';converted=work/'converted.f32';encoded=work/'output.at3';samples=0
+    try:
+        _run_ffmpeg(['-i',source,'-map','0:a:0','-vn','-acodec','pcm_f32le','-f','f32le','-ac',channels,'-ar',rate,converted],work,job,'WAV conversion')
+        converted_size=converted.stat().st_size
+        if converted_size%(4*channels):raise ValueError('Converted WAV ended inside a sample frame')
+        samples=converted_size//(4*channels)
         if not samples:raise ValueError('WAV contains no audio samples')
+        if samples>rate*1800:raise ValueError('A replacement track may not exceed 30 minutes')
+        with pcm_path.open('wb') as pcm,converted.open('rb') as src:
+            pcm.write(b'\0'*((GAME_DELAY-ENCODER_DELAY)*channels*4))
+            while True:
+                if job:job.check()
+                block=src.read(1024*1024)
+                if not block:break
+                pcm.write(block)
         if job:job.progress(0,1,'Encoding ATRAC3 replacement');job.check()
         with (work/'encoder.log').open('wb') as log:
             process=subprocess.Popen([str(encoder_path()),str(pcm_path),str(encoded),str(channels)],stdout=log,stderr=log,
