@@ -47,10 +47,12 @@ Licensed Music and Fight Songs tabs, selected/section WAV export, WAV replacemen
 preparation and shared cover-art actions. Independent review fixes scene/shoe
 navigation to Models/Courts by name, removes a clean-clone test dependency on
 proprietary converters, and makes batch WAV export transactional. See PR #5 for
-integration/review status. The `codex/audio-codec-packaging` branch is adding a
+integration/review status. The `codex/audio-codec-packaging` branch adds a
 restricted LGPL FFmpeg CLI and the ATRAC3 encoder to the standalone Windows GUI,
-with matching source archives and notices. Windows packaging/codec smoke remains
-pending; do not treat packaging as complete until that exact build passes CI.
+with matching source archives and notices. Exact-head Windows CI built both
+helpers, packaged the GUI, and passed the frozen synthetic WAV round trip on
+`e149790005fdaeb14d0a1b79689d0a3de3b8f2da` (run 54). This is CI-verified branch
+work, not yet a published release.
 
 Song-title/artist editing stays read-only because archive-only routing is not
 established, and EBOOT writing is prohibited. Unknown AUDO loops and general CDF
@@ -59,9 +61,8 @@ See AUDIO_RESEARCH.md and AUDIO_WORKFLOW.md.
 
 ## Priorities for the next instance
 
-1. Build and verify the LGPL-only Windows audio-helper package on the exact PR
-   head, including corresponding sources, notices and packaged WAV round trips.
-   Do not call it complete until the Windows workflow passes.
+1. Review and publish the CI-verified LGPL-only Windows audio-helper package,
+   including corresponding sources, notices and packaged WAV round trips.
 2. Continue independent validation of audio metadata identity, conversion
    limits, cancellation and no-overwrite handling. Keep uncertain name fields
    read-only. Reject non-WAV replacement sources before codec conversion.
@@ -93,8 +94,8 @@ and mypy. Native WAV re-encode/resample, AUSB preservation and AUDO/header check
 are covered. Read-only stock catalog returned 23 licensed/64 fight/159 total music
 bank streams. No game replacement consumption validation. See TEST_REPORT.md for
 exact commands; new commits require their own results rather than reused counts.
-The current LGPL-helper packaging branch has not yet passed a Windows build or
-packaged audio round trip.
+The LGPL-helper packaging branch passed the Windows build and packaged audio
+round trip on `e149790005fdaeb14d0a1b79689d0a3de3b8f2da`; see TEST_REPORT.md.
 
 All game inputs, rosters, templates, private reverse-engineering helpers and raw
 audio are local and absent from Git. A fresh PC must supply its own authorized

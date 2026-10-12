@@ -111,10 +111,11 @@ project dependencies.
   The package instead uses separately executable FFmpeg built from the official
   [FFmpeg source](https://github.com/FFmpeg/FFmpeg) with a pinned revision and
   corresponding source archive.
-- The packaging implementation is awaiting exact Windows CI and a packaged WAV
-  round trip. Until those pass, this is a build plan rather than verified release
-  evidence. The build script pins the tag and commit, checks its build options,
-  and packages the corresponding source and license files; CI must verify those
-  commands against the target Windows toolchain.
+- Exact-head Windows CI run 54 built the pinned FFmpeg and ATRAC3 helpers,
+  packaged/smoke-tested the GUI, and passed the frozen synthetic WAV round trip
+  on `e149790005fdaeb14d0a1b79689d0a3de3b8f2da`. The script checks the LGPL-only
+  build configuration and required audio components; source archives and license
+  files are packaged beside the app. This is branch verification, not a published
+  release claim.
 
 See CURRENT_STATUS.md and each PR's exact verification for the latest evidence.

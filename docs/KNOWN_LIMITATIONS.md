@@ -24,7 +24,7 @@ Updated 2026-10-11. CURRENT_STATUS.md and TEST_REPORT.md are the living evidence
   for Licensed Music, Fight Songs, WAV workflows and mapped cover art. Title/artist
   editing remains unavailable because archive-only routing is unproven; EBOOT
   writes are prohibited. Unknown AUDO loops are blocked and CDF audio growth is
-  unsupported. LGPL helper packaging is in review and remains unverified until
-  Windows CI builds and smoke-tests the exact PR head.
+  unsupported. The LGPL helper package has passed Windows CI on PR #6's current
+  head; it remains an unreleased branch until review and publication.
 - Outputs are constrained to output/. Game assets, exported music/art, private
   paths, logs, fixtures and EBOOT are not supplied publicly.

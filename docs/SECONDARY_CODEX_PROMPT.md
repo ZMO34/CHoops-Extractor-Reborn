@@ -131,10 +131,12 @@ Licensed Music and Fight Songs tabs, selected/section WAV export, WAV replacemen
 preparation and shared cover-art actions. Independent review fixes scene/shoe
 navigation to Models/Courts by name, removes a clean-clone test dependency on
 proprietary converters, and makes batch WAV export transactional. See PR #5 for
-integration/review status. The `codex/audio-codec-packaging` branch is adding a
+integration/review status. The `codex/audio-codec-packaging` branch adds a
 restricted LGPL FFmpeg CLI and the ATRAC3 encoder to the standalone Windows GUI,
-with matching source archives and notices. Windows packaging/codec smoke remains
-pending; do not treat packaging as complete until that exact build passes CI.
+with matching source archives and notices. Exact-head Windows CI built both
+helpers, packaged the GUI, and passed the frozen synthetic WAV round trip on
+`e149790005fdaeb14d0a1b79689d0a3de3b8f2da` (run 54). This is CI-verified branch
+work, not yet a published release.
 
 Song-title/artist editing stays read-only because archive-only routing is not
 established, and EBOOT writing is prohibited. Unknown AUDO loops and general CDF
@@ -143,9 +145,8 @@ See AUDIO_RESEARCH.md and AUDIO_WORKFLOW.md.
 
 ## Priorities for the next instance
 
-1. Build and verify the LGPL-only Windows audio-helper package on the exact PR
-   head, including corresponding sources, notices and packaged WAV round trips.
-   Do not call it complete until the Windows workflow passes.
+1. Review and publish the CI-verified LGPL-only Windows audio-helper package,
+   including corresponding sources, notices and packaged WAV round trips.
 2. Continue independent validation of audio metadata identity, conversion
    limits, cancellation and no-overwrite handling. Keep uncertain name fields
    read-only. Reject non-WAV replacement sources before codec conversion.
@@ -177,8 +178,8 @@ and mypy. Native WAV re-encode/resample, AUSB preservation and AUDO/header check
 are covered. Read-only stock catalog returned 23 licensed/64 fight/159 total music
 bank streams. No game replacement consumption validation. See TEST_REPORT.md for
 exact commands; new commits require their own results rather than reused counts.
-The current LGPL-helper packaging branch has not yet passed a Windows build or
-packaged audio round trip.
+The LGPL-helper packaging branch passed the Windows build and packaged audio
+round trip on `e149790005fdaeb14d0a1b79689d0a3de3b8f2da`; see TEST_REPORT.md.
 
 All game inputs, rosters, templates, private reverse-engineering helpers and raw
 audio are local and absent from Git. A fresh PC must supply its own authorized
@@ -472,11 +473,12 @@ project dependencies.
   The package instead uses separately executable FFmpeg built from the official
   [FFmpeg source](https://github.com/FFmpeg/FFmpeg) with a pinned revision and
   corresponding source archive.
-- The packaging implementation is awaiting exact Windows CI and a packaged WAV
-  round trip. Until those pass, this is a build plan rather than verified release
-  evidence. The build script pins the tag and commit, checks its build options,
-  and packages the corresponding source and license files; CI must verify those
-  commands against the target Windows toolchain.
+- Exact-head Windows CI run 54 built the pinned FFmpeg and ATRAC3 helpers,
+  packaged/smoke-tested the GUI, and passed the frozen synthetic WAV round trip
+  on `e149790005fdaeb14d0a1b79689d0a3de3b8f2da`. The script checks the LGPL-only
+  build configuration and required audio components; source archives and license
+  files are packaged beside the app. This is branch verification, not a published
+  release claim.
 
 See CURRENT_STATUS.md and each PR's exact verification for the latest evidence.
 
@@ -909,8 +911,8 @@ Updated 2026-10-11. CURRENT_STATUS.md and TEST_REPORT.md are the living evidence
   for Licensed Music, Fight Songs, WAV workflows and mapped cover art. Title/artist
   editing remains unavailable because archive-only routing is unproven; EBOOT
   writes are prohibited. Unknown AUDO loops are blocked and CDF audio growth is
-  unsupported. LGPL helper packaging is in review and remains unverified until
-  Windows CI builds and smoke-tests the exact PR head.
+  unsupported. The LGPL helper package has passed Windows CI on PR #6's current
+  head; it remains an unreleased branch until review and publication.
 - Outputs are constrained to output/. Game assets, exported music/art, private
   paths, logs, fixtures and EBOOT are not supplied publicly.
 
@@ -920,26 +922,29 @@ Embedded source: docs/TEST_REPORT.md
 
 # Development verification
 
-## LGPL audio packaging branch — portable checks
+## LGPL audio packaging branch — verified PR head
 
-`python tools/dev/verify.py`: 250 passed, 1 skipped, 2 deselected. The skip is
-the optional native codec round trip because the local checkout has not built
-the helpers; deselections are the private game/runtime checks and the optional
-legacy native comparison defined by the runner. CLI help and Qt startup smoke,
+Exact-head CI run 54 passed on `e149790005fdaeb14d0a1b79689d0a3de3b8f2da` on
+both Ubuntu and Windows. The Windows job built the pinned LGPL FFmpeg helper and
+ATRAC3 encoder, built/smoke-tested the standalone package, and printed
+`Bundled LGPL audio helpers passed a synthetic WAV round trip` from the frozen
+executable. Thus the packaged helper lookup, WAV resampling/encoding and ATRAC3
+decode validation ran in the actual frozen app.
+
+Local `python tools/dev/verify.py`: 250 passed, 1 skipped, 2 deselected. The one
+skip is the native helper round trip because MSYS2 helpers are not built in this
+checkout; the two deselections are private game/runtime checks and the optional
+legacy native comparison defined by the runner. CLI help, Qt startup smoke,
 scoped Ruff, studio/service mypy, handoff snapshot, compileall and
-`git diff --check` passed. The restricted FFmpeg build, Windows package smoke
-and packaged WAV round trip remain pending Windows CI; local MSYS2 is unavailable.
-An added synthetic regression rejects a non-RIFF/RF64 WAV before codec lookup.
-The first two Windows CI attempts exposed an annotated-tag/object SHA mix-up and
-then invalid FFmpeg component names / a missing MSYS2 `cmp` utility. The current
-follow-up pins the peeled source commit reported by
-`git rev-parse 'n9.0.2^{commit}'`, uses FFmpeg's `pcm_s16le`/`pcm_f32le` muxer
-component names and `ffmpeg.exe` make target, and installs `diffutils`. The
-corrected pin was confirmed in a local source checkout. Windows CI built both
-helpers and passed the GUI package smoke, then the explicit audio round trip
-revealed that resampling/format filters were missing from the restricted FFmpeg
-build. The latest follow-up enables only `aresample` and `aformat`; Windows CI
-must validate the frozen conversion round trip on that head.
+`git diff --check` passed. The suite includes a regression that rejects a
+non-RIFF/RF64 replacement before codec lookup.
+
+Earlier Windows runs exposed and fixed an annotated-tag SHA mismatch, FFmpeg
+component names/make target, a missing MSYS2 `cmp`, and the absence of conversion
+filters. The final verified helper pins the peeled `n9.0.2` source commit, enables
+only LGPL `aresample`/`aformat` conversion filters, and checks required codecs,
+formats and filters. No emulator or testing JB was run/built. PR #6 remains the
+review and publication path; verification does not itself make a release.
 
 ## Independent PR #5 review and continuation — 2026-10-12
 
