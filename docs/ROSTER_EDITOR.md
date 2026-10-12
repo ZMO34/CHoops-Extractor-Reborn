@@ -2,9 +2,18 @@
 
 Open the GUI Roster Editor and choose roster_english.iff, raw ROST, decrypted USERDATA, a type-21 tool wrapper, or a decrypted ZIP containing exactly one USERDATA. Encrypted saves are not decrypted by this tool.
 
-Players, teams, arenas and coaches have searchable tables; selecting a team displays its sixteen roster slots. Edit a selected player or team, validate, undo/revert unsaved changes, save a copy, or export JSON/CSV for review. The GUI runs long operations off the Tk thread.
+Players, teams, schools, arenas, coaches, conferences and uniforms have searchable
+views. Long operations run off the Qt GUI thread. Confirmed ratings, appearance/
+equipment, RGB palette choices and shoes are editable with undo/redo. Save copies
+preserve ZIP/decrypted wrappers; Export game roster IFF uses the loaded JB wrapper.
+Unchanged bad name characters warn; invalid pointers/new corruption still block.
 
-Supported player edits: first/last names using the same UTF-16 byte length and unshared storage, jersey number 0–99, height 36–100 inches and position 0–4. Supported team edits: sixteen player-slot references, existing team asset IDs, arena, coach and rival references. School, arena and coach strings can be edited only with identical UTF-16 byte length in unshared storage. Team palette editing supports all 31 RGBA slots; 22 slots have exact Edit Schools captions; the remaining roles are unresolved. Skin tone, appearance bytes, conference, prestige and long-string heap rebuilding remain read-only.
+Names require equal UTF-16 length and unshared storage. Verified references,
+ratings, attributes, packed equipment/appearance and school fields use their
+declared masks. Opaque fields remain read-only. Palettes have 22 exact captions,
+three additional runtime roles and six unresolved words. Optional D1/conference
+updates and alternate operations are explicit actions; never automatic conversion.
+See projects/README.md and CURRENT_STATUS.md for exact evidence and remaining limits.
 
 ```powershell
 python -m choops_py.cli roster-detect output/rips/roster_english.iff
@@ -21,11 +30,16 @@ The team asset ID identifies the sXXX stadium art family; the team row index and
 
 Palette words are four RGBA bytes at team row +0x1A0 through +0x218 inclusive (31 slots). Repeated colors across school slots support primary/secondary candidate labels. The palette can contain white, gray and accent colors as well as school colors. Green regions in some arena textures may be shader tint masks; no automatic green-to-roster recoloring is enabled because channel-to-slot routing is unproven.
 
-Research layout exports the roster header's count/pointer anchors and profiles every byte offset of the four known record tables, including unknown bytes and rating-like candidates. It reports unassigned payload regions and the inherited arena/team boundary ambiguity. This is structural coverage, not a complete semantic decode. Ratings, tendencies, appearance, conference affiliation/prestige, variable-length heap changes and unknown table meanings are not confirmed editable fields.
+Research layout profiles header count/pointer anchors and record offsets. This
+is structural coverage, not full semantic reversal. Verified fields have separate
+executable-backed evidence; variable-length heaps and opaque fields remain unresolved.
 
 ## Executable-backed semantics
 
-The editor derives the known table starts and counts from the roster header, including the coach name anchor and conference table. Team +0x48 is a relative conference reference. Conference +0x6E0 begins the observed team-reference list; conference assignment remains read-only until all reciprocal update rules are established.
+The editor derives table starts/counts from the header, including coach/conference
+anchors. Team +0x48 is a relative conference reference; conference +0x6E0 begins
+the observed team list. Optional D1 conversion updates reciprocal membership;
+see projects/06-declone-d1-teams.md for current scope and limits.
 
 All 30 attribute names are linked through localized UI registration metadata to the game's getters and setters. Ratings occupy player +0x3C through +0x76 as big-endian u16 values. The getter displays clamp(floor(raw / 100), 35, 99); edits store rating * 100, while untouched fractional values remain byte-exact. Player attributes shows these named channels. Four byte tendencies follow at +0x78..+0x7B. Potential is at +0x7F; confidence at +0x80. Packed weight and handedness edits preserve neighboring bits. Named appearance/equipment fields are readable; their enum choice meanings remain incomplete.
 
@@ -41,4 +55,8 @@ Jersey number is the byte at player row +0x1B (name-anchor +0x0B), corroborated 
 
 In Team palette, select a swatch and choose Pick selected color (or double-click it). The picker provides numeric RGB inputs, visual color selection, and an alpha control initialized from the existing value. Accept applies an undoable edit; Cancel leaves the roster unchanged. Hex RGBA remains visible in the palette table.
 
-Uniforms is a separate roster table linked to team asset IDs. Known jersey shapes (U, V, V triangle, triangle, wishbone) and existing uniform asset selectors are editable without changing record count or neighboring bits. Handedness uses L/R dropdowns; headband uses No/Yes and home sock color uses Black/White. Confirmed appearance enums display names; unresolved codes remain explicit. See [the project tracker](projects/README.md) for evidence and remaining research.
+Uniforms links owner/asset selector, variant, unlock ID and shape. Known shapes
+U/V/V triangle/triangle/wishbone and selectors are editable. Alternate 1/2/3
+availability controls remove/restore counted records; explicit builders may add
+assets/links. Restored unlock IDs remain intact. Handedness uses L/R, booleans
+Yes/No, home socks Black/White; unknown enums remain explicit. See project tracker.

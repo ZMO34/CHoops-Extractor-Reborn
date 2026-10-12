@@ -8,6 +8,7 @@ import threading
 import uuid
 from collections.abc import Callable
 from pathlib import Path
+from typing import Any
 
 from ..archive.manifests import OUTPUT, safe_name, safe_output
 from ..archive.usrdir_reader import Archive
@@ -187,8 +188,8 @@ def stage_folder(source: Path, folder: Path, mod: Path, job=None) -> dict:
     archive=Archive(source);folder=Path(folder);mod=safe_output(mod,[source,folder])
     if mod.exists():raise ValueError('Choose a new mod directory')
     job=job or JobContext();discovery=discover(archive,folder,job)
-    work=mod.parent/('.mod_'+uuid.uuid4().hex);rows=[];conditions=[];growth=[];unchanged=0
-    details=[];unapplied=[]
+    work=mod.parent/('.mod_'+uuid.uuid4().hex);rows: list[dict]=[];conditions=[];growth=[];unchanged=0
+    details=[];unapplied: list[dict]=[]
     try:
         for i,group in enumerate(discovery['groups']):
             job.check();job.progress(i,len(discovery['groups']),'Compile override '+group['name'])
@@ -280,7 +281,7 @@ def inspect_scene_preview(source: Path, record_index: int, include_all=False, jo
         scenes = [{'index': 0, 'name': source.stem}]
     if not scenes:
         raise ValueError('Select a SCNE record in an IFF or open a SCNE wrapper')
-    result = {'meshes': [], 'warnings': [], 'textures': [], 'images': {}}
+    result: dict[str, Any] = {'meshes': [], 'warnings': [], 'textures': [], 'images': {}}
     for rec in scenes:
         job.check()
         if container.iff:
@@ -309,13 +310,13 @@ def inspect_scene_preview(source: Path, record_index: int, include_all=False, jo
         result['meshes'].extend(scene['meshes'])
         result['warnings'].extend(scene['warnings'])
     needed = {batch['texture'] for mesh in result['meshes'] for batch in mesh['batches'] if batch['texture']}
-    assets = {a.name:a for a in container.assets if a.texture}
+    asset_lookup = {a.name:a for a in container.assets if a.texture}
     decoded_bytes = 0
     for i, name in enumerate(sorted(needed)):
         job.check()
         job.progress(i, len(needed), 'Loading material texture ' + name)
         try:
-            image = decode_preview_asset(assets[name], max_size=1024)
+            image = decode_preview_asset(asset_lookup[name], max_size=1024)
             decoded_bytes += len(image[1])
             if decoded_bytes > 128 * 1024 * 1024:
                 result['warnings'].append('Scene texture memory limit reached')

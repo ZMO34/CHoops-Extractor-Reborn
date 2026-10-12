@@ -33,7 +33,8 @@ class StreamBank:
             struct.pack_into('>I',head,92+i*8,len(out))
             if i in changes:
                 encoded,samples=changes[i]
-                if samples<=0 or len(encoded)%(152*self.channels):raise ValueError('Invalid encoded stream replacement')
+                if samples<=0 or len(encoded)%(152*self.channels) or len(encoded)//(152*self.channels)*1024-2048<samples:
+                    raise ValueError('Invalid encoded stream replacement')
                 duration=samples/self.rate;struct.pack_into('>f',head,96+i*8,duration)
                 if i==0:struct.pack_into('>f',head,88,duration)
                 out+=encoded

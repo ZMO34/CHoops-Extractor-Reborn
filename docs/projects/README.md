@@ -2,6 +2,7 @@
 
 | Project | Result | Remaining work |
 |---|---|---|
+| [Audio](../AUDIO_RESEARCH.md) | 23 licensed/64 fight songs mapped; experimental WAV/ATRAC3, AUSB and jukebox-art backend/CLI | GUI sections, title routing, CDF loops/growth and complete native packaging |
 | [Uniform preview](01-uniform-preview.md) | Uniform list and external IFF artwork applied to cloth | Runtime names, numbers and full material shading |
 | [Team/uniform routing](02-team-uniform-routing.md) | Uniform roster table, team owner, asset selector and five jersey shapes decoded; shape and existing asset edits | In-game alternate/unlock validation |
 | [Roster palettes](03-roster-palettes.md) | 22 exact captions, three additional verified roles and court material bindings | Six raw palette roles and shader-mask routing |

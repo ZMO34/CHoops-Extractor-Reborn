@@ -1,19 +1,40 @@
 # Development
 
-Use .venv and `pip install -e ".[dev]"`. requirements-windows-dev.txt records the actually installed Windows versions without local paths. Keep game source outside Git; CHOOPS_JB selects the private fixture for tests. A private .private/settings.json can hold the fixture path.
+Read AGENTS.md, CURRENT_STATUS.md, SECONDARY_CODEX_PROMPT.md and COLLABORATION.md.
+Upstream is ZMO34/CHoops-Extractor-Reborn; use documented feature PRs to master.
+Python 3.11+ supported; Python 3.12 x64 is the CI/Windows baseline. Git is required.
 
 ```powershell
-.\.venv\Scripts\python.exe -m pytest -q
-.\.venv\Scripts\python.exe -m ruff check choops_py/studio
-.\.venv\Scripts\python.exe -m mypy choops_py/studio --follow-imports=skip --ignore-missing-imports
-.\.venv\Scripts\python.exe -m choops_py.cli --help
-.\.venv\Scripts\python.exe -m choops_py.studio --smoke
-.\.venv\Scripts\python.exe tools/rebuild/verify_game.py "YOUR_JB_ROOT" --full-rip --build
-.\tools\rebuild\package_windows.ps1
+python tools/dev/setup.py
+python tools/dev/setup.py --check
+python tools/dev/setup.py --audio-encoder
+python tools/dev/verify.py
+.\.venv\Scripts\python.exe -m choops_py.studio
+.\.venv\Scripts\python.exe -m pytest tests/test_audio.py tests/test_cli.py -q
 ```
 
-Shared native operations: Archive.chunks, studio.services.extract, inspect_asset, stage_folder, roster EditorModel/workflow and texture_tools.pipeline. CLI extract-raw and stage-folder expose the new services. Existing rip command retains legacy decoded extraction behavior.
+Setup installs .[dev]; the encoder option installs Zig 0.13.0 and fetches pinned
+LGPL sources. Decoder development uses PyAV 16.x. No other PC's credentials,
+environment or paths are copied. Versions go into ignored dev-setup.txt.
+requirements-windows-dev.txt is an old environment snapshot; pyproject/setup
+are the portable dependency contract.
 
-See rebuild/ARCHITECTURE.md for contracts/debt. UI jobs cannot mutate widgets off the Qt main thread. Every writer must reparse output, preserve unknown ranges and reject ambiguous identities/capacity/aliasing. Source-game hashes and test assets stay ignored. Public CI uses synthetic fixtures and explicitly skips absent private fixture tests; verification has no branch/tag/release mutations.
+verify.py excludes real_game/runtime_manual and the optional legacy native
+comparison. It runs remaining synthetic/Qt tests, source smoke, fatal-error Ruff
+checks and scoped GUI/service mypy. New setup scripts get broader lint. Legacy
+style debt is not claimed resolved. CI runs the same runner on Windows/Linux.
+Native audio tests skip explicitly if the optional encoder is absent.
 
-Test groups: `pytest -m real_game`, `pytest -m windows`, `pytest -m gui`, or `pytest -m "not real_game and not windows"`. Public runners skip absent private fixtures explicitly; generated Windows converter tests skip on non-Windows.
+CHOOPS_JB selects a private read-only fixture. Do not run verify_game.py --build,
+copy a full game for tests, or launch RPCS3. Tiny synthetic archive copy/rollback
+tests are permitted. Record absent private fixture checks as skipped.
+
+GUI/CLI share Archive, studio.services, formats, texture_tools, roster model and
+audio_tools. Qt workers return signals/data, never manipulate widgets. Writers
+reparse output, preserve unknown bytes/bits and reject ambiguous shared ranges.
+Generated outputs live under output/ and originals remain immutable.
+
+tools/rebuild/package_windows.ps1 packages the established Windows GUI. v1.08
+supplies Python audio-workspace separately; PyAV/native audio GUI bundling is
+pending. Check licenses and corresponding sources for shipped native components;
+no proprietary converters/game assets. See AUDIO_WORKFLOW.md and the encoder README.

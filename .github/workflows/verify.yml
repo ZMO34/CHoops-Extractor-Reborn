@@ -24,13 +24,7 @@ jobs:
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y libegl1 libopengl0
       - run: python -m pip install -e ".[dev]"
-      - run: python -m compileall choops_py tests
-      - run: python -m unittest discover -s tests -v
-      - run: python -m pytest -q
-      - run: python -m choops_py.cli --help
-      - run: python -m choops_py.studio --smoke
-      - run: python -m ruff check choops_py/studio choops_py/modding/patch_package.py
-      - run: python -m mypy choops_py/studio choops_py/modding/patch_package.py --follow-imports=skip --ignore-missing-imports
+      - run: python tools/dev/verify.py
       - name: Windows standalone build and smoke
         if: runner.os == 'Windows'
         shell: pwsh

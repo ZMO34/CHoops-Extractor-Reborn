@@ -1,33 +1,27 @@
 # Texture conversion
 
-`gtf2dds.exe` and `dds2gtf.exe` are bundled required tools for DDS editing, stored in `tools/`. Users do not need Node or the old 2k-tools tree. Raw extraction works without converters. DDS export requires gtf2dds.exe; DDS import requires dds2gtf.exe.
+DDS/GTF conversion is built-in Python for L8, ARGB8, DXT1/3/5 and RGBA16F, including
+mips and complete cubes. Handles RSX endian/Morton/row-pitch/channel-remap rules.
+No gtf2dds.exe or dds2gtf.exe is required. Legacy executables are optional private
+comparison oracles and excluded from releases; see rebuild/CONVERTER_PROVENANCE.md.
 
-Discovery uses bundled tools first, configured paths in `output/config/texture_tools.json` second, then user-selected paths. Status readiness requires the bundled executable to pass a basic execution check; configured paths do not hide a missing bundle.
-
-```powershell
-python -m choops_py.cli setup-texture-tools --copy-from-old-sources
-python -m choops_py.cli texture-tools-status
-python -m choops_py.cli test-texture-tools
-```
-
-Setup copies only the two converters from the old read-only sources. Their SHA256 hashes are recorded in the architecture audit. The test performs actual DDS/GTF conversion and checks DXT1 image bytes. Converter execution captures stdout/stderr, uses output/temp, never writes the source, and emits conversion JSON reports.
-
-Export raw or wrapped TXTR, standard IFF, paired CDF textures, or parseable SCNE package textures. All exports preserve the source/payload and write a manifest, conversion report, and reconstructed GTF where the layout is understood. DDS conversion failures do not invalidate raw assets. Exports continue per texture unless `--strict` is set.
+Export supported raw/wrapped TXTR, IFF, paired CDF or SCNE textures with a manifest
+and raw data. Unsupported conversion can retain raw exports; --strict fails instead.
+Unknown descriptors/DX10/true volume layouts remain blocked. Declared 2D/cubes
+ignore unused stored depth rather than being misclassified as volumes.
 
 ```powershell
-python -m choops_py.cli export-dds output/rips/example.txtr output/rips/example_textures
 python -m choops_py.cli export-iff-textures output/rips/ua000.iff output/rips/uniform --dds
-python -m choops_py.cli export-cdf-textures output/rips/sideline_items.iff output/rips/sideline_items.cdf output/rips/sideline --dds
-python -m choops_py.cli export-court-textures output/rips/s000.iff output/rips/court --dds
-```
-
-Choose texture names/indexes from the manifest. Nested textures use paths such as `floor/texture_0`. Edit DDS without changing dimensions, format or mip count, then import into a new file:
-
-```powershell
 python -m choops_py.cli replace-iff-texture output/rips/ua000.iff unif output/temp/edited.dds output/temp/ua000.iff --same-format-only
-python -m choops_py.cli replace-cdf-texture output/rips/teamselectlogo.iff output/rips/teamselectlogo.cdf 0 output/temp/logo.dds output/temp/logo_pair --same-size-only
 ```
 
-Import validates original/DDS/GTF dimensions, format, mip count, layout and image length before writing. Standard IFF compressed blocks can be safely rebuilt only when the logical slices remain unchanged in size and the rebuilt file fits its original extent. CDF recompression must fit its original physical payload allocation. Otherwise an exact blocking reason is reported. NAME metadata and unrelated records remain intact. Review `output/reports/texture_import_report.json` and `.md`.
+Recursive staging discovers modern/older layouts automatically, replaces supplied
+SCNEs before artwork, and gives matching DDS priority over raw TXTRs. Non-stadium
+artwork is normalized to the selected base JB's layout; stadiums retain supported
+dynamic sizes. No version checkbox. Vanilla sizes require a vanilla source.
 
-The original converter cannot export the proven linear L8 uniform atlases. These use a validated tight L8 DDS fallback; DDS reimport still runs dds2gtf and normalizes its verified mip-row padding. Unknown layouts are never guessed or padded to simulate successful conversion.
+Validated standard IFF/SCNE payload growth and archive relocation are supported;
+unknown shared ranges/offsets remain rejected. CDF uses validated paired edits,
+not unrestricted relocation. Keep original headers/unknown bits/trailers and
+unrelated records; reparse and compare untouched data. See SINGLE_SURFACE_COURT.md
+for bump routing, floor-only draw suppression and texture memory limitations.

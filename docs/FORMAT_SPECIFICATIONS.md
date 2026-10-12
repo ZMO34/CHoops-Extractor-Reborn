@@ -1,5 +1,11 @@
 # Format specification index
 
+Current additions/confidence: [CURRENT_STATUS.md](CURRENT_STATUS.md) and
+[AUDIO_RESEARCH.md](AUDIO_RESEARCH.md). AUSB and known ATRAC3 AUDO headers have
+experimental support. Standard IFF/SCNE/archive growth exists for validated cases;
+older allocation-only descriptions below are conservative historical contracts,
+not universal current limits.
+
 Canonical layouts/confidence remain in PROJECT_SOURCE_OF_TRUTH.md, FORMAT_NOTES.md and preserved MASTER_HANDOFF.md. This rebuild does not replace their evidence with guesses.
 
 Archive AA00B3BF: BE alignment/part count/entry count; UTF-16BE part names; offsets in alignment units. Stored sizes on this fixture are invalid and bounded extents derive from next offset/logical end. Derived status remains visible.

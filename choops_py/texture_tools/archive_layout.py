@@ -35,6 +35,8 @@ def normalize_record(parts,base,kind,job=None,compact=True):
     result=parts;reports=[]
     for index,(texture,target) in enumerate(zip(current,reference)):
         if job:job.check()
+        if len(texture.blocks[0])<0x70 or len(target.blocks[0])<0x70:
+            raise ValueError('Texture header is truncated; cannot normalize its base-JB layout')
         if texture.blocks[0][0x58]&0x9f not in FORMATS:
             if texture.blocks[0][0x58:0x70]!=target.blocks[0][0x58:0x70]:raise ValueError('Unsupported texture format changed its base-JB layout')
             continue

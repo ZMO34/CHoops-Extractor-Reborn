@@ -13,7 +13,7 @@ from support import game_fixture, iff_fixture
 
 
 def test_streaming_cancellation_and_collision(tmp_path):
-    source=game_fixture(tmp_path/'game',iff_fixture())
+    source=game_fixture(tmp_path/'game',iff_fixture(records=[(0xa7701f00,[0])]))
     archive=Archive(source)
     job=JobContext()
     job.cancelled.set()
@@ -27,7 +27,7 @@ def test_streaming_cancellation_and_collision(tmp_path):
 
 
 def test_exclusive_extraction_and_folder_stage(tmp_path):
-    source=game_fixture(tmp_path/'game',iff_fixture())
+    source=game_fixture(tmp_path/'game',iff_fixture(records=[(0xa7701f00,[0])]))
     archive=Archive(source)
     out=OUTPUT/'temp'/(tmp_path.name+uuid.uuid4().hex)/'rip'
     result=extract(archive,archive.entries,out)
@@ -80,7 +80,7 @@ def test_roster_redo_and_new_edit_clears_future():
 
 def test_source_precondition_rejects_changed_original(tmp_path):
     from choops_py.archive.build_copy import preflight
-    source=game_fixture(tmp_path/'game',iff_fixture())
+    source=game_fixture(tmp_path/'game',iff_fixture(records=[(0xa7701f00,[0])]))
     archive=Archive(source)
     out=OUTPUT/'temp'/(tmp_path.name+uuid.uuid4().hex)/'rip'
     extract(archive,archive.entries,out)
@@ -115,7 +115,7 @@ def test_difference_patch_roundtrip_and_rejects_traversal(tmp_path):
     import zipfile,json
     from choops_py.archive.build_copy import preflight
     from choops_py.modding.patch_package import export_patch,import_patch
-    source=game_fixture(tmp_path/'game',iff_fixture())
+    source=game_fixture(tmp_path/'game',iff_fixture(records=[(0xa7701f00,[0])]))
     archive=Archive(source)
     work=OUTPUT/'temp'/('patch_'+uuid.uuid4().hex)
     edits=work/'edits';edits.mkdir(parents=True)
@@ -142,7 +142,7 @@ def test_difference_patch_roundtrip_and_rejects_traversal(tmp_path):
 def test_cancel_copy_removes_only_owned_staging(tmp_path):
     from choops_py.archive.build_copy import build
     from choops_py.studio.services import Cancelled
-    source=game_fixture(tmp_path/'game',iff_fixture())
+    source=game_fixture(tmp_path/'game',iff_fixture(records=[(0xa7701f00,[0])]))
     archive=Archive(source)
     work=OUTPUT/'temp'/('cancel_copy_'+uuid.uuid4().hex)
     extract(archive,archive.entries,work/'edits')

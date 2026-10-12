@@ -1,5 +1,29 @@
 # Development verification
 
+## Audio/handoff update — 2026-10-11
+
+`python tools/dev/verify.py`: 240 passed, 2 deselected (private game test and
+optional historical executable comparison). Source CLI help and Qt smoke passed;
+scoped fatal-error Ruff, new setup script lint and GUI/service mypy passed.
+`python tools/dev/setup.py --check`: installed desktop/dev dependencies imported.
+`python tools/dev/setup.py --audio-encoder`: dependency install and pinned-source
+native helper rebuild completed. Windows packaging and startup smoke completed;
+packaged CLI help includes audio registrations. Decode/encode uses Python workspace.
+`pytest tests/test_audio.py tests/test_cli.py -q`: 17 passed at this checkpoint.
+Audio tests cover AUSB neighbor/prefix/tail/unknown preservation, invalid offsets/
+encoded sample bounds, flat/split/inline/wrapped AUDO, blocked loop fields, catalog
+artwork/category counts and native 24k mono WAV -> 48k stereo ATRAC3 round trip.
+Private read-only stock catalog: 23 licensed, 64 fight, 159 total music streams.
+No native decoder DLL redistribution, full bank game validation, EBOOT writes,
+RPCS3 or testing JB. Exact commit SHAs are recorded in the PR/release metadata.
+
+The full portable run exposed pre-existing invalid four-byte fixtures tagged as
+TXTR and an output-safety test expecting a later error. Fixtures now use generic
+CDAN where appropriate; normalization rejects truncated texture headers cleanly.
+Type annotations were corrected without changing preview/staging behavior.
+
+Historical results below remain separate observations, not current test totals.
+
 The community roster and shoe-editing update passed 135 targeted Python/Qt
 checks. Both supplied community ZIPs were loaded, edited for ratings and
 player/school shoes, saved and reopened with exact payload round trips. ZIP

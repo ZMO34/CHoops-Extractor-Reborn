@@ -1,5 +1,11 @@
 # Native rebuild additions
 
+Experimental audio examples: [AUDIO_WORKFLOW.md](AUDIO_WORKFLOW.md). Commands:
+audio-catalog, export-soundtrack, replace-song, import-audio-folder, export-audo,
+replace-audo, export-jukebox-art, replace-jukebox-art. Python audio-workspace
+dependencies are required. No Audio GUI or title editing. These commands create
+asset copies, not JB builds. Agents must not use the manual build examples below.
+
 `gui` now launches the PySide6 studio. `python -m choops_py.studio` supports --smoke and --game PATH. The packaged executable also accepts --cli followed by ordinary CLI arguments.
 
 `extract-raw SOURCE OUTPUT [--file NAME | --index INDEX]` uses streaming paired raw extraction; `stage-folder SOURCE EDITED_FOLDER NEW_MOD_OUTPUT` automatically matches canonical filenames and stores original-source hash preconditions. Existing `rip` retains its decoded extraction options.

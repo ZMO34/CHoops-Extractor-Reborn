@@ -17,6 +17,14 @@ GAME_DELAY=2048
 ENCODER_DELAY=1162
 
 
+def decoder_module():
+    try:
+        import av
+    except ImportError as error:
+        raise ValueError('Audio decoding needs PyAV; run audio commands from the Python audio-workspace after tools/dev/setup.py') from error
+    return av
+
+
 def atrac_riff(data,channels,rate):
     if channels not in (1,2) or not 8000<=rate<=192000:raise ValueError('Unsupported ATRAC3 channel/rate configuration')
     align=BYTES_PER_CHANNEL*channels
@@ -28,7 +36,7 @@ def atrac_riff(data,channels,rate):
 
 
 def export_wav(data,channels,rate,output,samples=None,job=None):
-    import av
+    av=decoder_module()
     converter=av.AudioResampler(format='s16',layout='mono' if channels==1 else 'stereo',rate=rate)
     skip=GAME_DELAY;written=0
     with av.open(io.BytesIO(atrac_riff(data,channels,rate))) as source,wave.open(str(output),'wb') as target:
@@ -51,7 +59,8 @@ def encoder_path():
 
 
 def encode_wav(source,channels,rate,job=None):
-    import av
+    if channels not in (1,2) or not 8000<=rate<=192000:raise ValueError('Unsupported ATRAC3 channel/rate configuration')
+    av=decoder_module()
     work=OUTPUT/'temp'/('audio_encode_'+uuid.uuid4().hex);work.mkdir(parents=True)
     pcm_path=work/'input.f32';encoded=work/'output.at3';samples=0
     try:

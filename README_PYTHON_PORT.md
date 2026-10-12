@@ -1,5 +1,9 @@
 # Python port
 
-The current tree is Python-first. Only the two original texture converter executables are bundled from the old tool. No JavaScript source, Node packages or desktop editor builds are required.
+The tree is Python-first with a native PySide6 GUI. DDS/GTF conversion is built in;
+historical converter executables are not bundled. No JavaScript or Node needed.
 
-Related workflows share one implementation: archive readers/cache/ripper, a preservation-first IFF writer, package parsing, one texture container pipeline, one roster model, and one transactional JB builder. The CLI and Tkinter GUI consume the same command registry and backends. See docs/OLD_TOOL_ARCHITECTURE_AUDIT.md for parity and remaining restrictions.
+GUI and CLI share archive/format services, texture pipeline, roster model and
+transactional manual JB builder. Experimental audio Python commands use the same
+archive contracts. See docs/CURRENT_STATUS.md, docs/AUDIO_WORKFLOW.md and
+docs/COLLABORATION.md. Both Codex instances maintain docs with every update PR.

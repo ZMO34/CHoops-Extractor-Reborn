@@ -1,3 +1,7 @@
+# Historical Windows snapshot; use python tools/dev/setup.py for portable setup.
+# Audio additions reflect the validated local development versions.
+av==16.1.0
+ziglang==0.13.0
 altgraph==0.17.5
 ast_serialize==0.12.1
 colorama==0.4.6

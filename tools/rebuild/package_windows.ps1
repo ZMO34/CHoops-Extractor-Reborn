@@ -7,7 +7,7 @@ Push-Location $projectRoot
 try {
     $nativeArgs = @()
     if (Test-Path -LiteralPath 'choops_py/formats/_h7a.dll') { $nativeArgs = @('--add-binary', 'choops_py/formats/_h7a.dll;choops_py/formats') }
-    & $pythonExe -m PyInstaller --noconfirm --onedir --console --name CHoops-Studio --add-data 'choops_py/archive/names.json;choops_py/archive' --add-data 'choops_py/archive/verified_names.json;choops_py/archive' --add-data 'choops_py/formats/native/LICENSE.txt;choops_py/formats/native' @nativeArgs --exclude-module PySide6.QtWebEngineCore --exclude-module PySide6.QtWebEngineWidgets --exclude-module PySide6.QtPdf --exclude-module PySide6.QtQml --exclude-module tkinter tools/rebuild/studio_entry.py
+    & $pythonExe -m PyInstaller --noconfirm --onedir --console --name CHoops-Studio --add-data 'choops_py/archive/names.json;choops_py/archive' --add-data 'choops_py/archive/verified_names.json;choops_py/archive' --add-data 'choops_py/audio_tools/soundtrack_names.json;choops_py/audio_tools' --add-data 'choops_py/formats/native/LICENSE.txt;choops_py/formats/native' @nativeArgs --exclude-module av --exclude-module PySide6.QtWebEngineCore --exclude-module PySide6.QtWebEngineWidgets --exclude-module PySide6.QtPdf --exclude-module PySide6.QtQml --exclude-module tkinter tools/rebuild/studio_entry.py
     if ($LASTEXITCODE -ne 0) { throw 'PyInstaller failed' }
     # Recent Qt uses Windows' unversioned ICU API. An unrelated ICU on PATH
     # can be collected by PyInstaller and shadow that API with suffixed exports.
@@ -19,7 +19,7 @@ try {
     }
     # Independent DDS conversion is included. Legacy converters are not bundled.
     Copy-Item -LiteralPath README.md, docs/USER_GUIDE.md, docs/rebuild/CONVERTER_PROVENANCE.md -Destination dist/CHoops-Studio
-    Set-Content -LiteralPath dist/CHoops-Studio/README-START-HERE.txt -Value 'Run CHoops-Studio.exe. CLI: CHoops-Studio.exe --cli --help. DDS conversion is built in; external converters and game assets are not included. See USER_GUIDE.md. Console/emulator gameplay verification remains separate.'
+    Set-Content -LiteralPath dist/CHoops-Studio/README-START-HERE.txt -Value 'Run CHoops-Studio.exe. CLI: CHoops-Studio.exe --cli --help. DDS conversion is built in. Experimental audio decode/encode runs from the release audio-workspace with Python prerequisites; there is no Audio GUI yet. External texture converters, codec DLLs and game assets are not included. See USER_GUIDE.md and AUDIO_WORKFLOW.md. Gameplay is unverified.'
     & dist/CHoops-Studio/CHoops-Studio.exe --smoke
     if ($LASTEXITCODE -ne 0) { throw 'Packaged Qt smoke failed' }
 } finally { Pop-Location }
