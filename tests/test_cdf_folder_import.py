@@ -1,11 +1,6 @@
 import struct
 import zlib
-import uuid
-from pathlib import Path
-from support import game_fixture,iff_fixture,literal,txtr_fixture
-from choops_py.archive.add_assets import build
-from choops_py.archive.manifests import OUTPUT
-from choops_py.archive.usrdir_reader import Archive
+from support import literal,txtr_fixture
 from choops_py.archive.hash_names import hash_name
 from choops_py.archive.folder_import import discover,compile_group
 from choops_py.formats.cdf_backed_iff import CDFPair
@@ -30,25 +25,32 @@ def logo_pair():
     return bytes(header)+name_trailer([{'name':'logo001','type':'TXTR'}]),b''.join(stored)
 
 
-def test_cdf_dds_discovery_and_growing_paired_import(tmp_path):
+def memory_archive(metadata,payload):
+    class MemoryArchive:
+        entries=[dict(hash=hash_name('logos.iff'),name='logos.iff',size=len(metadata),offset=0),
+                 dict(hash=hash_name('logos.cdf'),name='logos.cdf',size=len(payload),offset=0)]
+        def read(self,entry):
+            data=metadata if entry['name']=='logos.iff' else payload
+            return data[entry.get('offset',0):entry.get('offset',0)+entry['size']]
+        def chunks(self,entry,size):yield self.read(entry)[:size]
+    return MemoryArchive()
+
+
+def test_cdf_dds_discovery_preserves_base_layout(tmp_path):
     metadata,cdf=logo_pair()
-    source=game_fixture(tmp_path/'source',iff_fixture())
-    jb=OUTPUT/'builds'/('logo_source_'+uuid.uuid4().hex)
-    build(source,{'logos.iff':metadata,'logos.cdf':cdf},jb)
     folder=tmp_path/'overrides'/'logos'/'_logo001.txtr';folder.mkdir(parents=True)
     image=b'\x12'*64
     (folder/'logo001.dds').write_bytes(compressed_preview(8,8,'DXT5',image))
-    archive=Archive(jb);groups=discover(archive,tmp_path/'overrides')['groups']
+    archive=memory_archive(metadata,cdf);groups=discover(archive,tmp_path/'overrides')['groups']
     assert len(groups)==1
     rebuilt,details=compile_group(archive,groups[0])
     _,name,payload=groups[0]['compiled_companion']
-    assert name=='logos.cdf' and details[0]['width']==8
+    assert name=='logos.cdf' and details[0]['width']==4
     pair=CDFPair(rebuilt,payload);r=pair.records[0]
     parts=[decode(payload[r[k+'_offset']:r[k+'_offset']+r[k+'_length']]) for k in ('header','payload')]
-    assert TXTR(parts).image()==image
-    assert struct.unpack_from('>I',rebuilt,84)[0]>=64
-    import shutil
-    shutil.rmtree(jb)
+    assert TXTR(parts).info()['width']==4 and TXTR(parts).info()['format']=='DXT1'
+    assert len(TXTR(parts).image())==8
+    assert any(detail.get('storage_layout_preserved') and detail.get('artwork_resampled') for detail in details)
 
 
 def test_cdf_writer_preserves_unchanged_record_content():
@@ -58,6 +60,16 @@ def test_cdf_writer_preserves_unchanged_record_content():
     for old,new in zip(before.records,after.records):
         for k in ('header','payload'):
             assert decode(payload[old[k+'_offset']:old[k+'_offset']+old[k+'_length']])==decode(cdf[new[k+'_offset']:new[k+'_offset']+new[k+'_length']])
+
+
+def test_cdf_only_replacement_automatically_uses_paired_import(tmp_path):
+    metadata,payload=logo_pair();archive=memory_archive(metadata,payload)
+    (tmp_path/'logos.cdf').write_bytes(payload)
+    groups=discover(archive,tmp_path)['groups']
+    assert len(groups)==1 and groups[0]['name']=='logos.iff' and groups[0]['cdf_whole']
+    rebuilt,_=compile_group(archive,groups[0])
+    assert groups[0]['compiled_companion'][1]=='logos.cdf'
+    CDFPair(rebuilt,groups[0]['compiled_companion'][2])
 
 
 def test_legacy_cdf_record_folder_resolves_generic_artwork_name(tmp_path):
@@ -78,4 +90,4 @@ def test_legacy_cdf_record_folder_resolves_generic_artwork_name(tmp_path):
     assert details[0]['selector']=='logo001'
     _,_,cdf=group['compiled_companion'];rec=CDFPair(rebuilt,cdf).records[0]
     blocks=[decode(cdf[rec[k+'_offset']:rec[k+'_offset']+rec[k+'_length']]) for k in ('header','payload')]
-    assert TXTR(blocks).image()==image
+    assert TXTR(blocks).info()['width']==4 and TXTR(blocks).info()['format']=='DXT1'

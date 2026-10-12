@@ -225,7 +225,20 @@ def resolve_legacy_targets(archive,discovery,folder,job=None):
         partner=groups.get(hash_name(group['name'][:-4]+'.cdf'))
         if partner and partner['whole'] and not (partner['records'] or partner['dds'] or partner['package_records']):
             group['cdf_whole']=partner['whole'];partner['whole']=None
-    discovery['groups']=[g for g in groups.values() if g['whole'] or g['records'] or g['dds'] or g['package_records']]
+    # A complete CDF replacement alone still needs its IFF metadata validated
+    # and normalized. Route it through the paired importer automatically.
+    for group in list(groups.values()):
+        if not group['whole'] or not group['name'].lower().endswith('.cdf'):continue
+        identity=hash_name(group['name'][:-4]+'.iff')
+        entry=next((e for e in archive.entries if e['hash']==identity),None)
+        if entry is None or archive.read({**entry,'size':4})!=bytes.fromhex('f0985030'):continue
+        target=groups.get(identity)
+        if target is None:
+            target=dict(whole=None,records={},dds={},dds_rank={},package_records={},entry=entry,name=group['name'][:-4]+'.iff')
+            groups[identity]=target
+        if target.get('cdf_whole'):raise ValueError('Duplicate CDF companion replacement')
+        target['cdf_whole']=group['whole'];group['whole']=None
+    discovery['groups']=[g for g in groups.values() if g['whole'] or g['records'] or g['dds'] or g['package_records'] or g.get('cdf_whole')]
 
 
 
@@ -237,9 +250,21 @@ def compile_group(archive,group,job=None):
     from ..texture_tools.override_import import apply_dds
     original=archive.read(group['entry'])
     data=group['whole'].read_bytes() if group['whole'] else original
-    if not group['records'] and not group['dds'] and not group['package_records']:return data,[]
+    from ..texture_tools.archive_layout import stadium_archive,normalize_record
+    preserve=not stadium_archive(group)
+    if not group['records'] and not group['dds'] and not group['package_records'] and not group.get('cdf_whole') and (not preserve or data[:4] not in (bytes.fromhex('ff3bef94'),bytes.fromhex('f0985030'))):return data,[]
     if data[:4]==bytes.fromhex('f0985030'):return compile_cdf_group(archive,group,data,job)
-    iff=StandardIFF(data);decoded={};changes={};details=[]
+    iff=StandardIFF(data);decoded={};changes={};details=[];scene_baselines={}
+    base=StandardIFF(original) if preserve else None;base_decoded={}
+    def base_parts(rec):
+        matches=[r for r in base.records if r['name'].casefold()==rec['name'].casefold() and r['type']==rec['type']]
+        if len(matches)!=1:raise ValueError('Texture record has no unique base-JB reference: '+rec['name'])
+        reference=[]
+        for block,start,end in base.spans(matches[0]):
+            if block not in base_decoded:
+                b=base.blocks[block];base_decoded[block]=decode(base.raw[b['start']:b['start']+b['size']],b['logical_size'])
+            reference.append(base_decoded[block][start:end])
+        return reference
     def find(name,typ=None):
         matches=[r for r in iff.records if r['name'].casefold()==name.casefold() and (typ is None or r['type']==typ)]
         if len(matches)!=1:raise ValueError('Unknown/ambiguous record '+name+' in '+group['name'])
@@ -259,15 +284,21 @@ def compile_group(archive,group,job=None):
         else:
             raw=file.read_bytes();changes[rec['index']]=unwrap(raw)[1] if raw[:4]==b'2kTl' else [raw]
     from ..texture_tools.override_import import apply_raw_texture
+    from ..modding.court_template import active_slots
     for selector,file in group['package_records'].items():
         if selector in group['dds']:continue
         name,texture=selector.split('/',1);rec=find(name,'SCNE')
+        if preserve:scene_baselines.setdefault(rec['index'],parts(rec))
+        allowed=active_slots(parts(rec))
+        if allowed is not None and int(texture.removeprefix('texture_')) not in allowed:
+            details.append(dict(selector=selector,status='inactive',reason='Single-surface court has disabled this texture slot'));continue
         raw=file.read_bytes();replacement=unwrap(raw)[1] if raw[:4]==b'2kTl' else [raw]
         changes[rec['index']]=apply_raw_texture(parts(rec),texture,replacement)
     for i,(selector,file) in enumerate(group['dds'].items()):
         if job:job.check();job.progress(i,len(group['dds']),'DDS priority: '+group['name']+'/'+selector)
         if '/' in selector:
             name,texture=selector.split('/',1);rec=find(name,'SCNE')
+            if preserve:scene_baselines.setdefault(rec['index'],parts(rec))
             from ..formats.package import textures as package_textures
             items=package_textures(parts(rec))
             if texture.startswith('texture_') and texture[8:].isdigit() and int(texture[8:])>=len(items):
@@ -290,12 +321,38 @@ def compile_group(archive,group,job=None):
                 texture='texture_'+str(index)
                 if name+'/'+texture in group['dds']:
                     details.append(dict(selector=selector,status='shadowed',reason='canonical scene texture filename has priority'));continue
+            allowed=active_slots(parts(rec))
+            if allowed is not None and int(texture.removeprefix('texture_')) not in allowed:
+                details.append(dict(selector=selector,status='inactive',reason='Single-surface court has disabled this texture slot'));continue
         else:texture=selector;rec=find(selector,'TXTR')
-        options={'preserve_layout':True} if group['entry']['hash']==hash_name('gamedata.iff') else {}
+        options={}
+        if preserve:
+            from ..formats.txtr import TXTR
+            reference=base_parts(rec)
+            if rec['type']=='TXTR':target=TXTR(reference)
+            else:
+                current=items[int(texture.removeprefix('texture_'))]
+                matches=[t for t in package_textures(reference) if t.header[:4]==current.header[:4]]
+                if len(matches)!=1:raise ValueError('Scene texture has no unique base-JB identity: '+selector)
+                target=TXTR([matches[0].header,matches[0].payload])
+            options=dict(preserve_layout=True,reference=target)
         try:changed,info=apply_dds(parts(rec),rec['type'],texture,file,job,**options)
         except (ValueError,OSError) as error:raise ValueError(selector+': '+str(error)) from error
         changes[rec['index']]=changed
         details.append(dict(selector=(name+'/'+texture if '/' in selector else selector),input_selector=selector,**info))
+    if preserve:
+        for rec in iff.records:
+            if rec['type'] not in ('TXTR','SCNE') or (rec['index'] not in changes and not group['whole']):continue
+            reference=base_parts(rec)
+            if job:job.check();job.progress(0,1,'Base resolution: '+group['name']+'/'+rec['name'])
+            before=scene_baselines.get(rec['index'],parts(rec))
+            normalized,reports=normalize_record(parts(rec),reference,rec['type'],job,compact=False)
+            if rec['type']=='SCNE' and len(before)==2:
+                from ..formats.package import repack_images
+                normalized=repack_images(before,normalized)
+            changes[rec['index']]=normalized
+            details.extend(dict(selector=rec['name'],policy='base-JB texture layout',**info) for info in reports)
+    if not changes:return data,details
     if job:job.check();job.progress(0,1,'Rebuilding and compressing '+group['name'])
     return replace_records_expanding(iff,changes),details
 
@@ -311,6 +368,13 @@ def compile_cdf_group(archive,group,data,job=None):
     if entry is None:raise ValueError('CDF companion is missing: '+companion)
     cdf=group['cdf_whole'].read_bytes() if group.get('cdf_whole') else archive.read(entry)
     pair=CDFPair(data,cdf);changes={};details=[]
+    from ..texture_tools.archive_layout import stadium_archive,normalize_record
+    preserve=not stadium_archive(group)
+    base_cdf=archive.read(entry);base_pair=CDFPair(archive.read(group['entry']),base_cdf) if preserve else None
+    def base_parts(rec):
+        matches=[r for r in base_pair.records if r['name'].casefold()==rec['name'].casefold() and r['type']=='TXTR']
+        if len(matches)!=1:raise ValueError('CDF texture has no unique base-JB reference: '+rec['name'])
+        return [decode(base_cdf[matches[0][k+'_offset']:matches[0][k+'_offset']+matches[0][k+'_length']]) for k in ('header','payload')]
     def find(name):
         matches=[r for r in pair.records if r['name'].casefold()==name.casefold() and r['type']=='TXTR']
         if len(matches)!=1:raise ValueError('Unknown/ambiguous CDF texture '+name)
@@ -323,8 +387,19 @@ def compile_cdf_group(archive,group,data,job=None):
         rec=find(name);raw=file.read_bytes();changes[rec['index']]=unwrap(raw)[1] if raw[:4]==b'2kTl' else [raw]
     for name,file in group['dds'].items():
         if job:job.check()
-        rec=find(name);changed,info=apply_dds(parts(rec),'TXTR',name,file,job)
+        rec=find(name);options={}
+        if preserve:
+            from ..formats.txtr import TXTR
+            options=dict(preserve_layout=True,reference=TXTR(base_parts(rec)))
+        changed,info=apply_dds(parts(rec),'TXTR',name,file,job,**options)
         changes[rec['index']]=changed;details.append(dict(selector=name,**info))
+    if preserve:
+        for rec in pair.records:
+            if rec['type']!='TXTR' or (rec['index'] not in changes and not group['whole'] and not group.get('cdf_whole')):continue
+            reference=base_parts(rec)
+            normalized,reports=normalize_record(parts(rec),reference,'TXTR',job)
+            changes[rec['index']]=normalized
+            details.extend(dict(selector=rec['name'],policy='base-JB texture layout',**info) for info in reports)
     if job:job.check();job.progress(0,1,'Rebuilding paired texture bank '+group['name'])
     rebuilt,payload=replace_texture_records(data,cdf,changes)
     group['compiled_companion']=(entry,companion,payload)

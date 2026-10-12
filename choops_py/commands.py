@@ -6,6 +6,7 @@ class Command:
     options: tuple = ()
     output_file: bool = False
 COMMANDS={
+    'prepare-court-template':Command(('input','output')),
     'export-mod-patch':Command(('source','mod','output'),(),True),
     'import-mod-patch':Command(('source','input','output')),
     'extract-raw':Command(('source','output'),('selection',)),

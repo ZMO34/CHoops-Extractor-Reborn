@@ -41,6 +41,9 @@ def execute(a):
         return launch([])
     sources=[getattr(a,key) for key in ('source','input','cdf','dds_file','mod','modded','edited','patch') if getattr(a,key,None)]
     if hasattr(a,'output'):a.output=safe_output(a.output,sources)
+    if c=='prepare-court-template':
+        from .modding.court_template import prepare
+        return prepare(a.input,a.output)
     if c=='fill-five-uniforms':
         from .modding.add_alternate import fill_five
         return fill_five(a.source,a.output)

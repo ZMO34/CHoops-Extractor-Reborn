@@ -1436,12 +1436,24 @@ class Window(QMainWindow):
                 lambda job: save_model(self.roster, output),
             )
 
+    def prepare_court_template(self):
+        source,_=QFileDialog.getOpenFileName(self,'Select full court template ZIP','','Court template (*.zip)')
+        if not source:return
+        from ..modding.court_template import prepare
+        import uuid
+        output=OUTPUT/'templates'/('single_surface_court_'+uuid.uuid4().hex[:8])
+        def completed(result):
+            self.model_details.setPlainText(json.dumps(result,indent=2))
+            QMessageBox.information(self,'Court template ready',
+                'Prepared floor and two texture overrides:\n'+result['floor']+'\n\nCopy the prepared folder into your overrides. Gameplay compatibility still requires your manual check.')
+        self.run_job('Prepare single-texture court',lambda job:prepare(source,output,job),completed,cancellable=True)
+
     def create_models(self):
         layout = self.page(
             "Models / Courts • 3D preview",
             "Select a SCNE record in Explorer, then Preview scene. Left-drag: orbit; right-drag: look around; middle-drag or Shift-drag: pan. WASD: move; Q/E: down/up; Shift: faster; Ctrl: slower; wheel: zoom; F: fit. Material textures load automatically. Use cutaway to see inside; game shader effects are not reproduced.",
         )
-        self.buttons(layout, [("Preview selected SCNE", self.inspect_scene)])
+        self.buttons(layout, [("Preview selected SCNE", self.inspect_scene), ("Prepare single-texture court…", self.prepare_court_template)])
         self.scene_complete = QCheckBox("Include all SCNE sections (arena and court)")
         self.scene_complete.setChecked(True)
         layout.addWidget(self.scene_complete)

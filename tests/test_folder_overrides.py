@@ -44,7 +44,7 @@ def test_raw_record_then_dds_takes_priority(tmp_path,monkeypatch):
     source=game_fixture(tmp_path/'game',payload);folder=tmp_path/'overrides'/'ua000';folder.mkdir(parents=True)
     (folder/'unif.txtr').write_bytes(wrap(1,[txtr_header(),b'rawimage']))
     child=folder/'_unif.txtr';child.mkdir();(child/'unif.dds').write_bytes(b'DDS artwork')
-    def import_dds(parts,kind,selector,path,job=None):
+    def import_dds(parts,kind,selector,path,job=None,**options):
         assert parts[1]==b'rawimage' and kind=='TXTR'
         return [parts[0],b'DDS wins'],{'width':4,'height':4,'format':'DXT1','mip_count':1}
     monkeypatch.setattr(override_import,'apply_dds',import_dds)
@@ -124,9 +124,9 @@ def test_scne_growth_keeps_existing_geometry_bytes(tmp_path,monkeypatch):
 
 def test_nested_growing_scene_build_uses_relocation(tmp_path):
     from choops_py.archive.build_copy import build
-    payload=named_iff([b'old head',b'old data'],[(0xe26c9b5d,[0,0])],[('arena','SCNE')])
+    payload=named_iff([bytes(0x54),b'old data'],[(0xe26c9b5d,[0,0])],[('arena','SCNE')])
     source=game_fixture(tmp_path/'game',payload);folder=tmp_path/'overrides'/'ua000';folder.mkdir(parents=True)
-    (folder/'arena.scne').write_bytes(wrap(2,[b'new scene header'*100,b'new vertices and textures'*500]))
+    (folder/'arena.scne').write_bytes(wrap(2,[bytes(0x54)+b'new scene header'*100,b'new vertices and textures'*500]))
     mod=OUTPUT/'builds'/('dynamic_scene_mod_'+uuid.uuid4().hex)
     staged=stage_folder(source,folder,mod)
     assert staged['growing_archives']
@@ -139,7 +139,7 @@ def test_nested_growing_scene_build_uses_relocation(tmp_path):
     assert replaced['validation']['source_unchanged']
     new=Archive(output);iff=StandardIFF(new.read(new.entries[0]))
     spans=record_blocks(iff,iff.records[0])
-    assert spans[0][3].startswith(b'new scene header'*100) and spans[1][3].startswith(b'new vertices and textures'*500)
+    assert spans[0][3].startswith(bytes(0x54)+b'new scene header'*100) and spans[1][3].startswith(b'new vertices and textures'*500)
     assert Archive(source).read(Archive(source).entries[0]).startswith(payload)
 
 
@@ -180,7 +180,7 @@ def test_python_texture_manifest_detected_without_archive_folder_name(tmp_path,m
     (folder/'0000_unif.dds').write_bytes(b'DDS')
     metadata={'schema':2,'source':r'Z:\old\ua000.iff','textures':[{'texture_name':'unif','raw_output_path':r'Z:\old\0000_unif.txtr','dds_output_path':r'Z:\old\0000_unif.dds'}]}
     (folder/'manifest.json').write_text(json.dumps(metadata),encoding='utf8')
-    def apply(parts,kind,selector,path,job=None):
+    def apply(parts,kind,selector,path,job=None,**options):
         assert parts[1]==b'rawimage'
         return [parts[0],b'DDS wins'],{'width':4,'height':4,'format':'DXT1','mip_count':1}
     monkeypatch.setattr(override_import,'apply_dds',apply)
@@ -193,11 +193,11 @@ def test_python_texture_manifest_detected_without_archive_folder_name(tmp_path,m
 
 def test_python_record_dump_manifest_and_split_blocks(tmp_path):
     import json
-    payload=named_iff([b'old head',b'old data'],[(0xe26c9b5d,[0,0])],[('arena','SCNE')])
+    payload=named_iff([bytes(0x54),b'old data'],[(0xe26c9b5d,[0,0])],[('arena','SCNE')])
     source=game_fixture(tmp_path/'game',payload);folder=tmp_path/'dump';parts=folder/'ua000.iff.subfiles';parts.mkdir(parents=True)
     (folder/'ua000.iff').write_bytes(payload)
     iff=StandardIFF(payload);(parts/'manifest.json').write_text(json.dumps(iff.manifest()),encoding='utf8')
-    (parts/'0000_arena.scne.block0').write_bytes(b'larger replacement header')
+    (parts/'0000_arena.scne.block0').write_bytes(bytes(0x54)+b'larger replacement header')
     (parts/'0000_arena.scne.block1').write_bytes(b'larger replacement data'*100)
     arc=Archive(source);plan=discover(arc,folder)
     assert 'python-record-manifest' in plan['detected_formats']
@@ -217,14 +217,14 @@ def test_legacy_rgba_dds_is_normalized_without_changing_pixels():
 
 def test_hashed_python_rip_relocates_existing_unknown_asset(tmp_path):
     from choops_py.archive.build_copy import build
-    payload=named_iff([b'old head',b'old data'],[(0xe26c9b5d,[0,0])],[('arena','SCNE')])
+    payload=named_iff([bytes(0x54),b'old data'],[(0xe26c9b5d,[0,0])],[('arena','SCNE')])
     source=game_fixture(tmp_path/'game',payload)
     bank=source/'PS3_GAME'/'USRDIR'/'0A';raw=bytearray(bank.read_bytes())
     struct.pack_into('>I',raw,40,0x13579bdf);bank.write_bytes(raw)
     folder=tmp_path/'hash_13579bdf.iff.subfiles';folder.mkdir()
     import json
     (folder/'manifest.json').write_text(json.dumps(StandardIFF(payload).manifest()),encoding='utf8')
-    (folder/'0000_arena.scne.block0').write_bytes(b'expanded head'*100)
+    (folder/'0000_arena.scne.block0').write_bytes(bytes(0x54)+b'expanded head'*100)
     (folder/'0000_arena.scne.block1').write_bytes(b'expanded mesh'*500)
     mod=OUTPUT/'builds'/('hashed_import_'+uuid.uuid4().hex)
     stage_folder(source,folder,mod)
@@ -291,7 +291,7 @@ def test_old_numeric_txtr_folder_uses_local_record_index(tmp_path):
     arc=Archive(source);plan=discover(arc,folder.parent)
     assert list(plan['groups'][0]['dds'])==['unif']
     result,_=compile_group(arc,plan['groups'][0]);iff=StandardIFF(result)
-    assert TXTR([x[3] for x in record_blocks(iff,iff.records[0])]).image()==bytes(range(64))
+    assert TXTR([x[3] for x in record_blocks(iff,iff.records[0])]).info()['width']==4
 
 
 def test_uniquely_misfiled_scene_routes_to_correct_archive(tmp_path):
@@ -311,7 +311,7 @@ def test_uniquely_misfiled_scene_routes_to_correct_archive(tmp_path):
     assert imports[0]['selector']=='tile_background/texture_0'
     from choops_py.formats.package import textures
     item=textures([x[3] for x in record_blocks(iff,iff.records[0])])[0]
-    assert TXTR([item.header,item.payload]).image()==bytes(range(64))
+    assert TXTR([item.header,item.payload]).info()['width']==4
 
 
 def test_absent_scene_slots_are_reported_while_valid_artwork_imports(tmp_path):
@@ -341,7 +341,7 @@ def test_windows_copy_suffix_does_not_create_a_second_scene_texture(tmp_path):
     result,_=compile_group(arc,plan['groups'][0]);iff=StandardIFF(result)
     from choops_py.formats.package import textures
     item=textures([x[3] for x in record_blocks(iff,iff.records[0])])[0]
-    assert TXTR([item.header,item.payload]).image()==chosen
+    assert TXTR([item.header,item.payload]).info()['width']==4
 
 
 def test_internal_record_index_cannot_collide_with_another_numeric_name():

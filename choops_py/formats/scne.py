@@ -70,7 +70,7 @@ def preview_meshes(blocks):
         shaders = {head.u32(shader_table+j*48): shader_table+j*48 for j in range(shader_count)}
         # Sampler semantics, rather than parameter order, select base color.
         # Bump/normal and gloss samplers must never become a diffuse fallback.
-        color_semantics = (0xb6e7ae40, 0x49412c54, 0x87d6e6f6)
+        color_semantics = (0xb6e7ae40, 0x49412c54)
         for j in range(0 if external_materials else material_count):
             material = material_table+j*40
             material_hashes[j] = head.u32(material)
@@ -118,6 +118,7 @@ def preview_meshes(blocks):
         name = f"part_{i}"
         try:
             name = head.utf16(head.relative(off), 'be')
+            if not head.u32(off+0x7c):continue
             if head.u32(off + 0x84) != 1:
                 raise ValueError("multiple vertex streams are unsupported")
             descriptor = head.relative(off + 0x88)

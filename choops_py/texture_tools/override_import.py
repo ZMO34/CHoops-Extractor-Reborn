@@ -9,8 +9,9 @@ from ..formats.binary import Binary
 from . import dds,gtf,external_converters
 
 
-def apply_dds(parts,kind,selector,source,job=None,converter=None,preserve_layout=False):
-    source=Path(source);meta=dds.inspect(source.read_bytes())
+def apply_dds(parts,kind,selector,source,job=None,converter=None,preserve_layout=False,reference=None):
+    source_data=bytes(source) if isinstance(source,(bytes,bytearray)) else Path(source).read_bytes()
+    meta=dds.inspect(source_data)
     index=None
     if kind=='TXTR':texture=TXTR(parts)
     elif kind=='SCNE':
@@ -19,19 +20,21 @@ def apply_dds(parts,kind,selector,source,job=None,converter=None,preserve_layout
         if not 0<=index<len(items):raise ValueError('SCNE texture index is out of range')
         item=items[index];texture=TXTR([item.header,item.payload])
     else:raise ValueError('DDS target must be TXTR or SCNE')
-    old=texture.info();work=OUTPUT/'temp'/('override_dds_'+uuid.uuid4().hex);work.mkdir(parents=True)
+    old=texture.info();reference=reference or texture
+    work=OUTPUT/'temp'/('override_dds_'+uuid.uuid4().hex);work.mkdir(parents=True)
     try:
         if job:job.check()
         converted=work/'converted.gtf'
         # Legacy exports use depth=1 for ordinary 2D DDS files. The native
         # converter incorrectly treats that header as a 3D texture.
-        normalized=dds.normalized_2d(source.read_bytes());input_meta=meta;conformed=False
+        normalized=dds.normalized_2d(source_data);input_meta=meta;conformed=False
         if preserve_layout:
             from .runtime_layout import conform
-            normalized,conformed=conform(normalized,old,job)
+            normalized,conformed=conform(normalized,reference.info(),job)
             meta=dds.inspect(normalized)
+        if max(meta['width'],meta['height'])>4096:raise ValueError('Texture exceeds the RSX 4096-pixel dimension ceiling')
         conversion_source=work/'input.dds';conversion_source.write_bytes(normalized)
-        external_converters.convert('dds2gtf',conversion_source,converted,override=converter,swizzle=not old['linear'])
+        external_converters.convert('dds2gtf',conversion_source,converted,override=converter,swizzle=not (reference.info()['linear'] if preserve_layout else old['linear']))
         info,descriptor,image=gtf.parse(converted.read_bytes())
         for key in ('width','height','format','mip_count','cubemap'):
             if info[key]!=meta[key]:raise ValueError('DDS converter changed '+key)
@@ -52,7 +55,7 @@ def apply_dds(parts,kind,selector,source,job=None,converter=None,preserve_layout
         descriptor[4:8]=texture.blocks[0][0x5c:0x60]
         descriptor[20:24]=texture.blocks[0][0x6c:0x70]
         if preserve_layout:
-            descriptor=bytearray(texture.blocks[0][0x58:0x70])
+            descriptor=bytearray(reference.blocks[0][0x58:0x70])
         result=[bytearray(p) for p in parts]
         def update_header(buffer,base):
             old_descriptor=texture.blocks[0][0x58:0x70]
@@ -62,6 +65,7 @@ def apply_dds(parts,kind,selector,source,job=None,converter=None,preserve_layout
                 if int.from_bytes(buffer[base+field:base+field+4],'big')==old_key:
                     buffer[base+field:base+field+4]=new_key.to_bytes(4,'big')
             buffer[base+0x58:base+0x70]=descriptor
+            if preserve_layout:buffer[base+0x90:base+0x96]=reference.blocks[0][0x90:0x96]
             # +0x90/+0x92 are also consumed by sprite sizing in the game.
             # Preserve the authored extent when replacing artwork at a higher
             # resolution; the RSX descriptor carries the actual image size.
@@ -80,11 +84,19 @@ def apply_dds(parts,kind,selector,source,job=None,converter=None,preserve_layout
         else:
             update_header(result[0],0)
             if len(result)==2:
-                if len(image)<=len(result[1]):result[1][:len(image)]=image
+                if preserve_layout and len(reference.blocks)==2:
+                    base_info=reference.info();result[1]=bytearray(image+reference.blocks[1][base_info['image_size']:])
+                elif len(image)<=len(result[1]):result[1][:len(image)]=image
                 else:result[1]=bytearray(image)
             else:
                 target=old['payload_offset']
-                if len(image)>old['image_size']:
+                if preserve_layout and len(reference.blocks)==1:
+                    base_info=reference.info();target=base_info['payload_offset']
+                    prefix=bytearray(reference.blocks[0][:target])
+                    prefix[:0xb0]=result[0][:0xb0]
+                    prefix[0xa4:0xac]=reference.blocks[0][0xa4:0xac]
+                    result[0]=prefix+image+reference.blocks[0][target+base_info['image_size']:]
+                elif len(image)>old['image_size']:
                     target=(len(result[0])+15)&~15
                     result[0]+=b'\0'*(target-len(result[0]))+image
                     import struct

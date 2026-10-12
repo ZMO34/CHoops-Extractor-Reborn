@@ -1,5 +1,18 @@
 # Development verification
 
+The court-template and non-stadium texture policy update passed 125 targeted
+Python checks, including raw and whole-IFF normalization, paired CDF imports,
+HDR preservation, multistream geometry relocation, previews, compression and
+CLI registration. Real gameplay/uniform replacements were compiled in memory
+and retained exact base headers after resizing. The supplied court template
+retained its floor triangles and primary UVs, resolved albedo to slot 0 and
+bump to slot 2, disabled the other floor draws, and ignored inactive artwork.
+The source GUI passed its startup smoke check. No emulator was opened and no
+JB build was produced for this update. The optional historical executable
+comparison was excluded after Windows rejected its DLL relocation; built-in
+conversion checks passed independently. The game's crash-free court texture
+budget remains unverified.
+
 Built-in DDS/GTF conversion is tested in both directions against generated
 native-reference fixtures for L8, ARGB8, DXT1/3/5 and RGBA16F. Coverage includes
 rectangular Morton order, non-power-of-two linear storage, mip chains and all six

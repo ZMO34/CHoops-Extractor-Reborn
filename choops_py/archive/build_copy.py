@@ -31,7 +31,7 @@ def import_summary(mod):
     if not path.is_file():return {}
     report=json.loads(path.read_text(encoding='utf-8'))
     unapplied=report.get('unapplied_overrides',[])
-    return {'staged_archives':report.get('staged'),'applied_dds':sum('width' in item for group in report.get('imports',[]) for item in group['dds_imports']),
+    return {'staged_archives':report.get('staged'),'applied_dds':sum('width' in item and not item.get('policy') for group in report.get('imports',[]) for item in group['dds_imports']),
             'unapplied_count':len(unapplied),'unapplied_overrides':unapplied,'report':str(path.resolve())}
 
 def preflight(source,mod,job=None):
