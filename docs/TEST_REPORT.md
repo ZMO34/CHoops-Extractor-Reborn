@@ -1,5 +1,29 @@
 # Development verification
 
+## LGPL audio packaging branch — verified PR head
+
+Exact-head CI run 54 passed on `e149790005fdaeb14d0a1b79689d0a3de3b8f2da` on
+both Ubuntu and Windows. The Windows job built the pinned LGPL FFmpeg helper and
+ATRAC3 encoder, built/smoke-tested the standalone package, and printed
+`Bundled LGPL audio helpers passed a synthetic WAV round trip` from the frozen
+executable. Thus the packaged helper lookup, WAV resampling/encoding and ATRAC3
+decode validation ran in the actual frozen app.
+
+Local `python tools/dev/verify.py`: 250 passed, 1 skipped, 2 deselected. The one
+skip is the native helper round trip because MSYS2 helpers are not built in this
+checkout; the two deselections are private game/runtime checks and the optional
+legacy native comparison defined by the runner. CLI help, Qt startup smoke,
+scoped Ruff, studio/service mypy, handoff snapshot, compileall and
+`git diff --check` passed. The suite includes a regression that rejects a
+non-RIFF/RF64 replacement before codec lookup.
+
+Earlier Windows runs exposed and fixed an annotated-tag SHA mismatch, FFmpeg
+component names/make target, a missing MSYS2 `cmp`, and the absence of conversion
+filters. The final verified helper pins the peeled `n9.0.2` source commit, enables
+only LGPL `aresample`/`aformat` conversion filters, and checks required codecs,
+formats and filters. No emulator or testing JB was run/built. PR #6 remains the
+review and publication path; verification does not itself make a release.
+
 ## Independent PR #5 review and continuation — 2026-10-12
 
 Reviewed submitted head 6603d24f4d32f70abfd25e3f6770939b86f4594b in an isolated

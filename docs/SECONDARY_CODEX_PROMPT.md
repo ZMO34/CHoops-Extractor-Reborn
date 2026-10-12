@@ -131,7 +131,12 @@ Licensed Music and Fight Songs tabs, selected/section WAV export, WAV replacemen
 preparation and shared cover-art actions. Independent review fixes scene/shoe
 navigation to Models/Courts by name, removes a clean-clone test dependency on
 proprietary converters, and makes batch WAV export transactional. See PR #5 for
-integration/review status. Self-contained codec packaging remains pending.
+integration/review status. The `codex/audio-codec-packaging` branch adds a
+restricted LGPL FFmpeg CLI and the ATRAC3 encoder to the standalone Windows GUI,
+with matching source archives and notices. Exact-head Windows CI built both
+helpers, packaged the GUI, and passed the frozen synthetic WAV round trip on
+`e149790005fdaeb14d0a1b79689d0a3de3b8f2da` (run 54). This is CI-verified branch
+work, not yet a published release.
 
 Song-title/artist editing stays read-only because archive-only routing is not
 established, and EBOOT writing is prohibited. Unknown AUDO loops and general CDF
@@ -140,12 +145,13 @@ See AUDIO_RESEARCH.md and AUDIO_WORKFLOW.md.
 
 ## Priorities for the next instance
 
-1. Continue independent validation of audio metadata identity, conversion limits,
-   cancellation and no-overwrite handling. Keep uncertain name fields read-only.
-2. Validate standalone/paired/inline AUDO handling and explicitly block unknown
+1. Review and publish the CI-verified LGPL-only Windows audio-helper package,
+   including corresponding sources, notices and packaged WAV round trips.
+2. Continue independent validation of audio metadata identity, conversion
+   limits, cancellation and no-overwrite handling. Keep uncertain name fields
+   read-only. Reject non-WAV replacement sources before codec conversion.
+3. Validate standalone/paired/inline AUDO handling and explicitly block unknown
    loop formats or unsupported CDF writes. Do not claim all formats writable.
-3. Finish native decoder/encoder release integration with corresponding sources,
-   license notices and independent packaged checks. No proprietary codec tools.
 4. Continue remaining roster semantics, palettes, shaders and asset-linking
    investigation as separate documented PRs; do not distract from audio validation.
 
@@ -172,6 +178,8 @@ and mypy. Native WAV re-encode/resample, AUSB preservation and AUDO/header check
 are covered. Read-only stock catalog returned 23 licensed/64 fight/159 total music
 bank streams. No game replacement consumption validation. See TEST_REPORT.md for
 exact commands; new commits require their own results rather than reused counts.
+The LGPL-helper packaging branch passed the Windows build and packaged audio
+round trip on `e149790005fdaeb14d0a1b79689d0a3de3b8f2da`; see TEST_REPORT.md.
 
 All game inputs, rosters, templates, private reverse-engineering helpers and raw
 audio are local and absent from Git. A fresh PC must supply its own authorized
@@ -319,8 +327,10 @@ python tools/dev/verify.py
 ```
 
 Setup installs .[dev]; the encoder option installs Zig 0.13.0 and fetches pinned
-LGPL sources. Decoder development uses PyAV 16.x. No other PC's credentials,
-environment or paths are copied. Versions go into ignored dev-setup.txt.
+LGPL sources. Audio conversion uses the restricted LGPL FFmpeg helper built from
+`tools/audio_codec/build_ffmpeg.sh` and the optional ATRAC3 encoder. No PyAV
+wheel is required or packaged. No other PC's credentials, environment or paths
+are copied. Versions go into ignored dev-setup.txt.
 requirements-windows-dev.txt is an old environment snapshot; pyproject/setup
 are the portable dependency contract.
 
@@ -339,11 +349,12 @@ audio_tools. Qt workers return signals/data, never manipulate widgets. Writers
 reparse output, preserve unknown bytes/bits and reject ambiguous shared ranges.
 Generated outputs live under output/ and originals remain immutable.
 
-tools/rebuild/package_windows.ps1 packages the Windows GUI. The Audio workspace
-uses PyAV and an optional ATRAC3 helper built from pinned LGPL source; native
-codec dependencies are not self-contained in the GUI package yet. Check licenses
-and corresponding sources for shipped native components; no proprietary
-converters/game assets. See AUDIO_WORKFLOW.md and the encoder README.
+`tools/rebuild/package_windows.ps1` packages the Windows GUI and audio helpers.
+The FFmpeg helper is configured without GPL/nonfree components and uses only the
+PCM formats and ATRAC3 decoder needed for WAV/audio operations. Its FFmpeg and
+AtracDEnc source archives and applicable notices accompany the package. Confirm
+the exact configuration and packaged smoke on Windows; no proprietary converters
+or game assets are included. See AUDIO_WORKFLOW.md and the encoder README.
 
 ---
 
@@ -448,11 +459,26 @@ project dependencies.
 - [AtracDEnc](https://github.com/dcherednik/atracdenc), revision
   `cb170709f836cb43dc0312455188c791159d81dc`, LGPL-2.1-or-later. Thin frontend and
   build instructions are in tools/audio_encoder. No Sony SDK executable is used.
-- PyAV 16.1.0 supplies the decoder in local Python development. The inspected
-  Windows FFmpeg DLL reports **LGPL version 3 or later**, with shared libraries
-  and multiple optional codecs. Do not infer the license from DLL names alone.
-  Native redistribution needs matching notices/corresponding sources for shipped
-  components; dependency installation by the user is separate from bundling them.
+- The standalone app's LGPL packaging uses FFmpeg 9.0.2 at revision
+  `946fcce07b6dcd0331c8cc609192aeff5e1924f8` (the peeled commit of the annotated
+  `n9.0.2` tag), built as a separate CLI with GPL,
+  nonfree and autodetected components disabled. Only the PCM formats, WAV/RF64
+  demuxer, raw PCM muxers, ATRAC3 decoder, audio resampling/format filters and
+  file/pipe protocols used by the workflow are enabled. The exact build script
+  and corresponding FFmpeg source archive ship beside the app.
+- Do not bundle the default PyAV Windows wheel for this project: the PyAV FFmpeg
+  build configuration enables x264/x265, which enables FFmpeg's GPL options.
+  See [PyAV's FFmpeg build](https://github.com/PyAV-Org/pyav-ffmpeg/blob/master/scripts/build-ffmpeg.py)
+  and [the PyAV wheel licensing discussion](https://github.com/PyAV-Org/PyAV/issues/2270).
+  The package instead uses separately executable FFmpeg built from the official
+  [FFmpeg source](https://github.com/FFmpeg/FFmpeg) with a pinned revision and
+  corresponding source archive.
+- Exact-head Windows CI run 54 built the pinned FFmpeg and ATRAC3 helpers,
+  packaged/smoke-tested the GUI, and passed the frozen synthetic WAV round trip
+  on `e149790005fdaeb14d0a1b79689d0a3de3b8f2da`. The script checks the LGPL-only
+  build configuration and required audio components; source archives and license
+  files are packaged beside the app. This is branch verification, not a published
+  release claim.
 
 See CURRENT_STATUS.md and each PR's exact verification for the latest evidence.
 
@@ -480,19 +506,24 @@ the same Python backend; no emulator or gameplay check is part of these flows.
 
 Launch the studio with `python -m choops_py.studio`, then choose **Audio** in the
 left navigation. Open a JB from Explorer first, then use **Load / refresh
-catalog**. WAV decoding requires PyAV; WAV replacement also requires the helper
-built by `python tools/dev/setup.py --audio-encoder`.
+catalog**. WAV export needs the LGPL FFmpeg helper. WAV replacement also needs
+the LGPL ATRAC3 encoder helper.
 
 From a checkout or the release's **audio-workspace** directory:
 
 ```powershell
-python tools/dev/setup.py --audio-encoder
+python tools/dev/setup.py
 .\.venv\Scripts\python.exe -m choops_py.cli --help
 ```
 
-Python 3.12 x64 and Git must already be available. Setup installs the Python
-prerequisites, fetches pinned LGPL AtracDEnc sources into ignored .private/vendor,
-and builds the helper with Zig. Decoder-only exports need PyAV, not the encoder.
+Python 3.12 x64 and Git must already be available. Setup installs the desktop
+and development dependencies. On Windows, install MSYS2 with its MINGW64 toolchain,
+`make`, `git` and `pkgconf`, then run `bash tools/audio_codec/build_ffmpeg.sh`
+from an MSYS2 MINGW64 shell at the repository root. This builds FFmpeg 9.0.2
+from pinned upstream source with GPL/nonfree components disabled. Build the
+separate ATRAC3 encoder with `python tools/dev/setup.py --audio-encoder`; this
+fetches pinned LGPL AtracDEnc source and builds the helper with Zig. WAV export
+needs FFmpeg; WAV replacement needs both helpers.
 
 ```powershell
 .\.venv\Scripts\python.exe -m choops_py.cli audio-catalog "YOUR_JB_ROOT" output/reports/audio.json
@@ -523,11 +554,12 @@ Cover replacement outputs complete jukebox.iff for manual staging. Record 021 is
 shared by all fight songs; 002 by both Strange Fruit tracks. DDS or Pillow-readable
 artwork such as PNG is normalized to the selected JB's base texture layout.
 
-The v1.08 development bundle includes the established standalone Windows GUI
-and a Python **audio-workspace**. Audio commands run from that workspace, not the
-GUI executable. PyAV/encoder build dependencies are installed by setup, not
-distributed as native codec DLLs. Self-contained audio GUI packaging is pending.
-See AUDIO_RESEARCH.md for evidence and limits.
+The Windows standalone GUI includes the restricted LGPL FFmpeg and ATRAC3 helper
+executables. Their exact source archives, license texts and build instructions
+are distributed in `THIRD-PARTY-SOURCES`. The default PyAV wheel is not bundled.
+When building locally, both helpers must be present before running
+`tools/rebuild/package_windows.ps1`. See AUDIO_RESEARCH.md for evidence and
+format limits.
 
 ---
 
@@ -878,8 +910,9 @@ Updated 2026-10-11. CURRENT_STATUS.md and TEST_REPORT.md are the living evidence
 - Audio has an experimental Python backend/CLI and a shared-backend Qt workspace
   for Licensed Music, Fight Songs, WAV workflows and mapped cover art. Title/artist
   editing remains unavailable because archive-only routing is unproven; EBOOT
-  writes are prohibited. Unknown AUDO loops are blocked; CDF audio growth and
-  self-contained codec packaging remain pending.
+  writes are prohibited. Unknown AUDO loops are blocked and CDF audio growth is
+  unsupported. The LGPL helper package has passed Windows CI on PR #6's current
+  head; it remains an unreleased branch until review and publication.
 - Outputs are constrained to output/. Game assets, exported music/art, private
   paths, logs, fixtures and EBOOT are not supplied publicly.
 
@@ -888,6 +921,30 @@ Updated 2026-10-11. CURRENT_STATUS.md and TEST_REPORT.md are the living evidence
 Embedded source: docs/TEST_REPORT.md
 
 # Development verification
+
+## LGPL audio packaging branch — verified PR head
+
+Exact-head CI run 54 passed on `e149790005fdaeb14d0a1b79689d0a3de3b8f2da` on
+both Ubuntu and Windows. The Windows job built the pinned LGPL FFmpeg helper and
+ATRAC3 encoder, built/smoke-tested the standalone package, and printed
+`Bundled LGPL audio helpers passed a synthetic WAV round trip` from the frozen
+executable. Thus the packaged helper lookup, WAV resampling/encoding and ATRAC3
+decode validation ran in the actual frozen app.
+
+Local `python tools/dev/verify.py`: 250 passed, 1 skipped, 2 deselected. The one
+skip is the native helper round trip because MSYS2 helpers are not built in this
+checkout; the two deselections are private game/runtime checks and the optional
+legacy native comparison defined by the runner. CLI help, Qt startup smoke,
+scoped Ruff, studio/service mypy, handoff snapshot, compileall and
+`git diff --check` passed. The suite includes a regression that rejects a
+non-RIFF/RF64 replacement before codec lookup.
+
+Earlier Windows runs exposed and fixed an annotated-tag SHA mismatch, FFmpeg
+component names/make target, a missing MSYS2 `cmp`, and the absence of conversion
+filters. The final verified helper pins the peeled `n9.0.2` source commit, enables
+only LGPL `aresample`/`aformat` conversion filters, and checks required codecs,
+formats and filters. No emulator or testing JB was run/built. PR #6 remains the
+review and publication path; verification does not itself make a release.
 
 ## Independent PR #5 review and continuation — 2026-10-12
 

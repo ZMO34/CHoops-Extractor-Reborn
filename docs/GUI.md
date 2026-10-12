@@ -17,6 +17,7 @@ orbit/look/pan/keyboard movement. Mod Builder stages recursive overrides and bui
 only on the user's explicit action. Research/Diagnostics support bounded inspection.
 
 See USER_GUIDE.md and AUDIO_WORKFLOW.md for controls and codec setup. The audio
-workspace uses the shared Python services and writes replacement assets under
-`output/`; users stage changes and build JB folders manually. No song-name/EBOOT
-editing. Agents do not open RPCS3 or trigger full testing JB builds.
+workspace uses the shared Python services and bundled LGPL audio helpers in the
+Windows package; it writes replacement assets under `output/`. Users stage
+changes and build JB folders manually. No song-name/EBOOT editing. Agents do not
+open RPCS3 or trigger full testing JB builds.

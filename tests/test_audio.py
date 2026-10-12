@@ -9,7 +9,7 @@ import pytest
 
 from choops_py.archive.manifests import OUTPUT
 from choops_py.audio_tools.banks import StreamBank
-from choops_py.audio_tools.codec import atrac_riff, encode_wav, encoder_path, playback_samples
+from choops_py.audio_tools.codec import atrac_riff, encode_wav, encoder_path, ffmpeg_path, playback_samples
 from choops_py.audio_tools.workflow import names, read_audo
 from choops_py.formats import audio
 from choops_py.formats.tool_wrapper import wrap
@@ -116,6 +116,13 @@ def test_frame_extent_and_stale_sample_metadata():
         atrac_riff(b'x' * 303, 2, 48000)
 
 
+def test_replacement_rejects_non_wav_before_codec_lookup(tmp_path):
+    source = tmp_path / 'not-audio.bin'
+    source.write_bytes(b'not a wav file')
+    with pytest.raises(ValueError, match='RIFF or RF64 WAV'):
+        encode_wav(source, 2, 48000)
+
+
 def test_catalog_counts_and_shared_artwork():
     catalog = names()
     assert len(catalog) == 87
@@ -129,9 +136,9 @@ def test_catalog_counts_and_shared_artwork():
 def test_native_wav_roundtrip_resamples_and_keeps_input():
     try:
         encoder_path()
+        ffmpeg_path()
     except ValueError:
-        pytest.skip('Optional open-source ATRAC3 encoder has not been built')
-    pytest.importorskip('av')
+        pytest.skip('Optional LGPL audio helpers have not been built')
     parent = OUTPUT / 'temp'
     parent.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix='audio_test_', dir=parent) as folder:

@@ -26,6 +26,8 @@ See [user guide](docs/USER_GUIDE.md), [development](docs/DEVELOPER_GUIDE.md), [f
 The experimental [Audio workspace](docs/AUDIO_WORKFLOW.md) provides separate
 Licensed Music and Fight Songs views, WAV export/replacement preparation and
 mapped cover-art actions. Song-title editing is unavailable and EBOOT remains
-read-only. Audio codec dependencies are installed through the project setup.
+read-only. The standalone Windows package includes restricted LGPL audio helpers
+with corresponding source archives and license notices; Windows CI has verified
+the packaged WAV round trip on the current development branch.
 Both Codex instances maintain documentation and submit each update through a PR;
 [AGENTS.md](AGENTS.md) defines the shared rules.

@@ -97,10 +97,25 @@ project dependencies.
 - [AtracDEnc](https://github.com/dcherednik/atracdenc), revision
   `cb170709f836cb43dc0312455188c791159d81dc`, LGPL-2.1-or-later. Thin frontend and
   build instructions are in tools/audio_encoder. No Sony SDK executable is used.
-- PyAV 16.1.0 supplies the decoder in local Python development. The inspected
-  Windows FFmpeg DLL reports **LGPL version 3 or later**, with shared libraries
-  and multiple optional codecs. Do not infer the license from DLL names alone.
-  Native redistribution needs matching notices/corresponding sources for shipped
-  components; dependency installation by the user is separate from bundling them.
+- The standalone app's LGPL packaging uses FFmpeg 9.0.2 at revision
+  `946fcce07b6dcd0331c8cc609192aeff5e1924f8` (the peeled commit of the annotated
+  `n9.0.2` tag), built as a separate CLI with GPL,
+  nonfree and autodetected components disabled. Only the PCM formats, WAV/RF64
+  demuxer, raw PCM muxers, ATRAC3 decoder, audio resampling/format filters and
+  file/pipe protocols used by the workflow are enabled. The exact build script
+  and corresponding FFmpeg source archive ship beside the app.
+- Do not bundle the default PyAV Windows wheel for this project: the PyAV FFmpeg
+  build configuration enables x264/x265, which enables FFmpeg's GPL options.
+  See [PyAV's FFmpeg build](https://github.com/PyAV-Org/pyav-ffmpeg/blob/master/scripts/build-ffmpeg.py)
+  and [the PyAV wheel licensing discussion](https://github.com/PyAV-Org/PyAV/issues/2270).
+  The package instead uses separately executable FFmpeg built from the official
+  [FFmpeg source](https://github.com/FFmpeg/FFmpeg) with a pinned revision and
+  corresponding source archive.
+- Exact-head Windows CI run 54 built the pinned FFmpeg and ATRAC3 helpers,
+  packaged/smoke-tested the GUI, and passed the frozen synthetic WAV round trip
+  on `e149790005fdaeb14d0a1b79689d0a3de3b8f2da`. The script checks the LGPL-only
+  build configuration and required audio components; source archives and license
+  files are packaged beside the app. This is branch verification, not a published
+  release claim.
 
 See CURRENT_STATUS.md and each PR's exact verification for the latest evidence.
