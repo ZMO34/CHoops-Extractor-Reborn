@@ -19,7 +19,8 @@ try {
     }
     # Independent DDS conversion is included. Legacy converters are not bundled.
     Copy-Item -LiteralPath README.md, docs/USER_GUIDE.md, docs/rebuild/CONVERTER_PROVENANCE.md -Destination dist/CHoops-Studio
-    Set-Content -LiteralPath dist/CHoops-Studio/README-START-HERE.txt -Value 'Run CHoops-Studio.exe. CLI: CHoops-Studio.exe --cli --help. DDS conversion is built in. Experimental audio decode/encode runs from the release audio-workspace with Python prerequisites; there is no Audio GUI yet. External texture converters, codec DLLs and game assets are not included. See USER_GUIDE.md and AUDIO_WORKFLOW.md. Gameplay is unverified.'
+    Copy-Item -LiteralPath docs/AUDIO_WORKFLOW.md -Destination dist/CHoops-Studio
+    Set-Content -LiteralPath dist/CHoops-Studio/README-START-HERE.txt -Value 'Run CHoops-Studio.exe. CLI: CHoops-Studio.exe --cli --help. DDS conversion is built in. The Audio workspace is experimental; WAV decode/encode needs the Python workspace and codec prerequisites because native codecs are not bundled here. External texture converters and game assets are not included. See USER_GUIDE.md and AUDIO_WORKFLOW.md. Gameplay is unverified.'
     & dist/CHoops-Studio/CHoops-Studio.exe --smoke
     if ($LASTEXITCODE -ne 0) { throw 'Packaged Qt smoke failed' }
 } finally { Pop-Location }

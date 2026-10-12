@@ -1,5 +1,42 @@
 # Development verification
 
+## Independent PR #5 review and continuation — 2026-10-12
+
+Reviewed submitted head 6603d24f4d32f70abfd25e3f6770939b86f4594b in an isolated
+checkout: 239 passed, 1 skipped (encoder absent), 1 failed (legacy converter
+presence), 2 deselected. Reproduction tests separately showed both scene and shoe
+previews opened Audio instead of Models/Courts. Navigation now uses page names;
+discovery tests use synthetic files instead of excluded proprietary executables.
+
+Continuation makes batch WAV export transactional. Regressions cover successful
+publication, decode failure, cancellation, destination preservation, final sidecar
+paths, shared fight-song artwork and cancelled GUI output selection. The unchanged
+pinned-source encoder was enabled for an actual native WAV round trip. No emulator,
+EBOOT writes or full testing JB. Final exact-head results are recorded in the PR.
+
+The final portable continuation run passed 250 tests, 2 deselected; actual native
+WAV encoding ran rather than skipping. Source GUI/CLI smoke, scoped Ruff and mypy
+passed. The handoff snapshot check passed. No private game fixture was required.
+
+## Audio workspace update — 2026-10-11
+
+Python 3.12 x64 setup check and pinned LGPL ATRAC3 helper build completed.
+Audio/CLI tests: `pytest tests/test_audio.py tests/test_cli.py -q` — 17 passed.
+Qt navigation and audio-category tests: 2 passed. Full portable suite excluding
+the two documented private/optional checks and the legacy converter-presence
+assertion: 240 passed, 3 deselected. CLI help, Qt startup smoke, scoped Ruff and
+studio/service mypy checks passed. A read-only scan of the available Vanilla JB
+catalog returned 23 licensed tracks and 64 fight songs; no audio or artwork was
+exported and no source was modified.
+
+The exact `tools/dev/verify.py` run on this audio GUI head reported 240 passed,
+1 failed and 2 deselected before stopping at the pre-existing
+`test_bundled_paths_have_precedence` assertion. It expects the historical
+`tools/gtf2dds.exe`, which is absent from the public clone and excluded from
+releases. That single check is outside the audio GUI change; no proprietary
+converter was fetched or substituted. The full suite with that assertion
+excluded passed. No emulator, gameplay test or JB build was performed.
+
 ## Audio/handoff update — 2026-10-11
 
 `python tools/dev/verify.py`: 240 passed, 2 deselected (private game test and

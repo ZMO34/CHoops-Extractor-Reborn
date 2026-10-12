@@ -1,10 +1,18 @@
 # Change log
 
+## Unreleased — reviewed audio GUI continuation
+
+Fix scene/shoe navigation after Audio insertion; clean-clone converter tests use
+synthetic fixtures. Batch WAV exports publish atomically and remove incomplete
+batches on cancellation/failure.
+
 ## v1.08 audio development bundle
 
 Experimental WAV/audio-bank/AUDO/jukebox-art CLI, unchanged-WAV checksum skipping,
 sample-extent checks, portable setup and shared Codex PR/documentation workflow.
-Audio GUI and song-name editing remain unfinished. No emulator or testing JB.
+Experimental Audio workspace adds separate Licensed Music/Fight Songs tabs, WAV
+export/replacement preparation and mapped cover-art actions. Song-name editing
+remains unavailable. No emulator or testing JB.
 
 ## v1.07
 

@@ -38,7 +38,16 @@ class TextureTests(WorkspaceTest):
         with patch('choops_py.texture_tools.external_converters.convert',side_effect=ToolError('conversion_failed','test failure')):
             result=export(source,self.work/'export');self.assertEqual(result['textures'][0]['converter_status'],'conversion_failed');self.assertEqual(result['raw_exported'],1)
     def test_bundled_paths_have_precedence(self):
-        with patch('choops_py.texture_tools.external_converters.configured',return_value={'gtf2dds':'missing'}):self.assertEqual(external_converters.find('gtf2dds','other'),(ROOT/'tools'/'gtf2dds.exe').resolve())
+        # Discovery precedence needs a synthetic file, not a proprietary binary
+        # that is deliberately absent from a clean public clone.
+        tools=self.work/'tools';tools.mkdir();bundled=tools/'gtf2dds.exe'
+        bundled.write_bytes(b'synthetic discovery fixture; never executed')
+        with patch.object(external_converters,'ROOT',self.work),patch.object(external_converters,'configured',return_value={'gtf2dds':'missing'}):
+            self.assertEqual(external_converters.find('gtf2dds','other'),bundled.resolve())
+    def test_absent_legacy_tools_do_not_block_builtin_readiness(self):
+        with patch.object(external_converters,'ROOT',self.work),patch.object(external_converters,'configured',return_value={}):
+            self.assertIsNone(external_converters.find('gtf2dds'))
+            self.assertTrue(external_converters.status(check=False)['export_dds_ready'])
     def test_wrong_dimensions_block_before_output(self):
         source=self.work/'input.txtr';source.write_bytes(txtr_fixture()[0]);file=self.work/'input.dds';file.write_bytes(dds.linear_l8(8,4,1,b'X'*32))
         with self.assertRaises(ToolError) as error:import_texture(source,'input',file,self.work/'result.txtr')

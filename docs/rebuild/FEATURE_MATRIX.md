@@ -17,7 +17,7 @@ software/structural checks, never game compatibility. Details: ../CURRENT_STATUS
 | D1 conversion | Explicit optional roster action | Independent IDs/asset copy validation |
 | Palettes | 22 exact captions and three runtime roles | Six words and arena masks |
 | Courts | Single-surface preparation and proper bump semantic | Crash-free GPU allocation unknown |
-| Audio | Experimental AUSB/AUDO/WAV/cover backend + CLI | GUI, title routing, loops/CDF/native packaging |
+| Audio | Experimental AUSB/AUDO/WAV/cover backend + CLI; Qt Licensed Music/Fight Songs workspace | Title routing, unknown loops/CDF growth, self-contained codec packaging |
 | JB builds | Manual transactional copy, supported growth/insertion | Gameplay unverified; no agent test builds |
 | Collaboration | Documented PRs, shared status, portable tests and CI | Independent review requires active session |
 

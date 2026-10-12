@@ -20,8 +20,10 @@ Updated 2026-10-11. CURRENT_STATUS.md and TEST_REPORT.md are the living evidence
   style names and the exact special-family manufacturer caption are unresolved.
 - 4096 is a court texture dimension ceiling, not a tested safe GPU allocation.
   Floor template preparation disables only extra floor draws, preserving arena.
-- Audio is experimental Python/CLI: no Audio GUI yet, archive-only title/artist
-  override route unproven, EBOOT writes prohibited. Unknown AUDO loops are blocked;
-  CDF audio growth and self-contained native packaging remain pending.
+- Audio has an experimental Python backend/CLI and a shared-backend Qt workspace
+  for Licensed Music, Fight Songs, WAV workflows and mapped cover art. Title/artist
+  editing remains unavailable because archive-only routing is unproven; EBOOT
+  writes are prohibited. Unknown AUDO loops are blocked; CDF audio growth and
+  self-contained codec packaging remain pending.
 - Outputs are constrained to output/. Game assets, exported music/art, private
   paths, logs, fixtures and EBOOT are not supplied publicly.

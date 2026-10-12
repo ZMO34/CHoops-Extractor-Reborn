@@ -1,6 +1,6 @@
 # Current project status
 
-Updated 2026-10-11. Upstream: ZMO34/CHoops-Extractor-Reborn; base: master.
+Updated 2026-10-12. Upstream: ZMO34/CHoops-Extractor-Reborn; base: master.
 Baseline before this handoff: `e556e360d0091df0bb645da9eb1d279e9d8f9e3a`.
 Last published Windows feature release at that baseline: **v1.07**, commit
 `bf43d81b10ea2f16bab7df3e798edb64435ab6f4`.
@@ -40,31 +40,29 @@ data in soundtrack_names.json. WAV decode/re-encode passed a synthetic round tri
 Bank replacement updates AUSB offsets/durations and checks untouched streams.
 Workflow and game archive replacement still need broader regression validation.
 
-Experimental catalog/WAV/song/batch/AUDO/jukebox-art CLI commands are now exposed;
+Experimental catalog/WAV/song/batch/AUDO/jukebox-art CLI commands are exposed;
 unchanged manifest WAVs are skipped and sample bounds/export overwrite are checked.
-The v1.08 development bundle supplies a Python audio-workspace alongside the
-established GUI, not self-contained audio GUI functionality.
+The Audio workspace now uses the shared backend in the Qt studio, with distinct
+Licensed Music and Fight Songs tabs, selected/section WAV export, WAV replacement
+preparation and shared cover-art actions. Independent review fixes scene/shoe
+navigation to Models/Courts by name, removes a clean-clone test dependency on
+proprietary converters, and makes batch WAV export transactional. See PR #5 for
+integration/review status. Self-contained codec packaging remains pending.
 
-No Audio GUI panel exists yet. Separate Licensed Music and Fight Songs sections
-remain required. Song-title/artist editing is disabled: archive-only routing is
-not established, and EBOOT writing is prohibited. Cover backend exists, but GUI
-controls and exact runtime behavior remain pending. See AUDIO_RESEARCH.md.
+Song-title/artist editing stays read-only because archive-only routing is not
+established, and EBOOT writing is prohibited. Unknown AUDO loops and general CDF
+audio growth remain unsupported. Users stage outputs and build JB copies manually.
+See AUDIO_RESEARCH.md and AUDIO_WORKFLOW.md.
 
 ## Priorities for the next instance
 
-1. Independently validate the audio backend; add meaningful synthetic fixtures,
-   frame/packet/sample checks, cancellation and no-overwrite protections.
-2. Add the Audio GUI with separate licensed/fight subsections, shared CLI/backend,
-   selected/batch WAV export and replacement preparation. Keep JB builds manual.
-3. Preserve unchanged WAVs using manifest checksums rather than lossy re-encoding
-   every exported file. Validate manifest identity/paths and source preconditions.
-4. Expose jukebox cover export/replacement. Explain shared artwork, particularly
-   fight songs and the two Strange Fruit tracks. Keep uncertain name fields read-only.
-5. Validate standalone/paired/inline AUDO handling and explicitly block unknown
+1. Continue independent validation of audio metadata identity, conversion limits,
+   cancellation and no-overwrite handling. Keep uncertain name fields read-only.
+2. Validate standalone/paired/inline AUDO handling and explicitly block unknown
    loop formats or unsupported CDF writes. Do not claim all formats writable.
-6. Finish native decoder/encoder release integration with corresponding sources,
+3. Finish native decoder/encoder release integration with corresponding sources,
    license notices and independent packaged checks. No proprietary codec tools.
-7. Continue remaining roster semantics, palettes, shaders and asset-linking
+4. Continue remaining roster semantics, palettes, shaders and asset-linking
    investigation as separate documented PRs; do not distract from audio validation.
 
 ## Remaining uncertainty
