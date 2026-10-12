@@ -36,5 +36,20 @@ def save_model(model,output):
     report={'status':'success','source_type':model.source.kind,'source_sha256':digest(model.source.original),'output_sha256':digest(data),'edits':model.edits,'validation':result,'unknown_bytes_preserved':True}
     save_json(out.with_suffix(out.suffix+'.edit_report.json'),report);return report
 
+
+def export_game_roster(model,base_iff,output):
+    """Wrap a community save's edited payload in the selected game's IFF."""
+    validation=model.validate()
+    if not validation['valid']:raise ToolError('roster_validation_failed',str(validation['issues'][:10]))
+    source=load_bytes(base_iff)
+    if source.kind!='standard-iff':raise ToolError('game_roster_iff_required','Choose the loaded JB roster_english.iff')
+    encoded=source.encode(bytes(model.data))
+    if load_bytes(encoded).payload!=bytes(model.data):raise ToolError('roster_wrapper_validation_failed','Game roster payload differs after export')
+    inputs=[model.source.source_path.split('!')[0]] if model.source.source_path else []
+    out=safe_output(output,inputs);write_bytes(out,encoded,inputs)
+    report=dict(status='success',output=str(out),source_type=model.source.kind,output_type='standard-iff',validation=validation,
+                output_sha256=digest(encoded),jb_built=False)
+    save_json(out.with_suffix(out.suffix+'.edit_report.json'),report);return report
+
 def save(path,patch,output):
     model=EditorModel.open(path);document=json.loads(Path(patch).read_text(encoding='utf-8'));model.apply_document(document);return save_model(model,output)

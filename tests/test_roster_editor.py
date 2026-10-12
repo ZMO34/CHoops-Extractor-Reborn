@@ -47,3 +47,46 @@ class RosterTests(WorkspaceTest):
         other=0x40+308+0x14;struct.pack_into('>i',m.data,other,target+2-other);m.reload();before=bytes(m.data)
         with self.assertRaises(ToolError):m.edit('players',1,'first_name','XY')
         self.assertEqual(bytes(m.data),before)
+
+    def test_preexisting_bad_string_allows_rating_edit_and_save_unchanged(self):
+        original=roster_fixture();data=bytearray(original.original)
+        field=0x40+0x14;target=field+struct.unpack_from('>i',data,field)[0]
+        data[target:target+2]=b'\x01\0'
+        model=EditorModel(load_bytes(bytes(data)),original.tables)
+        self.assertTrue(model.validate()['preserved_source_string_issues'])
+        model.edit('players',1,'attribute_ratings',87,slot=2)
+        self.assertEqual(model.data[target:target+2],b'\x01\0')
+        report=save_model(model,self.work/'ratings.rost')
+        self.assertTrue(report['validation']['valid'])
+        self.assertTrue(report['validation']['preserved_source_string_issues'])
+        # Newly changed invalid string data remains fatal.
+        model.data[target:target+2]=b'\x02\0'
+        self.assertFalse(model.validate()['valid'])
+
+    def test_community_zip_preserves_members_and_exports_game_iff(self):
+        import io,zipfile
+        from choops_py.roster.workflow import export_game_roster
+        original=roster_fixture();payload=bytearray(original.original)
+        field=0x40+0x14;target=field+struct.unpack_from('>i',payload,field)[0];payload[target:target+2]=b'\x19\0'
+        data=io.BytesIO()
+        with zipfile.ZipFile(data,'w') as archive:
+            archive.writestr('Community roster/USERDATA',struct.pack('>I',len(payload))+payload)
+            archive.writestr('Community roster/ICON0.PNG',b'ICON unchanged')
+            archive.writestr('Community roster/PARAM.SFO',b'SFO unchanged')
+        model=EditorModel(load_bytes(data.getvalue()),original.tables)
+        self.assertIn('\x19',model.rows['players'][0]['first_name'])
+        model.edit('players',1,'attribute_ratings',90,slot=3)
+        saved=self.work/'community.zip';save_model(model,saved)
+        with zipfile.ZipFile(saved) as archive:
+            self.assertEqual(archive.read('Community roster/ICON0.PNG'),b'ICON unchanged')
+            self.assertEqual(archive.read('Community roster/PARAM.SFO'),b'SFO unchanged')
+        base=iff_fixture([original.original],[(0xc61649b2,[0])],compressed=True)
+        out=self.work/'roster_english.iff';export_game_roster(model,base,out)
+        loaded=load_bytes(out.read_bytes());self.assertEqual(loaded.kind,'standard-iff');self.assertEqual(loaded.payload,bytes(model.data))
+
+    def test_preexisting_out_of_bounds_pointer_is_still_fatal(self):
+        original=roster_fixture();data=bytearray(original.original)
+        struct.pack_into('>i',data,0x40+0x14,0x7fffffff)
+        model=EditorModel(load_bytes(bytes(data)),original.tables)
+        self.assertFalse(model.validate()['valid'])
+        with self.assertRaises(ToolError):model.edit('players',1,'attribute_ratings',90,slot=3)

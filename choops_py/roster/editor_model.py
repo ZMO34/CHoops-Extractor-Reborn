@@ -13,6 +13,19 @@ class EditorModel:
         self.edits=[];self.history=[];self.redo_history=[]
         for name,(start,count,size) in self.tables.items():Binary(self.data).slice(start,count*size)
         self.rows={};self.issues=[];self.string_users=defaultdict(list);self.reload()
+        self.source_string_issues=[]
+        for issue in self.issues:
+            if issue['kind']!='invalid_string_pointer' or issue['detail']!='Control character in roster string':continue
+            field=issue['field_offset'];ranges=[(field,field+4)]
+            target=field+struct.unpack_from('>i',self.original,field)[0]
+            if 0<=target<len(self.original):
+                end=target
+                for _ in range(256):
+                    if end+2>len(self.original):break
+                    value=self.original[end:end+2];end+=2
+                    if value==b'\0\0':break
+                ranges.append((target,end))
+            self.source_string_issues.append((dict(issue),ranges))
     @classmethod
     def open(cls,path):return cls(load(path))
     def row_offset(self,table,index):
@@ -30,8 +43,10 @@ class EditorModel:
                 code=b.u16(end,'<')
                 if not code:
                     text=b.slice(target,end-target).decode('utf-16-le')
-                    if any(ord(c)<32 for c in text):raise ValueError('Control character in roster string')
-                    self.string_users[target].append(user);self.string_ranges[target]=end+2;return text
+                    self.string_users[target].append(user);self.string_ranges[target]=end+2
+                    if any(ord(c)<32 for c in text):
+                        self.issues.append({'kind':'invalid_string_pointer','field_offset':field,'detail':'Control character in roster string'})
+                    return text
                 end+=2
             raise ValueError('String exceeds 256 characters')
         except (ValueError,UnicodeError) as error:
@@ -95,9 +110,18 @@ class EditorModel:
             self.rows[table]=rows
     def validate(self):
         self.reload()
-        return {'valid':not self.issues,'issues':self.issues,'source_type':self.source.kind,'counts':{name:len(rows) for name,rows in self.rows.items()},'unsaved_edits':len(self.edits),'read_only_fields':['skin tone','prestige','unknown appearance bytes','long strings','unconfirmed palette roles']}
+        preserved=[];errors=[]
+        for issue in self.issues:
+            unchanged=any(issue==old and all(self.data[start:end]==self.original[start:end] for start,end in ranges)
+                          for old,ranges in self.source_string_issues)
+            (preserved if unchanged else errors).append(issue)
+        return {'valid':not errors,'issues':errors,'preserved_source_string_issues':preserved,'source_type':self.source.kind,'counts':{name:len(rows) for name,rows in self.rows.items()},'unsaved_edits':len(self.edits),'read_only_fields':['skin tone','prestige','unknown appearance bytes','long strings','unconfirmed palette roles']}
     def edit(self,table,index,field,value,slot=None):
         if field not in EDITABLE.get(table,()):raise ToolError('roster_field_read_only',f'{table}.{field} is not a confirmed writable field')
+        from .shoes import FIELDS
+        if field in FIELDS.get(table,{}):
+            row=self.rows[table][index];values={key:row[key] for key in FIELDS[table]};values[field]=self.integer(value)
+            return self.edit_shoes(table,index,**values)
         off=self.row_offset(table,index);before=bytes(self.data);old_row=self.rows[table][index];old_value=old_row[field]
         changes=[]
         if field in STRING_FIELDS.get(table, {}):
@@ -230,7 +254,8 @@ class EditorModel:
                 field=self.row_offset('teams',team_index)+TEAM_TYPE_OFFSET
                 struct.pack_into('>I',self.data,field,Binary(self.data).u32(field)&~(7<<15))
             self.reload()
-            if self.issues:raise ToolError('roster_validation_failed',str(self.issues[:5]))
+            result=self.validate()
+            if not result['valid']:raise ToolError('roster_validation_failed',str(result['issues'][:5]))
             for conf in self.rows['conferences']:
                 for member in conf['team_indices']:
                     if self.rows['teams'][member]['conference_index']!=conf['index']:raise ToolError('conference_backlink_mismatch','Reciprocal conference links disagree')
@@ -239,6 +264,27 @@ class EditorModel:
         if self.data==before:return
         self.history.append((before,old_edits));self.redo_history=[]
         self.edits.append({'table':'teams','index':team_index,'field':'conference_membership','old':old,'value':conference_index,'make_d1':make_d1})
+
+    def edit_shoes(self,table,index,shoe_brand_code,shoe_style_code,home_shoe_color_code,away_shoe_color_code):
+        from .shoes import FIELDS,texture_name
+        if table not in FIELDS:raise ToolError('invalid_shoe_table','Choose a player or school')
+        off=self.row_offset(table,index)
+        values=dict(shoe_brand_code=self.integer(shoe_brand_code),shoe_style_code=self.integer(shoe_style_code),
+                    home_shoe_color_code=self.integer(home_shoe_color_code),away_shoe_color_code=self.integer(away_shoe_color_code))
+        if any(texture_name(values['shoe_brand_code'],values['shoe_style_code'],values[color]) is None for color in ('home_shoe_color_code','away_shoe_color_code')):
+            raise ToolError('invalid_shoe_assignment','Choose an existing shoe brand/style and its available home/away colors')
+        before=bytes(self.data);old={key:self.rows[table][index][key] for key in FIELDS[table]}
+        try:
+            for key,(relative,shift,bits) in FIELDS[table].items():
+                position=off+relative;word=Binary(self.data).u32(position);mask=((1<<bits)-1)<<shift
+                struct.pack_into('>I',self.data,position,(word&~mask)|(values[key]<<shift))
+            result=self.validate()
+            if not result['valid']:raise ToolError('roster_validation_failed',str(result['issues'][:5]))
+        except Exception:
+            self.data=bytearray(before);self.reload();raise
+        if self.data==before:return
+        self.history.append((before,list(self.edits)));self.redo_history=[]
+        self.edits.append(dict(table=table,index=index,field='shoe_assignment',old=old,value=values))
 
     @staticmethod
     def integer(value):
@@ -268,6 +314,7 @@ class EditorModel:
             for e in document['edits']:
                 if e['field']=='alternate_enabled':self.set_alternate_enabled(int(e['index']),int(e['slot']),e['value'])
                 elif e['field']=='conference_membership':self.move_team_to_conference(int(e['index']),int(e['value']),e.get('make_d1',False))
+                elif e['field']=='shoe_assignment':self.edit_shoes(e['table'],int(e['index']),**e['value'])
                 else:self.edit(e['table'],int(e['index']),e['field'],e['value'],e.get('slot'))
         elif 'tables' in document:
             edits=[]

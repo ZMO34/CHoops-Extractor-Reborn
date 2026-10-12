@@ -5,6 +5,7 @@ from choops_py.formats.binary import Binary
 from choops_py.roster.shoes import player_fields,team_fields,texture_name
 from choops_py.texture_tools.gtf import remap_preview
 from choops_py.archive.hash_names import hash_name,namespace
+from support import roster_fixture
 
 
 def test_team_default_and_player_shoe_packing_use_distinct_offsets():
@@ -33,3 +34,52 @@ def test_ps3_green_luminance_remap_and_identity():
     assert remap_preview(image,0).getpixel((0,0))==(0,0,0,0)
     assert remap_preview(image,0x5555).getpixel((0,0))==(255,255,255,255)
     with pytest.raises(ValueError):remap_preview(image,0x3ff)
+
+
+@pytest.mark.parametrize('table',['players','teams'])
+def test_shoe_writes_preserve_other_packed_bits_and_undo(table):
+    from choops_py.roster.shoes import FIELDS
+    model=roster_fixture();off=model.row_offset(table,0);before=bytes(model.data)
+    model.edit_shoes(table,0,1,2,4,12)
+    row=model.rows[table][0]
+    assert row['home_shoe_texture']=='shoe_102_04.iff' and row['away_shoe_texture']=='shoe_102_12.iff'
+    masks={}
+    for relative,shift,bits in FIELDS[table].values():masks[relative]=masks.get(relative,0)|(((1<<bits)-1)<<shift)
+    for position in range(len(before)):
+        if not any(off+relative<=position<off+relative+4 for relative in masks):assert model.data[position]==before[position]
+    for relative,mask in masks.items():
+        assert Binary(model.data).u32(off+relative)&~mask==Binary(before).u32(off+relative)&~mask
+    changed=bytes(model.data);model.undo();assert bytes(model.data)==before
+    model.redo();assert bytes(model.data)==changed
+    encoded=model.source.encode(changed)
+    from choops_py.roster.adapters import load_bytes
+    assert load_bytes(encoded).payload==changed
+
+
+def test_invalid_shoe_assignment_is_atomic_and_scalar_fields_are_writable():
+    model=roster_fixture();before=bytes(model.data)
+    with pytest.raises(ValueError):model.edit_shoes('players',0,2,2,0,0)
+    assert bytes(model.data)==before and not model.history
+    model.edit('players',0,'shoe_brand_code',1)
+    model.edit('players',0,'shoe_style_code',2)
+    assert model.rows['players'][0]['home_shoe_texture']=='shoe_102_00.iff'
+
+
+def test_shoe_dialog_refreshes_choices_and_applies_one_undoable_edit(qtbot,monkeypatch):
+    from PySide6.QtWidgets import QDialog,QComboBox
+    from choops_py.studio.app import Window
+    window=Window();qtbot.addWidget(window)
+    model=roster_fixture();model.edit_shoes('players',0,1,2,4,12)
+    window.display_roster(model);window.roster_tabs.setCurrentWidget(window.roster_views['players'])
+    window.roster_views['players'].selectRow(0)
+    def accept(dialog):
+        brand=dialog.findChild(QComboBox,'shoe_brand_code');brand.setCurrentIndex(brand.findData(0))
+        assert dialog.findChild(QComboBox,'shoe_style_code').count()==1
+        assert dialog.findChild(QComboBox,'home_shoe_color_code').count()==2
+        away=dialog.findChild(QComboBox,'away_shoe_color_code');away.setCurrentIndex(away.findData(1))
+        return QDialog.DialogCode.Accepted
+    monkeypatch.setattr(QDialog,'exec',accept)
+    window.run_job=lambda title,work,callback:callback(work(None))
+    window.edit_roster_shoes()
+    assert model.rows['players'][0]['away_shoe_texture']=='shoe_1.iff'
+    model.undo();assert model.rows['players'][0]['away_shoe_texture']=='shoe_102_12.iff'

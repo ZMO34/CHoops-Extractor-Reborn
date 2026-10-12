@@ -118,3 +118,23 @@ def test_court_zip_cannot_escape_the_output_folder(tmp_path):
     with zipfile.ZipFile(source,'w') as archive:archive.writestr('../floor.scne',b'not a scene')
     with pytest.raises(ValueError,match='stadium sNNN'):prepare(source,tmp_path/'result')
     assert not (tmp_path/'floor.scne').exists()
+
+
+def test_dds_supersedes_invalid_legacy_raw_header_using_valid_base():
+    base=txtr_fixture(format=0x86,split=True);raw=[bytearray(base[0]),base[1]]
+    raw[0][0x5a]=3  # Discarded raw volume header; the base/DDS are 2D.
+    result,report=apply_dds(raw,'TXTR','texture',artwork(16,16,(0,0,255,255)),preserve_layout=True,reference=TXTR(base))
+    assert result[0]==base[0] and TXTR(result).info()['width']==4
+    assert report['storage_layout_preserved']
+
+
+@pytest.mark.parametrize('stored_depth',[0,1,7])
+def test_2d_stored_depth_does_not_turn_menu_art_into_a_volume(stored_depth):
+    base=txtr_fixture(format=0x86,split=True);head=bytearray(base[0]);struct.pack_into('>H',head,0x64,stored_depth);base=[bytes(head),base[1]]
+    result,_=apply_dds(base,'TXTR','menu',artwork(16,16,(0,0,255,255)),preserve_layout=True,reference=TXTR(base))
+    assert result[0]==base[0] and TXTR(result).info()['width']==4
+
+
+def test_real_volume_dimension_remains_rejected():
+    base=txtr_fixture(format=0x86,split=True);head=bytearray(base[0]);head[0x5a]=3
+    with pytest.raises(ValueError,match='dimension=3'):TXTR([bytes(head),base[1]]).info()

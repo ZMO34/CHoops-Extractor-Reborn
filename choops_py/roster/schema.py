@@ -108,7 +108,9 @@ CONFERENCE_MEMBERS=0x6e0
 CONFERENCE_MEMBER_COUNT=0x870
 CONFERENCE_MEMBER_CAPACITY=100
 
-from .shoes import BRANDS,COLORS
+from .shoes import BRANDS,COLORS,FIELDS as SHOE_FIELDS
 ENUM_CHOICES['shoe_brand_code']=BRANDS
 ENUM_CHOICES['home_shoe_color_code']=COLORS
 ENUM_CHOICES['away_shoe_color_code']=COLORS
+ENUM_CHOICES['shoe_style_code']={i:f'Style {i}' for i in range(4)}
+for table,fields in SHOE_FIELDS.items():EDITABLE[table]=(*EDITABLE[table],*fields)

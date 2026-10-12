@@ -6,7 +6,7 @@ import io
 import struct
 import zipfile
 from ..formats.standard_iff import StandardIFF
-from ..formats.standard_iff_writer import record,record_blocks,replace_records
+from ..formats.standard_iff_writer import record,record_blocks,replace_records_expanding
 from ..formats.tool_wrapper import unwrap,wrap
 from ..archive.manifests import digest
 from ..core.errors import ToolError
@@ -35,7 +35,7 @@ class RosterSource:
         if self.kind=='standard-iff':
             rec=record(self.iff,self.record_index,'ROST');spans=record_blocks(self.iff,rec);offset=0;parts=[]
             for _,start,end,_ in spans:parts.append(payload[offset:offset+end-start]);offset+=end-start
-            return replace_records(self.iff,{self.record_index:parts})
+            return replace_records_expanding(self.iff,{self.record_index:parts})
         if self.kind=='save-zip':
             new_userdata=self.inner.encode(payload);out=io.BytesIO()
             with zipfile.ZipFile(io.BytesIO(self.original)) as old,zipfile.ZipFile(out,'w') as new:

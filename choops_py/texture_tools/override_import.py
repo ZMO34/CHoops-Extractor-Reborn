@@ -20,6 +20,11 @@ def apply_dds(parts,kind,selector,source,job=None,converter=None,preserve_layout
         if not 0<=index<len(items):raise ValueError('SCNE texture index is out of range')
         item=items[index];texture=TXTR([item.header,item.payload])
     else:raise ValueError('DDS target must be TXTR or SCNE')
+    if kind=='TXTR' and preserve_layout and reference is not None:
+        # DDS supersedes raw TXTR artwork and layout. Build from the validated
+        # base header instead of attempting to parse an obsolete raw header
+        # (older exports can carry invalid depth/dimension markers).
+        texture=reference;parts=list(reference.blocks)
     old=texture.info();reference=reference or texture
     work=OUTPUT/'temp'/('override_dds_'+uuid.uuid4().hex);work.mkdir(parents=True)
     try:

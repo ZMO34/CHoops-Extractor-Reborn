@@ -1,5 +1,25 @@
 # Development verification
 
+The community roster and shoe-editing update passed 135 targeted Python/Qt
+checks. Both supplied community ZIPs were loaded, edited for ratings and
+player/school shoes, saved and reopened with exact payload round trips. ZIP
+members other than USERDATA remained byte-exact, and original input hashes
+were unchanged. Both payloads also exported to game roster IFFs and reopened
+successfully. Three malformed source name strings in one input remain
+unchanged warnings; changing their malformed bytes or introducing a new
+invalid pointer remains fatal, including pre-existing out-of-bounds pointers.
+All 90 DDS overrides for the frontend bank
+compiled in memory. Zero/non-one stored depth in declared 2D textures is
+covered separately from rejected volume dimensions. No JB build or emulator
+test was performed.
+
+For 2D/cubemap texture storage, the dimension selects the resource type and
+effective depth is one; an unused stored depth is not a volume declaration.
+The primary reference is [RPCS3's texture layout implementation](https://github.com/RPCS3/rpcs3/blob/master/rpcs3/Emu/RSX/Common/TextureUtils.cpp),
+whose image-section layout uses depth only for the 3D case. The importer now
+follows that distinction and includes dimension/cube/depth values in remaining
+unsupported-layout errors.
+
 The court-template and non-stadium texture policy update passed 125 targeted
 Python checks, including raw and whole-IFF normalization, paired CDF imports,
 HDR preservation, multistream geometry relocation, previews, compression and

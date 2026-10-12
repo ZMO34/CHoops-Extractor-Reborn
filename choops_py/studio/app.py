@@ -928,6 +928,7 @@ class Window(QMainWindow):
                 ("Move school / convert to D1…", self.move_school),
                 ("Enable alternates…", self.edit_alternate_availability),
                 ("Preview assigned shoes…", self.preview_assigned_shoes),
+                ("Edit shoes…", self.edit_roster_shoes),
                 ("Give school independent assets…", self.declone_school_assets),
                 ("Player attributes…", self.show_player_attributes),
                 ("Player properties…", self.show_player_properties),
@@ -935,6 +936,7 @@ class Window(QMainWindow):
                 ("Undo", self.undo_roster),
                 ("Redo", self.redo_roster),
                 ("Save copy…", self.save_roster),
+                ("Export game roster IFF…", self.export_game_roster),
             ],
         )
 
@@ -1026,8 +1028,10 @@ class Window(QMainWindow):
             columns.sort(key=lambda col: (0 if col[0]==identity else 1 if col[0]=='index' else 2))
             set_rows(view, rows, columns, self.roster_search.text())
 
+        warnings=len(model.validate()['preserved_source_string_issues'])
         self.roster_state.setText(
             f"{len(model.rows['players']):,} players • {len(model.edits)} unsaved edits"
+            +(f' • {warnings} unchanged source string warnings' if warnings else '')
         )
 
     def pick_rgba(self, value, parent):
@@ -1317,7 +1321,9 @@ class Window(QMainWindow):
             slot.setVisible(key in ('roster_slots','palette_colors','attribute_ratings','shot_tendencies'))
             choices.clear()
             if key in ENUM_CHOICES:
-                for code,label in ENUM_CHOICES[key].items():choices.addItem(label,code)
+                from ..roster.shoes import FIELDS,choices as shoe_choices
+                options=shoe_choices(key,row['shoe_brand_code']) if key in FIELDS.get(name,{}) else ENUM_CHOICES[key]
+                for code,label in options.items():choices.addItem(label,code)
                 choices.setCurrentIndex(choices.findData(row[key]))
             elif key == "position_code":
                 for code, label in POSITIONS.items():
@@ -1417,15 +1423,26 @@ class Window(QMainWindow):
 
             self.run_job("Redo roster edit", redo, self.display_roster)
 
+    def export_game_roster(self):
+        if not self.roster or self.active:return
+        if not self.archive:return self.log('Open the destination JB folder first.')
+        entries=[entry for entry in self.archive.entries if entry['name']=='roster_english.iff']
+        if len(entries)!=1:return self.log('The loaded JB has no unique roster_english.iff.')
+        output,_=QFileDialog.getSaveFileName(self,'Export edited roster for manual JB staging',str(OUTPUT/'rosters'/'roster_english.iff'),'Game roster (*.iff)')
+        if not output:return
+        from ..roster.workflow import export_game_roster
+        self.run_job('Export game roster IFF',lambda job:export_game_roster(self.roster,self.archive.read(entries[0]),output))
+
     def save_roster(self):
 
         if not self.roster:
             return
 
+        filename={'save-zip':'roster_edited.zip','userdata':'USERDATA','raw-rost':'roster_edited.rost','tool-wrapper':'roster_edited.rost'}.get(self.roster.source.kind,'roster_english.iff')
         output, _ = QFileDialog.getSaveFileName(
             self,
             "Save roster copy under output/",
-            str(OUTPUT / "temp" / "roster_english.iff"),
+            str(OUTPUT / "rosters" / filename),
         )
 
         if output:
@@ -1502,6 +1519,50 @@ class Window(QMainWindow):
         self.refresh_shoe_list()
         self.scene_palette_state = QLabel('No roster associated; embedded material textures only')
         layout.addWidget(self.scene_palette_state)
+
+    def edit_roster_shoes(self):
+        if not self.roster or self.active:return
+        view=self.roster_tabs.currentWidget()
+        table=next(key for key,value in self.roster_views.items() if value is view)
+        table='teams' if table=='schools' else table
+        rows=selected(view)
+        if table not in ('players','teams') or len(rows)!=1:return self.log('Select one player or school to edit shoes.')
+        from ..roster.shoes import FIELDS,BRANDS,choices,texture_name
+        row=rows[0];dialog=QDialog(self);dialog.setWindowTitle('Player shoes' if table=='players' else 'School shoe defaults')
+        form=QFormLayout(dialog);widgets={}
+        labels=('Brand','Style / artwork ID','Home color','Away color')
+        for key,label in zip(FIELDS[table],labels):
+            box=QComboBox();box.setObjectName(key);widgets[key]=box;form.addRow(label,box)
+        brand=widgets['shoe_brand_code']
+        for code,label in BRANDS.items():brand.addItem(label,code)
+        brand.setCurrentIndex(max(0,brand.findData(row['shoe_brand_code'])))
+        description=QLabel();form.addRow(description)
+        def show_paths():
+            values={key:widget.currentData() for key,widget in widgets.items()}
+            if any(value is None for value in values.values()):return
+            home=texture_name(values['shoe_brand_code'],values['shoe_style_code'],values['home_shoe_color_code'])
+            away=texture_name(values['shoe_brand_code'],values['shoe_style_code'],values['away_shoe_color_code'])
+            description.setText(f'Home: {home}\nAway: {away}'+('\nSchool defaults change independently of existing player assignments.' if table=='teams' else ''))
+        def refill():
+            for key,box in widgets.items():
+                if key=='shoe_brand_code':continue
+                current=box.currentData();current=row[key] if current is None else current
+                box.blockSignals(True);box.clear()
+                for code,label in choices(key,brand.currentData()).items():box.addItem(label,code)
+                box.setCurrentIndex(max(0,box.findData(current)));box.blockSignals(False)
+            show_paths()
+        brand.currentIndexChanged.connect(refill)
+        for key,box in widgets.items():
+            if key!='shoe_brand_code':box.currentIndexChanged.connect(show_paths)
+        refill()
+        buttons=QDialogButtonBox(QDialogButtonBox.StandardButton.Ok|QDialogButtonBox.StandardButton.Cancel)
+        buttons.accepted.connect(dialog.accept);buttons.rejected.connect(dialog.reject);form.addRow(buttons)
+        if dialog.exec()!=QDialog.DialogCode.Accepted:return
+        values={key:box.currentData() for key,box in widgets.items()}
+        def work(job):
+            self.roster.edit_shoes(table,row['index'],**values)
+            return self.roster
+        self.run_job('Apply shoe assignment',work,self.display_roster)
 
     def preview_assigned_shoes(self):
         if self.active or not self.archive or not self.roster:return self.log('Load a JB folder and its roster first.')
