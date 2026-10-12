@@ -1,5 +1,15 @@
 # Development verification
 
+## Conference historical fields — current branch
+
+The supplied read-only USERDATA file was used to confirm 39 conference rows.
+An in-memory model edit changed only the selected `final_fours` field byte;
+model validation passed and undo restored the exact original payload. The file
+was not modified or added to Git. Windows packaging completed with
+`tools/rebuild/package_windows.ps1`; the packaged Qt startup and bundled LGPL
+audio round-trip smoke checks passed. Conference gameplay effects are not
+independently verified.
+
 ## LGPL audio packaging branch — verified PR head
 
 Exact-head CI run 54 passed on `e149790005fdaeb14d0a1b79689d0a3de3b8f2da` on

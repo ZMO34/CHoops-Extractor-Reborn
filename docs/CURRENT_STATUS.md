@@ -20,7 +20,8 @@ not a permanently current HEAD assertion.
   material texture routing, packed geometry, camera movement and RSX remapping.
   Basic previews do not reproduce every game shader. Artificial floor lift is
   not the solution and must not be reintroduced.
-- Roster adapters, editable confirmed fields, ratings, undo/redo, RGB color dialog,
+- Roster adapters, editable confirmed fields and conference history records,
+  ratings, undo/redo, RGB color dialog,
   packed Yes/No and L/R choices, player/team shoe editing and roster IFF export.
 - Community ZIP/save wrappers are preserved. Existing unchanged malformed name
   characters are warnings; new corruption or invalid pointers still block writes.
