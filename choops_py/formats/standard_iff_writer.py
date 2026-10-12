@@ -97,7 +97,7 @@ def replace_records_expanding(iff,changes):
             if new==old:continue
             shared=any(other['index']!=index and any(b==block and start<e and s<end for b,s,e in iff.spans(other)) for other in iff.records)
             if len(new)>len(old) or shared:
-                if rec['type'] not in ('TXTR','SCNE','NAME','CDAN','LAYT','ROST'):raise ToolError('unsupported_record_growth',rec['name']+'.'+rec['type'])
+                if rec['type'] not in ('TXTR','SCNE','NAME','CDAN','LAYT','ROST','AUDO'):raise ToolError('unsupported_record_growth',rec['name']+'.'+rec['type'])
                 alignment=128 if iff.blocks[block]['fields'][0]==0x411536D5 else 16
                 target=(len(mutable[block])+alignment-1)&~(alignment-1)
                 mutable[block]+=b'\0'*(target-len(mutable[block]));mutable[block]+=new

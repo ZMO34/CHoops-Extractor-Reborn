@@ -2,6 +2,7 @@ from .binary import Binary
 from ..archive.manifests import safe_name, write_bytes, report
 MAGIC=0xFF3BEF94
 TYPES={0x5C369069:"TXTR",0xE26C9B5D:"SCNE",0x86A1AC9E:"LAYT",0xC61649B2:"ROST",0x1AEDDA1F:"AUDO",0x68B693B2:"NAME",0xA7701F00:"CDAN"}
+TYPES[0x61df2234]='AUSB'
 def names(data,offset,count):
     b=Binary(data)
     if offset+8>len(data) or b.u32(offset)!=0xAA171516: return []

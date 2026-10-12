@@ -18,3 +18,4 @@ __pycache__/
 /choops_py/formats/h7a.lib
 /tools/dds2gtf.exe
 /tools/gtf2dds.exe
+/choops_py/audio_tools/bin/
