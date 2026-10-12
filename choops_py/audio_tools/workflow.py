@@ -79,14 +79,27 @@ def export_track(archive,row,output,job=None):
 def export_tracks(archive,rows,output,job=None):
     out=safe_output(output,[archive.path])
     if out.exists():raise ValueError('Choose a new audio export folder')
-    out.mkdir(parents=True)
-    manifest=[]
-    for i,row in enumerate(rows):
-        if job:job.check();job.progress(i,len(rows),'Exporting '+row['title'])
-        filename=safe_name(row['bank'])+f'_{row["index"]:03d}_'+safe_name(row['artist']+' - '+row['title'])+'.wav'
-        export_track(archive,row,out/filename,job)
-        manifest.append(dict(bank=row['bank'],index=row['index'],file=filename,title=row['title'],artist=row['artist'],sha256=digest((out/filename).read_bytes())))
-    save_json(out/'audio_manifest.json',dict(schema=1,tracks=manifest))
+    if not rows:raise ValueError('Choose at least one audio track to export')
+    work=safe_output(out.parent/('.audio_export_'+uuid.uuid4().hex),[archive.path])
+    work.mkdir(parents=True);manifest=[]
+    try:
+        seen=set()
+        for i,row in enumerate(rows):
+            if job:job.check();job.progress(i,len(rows),'Exporting '+row['title'])
+            key=(row['bank'],row['index'])
+            if key in seen:raise ValueError('Duplicate audio export target')
+            seen.add(key)
+            filename=safe_name(row['bank'])+f'_{row["index"]:03d}_'+safe_name(row['artist']+' - '+row['title'])+'.wav'
+            report=export_track(archive,row,work/filename,job)
+            report['output']=str(out/filename)
+            save_json((work/filename).with_suffix('.audio.json'),report)
+            manifest.append(dict(bank=row['bank'],index=row['index'],file=filename,title=row['title'],artist=row['artist'],sha256=digest((work/filename).read_bytes())))
+        save_json(work/'audio_manifest.json',dict(schema=1,tracks=manifest))
+        if job:job.check()
+        work.rename(out)
+    except BaseException:
+        if work.exists():shutil.rmtree(work)
+        raise
     return dict(output=str(out),exported=len(manifest),format='PCM16 WAV',manifest=str(out/'audio_manifest.json'))
 
 

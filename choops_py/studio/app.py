@@ -456,6 +456,12 @@ class Window(QMainWindow):
         note.setWordWrap(True)
         layout.addWidget(note)
 
+    def navigate_to(self, name):
+        matches = self.navigation.findItems(name, Qt.MatchFlag.MatchExactly)
+        if len(matches) != 1:
+            raise ValueError('Navigation page is missing or ambiguous: ' + name)
+        self.navigation.setCurrentItem(matches[0])
+
     def audio_refresh(self):
 
         if not self.archive:
@@ -1817,7 +1823,7 @@ class Window(QMainWindow):
         from .services import inspect_shoe_preview
         def display(value):
             source,result=value
-            self.navigation.setCurrentItem(self.navigation.topLevelItem(3))
+            self.navigate_to('Models / Courts')
             self.scene_view.set_meshes([]);self.scene_view.set_image(None)
             self.scene_parts.clear();self.scene_textures.clear()
             self.show_scene_preview(result,source)
@@ -1890,7 +1896,7 @@ class Window(QMainWindow):
         else:
             return self.log("Select a SCNE record in the Explorer nested list.")
         source = self.asset_path
-        self.navigation.setCurrentItem(self.navigation.topLevelItem(3))
+        self.navigate_to('Models / Courts')
         self.scene_meshes = []
         self.scene_view.set_meshes([])
         self.scene_view.set_material_images({})

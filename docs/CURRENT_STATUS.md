@@ -1,6 +1,6 @@
 # Current project status
 
-Updated 2026-10-11. Upstream: ZMO34/CHoops-Extractor-Reborn; base: master.
+Updated 2026-10-12. Upstream: ZMO34/CHoops-Extractor-Reborn; base: master.
 Baseline before this handoff: `e556e360d0091df0bb645da9eb1d279e9d8f9e3a`.
 Last published Windows feature release at that baseline: **v1.07**, commit
 `bf43d81b10ea2f16bab7df3e798edb64435ab6f4`.
@@ -44,8 +44,10 @@ Experimental catalog/WAV/song/batch/AUDO/jukebox-art CLI commands are exposed;
 unchanged manifest WAVs are skipped and sample bounds/export overwrite are checked.
 The Audio workspace now uses the shared backend in the Qt studio, with distinct
 Licensed Music and Fight Songs tabs, selected/section WAV export, WAV replacement
-preparation and shared cover-art actions. The GUI update is under review on top
-of the open audio-backend PR; self-contained codec packaging remains pending.
+preparation and shared cover-art actions. Independent review fixes scene/shoe
+navigation to Models/Courts by name, removes a clean-clone test dependency on
+proprietary converters, and makes batch WAV export transactional. See PR #5 for
+integration/review status. Self-contained codec packaging remains pending.
 
 Song-title/artist editing stays read-only because archive-only routing is not
 established, and EBOOT writing is prohibited. Unknown AUDO loops and general CDF

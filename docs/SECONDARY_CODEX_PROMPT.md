@@ -84,7 +84,7 @@ Embedded source: docs/CURRENT_STATUS.md
 
 # Current project status
 
-Updated 2026-10-11. Upstream: ZMO34/CHoops-Extractor-Reborn; base: master.
+Updated 2026-10-12. Upstream: ZMO34/CHoops-Extractor-Reborn; base: master.
 Baseline before this handoff: `e556e360d0091df0bb645da9eb1d279e9d8f9e3a`.
 Last published Windows feature release at that baseline: **v1.07**, commit
 `bf43d81b10ea2f16bab7df3e798edb64435ab6f4`.
@@ -128,8 +128,10 @@ Experimental catalog/WAV/song/batch/AUDO/jukebox-art CLI commands are exposed;
 unchanged manifest WAVs are skipped and sample bounds/export overwrite are checked.
 The Audio workspace now uses the shared backend in the Qt studio, with distinct
 Licensed Music and Fight Songs tabs, selected/section WAV export, WAV replacement
-preparation and shared cover-art actions. The GUI update is under review on top
-of the open audio-backend PR; self-contained codec packaging remains pending.
+preparation and shared cover-art actions. Independent review fixes scene/shoe
+navigation to Models/Courts by name, removes a clean-clone test dependency on
+proprietary converters, and makes batch WAV export transactional. See PR #5 for
+integration/review status. Self-contained codec packaging remains pending.
 
 Song-title/artist editing stays read-only because archive-only routing is not
 established, and EBOOT writing is prohibited. Unknown AUDO loops and general CDF
@@ -459,6 +461,11 @@ See CURRENT_STATUS.md and each PR's exact verification for the latest evidence.
 Embedded source: docs/AUDIO_WORKFLOW.md
 
 # Experimental audio workflow
+
+Batch WAV export publishes its output folder only after all selected tracks and
+the manifest succeed. Cancellation/failure removes the owned temporary batch;
+existing destinations and unrelated files remain untouched. Scene/shoe preview
+actions navigate to Models/Courts by name even with Audio present.
 
 The Qt studio includes an **Audio** workspace with separate Licensed Music and
 Fight Songs tabs. It reads the catalog from the selected JB, exports selected
@@ -881,6 +888,24 @@ Updated 2026-10-11. CURRENT_STATUS.md and TEST_REPORT.md are the living evidence
 Embedded source: docs/TEST_REPORT.md
 
 # Development verification
+
+## Independent PR #5 review and continuation — 2026-10-12
+
+Reviewed submitted head 6603d24f4d32f70abfd25e3f6770939b86f4594b in an isolated
+checkout: 239 passed, 1 skipped (encoder absent), 1 failed (legacy converter
+presence), 2 deselected. Reproduction tests separately showed both scene and shoe
+previews opened Audio instead of Models/Courts. Navigation now uses page names;
+discovery tests use synthetic files instead of excluded proprietary executables.
+
+Continuation makes batch WAV export transactional. Regressions cover successful
+publication, decode failure, cancellation, destination preservation, final sidecar
+paths, shared fight-song artwork and cancelled GUI output selection. The unchanged
+pinned-source encoder was enabled for an actual native WAV round trip. No emulator,
+EBOOT writes or full testing JB. Final exact-head results are recorded in the PR.
+
+The final portable continuation run passed 250 tests, 2 deselected; actual native
+WAV encoding ran rather than skipping. Source GUI/CLI smoke, scoped Ruff and mypy
+passed. The handoff snapshot check passed. No private game fixture was required.
 
 ## Audio workspace update — 2026-10-11
 

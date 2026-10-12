@@ -1,5 +1,10 @@
 # Experimental audio workflow
 
+Batch WAV export publishes its output folder only after all selected tracks and
+the manifest succeed. Cancellation/failure removes the owned temporary batch;
+existing destinations and unrelated files remain untouched. Scene/shoe preview
+actions navigate to Models/Courts by name even with Audio present.
+
 The Qt studio includes an **Audio** workspace with separate Licensed Music and
 Fight Songs tabs. It reads the catalog from the selected JB, exports selected
 tracks or a full section to WAV, and prepares archive replacements from one WAV

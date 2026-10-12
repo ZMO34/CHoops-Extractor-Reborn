@@ -1,5 +1,11 @@
 # Change log
 
+## Unreleased — reviewed audio GUI continuation
+
+Fix scene/shoe navigation after Audio insertion; clean-clone converter tests use
+synthetic fixtures. Batch WAV exports publish atomically and remove incomplete
+batches on cancellation/failure.
+
 ## v1.08 audio development bundle
 
 Experimental WAV/audio-bank/AUDO/jukebox-art CLI, unchanged-WAV checksum skipping,
