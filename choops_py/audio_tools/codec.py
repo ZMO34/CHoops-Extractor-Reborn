@@ -88,7 +88,7 @@ def encoder_path():
     return path
 
 
-def encode_wav(source,channels,rate,job=None):
+def encode_wav(source,channels,rate,job=None,target_samples=None):
     if channels not in (1,2) or not 8000<=rate<=192000:raise ValueError('Unsupported ATRAC3 channel/rate configuration')
     source=Path(source).resolve()
     try:
@@ -104,16 +104,23 @@ def encode_wav(source,channels,rate,job=None):
         _run_ffmpeg(['-i',source,'-map','0:a:0','-vn','-acodec','pcm_f32le','-f','f32le','-ac',channels,'-ar',rate,converted],work,job,'WAV conversion')
         converted_size=converted.stat().st_size
         if converted_size%(4*channels):raise ValueError('Converted WAV ended inside a sample frame')
-        samples=converted_size//(4*channels)
-        if not samples:raise ValueError('WAV contains no audio samples')
-        if samples>rate*1800:raise ValueError('A replacement track may not exceed 30 minutes')
+        input_samples=converted_size//(4*channels)
+        if not input_samples:raise ValueError('WAV contains no audio samples')
+        if input_samples>rate*1800:raise ValueError('A replacement track may not exceed 30 minutes')
+        if target_samples is not None and (target_samples<=0 or target_samples>rate*1800):
+            raise ValueError('Target audio length is outside the supported range')
+        samples=input_samples if target_samples is None else target_samples
         with pcm_path.open('wb') as pcm,converted.open('rb') as src:
             pcm.write(b'\0'*((GAME_DELAY-ENCODER_DELAY)*channels*4))
-            while True:
+            remaining=samples*channels*4
+            while remaining:
                 if job:job.check()
-                block=src.read(1024*1024)
-                if not block:break
-                pcm.write(block)
+                block=src.read(min(1024*1024,remaining))
+                if block:
+                    pcm.write(block);remaining-=len(block)
+                else:
+                    silence=min(1024*1024,remaining)
+                    pcm.write(b'\0'*silence);remaining-=silence
         if job:job.progress(0,1,'Encoding ATRAC3 replacement');job.check()
         with (work/'encoder.log').open('wb') as log:
             process=subprocess.Popen([str(encoder_path()),str(pcm_path),str(encoded),str(channels)],stdout=log,stderr=log,

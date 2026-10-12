@@ -12,7 +12,10 @@ Build a restricted FFmpeg CLI from pinned upstream source with GPL/nonfree
 components disabled, ship corresponding FFmpeg/AtracDEnc sources and notices,
 and include both audio helpers in the standalone Windows GUI. Windows CI run 54
 built the package and passed the frozen synthetic WAV round trip on the current
-PR head.
+PR head. ATRAC PCM input now accepts finite samples through ±4.0, matching the
+encoder's 1/4 input scaling and avoiding rejection of over-range floating WAVs.
+Song replacements are trimmed or silence-padded to the selected track's original
+sample length.
 
 ## v1.08 audio development bundle
 

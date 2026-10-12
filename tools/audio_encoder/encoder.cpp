@@ -47,8 +47,11 @@ int main(int argc,char** argv) {
         for(uint64_t frame=0;frame<frames+3;frame++) {
             std::fill(pcm.begin(),pcm.end(),0.f);
             if(frame<frames)input.read(reinterpret_cast<char*>(pcm.data()),pcm.size()*4);
-            for(float value:pcm)if(!std::isfinite(value) || std::abs(value)>1.001f)
-                throw std::runtime_error("PCM sample is out of range");
+            // AtracDEnc scales PCM by 1/4 before its analysis filters, so allow
+            // samples through ±4 while rejecting values beyond its internal
+            // unit-scale limit.
+            for(float value:pcm)if(!std::isfinite(value) || std::abs(value)>4.0f)
+                throw std::runtime_error("PCM sample exceeds the ATRAC encoder input range (±4.0)");
             process(pcm.data(),TPCMEngine::ProcessMeta{static_cast<uint16_t>(channels)});
         }
         return 0;
