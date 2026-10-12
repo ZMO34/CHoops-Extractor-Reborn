@@ -1,8 +1,20 @@
-# Experimental audio command-line workflow
+# Experimental audio workflow
 
-Audio GUI controls are not present yet. These commands use the Python backend;
-title/artist changes and EBOOT writes are unavailable. They build no JB folder
-and never launch RPCS3.
+The Qt studio includes an **Audio** workspace with separate Licensed Music and
+Fight Songs tabs. It reads the catalog from the selected JB, exports selected
+tracks or a full section to WAV, and prepares archive replacements from one WAV
+or a previously exported/edited manifest folder. Select one track to export or
+replace its mapped shared cover artwork. All output is written under `output/`
+for manual staging. Users build their JB themselves.
+
+Song title/artist changes and EBOOT writes are unavailable. Unknown AUDO loop
+formats and general CDF audio growth remain blocked. The GUI and commands use
+the same Python backend; no emulator or gameplay check is part of these flows.
+
+Launch the studio with `python -m choops_py.studio`, then choose **Audio** in the
+left navigation. Open a JB from Explorer first, then use **Load / refresh
+catalog**. WAV decoding requires PyAV; WAV replacement also requires the helper
+built by `python tools/dev/setup.py --audio-encoder`.
 
 From a checkout or the release's **audio-workspace** directory:
 

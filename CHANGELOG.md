@@ -4,7 +4,9 @@
 
 Experimental WAV/audio-bank/AUDO/jukebox-art CLI, unchanged-WAV checksum skipping,
 sample-extent checks, portable setup and shared Codex PR/documentation workflow.
-Audio GUI and song-name editing remain unfinished. No emulator or testing JB.
+Experimental Audio workspace adds separate Licensed Music/Fight Songs tabs, WAV
+export/replacement preparation and mapped cover-art actions. Song-name editing
+remains unavailable. No emulator or testing JB.
 
 ## v1.07
 

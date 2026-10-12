@@ -124,31 +124,27 @@ data in soundtrack_names.json. WAV decode/re-encode passed a synthetic round tri
 Bank replacement updates AUSB offsets/durations and checks untouched streams.
 Workflow and game archive replacement still need broader regression validation.
 
-Experimental catalog/WAV/song/batch/AUDO/jukebox-art CLI commands are now exposed;
+Experimental catalog/WAV/song/batch/AUDO/jukebox-art CLI commands are exposed;
 unchanged manifest WAVs are skipped and sample bounds/export overwrite are checked.
-The v1.08 development bundle supplies a Python audio-workspace alongside the
-established GUI, not self-contained audio GUI functionality.
+The Audio workspace now uses the shared backend in the Qt studio, with distinct
+Licensed Music and Fight Songs tabs, selected/section WAV export, WAV replacement
+preparation and shared cover-art actions. The GUI update is under review on top
+of the open audio-backend PR; self-contained codec packaging remains pending.
 
-No Audio GUI panel exists yet. Separate Licensed Music and Fight Songs sections
-remain required. Song-title/artist editing is disabled: archive-only routing is
-not established, and EBOOT writing is prohibited. Cover backend exists, but GUI
-controls and exact runtime behavior remain pending. See AUDIO_RESEARCH.md.
+Song-title/artist editing stays read-only because archive-only routing is not
+established, and EBOOT writing is prohibited. Unknown AUDO loops and general CDF
+audio growth remain unsupported. Users stage outputs and build JB copies manually.
+See AUDIO_RESEARCH.md and AUDIO_WORKFLOW.md.
 
 ## Priorities for the next instance
 
-1. Independently validate the audio backend; add meaningful synthetic fixtures,
-   frame/packet/sample checks, cancellation and no-overwrite protections.
-2. Add the Audio GUI with separate licensed/fight subsections, shared CLI/backend,
-   selected/batch WAV export and replacement preparation. Keep JB builds manual.
-3. Preserve unchanged WAVs using manifest checksums rather than lossy re-encoding
-   every exported file. Validate manifest identity/paths and source preconditions.
-4. Expose jukebox cover export/replacement. Explain shared artwork, particularly
-   fight songs and the two Strange Fruit tracks. Keep uncertain name fields read-only.
-5. Validate standalone/paired/inline AUDO handling and explicitly block unknown
+1. Continue independent validation of audio metadata identity, conversion limits,
+   cancellation and no-overwrite handling. Keep uncertain name fields read-only.
+2. Validate standalone/paired/inline AUDO handling and explicitly block unknown
    loop formats or unsupported CDF writes. Do not claim all formats writable.
-6. Finish native decoder/encoder release integration with corresponding sources,
+3. Finish native decoder/encoder release integration with corresponding sources,
    license notices and independent packaged checks. No proprietary codec tools.
-7. Continue remaining roster semantics, palettes, shaders and asset-linking
+4. Continue remaining roster semantics, palettes, shaders and asset-linking
    investigation as separate documented PRs; do not distract from audio validation.
 
 ## Remaining uncertainty
@@ -341,10 +337,11 @@ audio_tools. Qt workers return signals/data, never manipulate widgets. Writers
 reparse output, preserve unknown bytes/bits and reject ambiguous shared ranges.
 Generated outputs live under output/ and originals remain immutable.
 
-tools/rebuild/package_windows.ps1 packages the established Windows GUI. v1.08
-supplies Python audio-workspace separately; PyAV/native audio GUI bundling is
-pending. Check licenses and corresponding sources for shipped native components;
-no proprietary converters/game assets. See AUDIO_WORKFLOW.md and the encoder README.
+tools/rebuild/package_windows.ps1 packages the Windows GUI. The Audio workspace
+uses PyAV and an optional ATRAC3 helper built from pinned LGPL source; native
+codec dependencies are not self-contained in the GUI package yet. Check licenses
+and corresponding sources for shipped native components; no proprietary
+converters/game assets. See AUDIO_WORKFLOW.md and the encoder README.
 
 ---
 
@@ -461,11 +458,23 @@ See CURRENT_STATUS.md and each PR's exact verification for the latest evidence.
 
 Embedded source: docs/AUDIO_WORKFLOW.md
 
-# Experimental audio command-line workflow
+# Experimental audio workflow
 
-Audio GUI controls are not present yet. These commands use the Python backend;
-title/artist changes and EBOOT writes are unavailable. They build no JB folder
-and never launch RPCS3.
+The Qt studio includes an **Audio** workspace with separate Licensed Music and
+Fight Songs tabs. It reads the catalog from the selected JB, exports selected
+tracks or a full section to WAV, and prepares archive replacements from one WAV
+or a previously exported/edited manifest folder. Select one track to export or
+replace its mapped shared cover artwork. All output is written under `output/`
+for manual staging. Users build their JB themselves.
+
+Song title/artist changes and EBOOT writes are unavailable. Unknown AUDO loop
+formats and general CDF audio growth remain blocked. The GUI and commands use
+the same Python backend; no emulator or gameplay check is part of these flows.
+
+Launch the studio with `python -m choops_py.studio`, then choose **Audio** in the
+left navigation. Open a JB from Explorer first, then use **Load / refresh
+catalog**. WAV decoding requires PyAV; WAV replacement also requires the helper
+built by `python tools/dev/setup.py --audio-encoder`.
 
 From a checkout or the release's **audio-workspace** directory:
 
@@ -859,9 +868,11 @@ Updated 2026-10-11. CURRENT_STATUS.md and TEST_REPORT.md are the living evidence
   style names and the exact special-family manufacturer caption are unresolved.
 - 4096 is a court texture dimension ceiling, not a tested safe GPU allocation.
   Floor template preparation disables only extra floor draws, preserving arena.
-- Audio is experimental Python/CLI: no Audio GUI yet, archive-only title/artist
-  override route unproven, EBOOT writes prohibited. Unknown AUDO loops are blocked;
-  CDF audio growth and self-contained native packaging remain pending.
+- Audio has an experimental Python backend/CLI and a shared-backend Qt workspace
+  for Licensed Music, Fight Songs, WAV workflows and mapped cover art. Title/artist
+  editing remains unavailable because archive-only routing is unproven; EBOOT
+  writes are prohibited. Unknown AUDO loops are blocked; CDF audio growth and
+  self-contained codec packaging remain pending.
 - Outputs are constrained to output/. Game assets, exported music/art, private
   paths, logs, fixtures and EBOOT are not supplied publicly.
 
@@ -870,6 +881,25 @@ Updated 2026-10-11. CURRENT_STATUS.md and TEST_REPORT.md are the living evidence
 Embedded source: docs/TEST_REPORT.md
 
 # Development verification
+
+## Audio workspace update — 2026-10-11
+
+Python 3.12 x64 setup check and pinned LGPL ATRAC3 helper build completed.
+Audio/CLI tests: `pytest tests/test_audio.py tests/test_cli.py -q` — 17 passed.
+Qt navigation and audio-category tests: 2 passed. Full portable suite excluding
+the two documented private/optional checks and the legacy converter-presence
+assertion: 240 passed, 3 deselected. CLI help, Qt startup smoke, scoped Ruff and
+studio/service mypy checks passed. A read-only scan of the available Vanilla JB
+catalog returned 23 licensed tracks and 64 fight songs; no audio or artwork was
+exported and no source was modified.
+
+The exact `tools/dev/verify.py` run on this audio GUI head reported 240 passed,
+1 failed and 2 deselected before stopping at the pre-existing
+`test_bundled_paths_have_precedence` assertion. It expects the historical
+`tools/gtf2dds.exe`, which is absent from the public clone and excluded from
+releases. That single check is outside the audio GUI change; no proprietary
+converter was fetched or substituted. The full suite with that assertion
+excluded passed. No emulator, gameplay test or JB build was performed.
 
 ## Audio/handoff update — 2026-10-11
 

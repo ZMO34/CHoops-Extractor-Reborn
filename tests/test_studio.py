@@ -49,6 +49,8 @@ def test_qt_game_model_and_navigation(qtbot,tmp_path):
     window.open_game(source)
     qtbot.waitUntil(lambda: window.active is None,timeout=10000)
     assert window.archive is not None
+    assert window.audio_state.text()=="Audio catalog has not been loaded for this JB."
+    assert window.audio_tables["Soundtrack"].model() is None
     assert window.explorer.model().rowCount()==1
     window.search.setText('no matching entry')
     assert window.explorer.model().rowCount()==0
@@ -58,9 +60,58 @@ def test_qt_game_model_and_navigation(qtbot,tmp_path):
     window.inspect_selected()
     qtbot.waitUntil(lambda: window.active is None,timeout=10000)
     assert window.nested.topLevelItemCount()==1
-    for i in range(7):
+    for i in range(8):
         window.navigation.setCurrentItem(window.navigation.topLevelItem(i))
         assert window.pages.currentIndex()==i
+    assert window.audio_tabs.tabText(0)=="Licensed Music"
+    assert window.audio_tabs.tabText(1)=="Fight Songs"
+    window.close()
+
+
+@pytest.mark.gui
+def test_audio_workspace_separates_licensed_and_fight_tracks(qtbot, monkeypatch):
+    from PySide6.QtCore import Qt
+    from choops_py.audio_tools import workflow
+
+    audio_catalog = {
+        "tracks": [
+            {
+                "title": "Licensed track",
+                "artist": "Artist",
+                "bank": "cribmusic",
+                "index": 0,
+                "seconds": 10,
+                "category": "Soundtrack",
+                "cover_record": "000",
+            },
+            {
+                "title": "Fight song",
+                "artist": "School",
+                "bank": "cribmusic",
+                "index": 23,
+                "seconds": 20,
+                "category": "Fight song",
+                "cover_record": "021",
+            },
+        ],
+        "soundtrack_count": 1,
+        "fight_song_count": 1,
+    }
+    monkeypatch.setattr(workflow, "catalog", lambda archive, job: audio_catalog)
+    window = Window()
+    qtbot.addWidget(window)
+    window.archive = object()
+    window.audio_refresh()
+    qtbot.waitUntil(lambda: window.active is None, timeout=10000)
+    assert window.audio_tables["Soundtrack"].model().rowCount() == 1
+    assert window.audio_tables["Fight song"].model().rowCount() == 1
+    assert "1 licensed tracks" in window.audio_state.text()
+    assert not (
+        window.audio_tables["Soundtrack"]
+        .model()
+        .flags(window.audio_tables["Soundtrack"].model().index(0, 0))
+        & Qt.ItemFlag.ItemIsEditable
+    )
     window.close()
 
 

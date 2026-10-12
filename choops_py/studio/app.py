@@ -295,6 +295,7 @@ class Window(QMainWindow):
             "Explorer",
             "Texture Editor",
             "Roster Editor",
+            "Audio",
             "Models / Courts",
             "Mod Builder",
             "Research",
@@ -365,6 +366,8 @@ class Window(QMainWindow):
 
         self.create_roster()
 
+        self.create_audio()
+
         self.create_models()
 
         self.create_builder()
@@ -414,6 +417,217 @@ class Window(QMainWindow):
             row.addWidget(button,index//4,index%4)
         for column in range(4):row.setColumnStretch(column,1)
         layout.addLayout(row)
+
+    def create_audio(self):
+
+        layout = self.page(
+            "Audio workspace",
+            "Browse Licensed Music and Fight Songs from the selected JB. WAV exports and replacement folders are prepared under output/ for you to stage and build manually.",
+        )
+
+        self.audio_state = QLabel("Open a JB folder, then load its audio catalog.")
+        self.audio_state.setWordWrap(True)
+        layout.addWidget(self.audio_state)
+
+        self.buttons(
+            layout,
+            [
+                ("Load / refresh catalog", self.audio_refresh),
+                ("Export selected WAVs…", self.audio_export_selected),
+                ("Export this section…", self.audio_export_section),
+                ("Replace selected from WAV…", self.audio_replace_selected),
+                ("Replace from edited export…", self.audio_replace_folder),
+                ("Export shared cover art…", self.audio_export_cover),
+                ("Replace shared cover art…", self.audio_replace_cover),
+            ],
+        )
+
+        self.audio_tabs = QTabWidget()
+        self.audio_tables = {}
+        self.audio_tables["Soundtrack"] = table()
+        self.audio_tables["Fight song"] = table()
+        self.audio_tabs.addTab(self.audio_tables["Soundtrack"], "Licensed Music")
+        self.audio_tabs.addTab(self.audio_tables["Fight song"], "Fight Songs")
+        layout.addWidget(self.audio_tabs)
+
+        note = QLabel(
+            "Song titles and artists are informational and read-only. Fight songs share jukebox cover record 021; some soundtrack records are shared too. Unknown AUDO loops and general CDF audio growth remain unsupported."
+        )
+        note.setWordWrap(True)
+        layout.addWidget(note)
+
+    def audio_refresh(self):
+
+        if not self.archive:
+            return self.log("Open a JB folder before loading the audio catalog.")
+        archive = self.archive
+
+        def display(result):
+            tracks = result["tracks"]
+            columns = [
+                ("title", "Title / stream"),
+                ("artist", "Artist"),
+                ("bank", "Bank"),
+                ("index", "Index"),
+                ("seconds", "Seconds"),
+            ]
+            for category, view in self.audio_tables.items():
+                rows = [row for row in tracks if row["category"] == category]
+                set_rows(view, rows, columns)
+            self.audio_state.setText(
+                f"{result['soundtrack_count']} licensed tracks • "
+                f"{result['fight_song_count']} fight songs • source JB read-only"
+            )
+
+        from ..audio_tools.workflow import catalog
+
+        self.run_job(
+            "Load audio catalog",
+            lambda job: catalog(archive, job),
+            display,
+            cancellable=True,
+        )
+
+    def audio_selected(self):
+        view = self.audio_tables.get(
+            "Soundtrack" if self.audio_tabs.currentIndex() == 0 else "Fight song"
+        )
+        return selected(view) if view else []
+
+    def audio_output_path(self, title, suggested):
+        path, _ = QFileDialog.getSaveFileName(self, title, str(OUTPUT / suggested))
+        return Path(path) if path else None
+
+    def audio_export_selected(self):
+        rows = self.audio_selected()
+        if not rows:
+            return self.log("Select one or more tracks first.")
+        self.audio_export_rows(rows)
+
+    def audio_export_section(self):
+        category = "Soundtrack" if self.audio_tabs.currentIndex() == 0 else "Fight song"
+        view = self.audio_tables[category]
+        proxy = view.model()
+        if not proxy:
+            return self.log("Load the audio catalog first.")
+        rows = list(proxy.sourceModel().rows)
+        if not rows:
+            return self.log("This section has no catalog tracks.")
+        self.audio_export_rows(rows)
+
+    def audio_export_rows(self, rows):
+        archive = self.archive
+        if not archive:
+            return self.log("Open a JB folder before exporting audio.")
+        category = "licensed_music" if rows[0]["category"] == "Soundtrack" else "fight_songs"
+        output = self.audio_output_path(
+            "Choose a new WAV export folder", Path("rips") / category
+        )
+        if not output:
+            return
+        from ..audio_tools.workflow import export_tracks
+
+        self.run_job(
+            "Export WAV tracks",
+            lambda job: export_tracks(archive, rows, output, job),
+            cancellable=True,
+        )
+
+    def audio_replace_selected(self):
+        rows = self.audio_selected()
+        if len(rows) != 1:
+            return self.log("Select exactly one track to replace from a WAV file.")
+        archive = self.archive
+        if not archive:
+            return self.log("Open a JB folder before preparing an audio replacement.")
+        wav, _ = QFileDialog.getOpenFileName(
+            self, "Select replacement WAV", "", "WAV audio (*.wav)"
+        )
+        if not wav:
+            return
+        output = self.audio_output_path(
+            "Choose a new replacement folder", Path("audio") / "song_edit"
+        )
+        if not output:
+            return
+        from ..audio_tools.workflow import replace_tracks
+
+        self.run_job(
+            "Prepare WAV replacement",
+            lambda job: replace_tracks(archive, [(rows[0], Path(wav))], output, job),
+            cancellable=True,
+        )
+
+    def audio_replace_folder(self):
+        archive = self.archive
+        if not archive:
+            return self.log("Open a JB folder before preparing audio replacements.")
+        folder = QFileDialog.getExistingDirectory(self, "Select an edited audio export folder")
+        if not folder:
+            return
+        output = self.audio_output_path(
+            "Choose a new replacement folder", Path("audio") / "batch_edit"
+        )
+        if not output:
+            return
+        from ..audio_tools.workflow import import_wav_folder
+
+        self.run_job(
+            "Prepare edited WAV replacements",
+            lambda job: import_wav_folder(archive, Path(folder), output, job),
+            cancellable=True,
+        )
+
+    def audio_cover_operation(self, replace=False):
+        rows = self.audio_selected()
+        if len(rows) != 1:
+            return self.log("Select exactly one track to choose its shared cover art.")
+        cover_record = rows[0].get("cover_record")
+        if not cover_record:
+            return self.log("This track has no confirmed cover-art mapping.")
+        archive = self.archive
+        if not archive:
+            return self.log("Open a JB folder before editing cover art.")
+        if replace:
+            image, _ = QFileDialog.getOpenFileName(
+                self,
+                "Select replacement cover image",
+                "",
+                "Images (*.dds *.png *.jpg *.jpeg *.bmp)",
+            )
+            if not image:
+                return
+            output = self.audio_output_path(
+                "Choose a new jukebox.iff output path", Path("audio") / "jukebox_edited.iff"
+            )
+            if not output:
+                return
+            from ..audio_tools.workflow import replace_cover
+
+            self.run_job(
+                "Prepare shared cover-art replacement",
+                lambda job: replace_cover(archive, cover_record, image, output, job),
+                cancellable=True,
+            )
+        else:
+            output = self.audio_output_path(
+                "Choose a new cover-art export path",
+                Path("rips") / "audio" / f"cover_{cover_record}.dds",
+            )
+            if not output:
+                return
+            from ..audio_tools.workflow import export_cover
+
+            self.run_job(
+                "Export shared cover art",
+                lambda job: export_cover(archive, cover_record, output),
+            )
+
+    def audio_export_cover(self):
+        return self.audio_cover_operation()
+
+    def audio_replace_cover(self):
+        return self.audio_cover_operation(replace=True)
 
     def run_job(self, label, function, callback=None, cancellable=False):
 
@@ -491,6 +705,9 @@ class Window(QMainWindow):
         def loaded(archive):
 
             self.archive = archive
+            self.audio_state.setText("Audio catalog has not been loaded for this JB.")
+            for view in self.audio_tables.values():
+                view.setModel(None)
             self.scene_uniform_images = {}
             # A newly selected JB folder must not inherit another source's roster.
             self.roster = None

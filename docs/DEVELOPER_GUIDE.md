@@ -34,7 +34,8 @@ audio_tools. Qt workers return signals/data, never manipulate widgets. Writers
 reparse output, preserve unknown bytes/bits and reject ambiguous shared ranges.
 Generated outputs live under output/ and originals remain immutable.
 
-tools/rebuild/package_windows.ps1 packages the established Windows GUI. v1.08
-supplies Python audio-workspace separately; PyAV/native audio GUI bundling is
-pending. Check licenses and corresponding sources for shipped native components;
-no proprietary converters/game assets. See AUDIO_WORKFLOW.md and the encoder README.
+tools/rebuild/package_windows.ps1 packages the Windows GUI. The Audio workspace
+uses PyAV and an optional ATRAC3 helper built from pinned LGPL source; native
+codec dependencies are not self-contained in the GUI package yet. Check licenses
+and corresponding sources for shipped native components; no proprietary
+converters/game assets. See AUDIO_WORKFLOW.md and the encoder README.
