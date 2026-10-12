@@ -154,7 +154,9 @@ def test_native_wav_roundtrip_resamples_and_keeps_input():
         assert samples == 48000 and len(encoded) % 304 == 0
         assert playback_samples(len(encoded), 2, 48000) >= samples
         trimmed, trimmed_samples = encode_wav(path, 2, 48000, target_samples=24000)
-        assert trimmed_samples == 24000 and playback_samples(len(trimmed), 2, 48000) >= trimmed_samples
+        assert trimmed_samples == 24000
+        assert playback_samples(len(trimmed), 2, 48000) >= trimmed_samples
         padded, padded_samples = encode_wav(path, 2, 48000, target_samples=60000)
-        assert padded_samples == 60000 and playback_samples(len(padded), 2, 48000) >= padded_samples
+        assert padded_samples == 60000
+        assert playback_samples(len(padded), 2, 48000) >= padded_samples
         assert path.read_bytes() == original
