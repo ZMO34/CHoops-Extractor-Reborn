@@ -98,7 +98,8 @@ project dependencies.
   `cb170709f836cb43dc0312455188c791159d81dc`, LGPL-2.1-or-later. Thin frontend and
   build instructions are in tools/audio_encoder. No Sony SDK executable is used.
 - The standalone app's LGPL packaging uses FFmpeg 9.0.2 at revision
-  `ce8f11b9fac4cd7ccfb41ca7c01bc17f5cda8cc3`, built as a separate CLI with GPL,
+  `946fcce07b6dcd0331c8cc609192aeff5e1924f8` (the peeled commit of the annotated
+  `n9.0.2` tag), built as a separate CLI with GPL,
   nonfree and autodetected components disabled. Only the PCM formats, WAV/RF64
   demuxers, raw PCM muxers, ATRAC3 decoder and file/pipe protocols used by the
   workflow are enabled. The exact build script and corresponding FFmpeg source

@@ -29,7 +29,7 @@ try {
     $codecSources = Join-Path $projectRoot 'dist/CHoops-Studio/THIRD-PARTY-SOURCES'
     New-Item -ItemType Directory -Force -Path $codecSources | Out-Null
     $ffmpegArchive = Join-Path $codecSources 'ffmpeg-n9.0.2.tar.gz'
-    & git -C $ffmpegSource archive --format=tar.gz --prefix=ffmpeg-n9.0.2/ "--output=$ffmpegArchive" ce8f11b9fac4cd7ccfb41ca7c01bc17f5cda8cc3
+    & git -C $ffmpegSource archive --format=tar.gz --prefix=ffmpeg-n9.0.2/ "--output=$ffmpegArchive" 946fcce07b6dcd0331c8cc609192aeff5e1924f8
     if ($LASTEXITCODE -ne 0) { throw 'Could not package the pinned FFmpeg corresponding source.' }
     Copy-Item -LiteralPath (Join-Path $ffmpegSource 'COPYING.LGPLv2.1') -Destination $codecSources
     Copy-Item -LiteralPath (Join-Path $projectRoot 'tools/audio_codec/build_ffmpeg.sh') -Destination $codecSources

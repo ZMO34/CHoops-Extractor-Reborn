@@ -459,7 +459,8 @@ project dependencies.
   `cb170709f836cb43dc0312455188c791159d81dc`, LGPL-2.1-or-later. Thin frontend and
   build instructions are in tools/audio_encoder. No Sony SDK executable is used.
 - The standalone app's LGPL packaging uses FFmpeg 9.0.2 at revision
-  `ce8f11b9fac4cd7ccfb41ca7c01bc17f5cda8cc3`, built as a separate CLI with GPL,
+  `946fcce07b6dcd0331c8cc609192aeff5e1924f8` (the peeled commit of the annotated
+  `n9.0.2` tag), built as a separate CLI with GPL,
   nonfree and autodetected components disabled. Only the PCM formats, WAV/RF64
   demuxers, raw PCM muxers, ATRAC3 decoder and file/pipe protocols used by the
   workflow are enabled. The exact build script and corresponding FFmpeg source
@@ -929,6 +930,10 @@ scoped Ruff, studio/service mypy, handoff snapshot, compileall and
 `git diff --check` passed. The restricted FFmpeg build, Windows package smoke
 and packaged WAV round trip remain pending Windows CI; local MSYS2 is unavailable.
 An added synthetic regression rejects a non-RIFF/RF64 WAV before codec lookup.
+The first Windows CI attempt exposed an annotated-tag/object SHA mix-up for FFmpeg;
+the follow-up now pins the peeled source commit reported by
+`git rev-parse 'n9.0.2^{commit}'`. This corrected pin was confirmed in a local source checkout;
+Windows build CI must still exercise configure and compilation.
 
 ## Independent PR #5 review and continuation — 2026-10-12
 

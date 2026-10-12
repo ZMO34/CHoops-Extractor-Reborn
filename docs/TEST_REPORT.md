@@ -10,6 +10,10 @@ scoped Ruff, studio/service mypy, handoff snapshot, compileall and
 `git diff --check` passed. The restricted FFmpeg build, Windows package smoke
 and packaged WAV round trip remain pending Windows CI; local MSYS2 is unavailable.
 An added synthetic regression rejects a non-RIFF/RF64 WAV before codec lookup.
+The first Windows CI attempt exposed an annotated-tag/object SHA mix-up for FFmpeg;
+the follow-up now pins the peeled source commit reported by
+`git rev-parse 'n9.0.2^{commit}'`. This corrected pin was confirmed in a local source checkout;
+Windows build CI must still exercise configure and compilation.
 
 ## Independent PR #5 review and continuation — 2026-10-12
 

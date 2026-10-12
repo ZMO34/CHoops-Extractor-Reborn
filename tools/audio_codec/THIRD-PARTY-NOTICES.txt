@@ -1,7 +1,7 @@
 Audio helper third-party notices
 
 FFmpeg 9.0.2
-Source revision: ce8f11b9fac4cd7ccfb41ca7c01bc17f5cda8cc3
+Source revision: 946fcce07b6dcd0331c8cc609192aeff5e1924f8
 License: GNU LGPL version 2.1 or later. This build disables GPL and nonfree
 components, autodetection, network support and all codecs except the PCM formats
 and ATRAC3 decoder required by the Audio workspace. It is a separate executable,

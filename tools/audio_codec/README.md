@@ -18,6 +18,6 @@ The package script requires both helpers and includes their pinned source
 archives, license texts and build scripts under `THIRD-PARTY-SOURCES`.
 
 The build fetches FFmpeg 9.0.2 at commit
-`ce8f11b9fac4cd7ccfb41ca7c01bc17f5cda8cc3`. The compiled helper is written to
+`946fcce07b6dcd0331c8cc609192aeff5e1924f8`. The compiled helper is written to
 the ignored `choops_py/audio_tools/bin/` directory. The executable's build
 configuration is checked to ensure GPL and nonfree options are absent.

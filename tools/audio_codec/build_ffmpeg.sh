@@ -7,7 +7,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd -W)"
 VERSION='n9.0.2'
-REVISION='ce8f11b9fac4cd7ccfb41ca7c01bc17f5cda8cc3'
+REVISION='946fcce07b6dcd0331c8cc609192aeff5e1924f8'
 VENDOR="$ROOT/.private/vendor/ffmpeg-$VERSION"
 BIN="$ROOT/choops_py/audio_tools/bin/choops_ffmpeg.exe"
 
