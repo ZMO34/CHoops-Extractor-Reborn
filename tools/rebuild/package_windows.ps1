@@ -43,4 +43,6 @@ try {
     Set-Content -LiteralPath dist/CHoops-Studio/README-START-HERE.txt -Value 'Run CHoops-Studio.exe. CLI: CHoops-Studio.exe --cli --help. DDS conversion and the Audio workspace are available. Audio WAV import/export uses separately built LGPL FFmpeg and ATRAC3 helpers; corresponding source archives and license notices are in THIRD-PARTY-SOURCES. No PyAV/FFmpeg GPL wheel or game assets are included. External texture converters are not included. See USER_GUIDE.md and AUDIO_WORKFLOW.md. Gameplay is unverified.'
     & dist/CHoops-Studio/CHoops-Studio.exe --smoke
     if ($LASTEXITCODE -ne 0) { throw 'Packaged Qt smoke failed' }
+    & dist/CHoops-Studio/CHoops-Studio.exe --audio-codec-smoke
+    if ($LASTEXITCODE -ne 0) { throw 'Packaged audio codec round-trip smoke failed' }
 } finally { Pop-Location }
