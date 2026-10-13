@@ -1,5 +1,9 @@
 # Native GUI
 
+v1.10 roster layout: Schools combines Teams/Edit Schools. Players show a compact
+table and persistent Player/Ratings/Scholarship pane with direct edits. Shoes and
+export are grouped menus. D1/alternate/independent-asset public actions are removed.
+
 Launch `python -m choops_py.studio` or CHoops-Studio.exe. PySide6 provides Explorer,
 Texture Editor, Roster Editor, Models/Courts, Mod Builder, Research and Diagnostics.
 No Tkinter, Node or browser server is required. Long jobs run in bounded workers;

@@ -1,5 +1,9 @@
 # Current limitations
 
+v1.10 removes D1 conversion and new alternate/independent-asset actions from the
+public editor/CLI. Single position and Scholarship/Walk-on are confirmed; secondary
+position is unproven and not exposed. See PLAYER_QOL_RESEARCH.md for evidence.
+
 Updated 2026-10-11. CURRENT_STATUS.md and TEST_REPORT.md are the living evidence.
 
 - Python/Qt checks do not establish game behavior. Agents never open RPCS3 or

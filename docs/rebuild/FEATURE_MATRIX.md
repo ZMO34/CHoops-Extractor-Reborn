@@ -1,5 +1,9 @@
 # Current feature matrix
 
+v1.10 supersedes historical D1/alternate/independent-asset public action claims:
+those actions are removed. Player detail/rating/scholarship editing is consolidated;
+height and positions have readable presentation. See ../PLAYER_QOL_RESEARCH.md.
+
 Updated 2026-10-11; supersedes the historical rebuild matrix. Tested here means
 software/structural checks, never game compatibility. Details: ../CURRENT_STATUS.md.
 

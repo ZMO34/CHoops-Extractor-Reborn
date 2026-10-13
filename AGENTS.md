@@ -18,7 +18,9 @@ current handoff; dated historical research is supporting evidence.
   supplied inputs and Qt/packaged startup checks. The user builds JB manually.
 - Keep source JB files, supplied overrides, ZIPs, rosters and executable copies
   immutable. EBOOT is read-only research; song-name editing must not require
-  EBOOT writes. D1 conversion is optional, never automatic.
+  EBOOT writes. Public D1-conversion and alternate/independent-asset actions are
+  removed in v1.10; realignment stays available. Do not reintroduce them or add
+  alternate assets without a new explicit owner request.
 - Keep game assets, exported music/artwork, logs, private paths, credentials,
   local settings and generated binaries out of Git. Cleanup is limited to known
   generated files; never remove user builds or staging folders on another PC.

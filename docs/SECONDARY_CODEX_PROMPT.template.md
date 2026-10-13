@@ -37,7 +37,9 @@ supersede its dated observations. Treat research hypotheses as hypotheses.
    inspection. Tiny synthetic archive fixtures are okay; copied game tests are not.
 6. Keep JB source, overrides, rosters, templates and EBOOT immutable. EBOOT may be
    read for research but never patched. If jukebox name changes need executable
-   edits, do not implement them. D1 conversion is optional, never automatic.
+   edits, do not implement them. v1.10 removes D1/alternate/independent-asset public
+   actions. Keep realignment, but do not restore those actions or add alternates
+   without an explicit new owner request. Read PLAYER_QOL_RESEARCH.md.
 7. Preserve unknown bits/bytes, IDs, record ordering, padding and unaffected
    streams. Reparse written output and compare untouched ranges. Reject ambiguous
    aliases, unknown pointers/layouts, unsafe outputs and invalid data explicitly.

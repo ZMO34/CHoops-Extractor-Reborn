@@ -1,5 +1,15 @@
 # Release notes
 
+## v1.10 — roster usability and Windows release
+
+Player table shows feet/inches and PG–C. Always-visible Player/Ratings/Scholarship
+tabs replace properties/attributes buttons; scholarship editing preserves weight
+and neighboring flags. Equipment uses actual names and styles. Schools replaces
+duplicate Teams/Edit Schools views. Shoe/export actions are grouped. Realignment
+remains; D1, new alternate/five-jersey/independent-asset actions are removed.
+No alternate assets added. EBOOT and inputs remain read-only; no emulator/testing
+JB. Full Windows packaging includes LGPL audio helpers, source and notices.
+
 ## v1.08 — experimental audio development bundle
 
 Windows GUI plus a portable Python audio-workspace with setup, documented CLI

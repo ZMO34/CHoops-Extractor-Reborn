@@ -37,7 +37,9 @@ supersede its dated observations. Treat research hypotheses as hypotheses.
    inspection. Tiny synthetic archive fixtures are okay; copied game tests are not.
 6. Keep JB source, overrides, rosters, templates and EBOOT immutable. EBOOT may be
    read for research but never patched. If jukebox name changes need executable
-   edits, do not implement them. D1 conversion is optional, never automatic.
+   edits, do not implement them. v1.10 removes D1/alternate/independent-asset public
+   actions. Keep realignment, but do not restore those actions or add alternates
+   without an explicit new owner request. Read PLAYER_QOL_RESEARCH.md.
 7. Preserve unknown bits/bytes, IDs, record ordering, padding and unaffected
    streams. Reparse written output and compare untouched ranges. Reject ambiguous
    aliases, unknown pointers/layouts, unsafe outputs and invalid data explicitly.
@@ -83,6 +85,17 @@ source docs; update those docs, then regenerate rather than editing this output.
 Embedded source: docs/CURRENT_STATUS.md
 
 # Current project status
+
+## v1.10 roster usability update
+
+Current public GUI combines Teams/Edit Schools as Schools, displays player height
+in feet/inches and positions as PG–C, and keeps Player/Ratings/Scholarship details
+beside the player table. Scholarship/Walk-on is writable through a verified flag,
+preserving weight and unknown bits. Separate properties/attributes dialogs and
+D1/alternate/independent-asset actions are removed from the release surface;
+conference realignment remains. No alternate work is authorized in this update.
+See PLAYER_QOL_RESEARCH.md; older feature descriptions below record historical
+backend capabilities rather than removed public actions.
 
 Updated 2026-10-12. Upstream: ZMO34/CHoops-Extractor-Reborn; base: master.
 Baseline before this handoff: `e556e360d0091df0bb645da9eb1d279e9d8f9e3a`.
@@ -188,6 +201,62 @@ round trip on `e149790005fdaeb14d0a1b79689d0a3de3b8f2da`; see TEST_REPORT.md.
 All game inputs, rosters, templates, private reverse-engineering helpers and raw
 audio are local and absent from Git. A fresh PC must supply its own authorized
 fixtures. Do not assume a generated court template or any old local build exists.
+
+---
+
+Embedded source: docs/PLAYER_QOL_RESEARCH.md
+
+# Player editing and scholarship evidence (v1.10)
+
+The v1.10 editor shows player details without a separate properties/attributes
+button. Player, Ratings and Scholarship tabs share the existing validated model,
+undo/redo and save-copy/export services. Names retain equal encoded lengths.
+
+Height stays an integer byte at player row +0x3A and sorts numerically; only its
+presentation/input changes to feet/inches. Position stays the whole byte +0x3B,
+using 0 PG, 1 SG, 2 SF, 3 PF, 4 C. Edit-player getter/setter 0x69DAA8/0x69DABC
+read/write anchor +0x2B; the runtime getter 0x753104 reads the same byte. All 5,685
+stock player values fall in that five-value set. It is a single confirmed position
+field, not two packed primary/secondary nibbles. No independent secondary field
+has been established; the editor does not expose a guessed second position.
+
+## Scholarship / walk-on
+
+The localized Scholarship control (English key 0x360FDA01) is registered in the
+edit-player constructor at 0x6971FC, with callback 0x68FE40. That callback toggles
+bit 31 of a big-endian word at player anchor +0x8C, equivalent to model row +0x9C.
+The name formatter at 0x69F30C tests the same signed word. Its nonnegative branch
+at 0x69F3E4 uses suffix key 0xDEBE7B99 (walk-on); the negative branch uses the empty
+suffix key 0x3729608D. Thus **bit 1 = Scholarship; bit 0 = Walk-on**.
+
+The stock roster contains 5,166 set flags and 519 clear flags. These counts are
+cross-checks, not format requirements. The editor masks only 0x80000000 and preserves
+weight (bits 11–19) and all neighboring data. Tests check exact payload changes,
+undo/redo and visible selection continuity. Recruiting-menu eligibility callback
+0x68F974 has roster/context restrictions; this offline editor changes roster data
+and does not claim to reproduce those Legacy restrictions or validate gameplay.
+
+## Equipment and readable values
+
+One-bit data uses established captions: hand L/R, muscle tone Buff/Ripped, sock
+colors Black/White. Equipment bands/pads are multi-valued, so treating all codes
+as booleans would be incorrect. Localized option arrays supply None, White Pad,
+Black Pad, team-color variants and other styles for the established packed getters.
+Unconfirmed left-arm styles remain read-only and display None/Style rather than
+an invented semantic label. Confidence, potential, ratings and tendencies remain
+numeric quantities. Unknown source enum values are preserved unless edited.
+
+## Scope removal
+
+Schools combines the former Teams/Edit Schools views. Realignment remains a
+reciprocal conference-membership action without a conversion checkbox. Player
+properties/attributes buttons, D1 conversion, alternate availability/creation,
+five-jersey builds and independent-asset buttons are absent. Public CLI commands
+for new alternate/archive insertion are no longer registered. Lower-level research
+code/history is retained; no alternate assets are created or added in this update.
+
+Executable/stock inputs were inspected read-only and are not distributed. EBOOT
+is not modified. No emulator or automatic testing JB is used for this release.
 
 ---
 
@@ -901,6 +970,10 @@ Embedded source: docs/KNOWN_LIMITATIONS.md
 
 # Current limitations
 
+v1.10 removes D1 conversion and new alternate/independent-asset actions from the
+public editor/CLI. Single position and Scholarship/Walk-on are confirmed; secondary
+position is unproven and not exposed. See PLAYER_QOL_RESEARCH.md for evidence.
+
 Updated 2026-10-11. CURRENT_STATUS.md and TEST_REPORT.md are the living evidence.
 
 - Python/Qt checks do not establish game behavior. Agents never open RPCS3 or
@@ -935,6 +1008,21 @@ Updated 2026-10-11. CURRENT_STATUS.md and TEST_REPORT.md are the living evidence
 Embedded source: docs/TEST_REPORT.md
 
 # Development verification
+
+## v1.10 roster usability checks
+
+Portable suite: 295 passed, 1 native-codec skip, 2 deselected at the local
+checkpoint. Source startup, scoped lint/type and handoff checks passed. Added
+height/position display and numeric-sort checks, scholarship exact-mask/undo
+checks, visible Player/Ratings/Scholarship tabs, equipment labels, removed-action
+checks and combined Schools view. Updated existing position edit/save/reopen and
+realignment interactions. Synthetic Qt visual QA checked the main roster layout;
+a toolbar text-encoding issue found during rendering was corrected before release.
+
+Read-only stock/EBOOT tracing confirms single byte positions and scholarship
+polarity; the full stock roster contains 5,166 scholarship flags and 519 walk-ons.
+No game input modified. Exact source SHA and Windows packaging/codec smoke results
+are recorded in the PR/release metadata. No emulator or testing JB.
 
 ## Independent conference review — 2026-10-12
 

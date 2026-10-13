@@ -1,5 +1,13 @@
 # Change log
 
+## v1.10 — roster editing cleanup
+
+Readable height/positions, visible Player/Ratings/Scholarship editor tabs, verified
+scholarship flag editing and named equipment. Schools combines duplicate views.
+Removed separate properties/attributes and D1/alternate/independent-asset actions;
+conference realignment remains. No alternate assets added. Full Windows package
+includes the established LGPL audio codecs and corresponding source notices.
+
 ## Unreleased — reviewed audio GUI continuation
 
 Fix scene/shoe navigation after Audio insertion; clean-clone converter tests use
