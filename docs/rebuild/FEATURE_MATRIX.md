@@ -12,7 +12,7 @@ software/structural checks, never game compatibility. Details: ../CURRENT_STATUS
 | DDS/GTF | Built-in supported formats, mips, complete cubes, remapping | Unknown layouts/DX10/volumes |
 | Overrides | Recursive, DDS/SCNE priority, base normalization outside stadiums | Ambiguous identities rejected |
 | SCNE preview | Arena/court/cloth/shoes, texture routing and movable camera | Full shaders/skinning/authoring |
-| Rosters | Confirmed ratings/fields, RGB, shoes, undo, ZIP save and IFF export | Opaque fields/long strings |
+| Rosters | Confirmed ratings/fields, conference history records, RGB, shoes, undo, ZIP save and IFF export | Opaque fields/long strings; conference gameplay effects |
 | Uniforms/alternates | Shape/owner/asset linking and explicit builders/check boxes | Complete runtime unlock behavior |
 | D1 conversion | Explicit optional roster action | Independent IDs/asset copy validation |
 | Palettes | 22 exact captions and three runtime roles | Six words and arena masks |

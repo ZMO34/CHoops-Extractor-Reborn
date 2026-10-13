@@ -1136,7 +1136,7 @@ class Window(QMainWindow):
 
         layout = self.page(
             "Roster editor",
-            "Confirmed player and team fields only. Save a copy, reopen it, then stage it for a separate JB build.",
+            "Edit supported roster and conference records. Save a copy, reopen it, then stage it for a separate JB build.",
         )
 
         self.buttons(

@@ -24,7 +24,16 @@ EDITABLE = {**EDITABLE,
 
 STRING_FIELDS['conferences'] = {'conference_name':0, 'abbreviation':4}
 REFERENCES['conference_index'] = (0x48,'conferences',1)
-EDITABLE['conferences'] = tuple(STRING_FIELDS['conferences'])
+# Conference row fields corroborated against the public CH2k8 roster parser and
+# the matching USERDATA row values. Keep the original field names and widths.
+CONFERENCE_SCALARS = {
+    'conference_type':(0x0a,2), 'sort_order':(0x0c,2), 'founded_year':(0x0e,2),
+    'champs_order':(0x10,2), 'final_fours':(0x12,2), 'prev_yr_bids':(0x14,2),
+    'rank':(0x16,2), 'last_champ_order':(0x18,2), 'presentation_id':(0x1a,2),
+    'tourney_slots':(0x1c,2), 'tourney_day':(0x1e,2),
+    'color_red':(0x20,1), 'color_green':(0x21,1), 'color_blue':(0x22,1),
+}
+EDITABLE['conferences'] = (*STRING_FIELDS['conferences'], *CONFERENCE_SCALARS)
 # Assignment requires reciprocal member-list updates; expose the link read-only.
 HEADER_TABLES = {'players':(8,17,308,65535),'arenas':(0x20,25,28,8192),
                  'teams':(0x28,49,704,8192),'coaches':(0x38,21,44,65535),

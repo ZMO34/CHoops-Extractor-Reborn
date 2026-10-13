@@ -4,7 +4,7 @@ from collections import defaultdict
 from ..formats.binary import Binary
 from ..archive.manifests import digest
 from ..core.errors import ToolError
-from .schema import TABLES,STRING_FIELDS,REFERENCES,EDITABLE,POSITIONS,PALETTE_OFFSET,PALETTE_COUNT,detect_tables,RATING_OFFSET,RATING_COUNT,PLAYER_PROPERTIES,PLAYER_SCALARS,TENDENCY_OFFSET,TENDENCY_NAMES,TEAM_TYPE_OFFSET,TEAM_TYPES,CONFERENCE_MEMBER_CAPACITY,CONFERENCE_MEMBER_COUNT
+from .schema import TABLES,STRING_FIELDS,REFERENCES,EDITABLE,POSITIONS,PALETTE_OFFSET,PALETTE_COUNT,detect_tables,RATING_OFFSET,RATING_COUNT,PLAYER_PROPERTIES,PLAYER_SCALARS,TENDENCY_OFFSET,TENDENCY_NAMES,TEAM_TYPE_OFFSET,TEAM_TYPES,CONFERENCE_MEMBER_CAPACITY,CONFERENCE_MEMBER_COUNT,CONFERENCE_SCALARS
 from .adapters import load,load_bytes
 
 class EditorModel:
@@ -95,6 +95,8 @@ class EditorModel:
                     row.update(team_asset_id=(word0>>22)&1023,uniform_asset_id=(word0>>12)&1023,
                                variant_code=(word0>>8)&7,jersey_shape_code=(word1>>27)&7,unlock_id=word0&127)
                 elif table=='conferences':
+                    for name,(rel,field_size) in CONFERENCE_SCALARS.items():
+                        row[name]=int.from_bytes(b.slice(off+rel,field_size),'big')
                     row['team_indices'] = []
                     member_count=b.u16(off+CONFERENCE_MEMBER_COUNT)
                     if member_count>CONFERENCE_MEMBER_CAPACITY:raise ToolError('invalid_conference_count','Conference member count exceeds capacity')
@@ -154,6 +156,12 @@ class EditorModel:
             original=int.from_bytes(Binary(self.data).slice(off+rel,size),'big')
             mask=((1<<bits)-1)<<shift
             changes.append((off+rel,((original&~mask)|(value<<shift)).to_bytes(size,'big')))
+        elif table=='conferences' and field in CONFERENCE_SCALARS:
+            value=self.integer(value)
+            rel,size=CONFERENCE_SCALARS[field]
+            if not 0 <= value < (1 << (size*8)):
+                raise ToolError('conference_value_out_of_range',f'{field} must be 0..{(1 << (size*8))-1}')
+            changes.append((off+rel,value.to_bytes(size,'big')))
         elif table=='players' and field=='shot_tendencies':
             slot=self.integer(slot);value=self.integer(value)
             if not 0<=slot<len(TENDENCY_NAMES) or not 0<=value<=99:

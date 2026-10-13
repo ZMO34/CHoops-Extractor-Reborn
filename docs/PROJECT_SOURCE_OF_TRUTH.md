@@ -59,6 +59,12 @@ SCNE package header is 0x54 bytes. +20 texture count; +24 relative texture point
 
 ## Roster and development direction
 
+Conference scalar provenance: the public
+[conferences.py](https://github.com/bphit4/CH2k8-Roster-Editor/blob/main/conferences.py)
+defines the same +0x0A..+0x22 field offsets and big-endian u16/RGB widths. The
+separate Conference_Parser.py only locates rows/names; it does not establish those
+scalar meanings. Source captions are retained and gameplay effects remain unverified.
+
 Current corrections: jersey number is byte +0x1B, preserving adjacent flags at
 +0x1A. Tables/counts derive from the header. Verified ratings, equipment/shoes,
 appearance choices, optional conference/D1 updates and alternate links are
@@ -68,7 +74,7 @@ remain unresolved; long string rebuilding and unknown fields remain blocked.
 
 Roster adapters support standard IFF ROST, raw ROST, type-21 wrapper, decrypted USERDATA with 4-byte prefix, and one-USERDATA decrypted ZIP. No encrypted-save decryption is provided. Known tables: players 0x0271AC/5685/308, arenas 0x1D5C84/379/28, teams 0x1D85E0/443/704, coaches 0x23F78C/1373/44.
 
-ROST pointers are field + signed delta (no standard-IFF minus one). Player last/first pointers +0x10/+0x14 use UTF-16LE; odd addresses are valid. Jersey is u16 +0x1A (preserve high ID +0x18), height +0x3A, position +0x3B. Team roster references +0x6C, 16 slots, point to player row +0x11. Team arena +0x44 targets arena row +0x19, coaches +0x60/+0x64/+0x68 target coach row +0x15, rivals +0x4C/+0x50/+0x54 target team row +0x31. Asset IDs are high u16 at +0x18C/+0x190/+0x194; preserve low words and require consistent existing IDs. Conference/prestige/appearance are not safe editable fields. Names require same UTF-16 byte length and unshared storage.
+ROST pointers are field + signed delta (no standard-IFF minus one). Player last/first pointers +0x10/+0x14 use UTF-16LE; odd addresses are valid. Jersey is u16 +0x1A (preserve high ID +0x18), height +0x3A, position +0x3B. Team roster references +0x6C, 16 slots, point to player row +0x11. Team arena +0x44 targets arena row +0x19, coaches +0x60/+0x64/+0x68 target coach row +0x15, rivals +0x4C/+0x50/+0x54 target team row +0x31. Asset IDs are high u16 at +0x18C/+0x190/+0x194; preserve low words and require consistent existing IDs. Conference record fields +0x0A..+0x22 are exposed with their source labels and original u16/RGB widths, based on the public CH2k8 roster parser and cross-checked against supplied USERDATA record values. The source labels identify founded year, championship-order values, Final Fours, prior-year bids, rank, presentation/tournament settings, and color; gameplay effects are not independently verified. Prestige and unknown appearance fields remain read-only. Names require same UTF-16 byte length and unshared storage.
 
 Current TXTR descriptor +0x58 contains format, mips, dimension, cube, remap,
 width/height/depth and pitch. GTF wraps descriptor/image in a 0x30-byte header.

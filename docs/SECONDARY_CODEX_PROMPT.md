@@ -104,7 +104,8 @@ not a permanently current HEAD assertion.
   material texture routing, packed geometry, camera movement and RSX remapping.
   Basic previews do not reproduce every game shader. Artificial floor lift is
   not the solution and must not be reintroduced.
-- Roster adapters, editable confirmed fields, ratings, undo/redo, RGB color dialog,
+- Roster adapters, editable confirmed fields and conference history records,
+  ratings, undo/redo, RGB color dialog,
   packed Yes/No and L/R choices, player/team shoe editing and roster IFF export.
 - Community ZIP/save wrappers are preserved. Existing unchanged malformed name
   characters are warnings; new corruption or invalid pointers still block writes.
@@ -633,6 +634,12 @@ SCNE package header is 0x54 bytes. +20 texture count; +24 relative texture point
 
 ## Roster and development direction
 
+Conference scalar provenance: the public
+[conferences.py](https://github.com/bphit4/CH2k8-Roster-Editor/blob/main/conferences.py)
+defines the same +0x0A..+0x22 field offsets and big-endian u16/RGB widths. The
+separate Conference_Parser.py only locates rows/names; it does not establish those
+scalar meanings. Source captions are retained and gameplay effects remain unverified.
+
 Current corrections: jersey number is byte +0x1B, preserving adjacent flags at
 +0x1A. Tables/counts derive from the header. Verified ratings, equipment/shoes,
 appearance choices, optional conference/D1 updates and alternate links are
@@ -642,7 +649,7 @@ remain unresolved; long string rebuilding and unknown fields remain blocked.
 
 Roster adapters support standard IFF ROST, raw ROST, type-21 wrapper, decrypted USERDATA with 4-byte prefix, and one-USERDATA decrypted ZIP. No encrypted-save decryption is provided. Known tables: players 0x0271AC/5685/308, arenas 0x1D5C84/379/28, teams 0x1D85E0/443/704, coaches 0x23F78C/1373/44.
 
-ROST pointers are field + signed delta (no standard-IFF minus one). Player last/first pointers +0x10/+0x14 use UTF-16LE; odd addresses are valid. Jersey is u16 +0x1A (preserve high ID +0x18), height +0x3A, position +0x3B. Team roster references +0x6C, 16 slots, point to player row +0x11. Team arena +0x44 targets arena row +0x19, coaches +0x60/+0x64/+0x68 target coach row +0x15, rivals +0x4C/+0x50/+0x54 target team row +0x31. Asset IDs are high u16 at +0x18C/+0x190/+0x194; preserve low words and require consistent existing IDs. Conference/prestige/appearance are not safe editable fields. Names require same UTF-16 byte length and unshared storage.
+ROST pointers are field + signed delta (no standard-IFF minus one). Player last/first pointers +0x10/+0x14 use UTF-16LE; odd addresses are valid. Jersey is u16 +0x1A (preserve high ID +0x18), height +0x3A, position +0x3B. Team roster references +0x6C, 16 slots, point to player row +0x11. Team arena +0x44 targets arena row +0x19, coaches +0x60/+0x64/+0x68 target coach row +0x15, rivals +0x4C/+0x50/+0x54 target team row +0x31. Asset IDs are high u16 at +0x18C/+0x190/+0x194; preserve low words and require consistent existing IDs. Conference record fields +0x0A..+0x22 are exposed with their source labels and original u16/RGB widths, based on the public CH2k8 roster parser and cross-checked against supplied USERDATA record values. The source labels identify founded year, championship-order values, Final Fours, prior-year bids, rank, presentation/tournament settings, and color; gameplay effects are not independently verified. Prestige and unknown appearance fields remain read-only. Names require same UTF-16 byte length and unshared storage.
 
 Current TXTR descriptor +0x58 contains format, mips, dimension, cube, remap,
 width/height/depth and pitch. GTF wraps descriptor/image in a 0x30-byte header.
@@ -928,6 +935,29 @@ Updated 2026-10-11. CURRENT_STATUS.md and TEST_REPORT.md are the living evidence
 Embedded source: docs/TEST_REPORT.md
 
 # Development verification
+
+## Independent conference review — 2026-10-12
+
+Original PR #8 head f38448cadd71eae38e0374517193312fd3367bbd failed the generated
+handoff synchronization gate. Regenerated the snapshot and added parameterized
+coverage for all 14 conference scalars: exact byte preservation, reopen, validation,
+undo and negative/overflow rejection without mutation. The source offset/width
+table matches the primary public `conferences.py` definition; labels remain source
+labels, not independently verified gameplay semantics. No private inputs required,
+emulator/gameplay checks or test JB copies. Final head/results are recorded in PR #8.
+Portable checks passed 292 tests, 1 native codec skip, 2 deselected; source startup,
+scoped lint/type checks and handoff synchronization passed. The native FFmpeg
+helper is unavailable locally, so that skip is explicit rather than a pass.
+
+## Conference historical fields — current branch
+
+The supplied read-only USERDATA file was used to confirm 39 conference rows.
+An in-memory model edit changed only the selected `final_fours` field byte;
+model validation passed and undo restored the exact original payload. The file
+was not modified or added to Git. Windows packaging completed with
+`tools/rebuild/package_windows.ps1`; the packaged Qt startup and bundled LGPL
+audio round-trip smoke checks passed. Conference gameplay effects are not
+independently verified.
 
 ## LGPL audio packaging branch — verified PR head
 

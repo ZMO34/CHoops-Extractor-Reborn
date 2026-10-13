@@ -16,7 +16,7 @@ class RosterEditor(ttk.Frame):
         for label,callback in [('Validate Changes',self.validate),('Undo',self.undo),('Revert Unsaved',self.revert),('Save Copy',self.save),('Export JSON/CSV',self.export)]:ttk.Button(controls,text=label,command=callback).pack(side='left')
         ttk.Label(self,textvariable=self.status,wraplength=850).pack(fill='x')
         self.notebook=ttk.Notebook(self);self.notebook.pack(fill='both',expand=True);self.trees={};self.filters={}
-        columns={'players':['index','first_name','last_name','jersey_number','height_inches','position'],'teams':['index','school_name','asset_id','arena_index','coach_index'],'arenas':['index','arena_name','arena_code'],'coaches':['index','coach_name','abbreviation']}
+        columns={'players':['index','first_name','last_name','jersey_number','height_inches','position'],'teams':['index','school_name','asset_id','arena_index','coach_index'],'arenas':['index','arena_name','arena_code'],'coaches':['index','coach_name','abbreviation'],'conferences':['index','conference_name','abbreviation','founded_year','champs_order','final_fours','prev_yr_bids','rank','last_champ_order']}
         for table,cols in columns.items():
             frame=ttk.Frame(self.notebook);self.notebook.add(frame,text=table.title());filter_var=tk.StringVar();self.filters[table]=filter_var
             ttk.Label(frame,text='Search/filter').pack(anchor='w');entry=ttk.Entry(frame,textvariable=filter_var);entry.pack(fill='x');entry.bind('<KeyRelease>',lambda e,t=table:self.refresh(t))
@@ -27,11 +27,11 @@ class RosterEditor(ttk.Frame):
         edit=ttk.LabelFrame(self,text='Edit selected player/team — confirmed fields only');edit.pack(fill='x');self.field=tk.StringVar();self.value=tk.StringVar();self.slot=tk.StringVar(value='1')
         self.field_box=ttk.Combobox(edit,textvariable=self.field,state='readonly',width=22);self.field_box.pack(side='left');self.field_box.bind('<<ComboboxSelected>>',lambda e:self.populate_value())
         ttk.Entry(edit,textvariable=self.value,width=28).pack(side='left');ttk.Label(edit,text='Roster slot (1–16)').pack(side='left');ttk.Spinbox(edit,from_=1,to=16,textvariable=self.slot,width=5).pack(side='left');ttk.Button(edit,text='Apply Edit',command=self.apply).pack(side='left')
-        ttk.Label(self,text='Names: same UTF-16 byte length, unshared storage only. Position: 0 PG, 1 SG, 2 SF, 3 PF, 4 C. References use table indices. Skin tone, conference, prestige, unknown appearance bytes and long strings remain read-only.',wraplength=850).pack(fill='x')
+        ttk.Label(self,text='Names: same UTF-16 byte length, unshared storage only. Position: 0 PG, 1 SG, 2 SF, 3 PF, 4 C. Conference history fields use the source record values and widths; conference names and other roster strings must retain their encoded length. Unknown fields remain read-only.',wraplength=850).pack(fill='x')
         slots=ttk.LabelFrame(self,text='Selected team roster slots');slots.pack(fill='both');self.slots=ttk.Treeview(slots,columns=['slot','player_index','player_name'],show='headings',height=4)
         for col in self.slots['columns']:self.slots.heading(col,text=col.replace('_',' ').title())
         self.slots.pack(fill='both');self.slots.bind('<<TreeviewSelect>>',self.select_slot)
-    def current_table(self):return ['players','teams','arenas','coaches'][self.notebook.index('current')]
+    def current_table(self):return list(self.trees)[self.notebook.index('current')]
     def selected_index(self,table):
         selection=self.trees[table].selection()
         if not selection:raise ToolError('no_row_selected','Select a row first')

@@ -1,5 +1,28 @@
 # Development verification
 
+## Independent conference review — 2026-10-12
+
+Original PR #8 head f38448cadd71eae38e0374517193312fd3367bbd failed the generated
+handoff synchronization gate. Regenerated the snapshot and added parameterized
+coverage for all 14 conference scalars: exact byte preservation, reopen, validation,
+undo and negative/overflow rejection without mutation. The source offset/width
+table matches the primary public `conferences.py` definition; labels remain source
+labels, not independently verified gameplay semantics. No private inputs required,
+emulator/gameplay checks or test JB copies. Final head/results are recorded in PR #8.
+Portable checks passed 292 tests, 1 native codec skip, 2 deselected; source startup,
+scoped lint/type checks and handoff synchronization passed. The native FFmpeg
+helper is unavailable locally, so that skip is explicit rather than a pass.
+
+## Conference historical fields — current branch
+
+The supplied read-only USERDATA file was used to confirm 39 conference rows.
+An in-memory model edit changed only the selected `final_fours` field byte;
+model validation passed and undo restored the exact original payload. The file
+was not modified or added to Git. Windows packaging completed with
+`tools/rebuild/package_windows.ps1`; the packaged Qt startup and bundled LGPL
+audio round-trip smoke checks passed. Conference gameplay effects are not
+independently verified.
+
 ## LGPL audio packaging branch — verified PR head
 
 Follow-up native reproduction: stereo IEEE-float WAV audio with peaks at ±1.5
