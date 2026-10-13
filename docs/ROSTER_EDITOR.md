@@ -1,5 +1,12 @@
 # Roster editor
 
+v1.10: Player, Ratings and Scholarship tabs are always beside the selected player.
+Double-click a writable value to edit it; Scholarship has a named status picker.
+Height uses feet/inches, positions PG–C and equipment readable styles. Schools
+combines Teams/Edit Schools. Realign conference changes membership without D1
+conversion. Alternate/new-asset/independent-asset actions and separate properties/
+attributes buttons are removed. [Research evidence](PLAYER_QOL_RESEARCH.md).
+
 Open the GUI Roster Editor and choose roster_english.iff, raw ROST, decrypted USERDATA, a type-21 tool wrapper, or a decrypted ZIP containing exactly one USERDATA. Encrypted saves are not decrypted by this tool.
 
 Players, teams, schools, arenas, coaches, conferences and uniforms have searchable

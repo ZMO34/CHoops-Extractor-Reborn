@@ -1,5 +1,8 @@
 # Native rebuild additions
 
+v1.10 no longer registers add-uniform-alternate, fill-five-uniforms or
+add-archive-assets. No alternate asset creation is included in this release.
+
 Experimental audio examples: [AUDIO_WORKFLOW.md](AUDIO_WORKFLOW.md). Commands:
 audio-catalog, export-soundtrack, replace-song, import-audio-folder, export-audo,
 replace-audo, export-jukebox-art, replace-jukebox-art. The Qt Audio workspace

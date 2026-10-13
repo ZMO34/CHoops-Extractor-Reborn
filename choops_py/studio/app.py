@@ -101,12 +101,15 @@ class Rows(QAbstractTableModel):
             if hint:return hint+f" [hash {self.rows[index.row()].get('hash',0):08X}]"
             return f"hash_{self.rows[index.row()].get('hash', 0):08x}"
         from ..roster.schema import ENUM_CHOICES
+        if key == 'height_inches':
+            from ..roster.presentation import height_text
+            return height_text(value)
         if key in ENUM_CHOICES:
             return ENUM_CHOICES[key].get(value, f'Unknown ({value})')
         if isinstance(value, (list, dict)):
             labels = {'palette_colors':'colors; use Team palette',
-                      'attribute_ratings':'ratings; use Player attributes',
-                      'properties':'properties; use Player properties',
+                      'attribute_ratings':'ratings; shown in player panel',
+                      'properties':'details; shown in player panel',
                       'roster_slots':'player slots; use Edit selected'}
             return f"{len(value)} {labels.get(key, 'entries')}"
         return str(value if value is not None else "")
@@ -1146,22 +1149,23 @@ class Window(QMainWindow):
                 ("Load game roster", self.load_game_roster),
                 ("Edit selected…", self.edit_roster),
                 ("Team palette…", self.show_team_palette),
-                ("Add alternate to JB copy…", self.add_uniform_alternate),
-                ("Give schools five jerseys…", self.fill_five_uniforms),
-                ("Move school / convert to D1…", self.move_school),
-                ("Enable alternates…", self.edit_alternate_availability),
-                ("Preview assigned shoes…", self.preview_assigned_shoes),
-                ("Edit shoes…", self.edit_roster_shoes),
-                ("Give school independent assets…", self.declone_school_assets),
-                ("Player attributes…", self.show_player_attributes),
-                ("Player properties…", self.show_player_properties),
-                ("Research layout…", self.research_roster),
+                ("Realign conference…", self.move_school),
                 ("Undo", self.undo_roster),
                 ("Redo", self.redo_roster),
                 ("Save copy…", self.save_roster),
-                ("Export game roster IFF…", self.export_game_roster),
             ],
         )
+
+        from PySide6.QtWidgets import QMenu
+        extra=QHBoxLayout()
+        shoe_button=QPushButton('Shoes…');shoe_menu=QMenu(shoe_button)
+        shoe_menu.addAction('Edit shoes…',self.edit_roster_shoes)
+        shoe_menu.addAction('Preview assigned shoes…',self.preview_assigned_shoes)
+        shoe_button.setMenu(shoe_menu);extra.addWidget(shoe_button)
+        export_button=QPushButton('Export…');export_menu=QMenu(export_button)
+        export_menu.addAction('Game roster IFF…',self.export_game_roster)
+        export_button.setMenu(export_menu);extra.addWidget(export_button);extra.addStretch()
+        layout.addLayout(extra)
 
         self.roster_search = QLineEdit()
 
@@ -1175,16 +1179,23 @@ class Window(QMainWindow):
 
         self.roster_views = {}
 
-        for name in ("players", "teams", "schools", "arenas", "coaches", "conferences", "uniforms"):
+        for name in ("players", "teams", "arenas", "coaches", "conferences", "uniforms"):
             view = table()
 
             self.roster_views[name] = view
 
-            self.roster_tabs.addTab(view, "Edit Schools" if name=="schools" else name.title())
+            self.roster_tabs.addTab(view, "Schools" if name=='teams' else name.title())
+        self.roster_views['schools']=self.roster_views['teams']
 
         # Keep category tabs outside the row-scrolling viewports.
         self.roster_tabs.tabBar().setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-        layout.addWidget(self.roster_tabs, 1)
+        from .player_details import PlayerDetails
+        self.player_details=PlayerDetails(self)
+        splitter=QSplitter();splitter.addWidget(self.roster_tabs);splitter.addWidget(self.player_details)
+        splitter.setStretchFactor(0,3);splitter.setStretchFactor(1,2)
+        layout.addWidget(splitter,1)
+        self.roster_tabs.currentChanged.connect(lambda _:self.update_player_details())
+        self.roster_views['players'].doubleClicked.connect(lambda _:self.edit_roster())
 
         self.roster_state = QLabel("No roster loaded")
 
@@ -1195,6 +1206,12 @@ class Window(QMainWindow):
         for view in self.roster_views.values():
             if view.model():
                 view.model().setFilterFixedString(text)
+
+    def update_player_details(self):
+        view=self.roster_views['players']
+        rows=selected(view) if view.model() and self.roster_tabs.currentWidget() is view else []
+        self.player_details.setVisible(self.roster_tabs.currentWidget() is view)
+        self.player_details.show_player(rows[0] if len(rows)==1 else None)
 
     def choose_roster(self):
 
@@ -1228,13 +1245,15 @@ class Window(QMainWindow):
         )
 
     def display_roster(self, model):
-
+        previous=selected(self.roster_views['players']) if self.roster_views['players'].model() else []
+        selected_index=previous[0]['index'] if len(previous)==1 else None
         self.roster = model
         self.refresh_uniform_list()
         if getattr(self, "scene_meshes", None):
             self.select_scene_part()
 
         for name, view in self.roster_views.items():
+            if name=='schools':continue
             rows = model.rows.get("teams" if name=="schools" else name, [])
 
             columns = (
@@ -1249,7 +1268,21 @@ class Window(QMainWindow):
 
             identity = 'display_name' if name=='players' else 'school_name' if name in ('teams','schools') else 'arena_name' if name=='arenas' else 'coach_name' if name=='coaches' else 'conference_name'
             columns.sort(key=lambda col: (0 if col[0]==identity else 1 if col[0]=='index' else 2))
+            if name=='players':
+                columns=[('display_name','Player'),('jersey_number','Number'),('height_inches','Height'),('position_code','Position'),('scholarship_status','Scholarship'),('weight_lbs','Weight'),('hand_code','Hand')]
+            elif name=='teams':
+                conferences={r['index']:r['conference_name'] for r in model.rows.get('conferences',[])}
+                rows=[dict(r,conference_name=conferences.get(r.get('conference_index'),'None')) for r in rows]
+                columns=[('school_name','School'),('abbreviation','Abbreviation'),('conference_name','Conference'),('asset_id','Asset ID')]
             set_rows(view, rows, columns, self.roster_search.text())
+            if name=='players':
+                view.selectionModel().selectionChanged.connect(lambda *_:self.update_player_details())
+                if selected_index is not None and 0<=selected_index<len(model.rows.get('players',[])):
+                    for i in range(view.model().rowCount()):
+                        if view.model().index(i,0).data(Qt.ItemDataRole.DisplayRole)==model.rows['players'][selected_index]['display_name']:
+                            source=view.model().mapToSource(view.model().index(i,0))
+                            if view.model().sourceModel().rows[source.row()]['index']==selected_index:view.selectRow(i);break
+        self.update_player_details()
 
         warnings=len(model.validate()['preserved_source_string_issues'])
         self.roster_state.setText(
@@ -1269,58 +1302,8 @@ class Window(QMainWindow):
         color = picker.currentColor()
         return f'#{color.red():02X}{color.green():02X}{color.blue():02X}{color.alpha():02X}'
 
-    def fill_five_uniforms(self):
-        if self.active or not self.archive or not self.roster:return self.log('Load the current JB folder and roster first.')
-        output,_=QFileDialog.getSaveFileName(self,'New JB folder with five jerseys per playable school',str(OUTPUT/'builds'/'five_uniforms'))
-        if not output:return
-        from ..modding.add_alternate import fill_five
-        payload=bytes(self.roster.data)
-        self.run_job('Build five-bank school uniforms',lambda job:fill_five(self.source,output,job,payload),
-                     lambda report:self.log(json.dumps(report,indent=2)),cancellable=True)
 
-    def declone_school_assets(self):
-        if self.active or not self.roster or not self.archive:return self.log('Load the current JB folder and roster first.')
-        view=self.roster_tabs.currentWidget()
-        if view not in (self.roster_views['teams'],self.roster_views['schools']):return self.log('Select a school in Teams or Edit Schools.')
-        rows=selected(view)
-        if len(rows)!=1:return self.log('Select exactly one school.')
-        asset,ok=QInputDialog.getInt(self,'Independent school assets','New stadium, uniform owner and menu-logo ID',1000,0,1023)
-        if not ok:return
-        output,_=QFileDialog.getSaveFileName(self,'New JB folder with independent school assets',str(OUTPUT/'builds'/'independent_school'))
-        if not output:return
-        from ..modding.declone import declone
-        payload=bytes(self.roster.data)
-        self.run_job('Copy independent school assets',lambda job:declone(self.source,rows[0]['index'],asset,output,job,payload),
-                     lambda report:self.log(json.dumps(report,indent=2)),cancellable=True)
 
-    def edit_alternate_availability(self):
-        if not self.roster or self.active:return
-        view=self.roster_tabs.currentWidget()
-        if view not in (self.roster_views['teams'],self.roster_views['schools']):return self.log('Select a school in Teams or Edit Schools.')
-        rows=selected(view)
-        if len(rows)!=1:return self.log('Select exactly one school.')
-        from ..roster.uniforms import disabled_uniforms
-        row=rows[0];owner=row['uniform_owner_id']
-        active={r['variant_code'] for r in self.roster.rows['uniforms'] if r['team_asset_id']==owner}
-        dormant={a>>8&7 for a,_ in disabled_uniforms(bytes(self.roster.data)) if a>>22&1023==owner}
-        dialog=QDialog(self);dialog.setWindowTitle('Alternate availability')
-        form=QFormLayout(dialog);checks={}
-        for variant in (2,3,4):
-            box=QCheckBox('Alternate '+str(variant-1));box.setChecked(variant in active)
-            box.setEnabled(variant in active or variant in dormant)
-            if not box.isEnabled():box.setToolTip('Add this alternate and its assets to a JB copy first.')
-            checks[variant]=box;form.addRow(box)
-        buttons=QDialogButtonBox(QDialogButtonBox.StandardButton.Ok|QDialogButtonBox.StandardButton.Cancel)
-        buttons.accepted.connect(dialog.accept);buttons.rejected.connect(dialog.reject);form.addRow(buttons)
-        if dialog.exec()!=QDialog.DialogCode.Accepted:return
-        before=bytes(self.roster.data);history=list(self.roster.history);edits=list(self.roster.edits);redo=list(self.roster.redo_history)
-        try:
-            for variant,box in checks.items():
-                if box.isEnabled():self.roster.set_alternate_enabled(row['index'],variant,box.isChecked())
-            self.display_roster(self.roster)
-        except ValueError as error:
-            self.roster.data=bytearray(before);self.roster.history=history;self.roster.edits=edits;self.roster.redo_history=redo;self.roster.reload()
-            QMessageBox.warning(self,'Alternate edit blocked',str(error))
 
     def move_school(self):
         if not self.roster or self.active:return
@@ -1329,45 +1312,19 @@ class Window(QMainWindow):
         rows=selected(view)
         if len(rows)!=1:return self.log('Select exactly one school.')
         row=rows[0];conferences=self.roster.rows.get('conferences',[])
-        dialog=QDialog(self);dialog.setWindowTitle('Conference membership / optional D1 conversion')
+        dialog=QDialog(self);dialog.setWindowTitle('Conference realignment')
         form=QFormLayout(dialog);choices=QComboBox()
         for conf in conferences:choices.addItem(str(conf['index'])+': '+conf['conference_name'],conf['index'])
         choices.setCurrentIndex(max(0,choices.findData(row.get('conference_index'))))
-        convert=QCheckBox('Convert this slot to Current D1 classification')
-        convert.setChecked(False)
-        form.addRow('Destination conference',choices);form.addRow(convert)
+        form.addRow('Destination conference',choices)
         buttons=QDialogButtonBox(QDialogButtonBox.StandardButton.Ok|QDialogButtonBox.StandardButton.Cancel)
         buttons.accepted.connect(dialog.accept);buttons.rejected.connect(dialog.reject);form.addRow(buttons)
         if dialog.exec()!=QDialog.DialogCode.Accepted:return
         try:
-            self.roster.move_team_to_conference(row['index'],choices.currentData(),make_d1=convert.isChecked())
+            self.roster.move_team_to_conference(row['index'],choices.currentData())
             self.display_roster(self.roster)
         except ValueError as error:QMessageBox.warning(self,'School move blocked',str(error))
 
-    def add_uniform_alternate(self):
-        if self.active or not self.roster or not self.archive:
-            return self.log('Load the current JB folder and roster first.')
-        if self.roster_tabs.currentWidget() is not self.roster_views['uniforms']:
-            return self.log('Select the template record in the Uniforms roster tab.')
-        rows=selected(self.roster_views['uniforms'])
-        if len(rows)!=1:return self.log('Select exactly one uniform template.')
-        row=rows[0]
-        occupied={r['variant_code'] for r in self.roster.rows['uniforms'] if r['team_asset_id']==row['team_asset_id']}
-        available=[v for v in (2,3,4) if v not in occupied]
-        if not available:return self.log('This team already uses all three supported alternate banks.')
-        from ..roster.uniforms import VARIANT_NAMES
-        label,ok=QInputDialog.getItem(self,'New alternate bank','Choose an unused bank',[VARIANT_NAMES[v] for v in available],0,False)
-        if not ok:return
-        variant=next(v for v in available if VARIANT_NAMES[v]==label)
-        asset,ok=QInputDialog.getInt(self,'New alternate asset','Asset selector (0–1023)',row['uniform_asset_id'],0,1023)
-        if not ok:return
-        output,_=QFileDialog.getSaveFileName(self,'New copied JB folder path',str(OUTPUT/'builds'/'new_alternate'))
-        if not output:return
-        from ..modding.add_alternate import add
-        payload=bytes(self.roster.data)
-        self.run_job('Build copied JB with new alternate',
-                     lambda job:add(self.source,row['index'],asset,variant,output,job,payload),
-                     lambda report:self.log(json.dumps(report,indent=2)),cancellable=True)
 
     def show_team_palette(self, team_index=None):
         if not self.roster:
@@ -1411,53 +1368,7 @@ class Window(QMainWindow):
         view.itemDoubleClicked.connect(lambda *_: edit())
         refresh();dialog.exec()
 
-    def show_player_properties(self):
-        if not self.roster:return
-        rows=selected(self.roster_views['players'])
-        if len(rows)!=1:return self.log("Select one player in the Players tab.")
-        from ..roster.schema import TENDENCY_NAMES
-        row=rows[0];dialog=QDialog(self);dialog.resize(650,650)
-        dialog.setWindowTitle('Player properties • executable-backed storage')
-        layout=QVBoxLayout(dialog)
-        layout.addWidget(QLabel('Confirmed choices use readable labels; unresolved appearance enums retain their raw codes.'))
-        view=QTreeWidget();view.setHeaderLabels(['Property','Value'])
-        from ..roster.schema import PROPERTY_CHOICES
-        for name,value in row['properties'].items():QTreeWidgetItem(view,[name,PROPERTY_CHOICES.get(name,{}).get(value,str(value))])
-        for name,value in zip(TENDENCY_NAMES,row['shot_tendencies']):QTreeWidgetItem(view,[name+' tendency',str(value)])
-        layout.addWidget(view);dialog.exec()
 
-    def show_player_attributes(self):
-        if not self.roster or self.active:
-            return
-        rows = selected(self.roster_views['players'])
-        if len(rows)!=1:
-            return self.log("Select one player in the Players tab.")
-        from ..roster.schema import RATING_HINTS,RATING_OFFSET
-        from ..formats.binary import Binary
-        player_index=rows[0]['index']
-        dialog=QDialog(self);dialog.resize(780,700)
-        dialog.setWindowTitle('Player attributes • executable and UI metadata verified')
-        layout=QVBoxLayout(dialog)
-        layout.addWidget(QLabel('30 named attributes; edits use the game setter encoding (rating × 100).'))
-        view=QTreeWidget();view.setHeaderLabels(['Channel','Row offset','Rating','Stored u16','Attribute'])
-        layout.addWidget(view)
-        def refresh():
-            view.clear();row=self.roster.rows['players'][player_index];binary=Binary(self.roster.data)
-            for i,value in enumerate(row['attribute_ratings']):
-                offset=RATING_OFFSET+i*2
-                QTreeWidgetItem(view,[str(i),hex(offset),str(value),str(binary.u16(row['row_offset']+offset)),RATING_HINTS.get(i,'Unassigned attribute')])
-        def edit():
-            items=view.selectedItems()
-            if not items:return
-            channel=int(items[0].text(0))
-            value,ok=QInputDialog.getInt(dialog,'Edit attribute channel','Rating',int(items[0].text(2)),35,99)
-            if ok:
-                try:
-                    self.roster.edit('players',player_index,'attribute_ratings',value,channel)
-                    self.display_roster(self.roster);refresh()
-                except ValueError as error:QMessageBox.warning(dialog,'Rating edit blocked',str(error))
-        button=QPushButton('Edit selected channel…');button.clicked.connect(edit);layout.addWidget(button)
-        refresh();dialog.exec()
 
     def scene_team_palette(self):
         import re
@@ -1495,6 +1406,12 @@ class Window(QMainWindow):
 
         if len(rows) != 1:
             return self.log("Select exactly one roster row.")
+
+        if name=='players':
+            self.player_details.setVisible(True)
+            self.player_details.show_player(rows[0])
+            self.player_details.setCurrentIndex(0)
+            return
 
 
         from ..roster.schema import EDITABLE, POSITIONS, REFERENCES, ENUM_CHOICES

@@ -90,7 +90,7 @@ def test_edit_schools_view_uses_team_records(qtbot):
     window.roster_tabs.setCurrentWidget(window.roster_views['schools'])
     window.roster_views['schools'].selectRow(1)
     assert selected(window.roster_tabs.currentWidget())[0]['asset_id']==1
-    assert window.roster_tabs.tabText(window.roster_tabs.currentIndex())=='Edit Schools'
+    assert window.roster_tabs.tabText(window.roster_tabs.currentIndex())=='Schools'
 
 
 def test_jersey_number_preserves_adjacent_flag_byte_and_roundtrips():

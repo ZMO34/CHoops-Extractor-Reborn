@@ -105,6 +105,31 @@ ENUM_CHOICES['jersey_shape_code'] = JERSEY_SHAPES
 
 ENUM_CHOICES['variant_code'] = {0:'Home (h)',1:'Away (a)',2:'Alternate 1 (x)',3:'Alternate 2 (y)',4:'Alternate 3 (z)'}
 
+# Scholarship toggle 0x68FE40 flips anchor +0x8C bit 31; the walk-on name
+# formatter 0x69F30C tests the same sign bit. Raw player row = anchor - 16.
+# One means scholarship, zero means walk-on; the nonnegative formatter branch
+# stores the walk-on suffix key. The weight bits share this word.
+PLAYER_SCALARS['scholarship_status']=(0x9c,4,31,1,0,1)
+EDITABLE['players']=(*EDITABLE['players'],'scholarship_status')
+ENUM_CHOICES['scholarship_status']={0:'Walk-on',1:'Scholarship'}
+ENUM_CHOICES['position_code']=POSITIONS
+PROPERTY_CHOICES['Away Sock Color']={0:'Black',1:'White'}
+from .equipment_choices import CHOICES as EQUIPMENT_CHOICES
+PROPERTY_CHOICES.update(EQUIPMENT_CHOICES)
+
+# Verified appearance/equipment masks already used by the property reader.
+# Multi-valued equipment is not a boolean: zero is None, one is a style.
+PROPERTY_FIELDS={}
+for prop in PLAYER_PROPERTIES:
+    if prop['name'] not in PROPERTY_CHOICES or prop['name'] in ('Hand','Weight','Potential','Confidence'):continue
+    key=prop['name'].lower().replace(' ','_')+'_code'
+    PROPERTY_FIELDS[prop['name']]=key
+    options=PROPERTY_CHOICES[prop['name']]
+    if key not in PLAYER_SCALARS:
+        PLAYER_SCALARS[key]=(prop['offset'],prop['size'],prop['shift'],prop['bits'],min(options),max(options))
+        EDITABLE['players']=(*EDITABLE['players'],key)
+    ENUM_CHOICES[key]=options
+
 # These are verified runtime/material roles, not extra Edit Schools captions.
 CONFIRMED_PALETTE_ROLES = {0:'Home team equipment color',1:'Non-home team equipment color',11:'Key Circle Inner'}
 PALETTE_HINTS.update(CONFIRMED_PALETTE_ROLES)

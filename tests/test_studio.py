@@ -208,7 +208,7 @@ def test_cancel_copy_removes_only_owned_staging(tmp_path):
 
 
 @pytest.mark.gui
-def test_native_roster_position_edit_and_copy_save(qtbot):
+def test_native_roster_position_edit_and_copy_save(qtbot,monkeypatch):
     from PySide6.QtCore import QTimer
     from PySide6.QtWidgets import QApplication,QDialog,QComboBox
     from support import roster_fixture
@@ -220,15 +220,14 @@ def test_native_roster_position_edit_and_copy_save(qtbot):
     window.show();window.navigation.setCurrentItem(window.navigation.topLevelItem(2));qtbot.wait(10)
     window.display_roster(model);window.roster_views['players'].selectRow(0)
     row_index=selected(window.roster_views['players'])[0]['index']
-    def choose():
-        dialog=QApplication.activeModalWidget();assert isinstance(dialog,QDialog)
-        field=dialog.findChild(QComboBox,'rosterField');field.setCurrentText('position_code')
-        value=dialog.findChild(QComboBox,'rosterValue');value.setCurrentIndex(value.findData(4))
-        dialog.accept()
     assert window.roster_tabs.tabText(window.roster_tabs.currentIndex())=='Players'
     assert window.active is None
-    timer=QTimer(window);timer.setSingleShot(True);timer.timeout.connect(choose);timer.start(100)
-    window.edit_roster();timer.stop()
+    from PySide6.QtWidgets import QInputDialog
+    monkeypatch.setattr(QInputDialog,'getItem',lambda *args,**kwargs:('C',True))
+    window.edit_roster()
+    item=window.player_details.details.topLevelItem(4)
+    assert item.text(0)=='Position'
+    window.player_details.edit_item(item,1)
     qtbot.waitUntil(lambda:window.active is None,timeout=10000)
     assert model.rows['players'][row_index]['position_code']==4
     path=OUTPUT/'temp'/('qt_save_'+uuid.uuid4().hex)/'roster.rost'
@@ -344,7 +343,7 @@ def test_explorer_previews_archive_textures_without_manual_export(qtbot, tmp_pat
 
 
 @pytest.mark.gui
-def test_alternate_checkboxes_and_opt_in_d1(qtbot,monkeypatch):
+def test_conference_realignment_has_no_conversion_controls(qtbot,monkeypatch):
     from PySide6.QtWidgets import QDialog,QCheckBox
     from test_roster_semantics import header_roster
     from choops_py.roster.editor_model import EditorModel
@@ -357,20 +356,8 @@ def test_alternate_checkboxes_and_opt_in_d1(qtbot,monkeypatch):
     window.display_roster(EditorModel(load_bytes(bytes(data))))
     window.roster_tabs.setCurrentWidget(window.roster_views['teams'])
     window.roster_views['teams'].selectRow(0)
-    def inspect_alternates(dialog):
-        boxes=dialog.findChildren(QCheckBox)
-        assert [b.text() for b in boxes]==['Alternate 1','Alternate 2','Alternate 3']
-        assert boxes[0].isChecked() and boxes[0].isEnabled()
-        assert not boxes[1].isChecked() and not boxes[1].isEnabled()
-        boxes[0].setChecked(False)
-        return QDialog.DialogCode.Accepted
-    monkeypatch.setattr(QDialog,'exec',inspect_alternates)
-    window.edit_alternate_availability()
-    assert len(window.roster.rows['uniforms'])==1
-    window.roster_views['teams'].selectRow(0)
     def inspect_conversion(dialog):
-        box=dialog.findChildren(QCheckBox)[0]
-        assert not box.isChecked()
+        assert not dialog.findChildren(QCheckBox)
         return QDialog.DialogCode.Rejected
     monkeypatch.setattr(QDialog,'exec',inspect_conversion)
     window.move_school();window.close()

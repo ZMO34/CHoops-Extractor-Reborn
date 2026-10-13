@@ -1,5 +1,16 @@
 # Current project status
 
+## v1.10 roster usability update
+
+Current public GUI combines Teams/Edit Schools as Schools, displays player height
+in feet/inches and positions as PG–C, and keeps Player/Ratings/Scholarship details
+beside the player table. Scholarship/Walk-on is writable through a verified flag,
+preserving weight and unknown bits. Separate properties/attributes dialogs and
+D1/alternate/independent-asset actions are removed from the release surface;
+conference realignment remains. No alternate work is authorized in this update.
+See PLAYER_QOL_RESEARCH.md; older feature descriptions below record historical
+backend capabilities rather than removed public actions.
+
 Updated 2026-10-12. Upstream: ZMO34/CHoops-Extractor-Reborn; base: master.
 Baseline before this handoff: `e556e360d0091df0bb645da9eb1d279e9d8f9e3a`.
 Last published Windows feature release at that baseline: **v1.07**, commit
