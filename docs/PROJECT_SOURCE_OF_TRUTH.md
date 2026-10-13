@@ -59,6 +59,12 @@ SCNE package header is 0x54 bytes. +20 texture count; +24 relative texture point
 
 ## Roster and development direction
 
+Conference scalar provenance: the public
+[conferences.py](https://github.com/bphit4/CH2k8-Roster-Editor/blob/main/conferences.py)
+defines the same +0x0A..+0x22 field offsets and big-endian u16/RGB widths. The
+separate Conference_Parser.py only locates rows/names; it does not establish those
+scalar meanings. Source captions are retained and gameplay effects remain unverified.
+
 Current corrections: jersey number is byte +0x1B, preserving adjacent flags at
 +0x1A. Tables/counts derive from the header. Verified ratings, equipment/shoes,
 appearance choices, optional conference/D1 updates and alternate links are
