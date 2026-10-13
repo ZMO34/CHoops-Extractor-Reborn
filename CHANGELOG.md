@@ -1,5 +1,13 @@
 # Change log
 
+## v1.11 — record side panels and previews
+
+Side editors for every category; integrated palettes, footwear and jersey preview.
+Safe player school assignment and 18-slot/count-aware roster handling, including
+real player row zero. School shoe brands propagate to that school’s roster as one
+undo step. Combined top/shorts preview with neck/build/cut dropdowns. Removed Edit
+selected, Team palette and shoe toolbar actions; no alternate assets added.
+
 ## v1.10 — roster editing cleanup
 
 Readable height/positions, visible Player/Ratings/Scholarship editor tabs, verified

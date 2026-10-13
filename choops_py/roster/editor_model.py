@@ -6,6 +6,7 @@ from ..archive.manifests import digest
 from ..core.errors import ToolError
 from .schema import TABLES,STRING_FIELDS,REFERENCES,EDITABLE,POSITIONS,PALETTE_OFFSET,PALETTE_COUNT,detect_tables,RATING_OFFSET,RATING_COUNT,PLAYER_PROPERTIES,PLAYER_SCALARS,TENDENCY_OFFSET,TENDENCY_NAMES,TEAM_TYPE_OFFSET,TEAM_TYPES,CONFERENCE_MEMBER_CAPACITY,CONFERENCE_MEMBER_COUNT,CONFERENCE_SCALARS
 from .adapters import load,load_bytes
+from .schema import ROSTER_SLOT_COUNT
 
 class EditorModel:
     def __init__(self,source,tables=None):
@@ -89,7 +90,8 @@ class EditorModel:
                     row['team_type_code']=(b.u32(off+TEAM_TYPE_OFFSET)>>15)&7 if off+TEAM_TYPE_OFFSET+4<=len(self.data) else None
                     for field,(rel,target,bias) in REFERENCES.items():
                         if target in self.tables:row[field]=self.reference(off+rel,target,bias)
-                    row['roster_slots']=[self.reference(off+0x6c+slot*4,'players',0x11,True) for slot in range(16)]
+                    active_count=b.u16(off+0x188)
+                    row['roster_slots']=[self.reference(off+0x6c+slot*4,'players',0x11,slot>=min(active_count,ROSTER_SLOT_COUNT)) for slot in range(ROSTER_SLOT_COUNT)]
                 elif table=='uniforms':
                     word0,word1=b.u32(off),b.u32(off+4)
                     row.update(team_asset_id=(word0>>22)&1023,uniform_asset_id=(word0>>12)&1023,
@@ -120,6 +122,7 @@ class EditorModel:
         return {'valid':not errors,'issues':errors,'preserved_source_string_issues':preserved,'source_type':self.source.kind,'counts':{name:len(rows) for name,rows in self.rows.items()},'unsaved_edits':len(self.edits),'read_only_fields':['skin tone','prestige','unknown appearance bytes','long strings','unconfirmed palette roles']}
     def edit(self,table,index,field,value,slot=None):
         if field not in EDITABLE.get(table,()):raise ToolError('roster_field_read_only',f'{table}.{field} is not a confirmed writable field')
+        if table=='teams' and field=='roster_slots':return self.edit_school_roster_slot(index,slot,value)
         from .shoes import FIELDS
         if field in FIELDS.get(table,{}):
             row=self.rows[table][index];values={key:row[key] for key in FIELDS[table]};values[field]=self.integer(value)
@@ -294,6 +297,18 @@ class EditorModel:
         self.history.append((before,list(self.edits)));self.redo_history=[]
         self.edits.append(dict(table=table,index=index,field='shoe_assignment',old=old,value=values))
 
+    def move_player_to_school(self,index,school_index):
+        from .membership import move_player
+        return move_player(self,index,school_index)
+
+    def edit_school_shoes(self,index,**values):
+        from .membership import school_shoes
+        return school_shoes(self,index,values)
+
+    def edit_school_roster_slot(self,index,slot,player_index):
+        from .membership import roster_slot
+        return roster_slot(self,index,slot,player_index)
+
     @staticmethod
     def integer(value):
         if isinstance(value,bool):raise ToolError('invalid_roster_value','Expected integer')
@@ -323,6 +338,9 @@ class EditorModel:
                 if e['field']=='alternate_enabled':self.set_alternate_enabled(int(e['index']),int(e['slot']),e['value'])
                 elif e['field']=='conference_membership':self.move_team_to_conference(int(e['index']),int(e['value']),e.get('make_d1',False))
                 elif e['field']=='shoe_assignment':self.edit_shoes(e['table'],int(e['index']),**e['value'])
+                elif e['field']=='school_assignment':self.move_player_to_school(int(e['index']),e['value'])
+                elif e['field']=='school_shoe_brand':self.edit_school_shoes(int(e['index']),**e['value'])
+                elif e['field']=='school_roster_slot':self.edit_school_roster_slot(int(e['index']),int(e['slot']),e['value'])
                 else:self.edit(e['table'],int(e['index']),e['field'],e['value'],e.get('slot'))
         elif 'tables' in document:
             edits=[]
@@ -335,7 +353,7 @@ class EditorModel:
                         if value==original[field]:continue
                         if field not in EDITABLE.get(table,()):raise ToolError('roster_field_read_only',field)
                         if field in ('roster_slots','palette_colors','attribute_ratings','shot_tendencies'):
-                            if len(value)!=(16 if field=='roster_slots' else PALETTE_COUNT if field=='palette_colors' else RATING_COUNT if field=='attribute_ratings' else len(TENDENCY_NAMES)):raise ToolError('roster_table_shape_changed','List field length changed')
+                            if len(value)!=(ROSTER_SLOT_COUNT if field=='roster_slots' else PALETTE_COUNT if field=='palette_colors' else RATING_COUNT if field=='attribute_ratings' else len(TENDENCY_NAMES)):raise ToolError('roster_table_shape_changed','List field length changed; export a fresh roster document')
                             for slot,(a,b) in enumerate(zip(original[field],value)):
                                 if a!=b:edits.append((table,index,field,b,slot))
                         else:edits.append((table,index,field,value,None))

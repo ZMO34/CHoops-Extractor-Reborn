@@ -55,6 +55,15 @@ class PlayerDetails(QTabWidget):
         layout.addWidget(note)
         layout.addStretch()
         self.addTab(scholarship, "Scholarship")
+        from .roster_panels import ShoeTab,JerseyTab
+        self.shoes=ShoeTab(owner);self.addTab(self.shoes,'Shoes')
+        self.jersey=JerseyTab(owner);self.addTab(self.jersey,'Jersey')
+        assignment=QWidget();form=QVBoxLayout(assignment)
+        self.school_state=QLabel('Select a player');self.school_state.setWordWrap(True);form.addWidget(self.school_state)
+        self.school=QComboBox();self.school.setObjectName('playerSchool');form.addWidget(self.school)
+        button=QPushButton('Apply school assignment');button.clicked.connect(self.apply_school);form.addWidget(button)
+        note=QLabel('Moves the player between roster slots and updates school counts. Attributes and current shoes are kept. Shared records, full rosters and inconsistent links are blocked.');note.setWordWrap(True);form.addWidget(note);form.addStretch()
+        self.addTab(assignment,'School')
         self.setEnabled(False)
 
     def add(self, tree, label, value, key=None, slot=None):
@@ -70,7 +79,16 @@ class PlayerDetails(QTabWidget):
         self.ratings.clear()
         self.player_index = row["index"] if row else None
         self.setEnabled(row is not None)
+        self.shoes.show_record('players',row);self.jersey.show_record('players',row)
+        self.school.clear()
         if row:
+            from ..roster.membership import player_schools
+            schools=player_schools(self.owner.roster,row['index'])
+            self.school.addItem('Unassigned',None)
+            for school in self.owner.roster.rows.get('teams',[]):self.school.addItem(school['school_name']+f" [#{school['index']}]",school['index'])
+            self.school.setCurrentIndex(max(0,self.school.findData(schools[0] if len(schools)==1 else None)))
+            names=[self.owner.roster.rows['teams'][i]['school_name'] for i in schools]
+            self.school_state.setText('Current school: '+(', '.join(names) if names else 'Unassigned')+(' — shared record; transfer blocked' if len(schools)>1 else ''))
             for key, label in [
                 ("first_name", "First name"),
                 ("last_name", "Last name"),
@@ -132,6 +150,13 @@ class PlayerDetails(QTabWidget):
 
     def apply_status(self):
         self.apply("scholarship_status", self.status.currentData())
+
+    def apply_school(self):
+        if self.player_index is None or self.owner.active:return
+        try:
+            self.owner.roster.move_player_to_school(self.player_index,self.school.currentData())
+            self.owner.display_roster(self.owner.roster)
+        except ValueError as error:QMessageBox.warning(self,'School assignment blocked',str(error))
 
     def edit_item(self, item, column):
         target = item.data(0, Qt.ItemDataRole.UserRole)

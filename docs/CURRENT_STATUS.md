@@ -1,5 +1,15 @@
 # Current project status
 
+## v1.11 side-panel update
+
+Every roster category has a right-side editor. School palettes, shoes and jersey
+previews are in appropriate side tabs; Edit selected/Team palette/shoe toolbar
+actions are removed. Player School supports guarded move/unassign; all 18 slots
+and counts are handled, with active player row zero correctly represented.
+School brand application updates that school’s players only in one undo step.
+Jersey preview combines top/shorts and offers neck/build/cut dropdowns. No alternate
+assets created. See ROSTER_SIDE_PANELS.md; it supersedes historical 16-slot claims.
+
 ## v1.10 roster usability update
 
 Current public GUI combines Teams/Edit Schools as Schools, displays player height

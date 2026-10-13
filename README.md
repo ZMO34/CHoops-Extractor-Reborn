@@ -1,5 +1,9 @@
 # CHoops Modding Studio — development rebuild
 
+v1.11 roster editing uses selected-record side panels for every category, with
+integrated palettes, footwear, player school assignment and combined jersey/shorts
+preview controls. [Guide and evidence](docs/ROSTER_SIDE_PANELS.md).
+
 Native PySide6 desktop tools for PS3 College Hoops 2K8: lazy archive/nested-record browsing, raw extraction, DDS preview/export/import, confirmed roster fields, replacement-folder staging and separate JB builds. The source game remains read-only.
 
 The full mandate remains incomplete. Start with [current status](docs/CURRENT_STATUS.md), [secondary Codex prompt](docs/SECONDARY_CODEX_PROMPT.md), [collaboration](docs/COLLABORATION.md), and [test report](docs/TEST_REPORT.md). Development releases use the v1.0x train; check GitHub for the latest tag.

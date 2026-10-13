@@ -1,5 +1,10 @@
 # Current limitations
 
+v1.11 transfers/brand propagation reject shared or inconsistent ownership and full
+18-player destinations. Whole-table older 16-slot JSON exports need refreshing.
+Static jersey preview has no runtime cloth, skinning, body or name/number overlays.
+No automatic Legacy eligibility/scholarship enforcement or gameplay guarantee.
+
 v1.10 removes D1 conversion and new alternate/independent-asset actions from the
 public editor/CLI. Single position and Scholarship/Walk-on are confirmed; secondary
 position is unproven and not exposed. See PLAYER_QOL_RESEARCH.md for evidence.

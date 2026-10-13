@@ -55,6 +55,9 @@ def test_player_details_visible_without_properties_button_and_editable_scholarsh
         "Player",
         "Ratings",
         "Scholarship",
+        "Shoes",
+        "Jersey",
+        "School",
     ]
     assert panel.details.topLevelItem(3).text(1) == "6 ft 0 in"
     assert panel.details.topLevelItem(4).text(1) == "PG"
