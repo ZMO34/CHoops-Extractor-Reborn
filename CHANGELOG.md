@@ -1,5 +1,11 @@
 # Change log
 
+## Unreleased — single-slice DDS replacements
+
+Allow a 2D DDS replacement for dimension-3 TXTR descriptors whose stored depth
+is exactly one, preserving the original descriptor. Deeper volume textures stay
+blocked.
+
 ## v1.11 — record side panels and previews
 
 Side editors for every category; integrated palettes, footwear and jersey preview.

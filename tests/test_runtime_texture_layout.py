@@ -137,4 +137,6 @@ def test_2d_stored_depth_does_not_turn_menu_art_into_a_volume(stored_depth):
 
 def test_real_volume_dimension_remains_rejected():
     base=txtr_fixture(format=0x86,split=True);head=bytearray(base[0]);head[0x5a]=3
+    assert TXTR([bytes(head),base[1]]).info()['width']==4
+    struct.pack_into('>H',head,0x64,2)
     with pytest.raises(ValueError,match='dimension=3'):TXTR([bytes(head),base[1]]).info()

@@ -21,7 +21,7 @@ conference realignment remains. No alternate work is authorized in this update.
 See PLAYER_QOL_RESEARCH.md; older feature descriptions below record historical
 backend capabilities rather than removed public actions.
 
-Updated 2026-10-12. Upstream: ZMO34/CHoops-Extractor-Reborn; base: master.
+Updated 2026-10-13. Upstream: ZMO34/CHoops-Extractor-Reborn; base: master.
 Baseline before this handoff: `e556e360d0091df0bb645da9eb1d279e9d8f9e3a`.
 Last published Windows feature release at that baseline: **v1.07**, commit
 `bf43d81b10ea2f16bab7df3e798edb64435ab6f4`.
@@ -37,6 +37,8 @@ not a permanently current HEAD assertion.
   raw TXTRs, replacement SCNE priority, dynamic supported stadium asset sizes.
 - Base-layout normalization outside sNNN stadiums; preserve source dimensions,
   format, mip count, remapping and layout. Use vanilla source for vanilla sizes.
+- DDS replacement accepts depth-one 3D TXTR descriptors as single-slice images,
+  preserving their descriptor; deeper volumes remain read-only.
 - Texture and geometry previews including arena, cloth and shoe selection;
   material texture routing, packed geometry, camera movement and RSX remapping.
   Basic previews do not reproduce every game shader. Artificial floor lift is

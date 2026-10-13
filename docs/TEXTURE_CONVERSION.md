@@ -7,8 +7,10 @@ comparison oracles and excluded from releases; see rebuild/CONVERTER_PROVENANCE.
 
 Export supported raw/wrapped TXTR, IFF, paired CDF or SCNE textures with a manifest
 and raw data. Unsupported conversion can retain raw exports; --strict fails instead.
-Unknown descriptors/DX10/true volume layouts remain blocked. Declared 2D/cubes
-ignore unused stored depth rather than being misclassified as volumes.
+Unknown descriptors/DX10 and volume layouts with more than one stored slice
+remain blocked. A dimension-3 descriptor with depth one can accept a 2D
+replacement while preserving its descriptor and one-slice payload. Declared
+2D/cubes ignore unused stored depth rather than being misclassified as volumes.
 
 ```powershell
 python -m choops_py.cli export-iff-textures output/rips/ua000.iff output/rips/uniform --dds
