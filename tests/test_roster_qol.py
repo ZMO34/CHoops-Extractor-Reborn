@@ -59,7 +59,7 @@ def test_player_details_visible_without_properties_button_and_editable_scholarsh
     assert panel.details.topLevelItem(3).text(1) == "6 ft 0 in"
     assert panel.details.topLevelItem(4).text(1) == "PG"
     texts = [button.text() for button in window.findChildren(QPushButton)]
-    assert not any('â' in text for text in texts)
+    assert not any("â" in text for text in texts)
     for removed in (
         "Player properties",
         "Give school independent assets",
@@ -85,3 +85,31 @@ def test_player_details_visible_without_properties_button_and_editable_scholarsh
     assert props["Away Sock Color"] in ("Black", "White")
     assert props["Left Arm Band"] == "None"
     assert window.roster_views["schools"] is window.roster_views["teams"]
+
+
+@pytest.mark.gui
+def test_duplicate_equipment_captions_do_not_change_selected_code(qtbot, monkeypatch):
+    from PySide6.QtWidgets import QInputDialog
+
+    model = roster_fixture()
+    model.edit("players", 0, "right_arm_band_code", 11)
+    window = Window()
+    qtbot.addWidget(window)
+    window.display_roster(model)
+    window.roster_views["players"].selectRow(0)
+    panel = window.player_details
+    item = next(
+        panel.details.topLevelItem(i)
+        for i in range(panel.details.topLevelItemCount())
+        if panel.details.topLevelItem(i).text(0) == "Right Arm Band"
+    )
+    before = bytes(model.data)
+
+    def choose_current(*args, **kwargs):
+        labels = args[3]
+        assert len(set(labels)) == len(labels)
+        return labels[args[4]], True
+
+    monkeypatch.setattr(QInputDialog, "getItem", choose_current)
+    panel.edit_item(item, 1)
+    assert bytes(model.data) == before

@@ -140,8 +140,16 @@ class PlayerDetails(QTabWidget):
         key, slot = target
         row = self.owner.roster.rows["players"][self.player_index]
         if key in ENUM_CHOICES:
-            options = ENUM_CHOICES[key]
-            labels = list(options.values())
+            options = dict(ENUM_CHOICES[key])
+            if row[key] not in options:
+                options[row[key]] = f"Unmapped option ({row[key]})"
+            captions = list(options.values())
+            labels = [
+                label
+                if captions.count(label) == 1
+                else f"{label} (variant {chr(65 + captions[:i].count(label))})"
+                for i, label in enumerate(captions)
+            ]
             value, ok = QInputDialog.getItem(
                 self,
                 "Edit " + item.text(0),
@@ -151,7 +159,9 @@ class PlayerDetails(QTabWidget):
                 False,
             )
             if ok:
-                self.apply(key, list(options)[labels.index(value)])
+                code = list(options)[labels.index(value)]
+                if code != row[key]:
+                    self.apply(key, code)
         elif key == "height_inches":
             value, ok = QInputDialog.getText(
                 self, "Edit height", "Feet and inches", text=height_text(row[key])

@@ -2,13 +2,15 @@
 
 ## v1.10 roster usability checks
 
-Portable suite: 295 passed, 1 native-codec skip, 2 deselected at the local
+Portable suite: 296 passed, 1 native-codec skip, 2 deselected at the local
 checkpoint. Source startup, scoped lint/type and handoff checks passed. Added
 height/position display and numeric-sort checks, scholarship exact-mask/undo
 checks, visible Player/Ratings/Scholarship tabs, equipment labels, removed-action
 checks and combined Schools view. Updated existing position edit/save/reopen and
 realignment interactions. Synthetic Qt visual QA checked the main roster layout;
 a toolbar text-encoding issue found during rendering was corrected before release.
+Duplicate equipment captions receive distinct variant labels so accepting the
+current choice cannot accidentally write a different code; a regression checks this.
 
 Read-only stock/EBOOT tracing confirms single byte positions and scholarship
 polarity; the full stock roster contains 5,166 scholarship flags and 519 walk-ons.
