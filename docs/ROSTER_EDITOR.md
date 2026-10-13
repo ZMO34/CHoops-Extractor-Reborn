@@ -1,5 +1,11 @@
 # Roster editor
 
+v1.11 supersedes earlier dialog/16-slot descriptions: every category uses a side
+editor; school references, 18 roster slots, palettes and shoes are editable there.
+Player school assignment is an atomic guarded membership update. School shoe
+brands propagate to that school’s roster only. See ROSTER_SIDE_PANELS.md for scope,
+row-zero/count correction, safeguards and static combined jersey previews.
+
 v1.10: Player, Ratings and Scholarship tabs are always beside the selected player.
 Double-click a writable value to edit it; Scholarship has a named status picker.
 Height uses feet/inches, positions PG–C and equipment readable styles. Schools

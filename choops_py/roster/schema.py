@@ -6,6 +6,7 @@ STRING_FIELDS={'players':{'last_name':0x10,'first_name':0x14},'teams':{'short_na
 REFERENCES={'arena_index':(0x44,'arenas',0x19),'rival1_index':(0x4c,'teams',0x31),'rival2_index':(0x50,'teams',0x31),'rival3_index':(0x54,'teams',0x31),'coach_index':(0x60,'coaches',0x15),'assistant1_index':(0x64,'coaches',0x15),'assistant2_index':(0x68,'coaches',0x15)}
 EDITABLE={'players':('first_name','last_name','jersey_number','height_inches','position_code'),'teams':('asset_id',*REFERENCES,'roster_slots'),'arenas':(),'coaches':()}
 POSITIONS={0:'PG',1:'SG',2:'SF',3:'PF',4:'C'}
+ROSTER_SLOT_COUNT=18  # Runtime count +0x158 and array +0x3C; stock has 17/18-player schools.
 
 PALETTE_OFFSET = 0x1a0
 PALETTE_COUNT = 31

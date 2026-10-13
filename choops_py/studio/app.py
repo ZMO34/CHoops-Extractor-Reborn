@@ -714,6 +714,7 @@ class Window(QMainWindow):
         def loaded(archive):
 
             self.archive = archive
+            self._jersey_preview_row=None;self.jersey_shape_controls.hide()
             self.audio_state.setText("Audio catalog has not been loaded for this JB.")
             for view in self.audio_tables.values():
                 view.setModel(None)
@@ -1147,9 +1148,6 @@ class Window(QMainWindow):
             [
                 ("Open roster…", self.choose_roster),
                 ("Load game roster", self.load_game_roster),
-                ("Edit selected…", self.edit_roster),
-                ("Team palette…", self.show_team_palette),
-                ("Realign conference…", self.move_school),
                 ("Undo", self.undo_roster),
                 ("Redo", self.redo_roster),
                 ("Save copy…", self.save_roster),
@@ -1158,10 +1156,6 @@ class Window(QMainWindow):
 
         from PySide6.QtWidgets import QMenu
         extra=QHBoxLayout()
-        shoe_button=QPushButton('Shoes…');shoe_menu=QMenu(shoe_button)
-        shoe_menu.addAction('Edit shoes…',self.edit_roster_shoes)
-        shoe_menu.addAction('Preview assigned shoes…',self.preview_assigned_shoes)
-        shoe_button.setMenu(shoe_menu);extra.addWidget(shoe_button)
         export_button=QPushButton('Export…');export_menu=QMenu(export_button)
         export_menu.addAction('Game roster IFF…',self.export_game_roster)
         export_button.setMenu(export_menu);extra.addWidget(export_button);extra.addStretch()
@@ -1190,8 +1184,13 @@ class Window(QMainWindow):
         # Keep category tabs outside the row-scrolling viewports.
         self.roster_tabs.tabBar().setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         from .player_details import PlayerDetails
+        from .roster_panels import RecordDetails
         self.player_details=PlayerDetails(self)
-        splitter=QSplitter();splitter.addWidget(self.roster_tabs);splitter.addWidget(self.player_details)
+        self.roster_detail_stack=QStackedWidget();self.roster_detail_stack.addWidget(self.player_details)
+        self.record_panels={}
+        for table_name in ('teams','arenas','coaches','conferences','uniforms'):
+            panel=RecordDetails(self,table_name);self.record_panels[table_name]=panel;self.roster_detail_stack.addWidget(panel)
+        splitter=QSplitter();splitter.addWidget(self.roster_tabs);splitter.addWidget(self.roster_detail_stack)
         splitter.setStretchFactor(0,3);splitter.setStretchFactor(1,2)
         layout.addWidget(splitter,1)
         self.roster_tabs.currentChanged.connect(lambda _:self.update_player_details())
@@ -1208,10 +1207,15 @@ class Window(QMainWindow):
                 view.model().setFilterFixedString(text)
 
     def update_player_details(self):
-        view=self.roster_views['players']
-        rows=selected(view) if view.model() and self.roster_tabs.currentWidget() is view else []
-        self.player_details.setVisible(self.roster_tabs.currentWidget() is view)
-        self.player_details.show_player(rows[0] if len(rows)==1 else None)
+        if getattr(self,'_roster_refreshing',False):return
+        view=self.roster_tabs.currentWidget()
+        name=next((key for key,value in self.roster_views.items() if value is view),'players')
+        rows=selected(view) if view and view.model() else []
+        row=rows[0] if len(rows)==1 and self.roster else None
+        panel=self.player_details if name=='players' else self.record_panels[name]
+        self.roster_detail_stack.setCurrentWidget(panel)
+        if name=='players':panel.show_player(row)
+        else:panel.show_record(row)
 
     def choose_roster(self):
 
@@ -1245,8 +1249,8 @@ class Window(QMainWindow):
         )
 
     def display_roster(self, model):
-        previous=selected(self.roster_views['players']) if self.roster_views['players'].model() else []
-        selected_index=previous[0]['index'] if len(previous)==1 else None
+        keep={name:[r['index'] for r in selected(view)] if view.model() and self.roster is model else [] for name,view in self.roster_views.items() if name!='schools'}
+        self._roster_refreshing=True
         self.roster = model
         self.refresh_uniform_list()
         if getattr(self, "scene_meshes", None):
@@ -1275,13 +1279,13 @@ class Window(QMainWindow):
                 rows=[dict(r,conference_name=conferences.get(r.get('conference_index'),'None')) for r in rows]
                 columns=[('school_name','School'),('abbreviation','Abbreviation'),('conference_name','Conference'),('asset_id','Asset ID')]
             set_rows(view, rows, columns, self.roster_search.text())
-            if name=='players':
-                view.selectionModel().selectionChanged.connect(lambda *_:self.update_player_details())
-                if selected_index is not None and 0<=selected_index<len(model.rows.get('players',[])):
-                    for i in range(view.model().rowCount()):
-                        if view.model().index(i,0).data(Qt.ItemDataRole.DisplayRole)==model.rows['players'][selected_index]['display_name']:
-                            source=view.model().mapToSource(view.model().index(i,0))
-                            if view.model().sourceModel().rows[source.row()]['index']==selected_index:view.selectRow(i);break
+            view.selectionModel().selectionChanged.connect(lambda *_:self.update_player_details())
+            if len(keep.get(name,[]))==1:
+                selected_index=keep[name][0]
+                for i in range(view.model().rowCount()):
+                    source=view.model().mapToSource(view.model().index(i,0))
+                    if view.model().sourceModel().rows[source.row()]['index']==selected_index:view.selectRow(i);break
+        self._roster_refreshing=False
         self.update_player_details()
 
         warnings=len(model.validate()['preserved_source_string_issues'])
@@ -1327,46 +1331,17 @@ class Window(QMainWindow):
 
 
     def show_team_palette(self, team_index=None):
-        if not self.roster:
-            return self.log("Load a roster first.")
-        if team_index is None or isinstance(team_index, bool):
-            view=self.roster_views['schools'] if self.roster_tabs.currentWidget() is self.roster_views.get('schools') else self.roster_views['teams']
-            rows = selected(view)
-            if len(rows) != 1:
-                return self.log("Select one team in the Teams tab.")
-            team_index = rows[0]['index']
-        from ..roster.research import palette_rows
-        team = self.roster.rows['teams'][team_index]
-        dialog = QDialog(self)
-        dialog.setWindowTitle(f"{team['school_name']} • asset {team['asset_id']} • team palette")
-        dialog.resize(760, 700)
-        layout = QVBoxLayout(dialog)
-        layout.addWidget(QLabel("22 Edit Schools captions are verified. Other slot roles remain provisional; court material bindings are supported."))
-        view = QTreeWidget()
-        view.setHeaderLabels(['Palette slot','RGBA','Edit Schools control','Caption / provisional role'])
-        layout.addWidget(view)
-        def refresh():
-            view.clear()
-            for row in palette_rows(self.roster, team_index):
-                item = QTreeWidgetItem(view,[str(row['slot']),row['rgba'],str(row['school_control']) if row['school_control'] is not None else 'Not in color callback list',row['role']])
-                color = bytes.fromhex(row['rgba'][1:])
-                item.setBackground(1,QColor(*color))
-        def edit():
-            items = view.selectedItems()
-            if not items:
-                return
-            slot = int(items[0].text(0))
-            value = self.pick_rgba(items[0].text(1), dialog)
-            if value is not None:
-                try:
-                    self.roster.edit('teams',team_index,'palette_colors',value,slot)
-                    refresh()
-                    self.display_roster(self.roster)
-                except ValueError as error:
-                    QMessageBox.warning(dialog,'Palette edit blocked',str(error))
-        button = QPushButton('Pick selected color…');button.clicked.connect(edit);layout.addWidget(button)
-        view.itemDoubleClicked.connect(lambda *_: edit())
-        refresh();dialog.exec()
+        if not self.roster:return self.log('Load a roster first.')
+        if team_index is None or isinstance(team_index,bool):
+            rows=selected(self.roster_views['teams'])
+            if len(rows)!=1:return self.log('Select one school.')
+            team_index=rows[0]['index']
+        self.navigate_to('Roster Editor');self.roster_tabs.setCurrentWidget(self.roster_views['teams']);self.roster_search.clear()
+        view=self.roster_views['teams'];proxy=view.model()
+        for i in range(proxy.rowCount()):
+            source=proxy.mapToSource(proxy.index(i,0))
+            if proxy.sourceModel().rows[source.row()]['index']==team_index:view.selectRow(i);break
+        panel=self.record_panels['teams'];panel.setCurrentWidget(panel.palette_view)
 
 
 
@@ -1394,150 +1369,9 @@ class Window(QMainWindow):
         self.run_job('Profile roster fields and unresolved regions',research)
 
     def edit_roster(self):
-
-        if not self.roster or self.active:
-            return
-
-        view = self.roster_tabs.currentWidget()
-        name = next(key for key,value in self.roster_views.items() if value is view)
-        name = 'teams' if name == 'schools' else name
-
-        rows = selected(view)
-
-        if len(rows) != 1:
-            return self.log("Select exactly one roster row.")
-
-        if name=='players':
-            self.player_details.setVisible(True)
-            self.player_details.show_player(rows[0])
-            self.player_details.setCurrentIndex(0)
-            return
-
-
-        from ..roster.schema import EDITABLE, POSITIONS, REFERENCES, ENUM_CHOICES
-
-        row = rows[0]
-
-        dialog = QDialog(self)
-
-        dialog.setWindowTitle(f"Edit {name} record {row['index']}")
-
-        form = QFormLayout(dialog)
-
-        field = QComboBox()
-        field.setObjectName("rosterField")
-
-        field.addItems(EDITABLE[name])
-
-        value = QLineEdit()
-
-        slot = QComboBox()
-
-        slot.addItems([str(i) for i in range(16)])
-
-        choices = QComboBox()
-        choices.setObjectName("rosterValue")
-
-        choices.setEditable(False)
-
-        rgb_button = QPushButton('Choose RGB color…')
-        def pick_color():
-            chosen = self.pick_rgba(value.text(), dialog)
-            if chosen is not None:value.setText(chosen)
-        rgb_button.clicked.connect(pick_color)
-
-        def changed(key):
-            rgb_button.setVisible(key == 'palette_colors')
-            reference = key == "roster_slots" or key in REFERENCES
-            menu = reference or key == "position_code" or key in ENUM_CHOICES
-            value.setVisible(not menu)
-            choices.setVisible(menu)
-            needed = 31 if key == 'palette_colors' else 30 if key == 'attribute_ratings' else 4 if key=='shot_tendencies' else 16
-            if slot.count() != needed:
-                slot.blockSignals(True)
-                slot.clear()
-                slot.addItems([str(i) for i in range(needed)])
-                slot.blockSignals(False)
-            slot.setVisible(key in ('roster_slots','palette_colors','attribute_ratings','shot_tendencies'))
-            choices.clear()
-            if key in ENUM_CHOICES:
-                from ..roster.shoes import FIELDS,choices as shoe_choices
-                options=shoe_choices(key,row['shoe_brand_code']) if key in FIELDS.get(name,{}) else ENUM_CHOICES[key]
-                for code,label in options.items():choices.addItem(label,code)
-                choices.setCurrentIndex(choices.findData(row[key]))
-            elif key == "position_code":
-                for code, label in POSITIONS.items():
-                    choices.addItem(label, code)
-                choices.setCurrentIndex(choices.findData(row[key]))
-            elif reference:
-                target = "players" if key == "roster_slots" else REFERENCES[key][1]
-                choices.addItem("None", None)
-                for candidate in self.roster.rows[target]:
-                    label = (
-                        candidate.get("display_name")
-                        or candidate.get("school_name")
-                        or candidate.get("arena_name")
-                        or candidate.get("coach_name")
-                        or ""
-                    )
-                    choices.addItem(
-                        f"{candidate['index']}: {label}", candidate["index"]
-                    )
-                current = (
-                    row[key][int(slot.currentText())]
-                    if key == "roster_slots"
-                    else row[key]
-                )
-                choices.setCurrentIndex(max(0, choices.findData(current)))
-            else:
-                value.setText(str(row[key][int(slot.currentText())]) if key in ('palette_colors','attribute_ratings','shot_tendencies') else str(row.get(key, "")))
-
-        slot.currentTextChanged.connect(lambda value: changed(field.currentText()))
-        form.addRow("Field (see palette dialog for verified captions)", field)
-
-        form.addRow("Value", value)
-        form.addRow(rgb_button)
-
-        form.addRow("Reference", choices)
-
-        form.addRow("Roster / palette slot", slot)
-
-        field.currentTextChanged.connect(changed)
-
-        changed(field.currentText())
-
-        buttons = QDialogButtonBox(
-            QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel
-        )
-
-        buttons.accepted.connect(dialog.accept)
-
-        buttons.rejected.connect(dialog.reject)
-
-        form.addRow(buttons)
-
-        if dialog.exec() == QDialog.DialogCode.Accepted:
-            key = field.currentText()
-
-            new = (
-                choices.currentData()
-                if key == "roster_slots" or key in REFERENCES or key == "position_code" or key in ENUM_CHOICES
-                else value.text()
-            )
-
-            def edit(job):
-
-                self.roster.edit(
-                    name,
-                    row["index"],
-                    key,
-                    new,
-                    int(slot.currentText()) if key in ("roster_slots", "palette_colors", "attribute_ratings", "shot_tendencies") else None,
-                )
-
-                return self.roster
-
-            self.run_job("Apply validated roster edit", edit, self.display_roster)
+        self.update_player_details()
+        panel=self.roster_detail_stack.currentWidget()
+        if panel:panel.setCurrentIndex(0)
 
     def undo_roster(self):
 
@@ -1611,6 +1445,17 @@ class Window(QMainWindow):
             "Select a SCNE record in Explorer, then Preview scene. Left-drag: orbit; right-drag: look around; middle-drag or Shift-drag: pan. WASD: move; Q/E: down/up; Shift: faster; Ctrl: slower; wheel: zoom; F: fit. Material textures load automatically. Use cutaway to see inside; game shader effects are not reproduced.",
         )
         self.buttons(layout, [("Preview selected SCNE", self.inspect_scene), ("Prepare single-texture court…", self.prepare_court_template)])
+        self.jersey_shape_controls=QWidget();shape_form=QFormLayout(self.jersey_shape_controls)
+        self.jersey_neck=QComboBox()
+        from ..roster.schema import JERSEY_SHAPES
+        for value,label in JERSEY_SHAPES.items():self.jersey_neck.addItem(label,value)
+        self.jersey_build=QComboBox();self.jersey_shorts=QComboBox()
+        for box in (self.jersey_build,self.jersey_shorts):
+            for value,label in [('thin','Thin'),('reg','Regular'),('fat','Fat')]:box.addItem(label,value)
+        self.jersey_parts=QComboBox();self.jersey_parts.addItems(['Top + shorts','Top only','Shorts only'])
+        for label,box in [('Neck',self.jersey_neck),('Jersey build',self.jersey_build),('Shorts cut',self.jersey_shorts),('Render',self.jersey_parts)]:
+            shape_form.addRow(label,box);box.activated.connect(self.refresh_jersey_preview)
+        layout.addWidget(self.jersey_shape_controls);self.jersey_shape_controls.hide();self._jersey_preview_row=None
         self.scene_complete = QCheckBox("Include all SCNE sections (arena and court)")
         self.scene_complete.setChecked(True)
         layout.addWidget(self.scene_complete)
@@ -1661,48 +1506,8 @@ class Window(QMainWindow):
         layout.addWidget(self.scene_palette_state)
 
     def edit_roster_shoes(self):
-        if not self.roster or self.active:return
-        view=self.roster_tabs.currentWidget()
-        table=next(key for key,value in self.roster_views.items() if value is view)
-        table='teams' if table=='schools' else table
-        rows=selected(view)
-        if table not in ('players','teams') or len(rows)!=1:return self.log('Select one player or school to edit shoes.')
-        from ..roster.shoes import FIELDS,BRANDS,choices,texture_name
-        row=rows[0];dialog=QDialog(self);dialog.setWindowTitle('Player shoes' if table=='players' else 'School shoe defaults')
-        form=QFormLayout(dialog);widgets={}
-        labels=('Brand','Style / artwork ID','Home color','Away color')
-        for key,label in zip(FIELDS[table],labels):
-            box=QComboBox();box.setObjectName(key);widgets[key]=box;form.addRow(label,box)
-        brand=widgets['shoe_brand_code']
-        for code,label in BRANDS.items():brand.addItem(label,code)
-        brand.setCurrentIndex(max(0,brand.findData(row['shoe_brand_code'])))
-        description=QLabel();form.addRow(description)
-        def show_paths():
-            values={key:widget.currentData() for key,widget in widgets.items()}
-            if any(value is None for value in values.values()):return
-            home=texture_name(values['shoe_brand_code'],values['shoe_style_code'],values['home_shoe_color_code'])
-            away=texture_name(values['shoe_brand_code'],values['shoe_style_code'],values['away_shoe_color_code'])
-            description.setText(f'Home: {home}\nAway: {away}'+('\nSchool defaults change independently of existing player assignments.' if table=='teams' else ''))
-        def refill():
-            for key,box in widgets.items():
-                if key=='shoe_brand_code':continue
-                current=box.currentData();current=row[key] if current is None else current
-                box.blockSignals(True);box.clear()
-                for code,label in choices(key,brand.currentData()).items():box.addItem(label,code)
-                box.setCurrentIndex(max(0,box.findData(current)));box.blockSignals(False)
-            show_paths()
-        brand.currentIndexChanged.connect(refill)
-        for key,box in widgets.items():
-            if key!='shoe_brand_code':box.currentIndexChanged.connect(show_paths)
-        refill()
-        buttons=QDialogButtonBox(QDialogButtonBox.StandardButton.Ok|QDialogButtonBox.StandardButton.Cancel)
-        buttons.accepted.connect(dialog.accept);buttons.rejected.connect(dialog.reject);form.addRow(buttons)
-        if dialog.exec()!=QDialog.DialogCode.Accepted:return
-        values={key:box.currentData() for key,box in widgets.items()}
-        def work(job):
-            self.roster.edit_shoes(table,row['index'],**values)
-            return self.roster
-        self.run_job('Apply shoe assignment',work,self.display_roster)
+        self.update_player_details();panel=self.roster_detail_stack.currentWidget()
+        if hasattr(panel,'shoes'):panel.setCurrentWidget(panel.shoes)
 
     def preview_assigned_shoes(self):
         if self.active or not self.archive or not self.roster:return self.log('Load a JB folder and its roster first.')
@@ -1740,6 +1545,7 @@ class Window(QMainWindow):
         from .services import inspect_shoe_preview
         def display(value):
             source,result=value
+            self._jersey_preview_row=None;self.jersey_shape_controls.hide()
             self.navigate_to('Models / Courts')
             self.scene_view.set_meshes([]);self.scene_view.set_image(None)
             self.scene_parts.clear();self.scene_textures.clear()
@@ -1780,9 +1586,19 @@ class Window(QMainWindow):
         entry_index=self.scene_uniforms.currentData()
         if entry_index is None or not self.archive:return
         entry=self.archive.entries[entry_index]
+        if self._jersey_preview_row:
+            import re
+            match=re.fullmatch(r'u([haxyz])(\d+)\.iff',entry['name'] or '',re.IGNORECASE)
+            if match:
+                uniform={'variant_code':'haxyz'.index(match[1].lower()),'uniform_asset_id':int(match[2])}
+                self.preview_jersey(uniform,self.jersey_neck.currentData(),self.jersey_build.currentData(),self.jersey_shorts.currentData(),self.jersey_parts.currentIndex())
+                return
         self.load_scene_uniform(None,entry)
 
     def load_scene_uniform(self, source, entry=None):
+        if source is not None and self._jersey_preview_row:
+            self.preview_jersey({'preview_path':str(source)},self.jersey_neck.currentData(),self.jersey_build.currentData(),self.jersey_shorts.currentData(),self.jersey_parts.currentIndex())
+            return
         if not any(m.get('uniform_surface') for m in self.scene_meshes):
             return self.log('Preview a cloth jersey or shorts scene first.')
         from .services import inspect_uniform_preview
@@ -1813,6 +1629,7 @@ class Window(QMainWindow):
         else:
             return self.log("Select a SCNE record in the Explorer nested list.")
         source = self.asset_path
+        self._jersey_preview_row=None;self.jersey_shape_controls.hide()
         self.navigate_to('Models / Courts')
         self.scene_meshes = []
         self.scene_view.set_meshes([])
@@ -1824,6 +1641,19 @@ class Window(QMainWindow):
         from .services import inspect_scene_preview
         include_all = self.scene_complete.isChecked()
         self.run_job('Decode scene geometry and textures', lambda job: inspect_scene_preview(source, index, include_all, job), lambda result:self.show_scene_preview(result,source), cancellable=True)
+
+    def preview_jersey(self,uniform,neck,build,shorts,parts=0):
+        if self.active or not self.archive:return
+        from .services import inspect_jersey_preview
+        archive=self.archive
+        def display(value):
+            source,result=value;self._jersey_preview_row=dict(uniform)
+            self.jersey_neck.setCurrentIndex(self.jersey_neck.findData(neck));self.jersey_build.setCurrentIndex(self.jersey_build.findData(build));self.jersey_shorts.setCurrentIndex(self.jersey_shorts.findData(shorts));self.jersey_parts.setCurrentIndex(parts)
+            self.navigate_to('Models / Courts');self.show_scene_preview(result,source);self.jersey_shape_controls.show()
+        self.run_job('Preview jersey and shorts',lambda job:inspect_jersey_preview(archive,uniform,neck,build,shorts,parts,job),display,cancellable=True)
+
+    def refresh_jersey_preview(self,*_):
+        if self._jersey_preview_row:self.preview_jersey(self._jersey_preview_row,self.jersey_neck.currentData(),self.jersey_build.currentData(),self.jersey_shorts.currentData(),self.jersey_parts.currentIndex())
 
     def show_scene_preview(self,result,source):
         self.scene_source = source

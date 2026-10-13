@@ -59,6 +59,12 @@ SCNE package header is 0x54 bytes. +20 texture count; +24 relative texture point
 
 ## Roster and development direction
 
+v1.11 correction: team roster pointers are an 18-element array at editor +0x6C;
+the active u16 count is +0x188. Runtime array/count are anchor +0x3C/+0x158. All
+443 stock arrays validate with those fields. Player row zero is real when active;
+only trailing row-zero references are empty. See ROSTER_SIDE_PANELS.md for evidence
+and guarded transfer/brand propagation. Historical 16-slot assumptions are superseded.
+
 Conference scalar provenance: the public
 [conferences.py](https://github.com/bphit4/CH2k8-Roster-Editor/blob/main/conferences.py)
 defines the same +0x0A..+0x22 field offsets and big-endian u16/RGB widths. The

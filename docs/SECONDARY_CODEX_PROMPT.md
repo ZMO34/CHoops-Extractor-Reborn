@@ -86,6 +86,16 @@ Embedded source: docs/CURRENT_STATUS.md
 
 # Current project status
 
+## v1.11 side-panel update
+
+Every roster category has a right-side editor. School palettes, shoes and jersey
+previews are in appropriate side tabs; Edit selected/Team palette/shoe toolbar
+actions are removed. Player School supports guarded move/unassign; all 18 slots
+and counts are handled, with active player row zero correctly represented.
+School brand application updates that school’s players only in one undo step.
+Jersey preview combines top/shorts and offers neck/build/cut dropdowns. No alternate
+assets created. See ROSTER_SIDE_PANELS.md; it supersedes historical 16-slot claims.
+
 ## v1.10 roster usability update
 
 Current public GUI combines Teams/Edit Schools as Schools, displays player height
@@ -201,6 +211,78 @@ round trip on `e149790005fdaeb14d0a1b79689d0a3de3b8f2da`; see TEST_REPORT.md.
 All game inputs, rosters, templates, private reverse-engineering helpers and raw
 audio are local and absent from Git. A fresh PC must supply its own authorized
 fixtures. Do not assume a generated court template or any old local build exists.
+
+---
+
+Embedded source: docs/ROSTER_SIDE_PANELS.md
+
+# Selected-record side panels (v1.11)
+
+Select one row in Players, Schools, Arenas, Coaches, Conferences or Uniforms.
+The right pane changes to that category. Double-click a writable detail; references
+use named selectors and existing validated model writers. Read-only metadata
+remains marked. The Edit selected, Team palette and separate shoe toolbar actions
+are removed. Existing save, export, undo/redo and known field editing remain.
+
+Schools have School, References, Players, Palette, Shoes and Jersey tabs. Palette
+opens the RGB/alpha picker directly from its swatches. References include safe
+reciprocal conference realignment. Players exposes all **18** roster slots, with
+count updates and guarded transfer/reordering. Coaches/Arenas/Conferences expose
+their supported strings/scalars; Conferences also lists member schools. Uniforms
+expose their existing writable selectors/shapes and a jersey preview tab.
+
+## Player school assignment
+
+The player School tab shows current ownership and allows move/unassign. The game
+uses a team player array at runtime anchor +0x3C and a count at +0x158, corresponding
+to editor row +0x6C and +0x188. Removal routine 0x7644B8 walks that array; assignment
+routine 0x764548 onward checks capacity, appends a player and increments the count.
+The mapped file pointers use player row +0x11 and signed self-relative deltas.
+
+The stock data confirms 18 contiguous pointer slots, including the previously
+hidden final members of 17/18-player schools. All 443 stock arrays agree with
+their counts. Player row zero is a real Charlotte member, not always an empty
+sentinel: an active slot may name it, while row-zero references beyond the active
+count are empty. The reader now makes that distinction.
+
+Transfers update source/destination arrays and counts in one undoable transaction.
+Player attributes and current footwear remain unchanged. Full destinations,
+duplicate/shared player records, invalid pointers and inconsistent/unmapped counts
+are blocked with no partial change. Roster-slot editing uses the same guarded
+membership writer; choosing an existing teammate swaps positions, removing a
+member compacts slots, and incoming players transfer safely. Legacy recruitment,
+eligibility and scholarship limits are not reproduced; gameplay is unverified.
+
+Whole-table JSON exports now contain 18 slots. Refresh older 16-slot exports before
+applying them; guessing omitted players or silently deleting row zero is unsafe.
+Individual edit patches remain supported through the guarded writer.
+
+## Shoes
+
+Player and School Shoes tabs contain brand/style/home/away controls and a direct
+preview button. Player edits affect that player record. Applying school shoes
+automatically applies its brand to **that school’s roster only**, as requested.
+Compatible player styles/colors remain; incompatible values use the first valid
+choice for the new brand. School style/color defaults do not overwrite compatible
+individual artwork choices. Shared player records block scoped propagation.
+The school/default/player updates form one undo step and preserve unrelated bits.
+
+## Jersey preview
+
+Player, School and Uniform side panes offer direct Jersey preview of linked,
+existing artwork. Models/Courts then shows neck, jersey build, shorts cut and
+Top + shorts / Top only / Shorts only dropdowns. Neck choices are U, V, V triangle,
+Triangle and Wishbone; available cloth bodies/cuts are Thin, Regular and Fat.
+Existing top/short meshes are combined in their original coordinates and their
+texture roles are routed independently. No artificial repositioning is applied.
+These dropdowns affect the preview, not saved roster shapes. Static cloth preview
+does not reproduce skinning, cloth simulation, player body or runtime name/number
+overlays. Opening another JB clears prior preview context. No assets are added.
+
+Stock verification used read-only source inputs: row-zero transfer/undo, scoped
+brand propagation/undo and actual combined jersey+shorts geometry. Synthetic
+tests cover guarded writes, field editing, palettes, references and texture roles.
+No RPCS3, EBOOT writes or automatic testing JB is involved.
 
 ---
 
@@ -703,6 +785,12 @@ SCNE package header is 0x54 bytes. +20 texture count; +24 relative texture point
 
 ## Roster and development direction
 
+v1.11 correction: team roster pointers are an 18-element array at editor +0x6C;
+the active u16 count is +0x188. Runtime array/count are anchor +0x3C/+0x158. All
+443 stock arrays validate with those fields. Player row zero is real when active;
+only trailing row-zero references are empty. See ROSTER_SIDE_PANELS.md for evidence
+and guarded transfer/brand propagation. Historical 16-slot assumptions are superseded.
+
 Conference scalar provenance: the public
 [conferences.py](https://github.com/bphit4/CH2k8-Roster-Editor/blob/main/conferences.py)
 defines the same +0x0A..+0x22 field offsets and big-endian u16/RGB widths. The
@@ -970,6 +1058,11 @@ Embedded source: docs/KNOWN_LIMITATIONS.md
 
 # Current limitations
 
+v1.11 transfers/brand propagation reject shared or inconsistent ownership and full
+18-player destinations. Whole-table older 16-slot JSON exports need refreshing.
+Static jersey preview has no runtime cloth, skinning, body or name/number overlays.
+No automatic Legacy eligibility/scholarship enforcement or gameplay guarantee.
+
 v1.10 removes D1 conversion and new alternate/independent-asset actions from the
 public editor/CLI. Single position and Scholarship/Walk-on are confirmed; secondary
 position is unproven and not exposed. See PLAYER_QOL_RESEARCH.md for evidence.
@@ -1008,6 +1101,22 @@ Updated 2026-10-11. CURRENT_STATUS.md and TEST_REPORT.md are the living evidence
 Embedded source: docs/TEST_REPORT.md
 
 # Development verification
+
+## v1.11 side-panel and membership verification
+
+The local source checkpoint passed 310 tests with 2 intentional deselections;
+native audio coverage runs using the unchanged verified LGPL helpers. GUI/source
+startup, scoped lint/type and generated handoff checks passed. New regressions
+cover every category side editor, palette/coach/uniform edits, transfer/count/
+row-zero handling, shared/inconsistent refusal, scoped shoe brand propagation,
+18-member/full-destination behavior, undo and top/shorts texture-role/coordinate
+preservation. No untested alternate-asset actions are restored.
+
+Read-only stock checks validate all 443 school arrays/counts (maximum 18), identify
+row-zero ownership, transfer/undo without player-data changes and school-only brand
+propagation/undo. Actual combined jersey/shorts decode returns both roles with
+separate mapped artwork. Inputs remain unchanged; no emulator, EBOOT write or
+testing JB. Exact release SHA and packaged Windows checks are recorded in the PR.
 
 ## v1.10 roster usability checks
 

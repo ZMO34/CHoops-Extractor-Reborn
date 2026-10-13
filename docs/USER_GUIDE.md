@@ -1,5 +1,15 @@
 # Native studio user guide (development build)
 
+v1.11: select a row in any roster category for the right-side editor. Schools have
+References, Players, Palette, Shoes and Jersey tabs. Players add Shoes, Jersey and
+School assignment tabs. Footwear edits/previews and jersey previews are now in
+these panes. School brand changes apply to its players only; use Undo to revert
+the whole group. Palette swatches open the RGB picker. Player transfer updates
+roster slots/counts and blocks ambiguous/full/inconsistent cases. All 18 slots are
+shown. Models/Courts provides combined top/shorts and neck/cut preview dropdowns.
+Edit selected/Team palette/shoe toolbar actions are removed. More details:
+[side-panel guide](ROSTER_SIDE_PANELS.md).
+
 In v1.10, select a player to see Player, Ratings and Scholarship tabs beside the
 table. Double-click a value to edit it; height is entered as e.g. 6 ft 3 in. Position
 uses PG/SG/SF/PF/C. Scholarship offers Scholarship/Walk-on. Undo and Save copy work

@@ -1,5 +1,21 @@
 # Development verification
 
+## v1.11 side-panel and membership verification
+
+The local source checkpoint passed 310 tests with 2 intentional deselections;
+native audio coverage runs using the unchanged verified LGPL helpers. GUI/source
+startup, scoped lint/type and generated handoff checks passed. New regressions
+cover every category side editor, palette/coach/uniform edits, transfer/count/
+row-zero handling, shared/inconsistent refusal, scoped shoe brand propagation,
+18-member/full-destination behavior, undo and top/shorts texture-role/coordinate
+preservation. No untested alternate-asset actions are restored.
+
+Read-only stock checks validate all 443 school arrays/counts (maximum 18), identify
+row-zero ownership, transfer/undo without player-data changes and school-only brand
+propagation/undo. Actual combined jersey/shorts decode returns both roles with
+separate mapped artwork. Inputs remain unchanged; no emulator, EBOOT write or
+testing JB. Exact release SHA and packaged Windows checks are recorded in the PR.
+
 ## v1.10 roster usability checks
 
 Portable suite: 296 passed, 1 native-codec skip, 2 deselected at the local

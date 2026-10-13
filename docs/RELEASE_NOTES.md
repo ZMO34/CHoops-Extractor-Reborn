@@ -1,5 +1,15 @@
 # Release notes
 
+## v1.11 — side-panel editing and uniform previews
+
+All categories now use selected-record side tabs. Palette and shoe controls,
+shoe previews and direct jersey preview move into appropriate panes. Player School
+supports safe move/unassign and one-step undo. Corrected 18-slot roster capacity
+and active row-zero handling. School brands apply to that school’s players only,
+normalizing incompatible styles/colors atomically. Jersey top and shorts render
+together with neck/build/cut/part dropdowns. Edit selected/Team palette/shoe toolbar
+actions are removed without losing supported field editing. No assets added.
+
 ## v1.10 — roster usability and Windows release
 
 Player table shows feet/inches and PG–C. Always-visible Player/Ratings/Scholarship

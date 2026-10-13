@@ -353,6 +353,41 @@ def inspect_uniform_preview(source, job=None):
     return images
 
 
+def inspect_jersey_preview(archive,uniform,neck,build,shorts,parts=0,job=None):
+    """Combine existing top/shorts meshes in their original rest-pose coordinates."""
+    from ..roster.uniforms import asset_name
+    from ..formats.standard_iff import StandardIFF
+    job=job or JobContext()
+    shapes={0:'u',1:'v',2:'vtri',3:'tri',4:'wishbone'}
+    if neck not in shapes or build not in ('thin','reg','fat') or shorts not in ('thin','reg','fat') or parts not in (0,1,2):raise ValueError('Choose a supported uniform preview shape')
+    def entry(name):
+        matches=[e for e in archive.entries if e.get('name')==name]
+        if len(matches)!=1:raise ValueError('Uniform preview asset is missing or ambiguous: '+name)
+        return matches[0]
+    source=Path(uniform['preview_path']) if uniform.get('preview_path') else materialize(archive,entry(asset_name(uniform)))
+    artwork=inspect_uniform_preview(source,job)
+    result=dict(meshes=[],textures=[],images={},warnings=['Static top/shorts preview; runtime cloth, skinning, numbers and player body are not reproduced.'])
+    selected=[]
+    if parts in (0,1):
+        name=f'cloth_{shapes[neck]}_{build}.iff'
+        if not any(e.get('name')==name for e in archive.entries):name=f'cloth_{shapes[neck]}.iff'
+        selected.append(('jersey',name,f'jersey_{shapes[neck]}_{build}'))
+    if parts in (0,2):selected.append(('shorts','cloth_shorts.iff',f'shorts{shorts}'))
+    for role,name,record_name in selected:
+        job.check();path=materialize(archive,entry(name));iff=StandardIFF(path.read_bytes())
+        records=[r for r in iff.records if r['type']=='SCNE' and r['name']==record_name]
+        if len(records)!=1:raise ValueError('Cloth shape record is missing or ambiguous: '+record_name)
+        scene=inspect_scene_preview(path,records[0]['index'],False,job)
+        if role not in artwork:raise ValueError('Uniform artwork has no '+role+' texture')
+        image_name='__uniform_'+role;result['images'][image_name]=artwork[role]
+        for mesh in scene['meshes']:
+            mesh['uniform_surface']=role;mesh['name']=role+'/'+mesh['name']
+            for batch in mesh['batches']:batch['texture']=image_name
+        result['meshes'].extend(scene['meshes']);result['warnings'].extend(scene['warnings'])
+        result['textures'].append(image_name)
+    return source,result
+
+
 def inspect_shoe_preview(archive,texture_entry,job=None):
     """Preview the standalone shoe mesh with named upper/sole artwork."""
     import re

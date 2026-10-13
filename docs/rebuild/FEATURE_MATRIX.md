@@ -1,5 +1,9 @@
 # Current feature matrix
 
+v1.11 uses side editors for all roster categories, guarded 18-slot player school
+assignment, integrated palette/shoe controls and direct combined jersey/shorts
+previews. See ../ROSTER_SIDE_PANELS.md for current scope and safeguards.
+
 v1.10 supersedes historical D1/alternate/independent-asset public action claims:
 those actions are removed. Player detail/rating/scholarship editing is consolidated;
 height and positions have readable presentation. See ../PLAYER_QOL_RESEARCH.md.

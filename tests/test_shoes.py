@@ -72,14 +72,13 @@ def test_shoe_dialog_refreshes_choices_and_applies_one_undoable_edit(qtbot,monke
     model=roster_fixture();model.edit_shoes('players',0,1,2,4,12)
     window.display_roster(model);window.roster_tabs.setCurrentWidget(window.roster_views['players'])
     window.roster_views['players'].selectRow(0)
-    def accept(dialog):
-        brand=dialog.findChild(QComboBox,'shoe_brand_code');brand.setCurrentIndex(brand.findData(0))
-        assert dialog.findChild(QComboBox,'shoe_style_code').count()==1
-        assert dialog.findChild(QComboBox,'home_shoe_color_code').count()==2
-        away=dialog.findChild(QComboBox,'away_shoe_color_code');away.setCurrentIndex(away.findData(1))
-        return QDialog.DialogCode.Accepted
-    monkeypatch.setattr(QDialog,'exec',accept)
-    window.run_job=lambda title,work,callback:callback(work(None))
     window.edit_roster_shoes()
+    panel=window.player_details.shoes
+    brand=panel.widgets['shoe_brand_code'];brand.setCurrentIndex(brand.findData(0))
+    assert panel.widgets['shoe_style_code'].count()==1
+    assert panel.widgets['home_shoe_color_code'].count()==2
+    away=panel.widgets['away_shoe_color_code'];away.setCurrentIndex(away.findData(1))
+    panel.apply()
+    qtbot.waitUntil(lambda:window.active is None,timeout=10000)
     assert model.rows['players'][0]['away_shoe_texture']=='shoe_1.iff'
     model.undo();assert model.rows['players'][0]['away_shoe_texture']=='shoe_102_12.iff'

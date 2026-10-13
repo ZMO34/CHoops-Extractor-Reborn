@@ -1,5 +1,10 @@
 # Native GUI
 
+v1.11 provides side tabs for every roster category, including school palettes,
+footwear edit/preview and linked jersey preview. Player School changes assignment
+safely. Neck/shorts dropdowns in Models/Courts render top and shorts together or
+individually. Retired roster edit/palette/shoe toolbar actions are absent.
+
 v1.10 roster layout: Schools combines Teams/Edit Schools. Players show a compact
 table and persistent Player/Ratings/Scholarship pane with direct edits. Shoes and
 export are grouped menus. D1/alternate/independent-asset public actions are removed.
