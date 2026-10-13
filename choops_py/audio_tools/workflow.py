@@ -125,7 +125,8 @@ def replace_tracks(archive,replacements,output,job=None):
                 groups[row['bank']]=dict(rec=rec,bank=StreamBank(parts[0],len(data)),data=data,entry=entry,changes={})
             group=groups[row['bank']];layout=group['bank'].info(row['index'])
             if job:job.check();job.progress(0,1,'Converting '+row['title'])
-            encoded,samples=encode_wav(path,layout['channels'],layout['sample_rate'],job)
+            encoded,samples=encode_wav(path,layout['channels'],layout['sample_rate'],job,
+                                       target_samples=layout['samples'])
             group['changes'][row['index']]=(encoded,samples)
             details.append(dict(bank=row['bank'],index=row['index'],samples=samples,seconds=samples/layout['sample_rate'],encoded_bytes=len(encoded)))
         changes={}
