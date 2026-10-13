@@ -51,7 +51,11 @@ needs FFmpeg; WAV replacement needs both helpers.
 
 Choose a new output name/folder each time. Export defaults to 23 licensed tracks;
 fight songs are a separate batch. WAVs are PCM16 at the source bank rate/channels.
-Import resamples and ATRAC3-encodes compatible WAVs. Maximum duration is 30 minutes.
+Import resamples and ATRAC3-encodes compatible WAVs. Finite floating-point PCM
+samples through ±4.0 are accepted by the encoder's 1/4 input scaling; higher
+peaks and non-finite samples are rejected. Song replacements are automatically
+trimmed to the selected track's catalog sample length; shorter sources are
+silence-padded to that same length. Maximum source duration is 30 minutes.
 Manifests hold bank/index and original WAV checksums; unchanged files are skipped.
 Changing manifest title/artist text does not rename game songs. No changed WAVs
 means no replacement folder is created.

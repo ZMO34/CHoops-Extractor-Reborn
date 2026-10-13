@@ -53,7 +53,10 @@ restricted LGPL FFmpeg CLI and the ATRAC3 encoder to the standalone Windows GUI,
 with matching source archives and notices. Exact-head Windows CI built both
 helpers, packaged the GUI, and passed the frozen synthetic WAV round trip on
 `e149790005fdaeb14d0a1b79689d0a3de3b8f2da` (run 54). This is CI-verified branch
-work, not yet a published release.
+work, not yet a published release. Follow-up fixes the ATRAC helper's PCM input
+ceiling to ±4.0, aligned with its internal 1/4 scaling, for over-range float WAVs.
+Licensed Music and Fight Songs replacements are also trimmed or silence-padded
+to the selected track's catalog sample length before archive rebuilding.
 
 Song-title/artist editing stays read-only because archive-only routing is not
 established, and EBOOT writing is prohibited. Unknown AUDO loops and general CDF

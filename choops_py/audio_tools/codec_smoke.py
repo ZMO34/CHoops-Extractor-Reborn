@@ -2,7 +2,6 @@
 import math
 import struct
 import tempfile
-import wave
 from pathlib import Path
 
 from ..archive.manifests import OUTPUT
@@ -17,14 +16,13 @@ def main():
     with tempfile.TemporaryDirectory(prefix="packaged_audio_smoke_", dir=temp_root) as folder:
         source = Path(folder) / "source.wav"
         pcm = b"".join(
-            struct.pack("<h", round(9000 * math.sin(2 * math.pi * 440 * i / 24000)))
+            struct.pack("<f", 1.5 * math.sin(2 * math.pi * 440 * i / 24000))
             for i in range(24000)
         )
-        with wave.open(str(source), "wb") as target:
-            target.setnchannels(1)
-            target.setsampwidth(2)
-            target.setframerate(24000)
-            target.writeframes(pcm)
+        fmt = struct.pack("<HHIIHH", 3, 1, 24000, 24000 * 4, 4, 32)
+        body = b"WAVEfmt " + struct.pack("<I", len(fmt)) + fmt
+        body += b"data" + struct.pack("<I", len(pcm)) + pcm
+        source.write_bytes(b"RIFF" + struct.pack("<I", len(body)) + body)
         encoded, samples = encode_wav(source, 2, 48000)
         if samples != 48000 or not encoded:
             raise SystemExit("Bundled audio helpers failed the WAV round trip")

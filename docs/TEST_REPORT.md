@@ -25,6 +25,15 @@ independently verified.
 
 ## LGPL audio packaging branch — verified PR head
 
+Follow-up native reproduction: stereo IEEE-float WAV audio with peaks at ±1.5
+encodes after raising the ATRAC frontend's finite-sample ceiling to ±4.0, aligned
+with AtracDEnc's internal 1/4 scaling. Direct helper checks accepted ±4.0 and
+rejected ±4.01 and NaN. `pytest tests/test_audio.py tests/test_cli.py -q`: 18 passed;
+native round trips verify replacement trim to 24,000 samples and silence padding
+to 60,000 at 48 kHz. `python -m compileall -q choops_py/audio_tools tests/test_audio.py`,
+handoff generation, and `git diff --check` passed. The rebuilt frozen app passed
+the Qt startup smoke and over-range float WAV encode/decode round trip.
+
 Exact-head CI run 54 passed on `e149790005fdaeb14d0a1b79689d0a3de3b8f2da` on
 both Ubuntu and Windows. The Windows job built the pinned LGPL FFmpeg helper and
 ATRAC3 encoder, built/smoke-tested the standalone package, and printed
@@ -32,20 +41,19 @@ ATRAC3 encoder, built/smoke-tested the standalone package, and printed
 executable. Thus the packaged helper lookup, WAV resampling/encoding and ATRAC3
 decode validation ran in the actual frozen app.
 
-Local `python tools/dev/verify.py`: 250 passed, 1 skipped, 2 deselected. The one
-skip is the native helper round trip because MSYS2 helpers are not built in this
-checkout; the two deselections are private game/runtime checks and the optional
-legacy native comparison defined by the runner. CLI help, Qt startup smoke,
-scoped Ruff, studio/service mypy, handoff snapshot, compileall and
-`git diff --check` passed. The suite includes a regression that rejects a
-non-RIFF/RF64 replacement before codec lookup.
+Local `python tools/dev/verify.py` on the previous PR head: 250 passed, 1 skipped,
+2 deselected. The one skip was the native helper round trip; the two deselections
+were private game/runtime checks and the optional legacy native comparison. CLI
+help, Qt startup smoke, scoped Ruff, studio/service mypy, handoff snapshot,
+compileall and `git diff --check` passed. The suite includes a regression that
+rejects a non-RIFF/RF64 replacement before codec lookup.
 
 Earlier Windows runs exposed and fixed an annotated-tag SHA mismatch, FFmpeg
 component names/make target, a missing MSYS2 `cmp`, and the absence of conversion
 filters. The final verified helper pins the peeled `n9.0.2` source commit, enables
 only LGPL `aresample`/`aformat` conversion filters, and checks required codecs,
-formats and filters. No emulator or testing JB was run/built. PR #6 remains the
-review and publication path; verification does not itself make a release.
+formats and filters. No emulator or testing JB was run/built. PR #6 was merged;
+this follow-up is tracked in its own PR and does not create a release.
 
 ## Independent PR #5 review and continuation — 2026-10-12
 
