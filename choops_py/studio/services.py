@@ -281,6 +281,29 @@ def scene_record_index(records, index, name):
     raise ValueError('Selected SCNE is ambiguous in this preview source: '+name)
 
 
+def inspect_scene_with_game_layers(source, record_index, archive, include_all=False, job=None, *, record_name=None):
+    """Preview floor artwork unchanged, with independent stock alignment guides."""
+    import re
+    result = inspect_scene_preview(source, record_index, include_all, job, record_name=record_name)
+    if archive is None or not re.fullmatch(r's\d+\.iff', source.name, re.IGNORECASE) or not any(m.get('court_surface') for m in result['meshes']):
+        return result
+    from ..formats.scene_palette import supplement_floor_layers
+    base = getattr(archive, 'base', archive)
+    # Fixed reference court, independent of selected school and override layout.
+    matches = [e for e in base.entries if e.get('name', '').lower() == 's256.iff']
+    if len(matches) != 1:
+        return result
+    original_path = materialize(base, matches[0])
+    from ..formats.standard_iff import StandardIFF
+    iff = StandardIFF(original_path.read_bytes())
+    floors = [r for r in iff.records if r['type'] == 'SCNE' and r['name'].lower() == 'floor']
+    if len(floors) != 1:
+        result['warnings'].append('No unique stock reference floor; alignment guides are unavailable')
+        return result
+    original = inspect_scene_preview(original_path, floors[0]['index'], False, job)
+    return supplement_floor_layers(result, original)
+
+
 def inspect_scene_preview(source: Path, record_index: int, include_all=False, job=None, *, record_name=None):
     from ..texture_tools.pipeline import Container
     from ..formats.standard_iff_writer import record_blocks
@@ -553,4 +576,4 @@ def inspect_stadium_preview(archive, entry, mode=0, job=None):
     if len(matches) != 1:
         raise ValueError('The selected stadium has no unique ' + name + ' SCNE')
     record = matches[0]
-    return source, inspect_scene_preview(source, record['index'], mode == 0, job, record_name=record['name'])
+    return source, inspect_scene_with_game_layers(source, record['index'], archive, mode == 0, job, record_name=record['name'])

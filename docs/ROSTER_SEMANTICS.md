@@ -37,8 +37,8 @@ comparison through the shared backend. No personal input data is included.
 0x69DAA8/0x69DABC read/write the complete position byte at raw +0x3B. Adjacent
 +0x3C begins scaled shooting ratings, not a secondary position. The localized
 player bindings contain one Position control. This establishes the supported
-primary field; it does not establish another independent field or prove that
-none exists elsewhere. No speculative secondary writer is supplied.
+primary field. The owner confirmed that secondary positions do not exist; that
+search is closed and no secondary-position writer is supplied.
 
 Confirmed text-entry capacities and copy-on-write growth are described in
 ROSTER_SCALE_AND_PREVIEWS.md. Entry-buffer capacities are not a universal renderer
@@ -46,3 +46,30 @@ ceiling. Fields without confirmed engine limits are not capped to the old string
 allocation. Complete semantics for every remaining byte are not claimed.
 
 Keyboard-entry limits are displayed as advisory values rather than enforced as engine ceilings. External text edits grow the string heap safely; the tool does not claim a universal game rendering limit.
+
+## Shared formatter representation ceiling
+
+Read-only tracing establishes an upper representation bound of **65,535 UTF-16
+units**, excluding NUL, for the common text-argument descriptor. Conference name
+formatter 0x73FF00 calls 0x49E1B4 → 0x1E1610 → 0x1E2634. The latter obtains a
+unit count via 0x11DF0 → 0x7C5818 (lhz until NUL, pointer difference divided by
+two) and stores it with `sth` at descriptor +0xA. Serializer 0x1E1C00/0x1E1C4C
+retains that u16. A count of 65,536 wraps to zero rather than retaining the text.
+
+The shared backend therefore blocks larger new text values, including CSV and
+comparison edits, with no mutation. This bound is separate from the adapter's
+file-size guard and each keyboard buffer. It does not prove that every menu can
+display 65,535 units, or establish smaller field-specific/combined-name limits.
+Qt's default QLineEdit limit of 32,767 is removed so it cannot silently truncate
+text before backend validation. Existing unchanged source values stay preserved.
+
+## Current conference and coverage continuation
+
+See CONFERENCE_ASSETS.md for the exact conference-logo route and newly traced
+tournament index. Research coverage records `known_bit_mask` and
+`unresolved_bit_mask` for every row byte, including packed player properties and
+shoes. Fully known bytes, partially known bytes and known bit counts are separate;
+unknown bits remain protected. Structural pointer classification is not proof of
+all history/legacy meaning. Roster text dialogs show a live orange border beyond
+confirmed game keyboard limits, measured in UTF-16 units. The warning does not
+truncate text or impose an invented engine limit.

@@ -59,3 +59,7 @@ def test_research_report_covers_every_row_byte_without_claiming_completion():
     for table in report['tables'].values():
         assert len(table['fields']) == table['stride']
         assert table['classified_bytes_per_row']+table['unknown_bytes_per_row']==table['stride']
+        assert table['classified_bits_per_row'] == sum(f['known_bit_mask'].bit_count() for f in table['fields'])
+        for field in table['fields']:
+            assert field['known_bit_mask'] ^ field['unresolved_bit_mask'] == 255
+    assert report['tables']['players']['partially_classified_bytes_per_row'] > 0

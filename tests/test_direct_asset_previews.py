@@ -48,8 +48,9 @@ def test_stadium_record_resolved_from_selected_archive(tmp_path,monkeypatch,mode
     archive=object();entry=dict(index=7,name='s256.iff')
     calls=[]
     monkeypatch.setattr(services,'materialize',lambda a,e:path if a is archive and e is entry else None)
-    monkeypatch.setattr(services,'inspect_scene_preview',lambda *args,**kwargs:calls.append((args,kwargs)))
+    monkeypatch.setattr(services,'inspect_scene_with_game_layers',lambda *args,**kwargs:calls.append((args,kwargs)))
     services.inspect_stadium_preview(archive,entry,mode)
     assert calls[0][0][0]==path
-    assert calls[0][0][2] is all_scenes
+    assert calls[0][0][2] is archive
+    assert calls[0][0][3] is all_scenes
     assert calls[0][1]['record_name']==name

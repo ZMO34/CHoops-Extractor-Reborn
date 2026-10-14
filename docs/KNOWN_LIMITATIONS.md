@@ -1,10 +1,22 @@
+## Current continuation evidence
+
+Floor alignment guides are independent flat-colour stock S256 reference geometry,
+raised 1 game unit. They never hide real floor materials or apply roster colours.
+Without the source reference they are unavailable.
+Conference logos have verified logo900+index routing; the separate
+tournament index is protected pending a backlink writer. Animation clips can be
+identified/extracted as raw SingleMoCap blocks, without decoded skeletal tracks.
+Orange text warnings concern confirmed keyboard buffers, not proven engine caps.
+Secondary positions are closed by owner confirmation and are not being searched.
+Unknown roster bits, reflection/fake-bump/AO and all runtime palette modes remain
+unestablished. See the current evidence docs; older dated limits below are history.
+
 # Current evidence boundary
 
 Arena vertex colour/alpha, lightmap, glow and flare masks are now supported;
 ARENA_SHADER_MASKS.md distinguishes them from unimplemented dynamic lighting/AO.
 ROSTER_SEMANTICS.md records new appearance, tattoo and signature edits. Complete
-semantics for all roster bytes, independent secondary positions, all engine text
-ceilings and remaining runtime palette links are not certified. Earlier notes
+semantics for all roster bytes, all engine text ceilings and remaining runtime palette links are not certified. Earlier notes
 that describe these newly mapped controls as unavailable are superseded by these
 evidence documents. Source data, EBOOT and unknown bits remain preserved.
 
@@ -13,13 +25,13 @@ evidence documents. Source data, EBOOT and unknown bits remain preserved.
 The scale branch remains incomplete semantic reverse engineering. Confirmed Edit
 Schools entry capacities are mapped; conference/coach/singular-mascot limits and
 the renderer's broader text ceiling, arena shader channels, number geometry/colour and
-independent secondary positions remain unresolved. CSV/comparison use supported
+Secondary-position research is closed by owner confirmation. CSV/comparison use supported
 writers and exclude ambiguous references. Text growth is structurally tested;
 game runtime remains unverified. See ROSTER_SCALE_AND_PREVIEWS.md.
 
 v1.11 transfers/brand propagation reject shared or inconsistent ownership and full
 18-player destinations. Whole-table older 16-slot JSON exports need refreshing.
-Static jersey preview has no runtime cloth, skinning, body or name/number overlays.
+Static jersey preview has authored number/Reborn overlays; runtime cloth, skinning and animated bodies are not reproduced.
 No automatic Legacy eligibility/scholarship enforcement or gameplay guarantee.
 
 v1.10 removes D1 conversion and new alternate/independent-asset actions from the

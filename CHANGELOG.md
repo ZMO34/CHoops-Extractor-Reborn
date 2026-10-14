@@ -1,3 +1,14 @@
+# Unreleased roster / game-line / motion continuation
+
+- Traced the shared 65,535-unit text descriptor bound; block count overflow and
+  remove Qt's unintended 32,767-character truncation.
+
+- Live orange warnings beyond verified UTF-16 keyboard entry capacity.
+- Authored 3-point/outer-border layers, source court supplementation, retained camera.
+- Guarded conference indices and exact conference-logo texture editor shortcut.
+- Corrected tournament-link semantics; unvalidated bracket editing protected.
+- Bit-accurate unresolved-byte coverage and lossless SingleMoCap inspection/export.
+
 - Dynamic UTF-16 edits no longer confuse keyboard entry capacities with engine storage ceilings.
 
 # Roster and arena continuation
@@ -91,3 +102,4 @@ normalization. Dynamic supported stadium sizes retained; runtime budget unknown.
 Native Qt studio; streaming cancelable raw extraction; precomputed IFF spans; replacement-folder staging and source preconditions; verified unpatched build bytes; roster redo; source/packaged smoke tooling. CI branch deletion/release side effects removed. Historical higher-looking version tags remain untouched. This is a new rebuild train, not a replacement of preserved releases.
 
 Override selection fix: automatically choose a fresh numbered workspace when the configured folder exists; update build and preview paths together. Rename the GUI action to Select overrides folder… and remove staging wording from GUI messages. Preserve previous workspaces on failure.
+Continuation: optional stock-court alignment guides default off and leave floor shader/palette rendering intact. Correct ROST runtime UTF-16BE string fixup, protect the 65,535-unit descriptor count, and remove Qt’s unrelated input ceiling.

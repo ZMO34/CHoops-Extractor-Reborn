@@ -846,7 +846,7 @@ class Window(QMainWindow):
         )
 
         layout.addWidget(self.search)
-        self.archive_category=QComboBox();self.archive_category.addItems(['All','Stadiums','Uniforms','Cloth geometry','Shoes','Logos','Players','Audio','Menus','Rosters','Other / unresolved'])
+        self.archive_category=QComboBox();self.archive_category.addItems(['All','Stadiums','Uniforms','Cloth geometry','Shoes','Logos','Players','Audio','Menus','Rosters','Animation banks','Other / unresolved'])
         self.archive_category.currentTextChanged.connect(lambda category:self.explorer.model().choose_category(category) if self.explorer.model() else None)
         layout.addWidget(self.archive_category)
 
@@ -960,14 +960,14 @@ class Window(QMainWindow):
         try: archive=self.preview_archive()
         except ValueError as error:return self.show_error(str(error))
         if getattr(self,'_scene_record_index',None) is not None and hasattr(self,'scene_source'):
-            from .services import inspect_scene_preview
+            from .services import inspect_scene_with_game_layers
             index=self._scene_record_index
             include_all=self.scene_complete.isChecked()
             scene_source=self.scene_source
             record_name=getattr(self,'_scene_record_name',None)
             def load(job):
                 source=self.preview_file(scene_source,archive)
-                return source,inspect_scene_preview(source,index,include_all,job,record_name=record_name)
+                return source,inspect_scene_with_game_layers(source,index,archive,include_all,job,record_name=record_name)
             def display(value):
                 source,result=value;self.scene_parts.clear();self.scene_textures.clear();self.show_scene_preview(result,source)
             self.run_job('Reload scene from selected preview source',load,display,cancellable=True)
@@ -1180,6 +1180,48 @@ class Window(QMainWindow):
                 display(result)
 
         self.run_job("Preview selected texture", decode_with_status, display_with_status)
+
+    def open_conference_logo(self, index):
+        if self.active or index is None:
+            return
+        from ..roster.conference_assets import logo_record
+        try:
+            name = logo_record(index)
+            archive = self.preview_archive()
+            if archive is None:
+                raise ValueError('Open a source JB folder first')
+            matches = [e for e in archive.entries if e.get('name') == 'teamselectlogo.iff']
+            if len(matches) != 1:
+                raise ValueError('No unique teamselectlogo.iff bank in the selected preview source')
+        except ValueError as error:
+            return self.show_error(str(error))
+
+        def inspect(job):
+            result = inspect_asset(materialize(archive, matches[0]))
+            if sum(row['name'] == name for row in result['textures']) != 1:
+                raise ValueError(f'No unique {name} texture in the selected logo bank')
+            return result
+
+        def display(result):
+            self.display_asset(result)
+            self._scene_record_index = None
+            self._shoe_preview_active = False
+            self._jersey_preview_row = None
+            for row in range(self.textures.model().rowCount()):
+                if self.textures.model().index(row, 0).data(Qt.ItemDataRole.UserRole) == name:
+                    self.textures.selectRow(row)
+                    break
+            self.explorer_texture.setCurrentIndex(self.explorer_texture.findData(name))
+            self.navigate_to('Texture Editor')
+            def preview_when_idle():
+                if self.asset_path != result['path']:
+                    return
+                if self.active:
+                    QTimer.singleShot(20, preview_when_idle)
+                else:
+                    self.decode_texture_preview(name, self.image)
+            QTimer.singleShot(0, preview_when_idle)
+        self.run_job('Open conference logo ' + name, inspect, display)
 
     def import_dds(self):
 
@@ -1587,6 +1629,12 @@ class Window(QMainWindow):
         self.scene_cutaway.setChecked(True)
         self.scene_cutaway.toggled.connect(self.select_scene_part)
         layout.addWidget(self.scene_cutaway)
+        self.scene_three_point = QCheckBox('Alignment guide: 3-point lines')
+        self.scene_border = QCheckBox('Alignment guide: out-of-bounds borders')
+        for box in (self.scene_three_point, self.scene_border):
+            box.setChecked(False)
+            box.toggled.connect(self.select_scene_part)
+            layout.addWidget(box)
         self.scene_parts = QComboBox()
         self.scene_parts.activated.connect(self.select_scene_part)
         layout.addWidget(self.scene_parts)
@@ -1829,11 +1877,11 @@ class Window(QMainWindow):
         self.scene_parts.clear()
         self.scene_textures.clear()
         self.model_details.setPlainText("Loading scene…")
-        from .services import inspect_scene_preview
+        from .services import inspect_scene_with_game_layers
         include_all = self.scene_complete.isChecked()
         def load(job):
             path=self.preview_file(source,archive)
-            return path,inspect_scene_preview(path,index,include_all,job,record_name=record_name)
+            return path,inspect_scene_with_game_layers(path,index,archive,include_all,job,record_name=record_name)
         self.run_job('Decode scene geometry and textures',load,lambda value:self.show_scene_preview(value[1],value[0]),cancellable=True)
 
     def preview_jersey(self,uniform,neck,build,shorts,parts=0):
@@ -1866,6 +1914,13 @@ class Window(QMainWindow):
     def show_scene_preview(self,result,source):
         self.scene_source = source
         self.scene_meshes = result['meshes']
+        from ..formats.scene_palette import COURT_PALETTE_ROUTES
+        layers = {b.get('reference_slot')
+                  for m in self.scene_meshes if m.get('game_floor_layer') for b in m.get('batches', [])}
+        for box, slot in ((self.scene_three_point, 18), (self.scene_border, 4)):
+            box.setEnabled(slot in layers)
+            box.setToolTip('Fixed stock court alignment guide, raised 1 game unit. '
+                           'Independent of roster palettes and floor artwork.')
         self.scene_parts.addItem('All supported parts', -1)
         for i, mesh in enumerate(self.scene_meshes):
             self.scene_parts.addItem(mesh['name'], i)
@@ -1889,9 +1944,11 @@ class Window(QMainWindow):
     def select_scene_part(self, index=None):
         part = self.scene_parts.currentData()
         meshes = self.scene_meshes if part == -1 else [self.scene_meshes[part]] if part is not None else []
+        if part not in (-1, None) and meshes and meshes[0].get('court_surface'):
+            meshes = meshes + [m for m in self.scene_meshes if m.get('game_floor_layer')]
         if part == -1 and self.scene_cutaway.isChecked():
             meshes = [m for m in meshes if not m.get('hidden_by_default')]
-        from ..formats.scene_palette import associate_palette
+        from ..formats.scene_palette import associate_palette, floor_layers
         import re
         match = re.fullmatch(r's(\d+)', self.scene_source.stem, re.IGNORECASE) if hasattr(self, 'scene_source') else None
         teams = [team for team in self.roster.rows['teams'] if match and team['asset_id'] == int(match[1])] if self.roster else []
@@ -1899,16 +1956,17 @@ class Window(QMainWindow):
         if self.roster and school is not None:teams=[self.roster.rows['teams'][school]]
         colors = teams[0]['palette_colors'] if len(teams) == 1 else None
         meshes = associate_palette(meshes, colors)
+        meshes = floor_layers(meshes, self.scene_three_point.isChecked(), self.scene_border.isChecked())
         if self.scene_uniform_images:
             meshes = [{**mesh,'batches':[{**batch,'texture':'__uniform_'+mesh['uniform_surface'], 'palette_tint':None}
                                         for batch in mesh['batches']]}
                       if mesh.get('uniform_surface') in self.scene_uniform_images else mesh for mesh in meshes]
         if colors is not None:
             count = sum(batch['palette_tint'] is not None for mesh in meshes for batch in mesh['batches'])
-            self.scene_palette_state.setText(f"Associated roster: {self.roster.source.source_path or 'current JB folder roster'}; {teams[0]['school_name']}; {count} court color bindings. Arena shader masks are unresolved.")
+            self.scene_palette_state.setText(f"Associated roster: {self.roster.source.source_path or 'current JB folder roster'}; {teams[0]['school_name']}; {count} court color bindings. Authored arena color/lightmap masks enabled; runtime effects remain under research.")
         else:
             self.scene_palette_state.setText('No unique roster/team association; embedded material textures only. Use Associate roster to select a matching roster.')
-        self.scene_view.set_meshes(meshes)
+        self.scene_view.set_meshes(meshes, fit=not isinstance(index, bool))
 
     def select_scene_texture(self, index=None):
         name = self.scene_textures.currentData()

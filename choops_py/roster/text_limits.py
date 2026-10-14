@@ -16,3 +16,9 @@ INPUT_LIMITS.update({('teams','short_name'):16,('teams','school_name'):16,
 # No smaller per-field storage/loader ceiling has been proved. Keyboard-entry
 # capacities above are advisory; they must not masquerade as engine hard limits.
 ENGINE_LIMITS = {}
+
+# Shared UTF-16 argument descriptors store length as u16: constructor
+# 0x1E2634 -> 0x11DF0/0x7C5818 (count 16-bit units), sth +0xA;
+# serializer 0x1E1C4C copies that u16. This representation cannot retain
+# 65,536 units. Smaller per-field/display capacities remain separate evidence.
+TEXT_DESCRIPTOR_MAX = 0xFFFF

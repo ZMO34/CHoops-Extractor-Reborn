@@ -19,7 +19,7 @@ class EditorModel:
         for issue in self.issues:
             if issue['kind']!='invalid_string_pointer' or issue['detail']!='Control character in roster string':continue
             field=issue['field_offset'];ranges=[(field,field+4)]
-            target=field+struct.unpack_from('>i',self.original,field)[0]
+            target=field+struct.unpack_from('>i',self.original,field)[0]-1
             if 0<=target<len(self.original):
                 end=self.string_ranges.get(target,target)
                 ranges.append((target,end))
@@ -34,13 +34,13 @@ class EditorModel:
     def string(self,field,user):
         value=struct.unpack_from('>i',self.data,field)[0]
         if value in (0,-1):return ''
-        target=field+value
+        target=field+value-1
         try:
             b=Binary(self.data);end=target
             for _ in range(max(0,(len(self.data)-target)//2)):
-                code=b.u16(end,'<')
+                code=b.u16(end)
                 if not code:
-                    text=b.slice(target,end-target).decode('utf-16-le')
+                    text=b.slice(target,end-target).decode('utf-16-be')
                     self.string_users[target].append(user);self.string_ranges[target]=end+2
                     if any(ord(c)<32 for c in text):
                         self.issues.append({'kind':'invalid_string_pointer','field_offset':field,'detail':'Control character in roster string'})
@@ -117,7 +117,7 @@ class EditorModel:
             unchanged=any(issue==old and all(self.data[start:end]==self.original[start:end] for start,end in ranges)
                           for old,ranges in self.source_string_issues)
             (preserved if unchanged else errors).append(issue)
-        return {'valid':not errors,'issues':errors,'preserved_source_string_issues':preserved,'source_type':self.source.kind,'counts':{name:len(rows) for name,rows in self.rows.items()},'unsaved_edits':len(self.edits),'read_only_fields':['unconfirmed roster bytes','independent secondary position','unconfirmed palette roles']}
+        return {'valid':not errors,'issues':errors,'preserved_source_string_issues':preserved,'source_type':self.source.kind,'counts':{name:len(rows) for name,rows in self.rows.items()},'unsaved_edits':len(self.edits),'read_only_fields':['unconfirmed roster bytes','unconfirmed palette roles']}
     def name_capacity(self,table,index,field):
         from .text_limits import ENGINE_LIMITS
         return ENGINE_LIMITS.get((table,field))
@@ -126,7 +126,7 @@ class EditorModel:
         return INPUT_LIMITS.get((table,field))
     def text_hint(self,table,field):
         entry=self.text_entry_capacity(table,field)
-        return 'UTF-16 storage grows; engine ceiling unproved'+(f'; game keyboard allows {entry} units' if entry is not None else '')
+        return 'UTF-16 storage grows; shared formatter count: 65,535 units; smaller display limits unproved'+(f'; game keyboard allows {entry} units' if entry is not None else '')
     def edit(self,table,index,field,value,slot=None):
         if field not in EDITABLE.get(table,()):raise ToolError('roster_field_read_only',f'{table}.{field} is not a confirmed writable field')
         if table=='teams' and field=='roster_slots':return self.edit_school_roster_slot(index,slot,value)
@@ -140,8 +140,11 @@ class EditorModel:
         changes=[]
         if field in STRING_FIELDS.get(table, {}):
             rel=STRING_FIELDS[table][field];pos=off+rel;delta=struct.unpack_from('>i',self.data,pos)[0]
-            target=pos+delta
-            encoded=str(value).encode('utf-16-le');old=str(old_value).encode('utf-16-le')
+            target=pos+delta-1
+            encoded=str(value).encode('utf-16-be');old=str(old_value).encode('utf-16-be')
+            from .text_limits import TEXT_DESCRIPTOR_MAX
+            if len(encoded)//2 > TEXT_DESCRIPTOR_MAX:
+                raise ToolError('roster_text_descriptor_overflow', f'Shared game formatter represents at most {TEXT_DESCRIPTOR_MAX:,} UTF-16 units')
             capacity=self.string_capacities.get(target,len(old))
             limit=self.name_capacity(table,index,field)
             if limit is not None and len(encoded)//2>limit:raise ToolError('string_length_mismatch',f'Confirmed engine storage ceiling: {limit} UTF-16 units')
@@ -150,11 +153,12 @@ class EditorModel:
             if delta not in (0,-1) and any(target<start+count*size and start<end for start,count,size in self.tables.values()):
                 raise ToolError('invalid_string_storage','Name storage overlaps a fixed roster table')
             # Copy-on-write isolates known or unknown aliases; original heap bytes
-            # and all table locations remain intact. Pointer target is UTF-16LE.
+            # and all table locations remain intact. The runtime target is BE
+            # UTF-16 at field + signed displacement - 1.
             relocated=(len(self.data)+1)&~1
             if relocated+len(encoded)+2>60*1024*1024:raise ToolError('roster_too_large','Expanded roster exceeds adapter size guard')
             padding=b'\0'*(relocated-len(self.data))
-            changes.append((pos,struct.pack('>i',relocated-pos)))
+            changes.append((pos,struct.pack('>i',relocated-pos+1)))
             changes.append((len(self.data),padding+encoded+b'\0\0'))
         elif table=='teams' and field=='palette_colors':
             slot = self.integer(slot)
@@ -266,6 +270,10 @@ class EditorModel:
         self.edits.append({'table':'teams','index':team_index,'field':'alternate_enabled','slot':variant,'value':bool(enabled)})
 
     def move_team_to_conference(self, team_index, conference_index, make_d1=False):
+        if type(team_index) is not int or not 0 <= team_index < len(self.rows['teams']):
+            raise ToolError('invalid_school', 'Select an existing school index')
+        if type(conference_index) is not int or not 0 <= conference_index < len(self.rows['conferences']):
+            raise ToolError('invalid_conference', 'Select an existing conference index')
         before=bytes(self.data);old_edits=list(self.edits)
         team=self.rows['teams'][team_index];old=team.get('conference_index')
         if old is None:raise ToolError('missing_conference','Team has no verified source conference')

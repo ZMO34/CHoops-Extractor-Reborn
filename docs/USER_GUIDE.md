@@ -137,3 +137,28 @@ chooses the next unused numbered sibling (for example my_mod_2). Existing folder
 are preserved. The Mod workspace field, previews, dry run and Build JB copy all
 use the newly prepared workspace. Failed or cancelled preparation leaves the
 previous workspace and GUI selection intact. This action does not build a JB.
+## Roster and preview continuation
+
+Text edits show an orange border beyond known game keyboard capacity; longer text
+remains allowed. School References includes the editable Conference index.
+Conference Logo opens its exact texture record for preview/DDS replacement;
+save and stage that paired bank manually. Floor 3-point/outer-border toggles use
+the game's authored line geometry, including missing layers from the matching
+source JB. See CONFERENCE_ASSETS.md, ARENA_SHADER_MASKS.md and
+ANIMATION_RESEARCH.md for limitations and raw motion-extraction commands.
+
+Alignment guides start disabled. Use Alignment guide toggles only to position full-court texture artwork. Guides use fixed stock S256 coordinates raised 1 game unit, not apron bounds; toggling them leaves the real floor and palette rendering intact.
+
+Reference guide width uses the central 10% of the authored strip UV: U across both 3-point and boundary strips. This thins guides without moving their centerlines or modifying floor geometry.
+
+### Direct 3D previews
+
+Load a JB folder, then open Models / Courts. Choose a uniform and click Preview
+selected jersey; choose shoe artwork and Preview selected shoes; or choose a
+stadium and the arena/floor mode, then Preview selected stadium / floor. No IFF
+must be opened in Explorer first. Select overrides folder… in Mod Builder to
+prepare artwork, then use the global Source JB / overrides toggle to compare
+both geometry and textures. Missing required cloth/shoe meshes are reported;
+no substitute geometry is guessed. Uniform top/shorts and shape dropdowns are
+available after a direct jersey preview. School labels appear when a roster is
+loaded, while archive selectors also work without a roster.
