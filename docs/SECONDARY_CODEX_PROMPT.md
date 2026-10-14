@@ -86,6 +86,36 @@ Embedded source: docs/CURRENT_STATUS.md
 
 # Current project status
 
+PR #13 combined roster/arena continuation: twelve additional appearance/tattoo/
+signature fields with verified inclusive option bounds, all 112 jump-shot labels,
+and authored arena vertex-colour/alpha, second-UV lightmaps, glow/flare masks.
+461 portable tests passed (7 offscreen GL skips, 2 deselected); 144 native
+checks passed. See ROSTER_SEMANTICS.md and ARENA_SHADER_MASKS.md. Complete
+remaining roster bytes, independent secondary positions, per-field engine ceilings
+and every runtime shader/palette mode remain unproved; no guessed edits are added.
+
+
+Authored jersey lettering continuation (PR #13): front/back numbers 0–99/00,
+roster-linked or preview-only number choices, and curved Reborn surname rendering
+use actual indexed fonts/metrics and placement. Declared material DiffuseColor
+and integer shader switches are fixed. Palette 16/17 runtime-copy roles are
+confirmed. Full roster semantics, secondary positions and arena mask routes
+remain under research. No guessed writers, EBOOT edits, RPCS3 or testing JB.
+Verification: 448 passed, 4 offscreen-OpenGL skips, 2 deselected; native hidden
+OpenGL checks separately passed. Source startup, CLI, lint/type checks passed.
+This continuation is not yet a published release.
+
+
+## Roster / preview continuation
+
+v1.12 is published from merged PR #12. Continuation source fixes worker source
+snapshots and named SCNE identity, comparison reference matching, school-filter
+reset and menu-logo subrecord references. Confirmed Edit Schools text capacities
+are mapped to roster fields, and the jump-shot animation ID is editable with
+confirmed bounds. See ROSTER_SCALE_AND_PREVIEWS.md for evidence and unfinished
+semantics. This continuation is not a published release.
+Combined with merged PR #11: 341 tests passed, 2 deselected; source/Qt startup,
+lint/type and documentation checks passed. No RPCS3, EBOOT edits or testing JB.
 ## Latest release and single-slice integration
 
 v1.12 publishes merged PR #12 at master 4f0eec7f95f9d624ff0fe09b4aac489ba4cf058e.
@@ -102,11 +132,12 @@ The feature branch adds source-bound CSV editing, selective comparison, atomic
 ratings paste, inline rating boxes, school filtering, Class/Redshirt controls,
 growing UTF-16 text, shared source/override SCNE and texture previews, archive
 categories/references and bounded conversion/normalization caching. This remains
-an in-progress project, not a published release or completed reverse engineering.
+a continuing research project; its implemented checkpoint is published in v1.12,
+while full reverse engineering remains unfinished.
 See ROSTER_SCALE_AND_PREVIEWS.md for exact behavior, evidence and remaining work.
 Development verification on 2026-10-13: 326 tests passed, 2 deselected; source/Qt
 startup, lint/type and generated handoff checks passed. No testing JB or gameplay.
-Draft checkpoint: https://github.com/ZMO34/CHoops-Extractor-Reborn/pull/12.
+Merged checkpoint: https://github.com/ZMO34/CHoops-Extractor-Reborn/pull/12.
 Jersey colour constants now trace to slots 0/1 and a separate mode using 14/15;
 fragment routing and mode selection remain unfinished.
 Recent functional PRs were merged before work; baseline is v1.11/master
@@ -240,6 +271,10 @@ All game inputs, rosters, templates, private reverse-engineering helpers and raw
 audio are local and absent from Git. A fresh PC must supply its own authorized
 fixtures. Do not assume a generated court template or any old local build exists.
 
+Additional appearance/tattoo/post/free-throw fields and all 112 jump-shot captions are now supported; see ROSTER_SEMANTICS.md. Arena vertex-colour/alpha, lightmap, glow and flare routing is implemented; see ARENA_SHADER_MASKS.md for evidence and remaining runtime effects.
+
+Text edits now grow beyond old allocations and keyboard entry capacities. The UI separates advisory game-keyboard sizes from unproved engine ceilings; structural pointer/UTF-16/adapter guards still apply.
+
 ---
 
 Embedded source: docs/ROSTER_SCALE_AND_PREVIEWS.md
@@ -306,10 +341,15 @@ Read-only EBOOT callbacks establish **game editor input capacities**, excluding
 the terminator: player first/last 16 (0x693F98/0x691ACC, buffer 0x11); School Name
 16 (0x6D17F8); Abbreviation 4 (0x6D18FC, buffer 5); Stadium Name 15 (0x6D1A00,
 buffer 0x10); Nickname 16 (0x6D1AF4); Student Section 32 (0x6D1CFC, buffer 0x21).
-Only the first/last-name mapping is currently enforced as a ROST input cap.
-School/arena callbacks operate on temporary C++ strings; exact correspondence to
-each serialized ROST text field still needs proof, so those values are not blindly
-applied to the roster fields. The text-buffer constructor is 0x7C708C through 0x1E3224; keyboard initialization
+The Edit Schools save path now connects those temporary strings to serialized
+fields: 0x6D09FC–0x6D0E5C writes team anchor +0/+8 (short/school name), +4
+(abbreviation), +0xC (plural mascot), +0x16C (event name) and +0x168 (student
+section). The team anchor bias is +0x30. Keyboard capacities are advisory, not engine storage caps:
+16/16/4/16/64/32 UTF-16 units. Stadium-name temporary string 0x3140(r2) loads
+from arena anchor +0 at 0x6D605C, matching arena row +0x18; its entry cap is 15.
+Text storage may grow beyond those keyboard capacities; unknown engine ceilings are not guessed. Singular mascot,
+conference and coach names are not assigned guessed caps.
+The text-buffer constructor is 0x7C708C through 0x1E3224; keyboard initialization
 0x1D8AAC uses that buffer descriptor. These are not claims that the renderer cannot
 display longer authored vanilla strings. Existing longer values are preserved.
 
@@ -331,29 +371,21 @@ selection clears Redshirt Used at row +0x9C bit 30. Used controls
 0x68F64C/0x68F518 toggle that bit; setting it clears active Redshirt. Scholarship
 bit 31 and weight bits 11–19 remain untouched. Tests cover these coupled effects.
 
-Runtime number formatter 0x4E7C8C treats 100 as **00**; this sentinel exists in
-stock data and now displays/edits as 00. NAME/numbers contains ten big-endian
-(atlas x, glyph width) u16 pairs. The formatter aligns glyph widths to four pixels
-and centers copies into a generated jersey-number texture. Exact references:
-atlas 0x4E80EC, generated resource 0x4E8144,
-player-number call 0x4E81C0–0x4E81D0. Geometry placement and shader color consumers
-are still being traced; authored glyph rendering is not yet exposed as completed.
-
-Further read-only tracing found global.iff's 256×128 jersey-number templates
-(the runtime identifier is `jerseynum00` through `jerseynum23`) and its UnAD
-`unidata` record. Function 0x4DCD5C uses +0x1C/+0x20 as number centre and
-+0x24/+0x28 as number width/height, setting semantic hash 0x1B951FD0 to
-(1/width, 1/height, 0.5-centreX/width, 0.5-centreY/height).
-The number texture binds `NumberMap` (CRC32 0x7FF175D8) at 0x4E0C80/0x4E3174.
-The program still needs the vertex UV and fragment mask/colour route; do not
-substitute guessed placement. Embedded `PS_Jersey` Cg program headers were located
-for continued read-only RSX analysis using published instruction definitions:
-https://github.com/RPCS3/rpcs3/blob/master/rpcs3/Emu/RSX/Program/RSXFragmentProgram.h.
-
 Confidence callbacks 0x69E910/0x69E924 read/write anchor +0x70, row +0x80.
 Constructor metadata exposes bounds 35 and 99; source values outside those bounds
 are preserved until explicitly edited. Jump-shot getter/setter +0x83 and its 0–111
-range were also located; exact option captions remain unimplemented.
+range were also located. The side panel now edits that animation ID with a
+bounded dropdown; exact localized animation captions remain unresolved.
+
+Continuation fixes: preview workers receive a source snapshot without reading Qt
+controls. Unique SCNE names survive archive record reordering; missing names are
+refused. Duplicate rest-pose records retain their explicit index and are not
+assigned invented identities. Comparison maps conference references by unique
+conference identity and excludes unnamed records. New rosters reset school
+filters/preview association to avoid carrying a previous roster's school index.
+Explorer nested records expose exact `teamselectlogo.iff/logoNNN` school links;
+stadium references follow the arena pointer/code rather than guessing from a
+school's asset ID. Other menu-bank subrecord routes remain under research.
 
 Read-only jersey colour tracing: 0x4DC8A0 binds semantic hashes 0x72251300
 (`CustomJerseyColor`) and 0xDC165DB5 (`CustomPipingColor`). Its normal team
@@ -370,7 +402,7 @@ need proof before automatic jersey recolouring is implemented.
 
 Full roster semantic reverse engineering, independent secondary positions,
 remaining school/coach/player records, complete per-field engine text limits,
-arena channel-to-palette masks, jersey-number geometry/shading and full menu asset
+arena channel-to-palette masks, complete jersey lighting and full menu asset
 subrecord links remain unfinished. No secondary position control appears in the
 traced localized player bindings; the confirmed position is a whole byte at +0x3B.
 Class/Redshirt findings do not justify guessing those other bits. Body shape and
@@ -380,6 +412,139 @@ Existing conference-parser reference:
 https://github.com/bphit4/CH2k8-Roster-Editor/blob/main/Conference_Parser.py.
 Executable evidence is retained privately, read-only; no proprietary bytes/assets
 or workstation paths are distributed. NEVER launch RPCS3 or make testing JB copies.
+
+## Authored jersey lettering (PR #13 continuation)
+
+The Jersey side panel supports every preview number 0–99 and **00**. A selected
+player can follow the roster number or use a preview-only number; neither preview
+numbers nor the requested **Reborn** surname alter roster data. Source/override
+selection applies to glyph artwork as well as cloth/texture records.
+
+Font TXTRs jersey_numbers/names use indexed L8, remap 0x5500, and a 256-entry
+ARGB palette after the four-byte-aligned mip payload. The remap forces GPU ones;
+CPU path 0x7A87B4/0x79F33C uses the palette instead. Preview decoding preserves
+that authored RGBA and rejects missing palettes rather than using a system font.
+NAME/numbers holds ten BE (x,width) u16 pairs; aligned copies/advances reproduce
+0x4E7C8C, including sentinel 100 -> 00. Global jerseynum00 supplies the template.
+UnAD/unidata +1C..28 places front numbers and +2C..38 places back numbers;
+**the latter is not a surname transform**. 0x4DCD5C sets their reciprocal-extent
+UV transforms; NumberMap is CRC32 0x7FF175D8.
+
+Surname consumer 0x4E7F0C calls 0x520898. 0x520740 maps apostrophe/hyphen to
+indices 0/1 and A–Z/a–z to 2–27; spaces advance without copying. NAME/names
+metrics and 0x5207B8/0x520898 supply aligned spacing and centering. Global
+jerseyname00 supplies the template (stock 256×32). UnAD +08..18 supplies the
+polar horizontal/vertical centre, radius, angular width and radial scale.
+The preview renders Reborn with authored uppercase glyphs and curved placement.
+GLSL atan/length evaluates the polar transform rather than reproducing the
+game's half-precision atan approximation; full cloth/lighting is not simulated.
+RSX instruction definitions used for read-only interpretation:
+https://github.com/RPCS3/rpcs3/blob/master/rpcs3/Emu/RSX/Program/RSXFragmentProgram.h.
+
+Explicit glUniform1i corrects Qt scalar overloads for sampler/bool uniforms;
+rendered-pixel tests cover front/back numbers, names and palette switches.
+Supported material DiffuseColor is read at the shader-declared CPU offset;
+confirmed court palette edits replace it. Arena channels are not assigned
+unproven palette roles. Edit Schools save 0x6D0CC0..0x6D0CD0 copies slots 14/15
+to 16/17; these are labelled school primary/secondary runtime copies. Slots
+27–30 and independent secondary positions remain unresolved, not writable guesses.
+
+Additional appearance/tattoo/post/free-throw fields and all 112 jump-shot captions are now supported; see ROSTER_SEMANTICS.md. Arena vertex-colour/alpha, lightmap, glow and flare routing is implemented; see ARENA_SHADER_MASKS.md for evidence and remaining runtime effects.
+
+Keyboard limits no longer block external edits. Dynamic text uses copy-on-write UTF-16 storage, NUL/control-character checks, signed-relative-pointer bounds and the adapter’s 60 MiB safety guard. That guard is a tool limit, not a claimed engine maximum; gameplay compatibility of arbitrary long names remains unverified.
+
+---
+
+Embedded source: docs/ROSTER_SEMANTICS.md
+
+# Roster semantic evidence and supported edits
+
+## Appearance and signature controls
+
+Read-only executable registration metadata links localized captions, paired
+getters/setters, maximum option indices and caption arrays. +0x34 is the maximum
+**index**, not the number of entries: adjacent array addresses corroborate the
+inclusive last option (Bald, Red, Beard Style 6, Sideburns 3, Tattoo 12, Strong,
+Freethrow 23 and Bigs 19). Unknown source codes remain unchanged until edited.
+No new assets or executable modifications are required.
+
+| Field | Raw player offset | Bits | Writable options | Getter |
+|---|---|---|---|---|
+| Hairstyle | 0x8C u32 | 7..12 | 0..36 | 0x69ED94 |
+| Hair colour | 0x90 u32 | 13..15 | 0..4 | 0x69EF54 |
+| Beard | 0x90 u32 | 21..23 | 0..6 | 0x69EE94 |
+| Sideburns | 0x90 u16 | 0..1 | 0..3 | 0x69EF14 |
+| Left shoulder tattoo | 0x84 u32 | 17..20 | 0..12 | 0x69E9DC |
+| Right shoulder tattoo | 0x84 u32 | 13..16 | 0..12 | 0x69EA1C |
+| Left biceps tattoo | 0x84 u32 | 9..12 | 0..12 | 0x69EA5C |
+| Right biceps tattoo | 0x84 u32 | 5..8 | 0..12 | 0x69EA9C |
+| Left forearm tattoo | 0x84 u32 | 1..4 | 0..12 | 0x69EADC |
+| Right forearm tattoo | 0x88 u32 | 28..31 | 0..12 | 0x69EB1C |
+| Post animation | 0x84 u32 | 21..25 | 0..7 | 0x69E99C |
+| Free-throw animation | 0x84 u32 | 26..31 | 0..21 | 0x69E960 |
+
+Jump shots at 0x83 now use all 112 exact game labels (Generic, Athletic, Guards,
+Bigs); writable IDs remain 0..111. Free-throw captions deliberately skip 16,
+as the game's table does. Tattoos and signature animations share packed words;
+mask-preservation/undo tests guard every neighbouring field. Existing body build,
+muscle tone, complexion, equipment, scholarship, class and redshirt controls remain.
+All new scalars automatically participate in source-bound CSV and selective
+comparison through the shared backend. No personal input data is included.
+
+## Position and text evidence boundary
+
+0x69DAA8/0x69DABC read/write the complete position byte at raw +0x3B. Adjacent
++0x3C begins scaled shooting ratings, not a secondary position. The localized
+player bindings contain one Position control. This establishes the supported
+primary field; it does not establish another independent field or prove that
+none exists elsewhere. No speculative secondary writer is supplied.
+
+Confirmed text-entry capacities and copy-on-write growth are described in
+ROSTER_SCALE_AND_PREVIEWS.md. Entry-buffer capacities are not a universal renderer
+ceiling. Fields without confirmed engine limits are not capped to the old string
+allocation. Complete semantics for every remaining byte are not claimed.
+
+Keyboard-entry limits are displayed as advisory values rather than enforced as engine ceilings. External text edits grow the string heap safely; the tool does not claim a universal game rendering limit.
+
+---
+
+Embedded source: docs/ARENA_SHADER_MASKS.md
+
+# Arena shader colour and alpha routing
+
+The stadium SCNE contains embedded Cg programs; it is unnecessary to modify EBOOT
+or load a complete game to inspect these shader families. The sampled source
+programs establish these operations (RGBA multiplication, not guessed school
+colours):
+
+| SCNE shader hash | Embedded fragment program | Static preview |
+|---|---|---|
+| 0x9BF5D4AE | BasePrelitPixelShader | Diffuse × vertex RGBA |
+| 0x9BF5D4AE | BaseLightmapPixelShader | Diffuse × vertex RGBA × lightmap RGBA |
+| 0xAD91D4DE | GlowSignsPixelShader | RGB = diffuse RGB × vertex RGB × (1 + diffuse alpha); alpha = vertex alpha |
+| 0xB3DC3294 | LightFlarePixelShader | RGB = diffuse RGB × vertex RGB; alpha = diffuse alpha |
+
+Float4 COLOR declarations (usage 3) are preserved including HDR values. The
+second signed-normalized TEXCOORD channel (usage 9) supplies lightmap coordinates;
+base UVs are not reused when the second declaration is present. For the verified
+prelit family, sampler 0xAB0D0064 is a lightmap, **not a normal map**. Other shader
+families do not acquire that role merely by having the same sampler hash.
+Material CPU offsets still select DiffuseColor; confirmed court palette uniforms
+continue to follow loaded roster/selected school state. Prelit materials do not
+receive a second artificial directional-light multiplier.
+
+Source/selected overrides supply SCNE and all sampled texture records through the
+same snapshot. Single archives remain usable. Tests verify declared attribute
+bounds and actual rendered lightmap/colour/alpha pixels. Hidden read-only S256
+inspection rendered 119 supported parts and 180 lightmapped batches without
+shader errors. No RPCS3 or testing JB was involved.
+
+This is static preview support. Reflection/environment lighting, full fake-bump
+lighting, screen-space AO, dynamic arena illumination, cloth and every runtime
+palette mode are not reproduced. Palette slots 24–26 must not be assigned to
+seating from colour similarity: Edit Schools also includes cheerleader colours.
+Unproved channel-to-roster links remain unassigned. Complete GPU/game shader
+emulation and full roster reverse engineering are not claimed.
 
 ---
 
@@ -946,7 +1111,7 @@ AUDO segment headers can carry a payload length at +18; interleaved audio banks 
 
 2kTl is BE magic 326B546C, header size, u16 type ID, u16 block count, BE u32 sizes, concatenated blocks. Header size = 12+4*count. Use numeric type IDs; no unvalidated semantic ID mapping. Strictly reject trailing/truncated wrapper bytes.
 
-Standard TXTR often uses separate header and payload blocks; exports preserve individual blocks plus record manifest. Uniform jersey_numbers and names are embedded TXTR subfiles, with separate NAME records possible. Atlas glyph layout is not validated. Validated TXTR descriptor: +58 format byte, +59 mip count, +5A dimension, +5B cube flag, +60 width u16, +62 height u16, +64 depth u16, +68 pitch u32; +A4 is payload offset+1. Unknown variants remain raw-preserved and blocked for DDS edits.
+Standard TXTR often uses separate header and payload blocks; exports preserve individual blocks plus record manifest. Uniform jersey_numbers and names are embedded TXTR subfiles, with separate NAME records possible. Indexed font glyph metrics and static placement are validated; see ROSTER_SCALE_AND_PREVIEWS.md. Validated TXTR descriptor: +58 format byte, +59 mip count, +5A dimension, +5B cube flag, +60 width u16, +62 height u16, +64 depth u16, +68 pitch u32; +A4 is payload offset+1. Unknown variants remain raw-preserved and blocked for DDS edits.
 
 ## SCNE / courts
 
@@ -1006,7 +1171,7 @@ Embedded source: docs/projects/01-uniform-preview.md
 
 Implemented. Open a cloth SCNE, choose a searchable home/away/alternate uniform from the loaded JB folder, or choose Open uniform IFF. The preview uses the selected source's `unifregion`/`shortregion` authored RGB; `unif`/`short` are fallback records. Normal maps and number atlases are not substituted for color artwork. Material-data alpha is made opaque only in the preview copy.
 
-Jersey and shorts use their corresponding images. Same-name cloth SCNE sections are alternatives, rather than superimposed geometry. Player names, numbers, cloth simulation and full game material shading are not reproduced. The original assets remain unchanged.
+Jersey and shorts use their corresponding images. Same-name cloth SCNE sections are alternatives, rather than superimposed geometry. Authored front/back numbers 0–99/00 and curved Reborn surname lettering now render. Cloth simulation and full game material shading are not reproduced. See ../ROSTER_SCALE_AND_PREVIEWS.md. The original assets remain unchanged.
 
 Verified with a native OpenGL jersey render and synthetic sampler-selection tests.
 
@@ -1225,10 +1390,21 @@ in the repository or Windows release.
 
 Embedded source: docs/KNOWN_LIMITATIONS.md
 
+# Current evidence boundary
+
+Arena vertex colour/alpha, lightmap, glow and flare masks are now supported;
+ARENA_SHADER_MASKS.md distinguishes them from unimplemented dynamic lighting/AO.
+ROSTER_SEMANTICS.md records new appearance, tattoo and signature edits. Complete
+semantics for all roster bytes, independent secondary positions, all engine text
+ceilings and remaining runtime palette links are not certified. Earlier notes
+that describe these newly mapped controls as unavailable are superseded by these
+evidence documents. Source data, EBOOT and unknown bits remain preserved.
+
 # Current limitations
 
-The scale branch remains incomplete semantic reverse engineering. School and
-conference engine text caps, arena shader channels, number geometry/colour and
+The scale branch remains incomplete semantic reverse engineering. Confirmed Edit
+Schools entry capacities are mapped; conference/coach/singular-mascot limits and
+the renderer's broader text ceiling, arena shader channels, number geometry/colour and
 independent secondary positions remain unresolved. CSV/comparison use supported
 writers and exclude ambiguous references. Text growth is structurally tested;
 game runtime remains unverified. See ROSTER_SCALE_AND_PREVIEWS.md.
@@ -1277,8 +1453,38 @@ Updated 2026-10-11. CURRENT_STATUS.md and TEST_REPORT.md are the living evidence
 
 Embedded source: docs/TEST_REPORT.md
 
+# Combined roster/arena continuation verification
+
+Portable runner: **461 passed, 7 skipped, 2 deselected**. Seven rendered-pixel
+checks are skipped only by Qt offscreen; native Windows targeted verification:
+**144 passed**, including all seven rendered shader paths. Source/Qt/CLI startup,
+compilation, Ruff, mypy and handoff checks passed. Synthetic appearance tests
+check shared packed-word neighbours, bounds, readback and undo for all 12 fields.
+Read-only S256 hidden rendering: 119 parts, 180 lightmapped batches, no shader
+errors. No RPCS3, testing JB or EBOOT edits. Proprietary fixtures stay private.
+
+# Uniform lettering continuation verification
+
+`python tools/dev/verify.py`: **448 passed, 4 skipped, 2 deselected**. Skips
+are rendered-pixel GL checks on Qt offscreen. Compilation, CLI/Qt startup,
+Ruff, mypy (11 files), handoff and diff checks passed.
+Native Windows targeted check: indexed_font, scene_number_gl, scene_preview and
+roster_side_panels: **128 passed**. GL tests read actual front/back/name/palette
+pixels. All 101 number codes are exercised. Private read-only source inspection
+and hidden rendering confirmed authored Reborn above the back number, and front
+and back 23. No assets/screenshots enter Git. Inputs remained immutable.
+No RPCS3/gameplay, EBOOT editing or full testing JB was performed.
+
 # Development verification
 
+## Roster / preview continuation checks
+
+Final integrated `python tools/dev/verify.py`: 341 passed, 2 intentional
+deselections; compile, CLI/Qt startup, lint/type and handoff checks passed.
+Final targeted preview/bulk/GUI run: 27 passed. Regressions include reordered
+conference references, entire long-string warning preservation, exact menu logo
+ownership, game entry capacities and isolated jump-shot writes/undo. No
+RPCS3, EBOOT writes or testing JB. Evidence is in ROSTER_SCALE_AND_PREVIEWS.md.
 ## PR #11 independent integration review — 2026-10-14
 
 Inspected exact original head 81cd1665c26ce8798c025f5bfbd2d20f98cf213f in

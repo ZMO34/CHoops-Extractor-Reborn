@@ -206,6 +206,12 @@ class JerseyTab(QWidget):
         self.parts = QComboBox()
         self.parts.addItems(["Top + shorts", "Top only", "Shorts only"])
         form.addRow("Render", self.parts)
+        self.number=QComboBox()
+        self.number.addItem("Selected player’s roster number",None)
+        for code in range(101):self.number.addItem('00' if code==100 else str(code),code)
+        self.number.setCurrentIndex(self.number.findData(23))
+        form.addRow('Number (preview)',self.number)
+        self.player_index=None
         button = QPushButton("Preview jersey")
         button.clicked.connect(self.preview)
         form.addRow(button)
@@ -224,6 +230,9 @@ class JerseyTab(QWidget):
         self.uniform.blockSignals(True)
         self.uniform.clear()
         self.setEnabled(row is not None)
+        self.player_index=row['index'] if row and table=='players' else None
+        self.number.model().item(0).setEnabled(bool(row and table=='players'))
+        self.number.setCurrentIndex(0 if row and table=='players' else self.number.findData(23))
         if row:
             model = self.owner.roster
             if table == "uniforms":
@@ -266,7 +275,7 @@ class JerseyTab(QWidget):
         if not uniform or not self.owner.archive:
             return self.owner.log("Open the JB and select a linked uniform to preview.")
         self.owner.preview_jersey(
-            uniform,
+            {**uniform,'preview_number':self.number.currentData() if self.number.currentData() is not None else self.owner.roster.rows['players'][self.player_index]['jersey_number'] if self.player_index is not None else 23,'preview_player_index':self.player_index if self.number.currentData() is None else None,'preview_name':'Reborn'},
             self.neck.currentData(),
             self.build.currentData(),
             self.shorts.currentData(),
@@ -439,9 +448,8 @@ class RecordDetails(QTabWidget):
             if ok:
                 self.apply(key, value, slot)
         elif key in STRING_FIELDS.get(self.table, {}):
-            capacity=model.name_capacity(self.table,self.index,key)
             value, ok = QInputDialog.getText(
-                self, "Edit " + item.text(0), f"Game text entry: up to {capacity} UTF-16 units" if capacity is not None else "Variable UTF-16 text; field-specific engine limit unresolved", text=current
+                self, "Edit " + item.text(0), model.text_hint(self.table,key), text=current
             )
             if ok:
                 self.apply(key, value)

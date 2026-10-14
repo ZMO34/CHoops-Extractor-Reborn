@@ -1,7 +1,18 @@
+# Current evidence boundary
+
+Arena vertex colour/alpha, lightmap, glow and flare masks are now supported;
+ARENA_SHADER_MASKS.md distinguishes them from unimplemented dynamic lighting/AO.
+ROSTER_SEMANTICS.md records new appearance, tattoo and signature edits. Complete
+semantics for all roster bytes, independent secondary positions, all engine text
+ceilings and remaining runtime palette links are not certified. Earlier notes
+that describe these newly mapped controls as unavailable are superseded by these
+evidence documents. Source data, EBOOT and unknown bits remain preserved.
+
 # Current limitations
 
-The scale branch remains incomplete semantic reverse engineering. School and
-conference engine text caps, arena shader channels, number geometry/colour and
+The scale branch remains incomplete semantic reverse engineering. Confirmed Edit
+Schools entry capacities are mapped; conference/coach/singular-mascot limits and
+the renderer's broader text ceiling, arena shader channels, number geometry/colour and
 independent secondary positions remain unresolved. CSV/comparison use supported
 writers and exclude ambiguous references. Text growth is structurally tested;
 game runtime remains unverified. See ROSTER_SCALE_AND_PREVIEWS.md.

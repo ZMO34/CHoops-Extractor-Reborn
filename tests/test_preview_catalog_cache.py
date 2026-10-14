@@ -11,6 +11,26 @@ from choops_py.studio.build_summary import summary
 pytestmark=pytest.mark.unit
 
 
+def test_catalog_uses_arena_pointer_and_exact_menu_subrecord():
+    from choops_py.archive.catalog import record_references
+    model=SimpleNamespace(rows={'teams':[dict(school_name='Alpha',asset_id=999,arena_index=0,menu_logo_id=7,uniform_owner_id=1)],'arenas':[dict(arena_code='256')],'uniforms':[]})
+    rows=catalog([dict(index=i,hash=hash_name(n),name=n) for i,n in enumerate(('s256.iff','s999.iff'))],model)
+    assert 'Alpha' in rows[0]['references'] and rows[1]['references']==''
+    records=record_references('teamselectlogo.iff',[dict(name='logo007'),dict(name='logo008')],model)
+    assert records[0]['references']=='Alpha' and records[1]['references']==''
+
+
+def test_scene_identity_follows_name_after_record_reordering():
+    from choops_py.studio.services import scene_record_index
+    records=[dict(index=0,type='TXTR',name='floor'),dict(index=5,type='SCNE',name='floor'),dict(index=2,type='SCNE',name='arena')]
+    assert scene_record_index(records,2,'floor')==5
+    with pytest.raises(ValueError,match='missing'):
+        scene_record_index(records,2,'cloth')
+    records.append(dict(index=6,type='SCNE',name='floor'))
+    with pytest.raises(ValueError,match='ambiguous'):
+        scene_record_index(records,2,'floor')
+
+
 def test_cache_reuses_content_rejects_corruption_and_separates_layout(tmp_path):
     calls=[]
     def convert():calls.append(1);return b'converted'

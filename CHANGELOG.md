@@ -1,11 +1,32 @@
+- Dynamic UTF-16 edits no longer confuse keyboard entry capacities with engine storage ceilings.
+
+# Roster and arena continuation
+
+- Twelve additional confirmed appearance/tattoo/signature fields and all jump-shot captions.
+- Authored arena vertex colour/alpha, secondary UV lightmaps, glow and flare masks.
+- No guessed secondary positions or unproved palette assignments.
+
+# Uniform lettering continuation (PR #13)
+
+- Authored indexed font decoding, front/back numbers 0–99/00 and curved Reborn surnames.
+- Roster-linked or preview-only number selection; source/override glyph consistency.
+- Correct sampler/bool uploads and declared material DiffuseColor.
+- Confirmed palette 16/17 school-colour runtime-copy labels.
+
 # Change log
+
+## Unreleased — roster / preview continuation
+
+Named SCNE source switching, worker source snapshots, comparison reference guards,
+confirmed school text capacities and jump-shot animation ID editing. Nested menu
+logo records show school ownership; stadium labels use arena references.
 
 ## Unreleased — single-slice DDS replacements
 
 Allow a 2D DDS replacement for dimension-3 TXTR descriptors whose stored depth
 is exactly one, preserving the original descriptor. Deeper volume textures stay
 blocked.
-## Unreleased — roster scale and preview source checkpoint
+## v1.12 — roster scale and preview source checkpoint
 
 Inline ratings, atomic multi-player ratings paste, source-bound CSV and selective
 roster comparison; school filtering, Class/Redshirt controls and growing text

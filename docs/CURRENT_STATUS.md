@@ -1,5 +1,35 @@
 # Current project status
 
+PR #13 combined roster/arena continuation: twelve additional appearance/tattoo/
+signature fields with verified inclusive option bounds, all 112 jump-shot labels,
+and authored arena vertex-colour/alpha, second-UV lightmaps, glow/flare masks.
+461 portable tests passed (7 offscreen GL skips, 2 deselected); 144 native
+checks passed. See ROSTER_SEMANTICS.md and ARENA_SHADER_MASKS.md. Complete
+remaining roster bytes, independent secondary positions, per-field engine ceilings
+and every runtime shader/palette mode remain unproved; no guessed edits are added.
+
+
+Authored jersey lettering continuation (PR #13): front/back numbers 0–99/00,
+roster-linked or preview-only number choices, and curved Reborn surname rendering
+use actual indexed fonts/metrics and placement. Declared material DiffuseColor
+and integer shader switches are fixed. Palette 16/17 runtime-copy roles are
+confirmed. Full roster semantics, secondary positions and arena mask routes
+remain under research. No guessed writers, EBOOT edits, RPCS3 or testing JB.
+Verification: 448 passed, 4 offscreen-OpenGL skips, 2 deselected; native hidden
+OpenGL checks separately passed. Source startup, CLI, lint/type checks passed.
+This continuation is not yet a published release.
+
+
+## Roster / preview continuation
+
+v1.12 is published from merged PR #12. Continuation source fixes worker source
+snapshots and named SCNE identity, comparison reference matching, school-filter
+reset and menu-logo subrecord references. Confirmed Edit Schools text capacities
+are mapped to roster fields, and the jump-shot animation ID is editable with
+confirmed bounds. See ROSTER_SCALE_AND_PREVIEWS.md for evidence and unfinished
+semantics. This continuation is not a published release.
+Combined with merged PR #11: 341 tests passed, 2 deselected; source/Qt startup,
+lint/type and documentation checks passed. No RPCS3, EBOOT edits or testing JB.
 ## Latest release and single-slice integration
 
 v1.12 publishes merged PR #12 at master 4f0eec7f95f9d624ff0fe09b4aac489ba4cf058e.
@@ -16,11 +46,12 @@ The feature branch adds source-bound CSV editing, selective comparison, atomic
 ratings paste, inline rating boxes, school filtering, Class/Redshirt controls,
 growing UTF-16 text, shared source/override SCNE and texture previews, archive
 categories/references and bounded conversion/normalization caching. This remains
-an in-progress project, not a published release or completed reverse engineering.
+a continuing research project; its implemented checkpoint is published in v1.12,
+while full reverse engineering remains unfinished.
 See ROSTER_SCALE_AND_PREVIEWS.md for exact behavior, evidence and remaining work.
 Development verification on 2026-10-13: 326 tests passed, 2 deselected; source/Qt
 startup, lint/type and generated handoff checks passed. No testing JB or gameplay.
-Draft checkpoint: https://github.com/ZMO34/CHoops-Extractor-Reborn/pull/12.
+Merged checkpoint: https://github.com/ZMO34/CHoops-Extractor-Reborn/pull/12.
 Jersey colour constants now trace to slots 0/1 and a separate mode using 14/15;
 fragment routing and mode selection remain unfinished.
 Recent functional PRs were merged before work; baseline is v1.11/master
@@ -153,3 +184,7 @@ round trip on `e149790005fdaeb14d0a1b79689d0a3de3b8f2da`; see TEST_REPORT.md.
 All game inputs, rosters, templates, private reverse-engineering helpers and raw
 audio are local and absent from Git. A fresh PC must supply its own authorized
 fixtures. Do not assume a generated court template or any old local build exists.
+
+Additional appearance/tattoo/post/free-throw fields and all 112 jump-shot captions are now supported; see ROSTER_SEMANTICS.md. Arena vertex-colour/alpha, lightmap, glow and flare routing is implemented; see ARENA_SHADER_MASKS.md for evidence and remaining runtime effects.
+
+Text edits now grow beyond old allocations and keyboard entry capacities. The UI separates advisory game-keyboard sizes from unproved engine ceilings; structural pointer/UTF-16/adapter guards still apply.

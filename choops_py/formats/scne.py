@@ -29,6 +29,9 @@ def preview_meshes(blocks):
     material_hashes = {}
     material_names = {}
     diffuse_materials = set()
+    material_colors = {}
+    lightmap_textures = {}
+    material_shader_modes = {}
     transforms = {}
     instance_count = head.u32(0x3c)
     if instance_count:
@@ -74,7 +77,9 @@ def preview_meshes(blocks):
         for j in range(0 if external_materials else material_count):
             material = material_table+j*40
             material_hashes[j] = head.u32(material)
-            shader = shaders.get(head.u32(material+8))
+            shader_hash=head.u32(material+8)
+            material_shader_modes[j]={0x9bf5d4ae:'prelit',0xad91d4de:'glow',0xb3dc3294:'flare'}.get(shader_hash)
+            shader = shaders.get(shader_hash)
             if shader is None:
                 continue
             uniform_count = head.u32(shader+8) >> 16
@@ -91,13 +96,21 @@ def preview_meshes(blocks):
                 continue
             parameters = head.relative(material+32)
             head.slice(parameters, length)
+            for k in range(uniform_count):
+                uniform=uniforms+k*44
+                if head.u32(uniform)!=0x9015351f:continue
+                color_offset=head.u16(uniform+20)
+                if color_offset+16>length:raise ValueError('DiffuseColor extends outside material parameters')
+                color=struct.unpack('>4f',head.slice(parameters+color_offset,16))
+                if not all(math.isfinite(v) and 0<=v<=1 for v in color):raise ValueError('Unsupported DiffuseColor value')
+                material_colors[j]=color
             samplers = head.relative(shader+28) if sampler_count else 0
             head.slice(samplers, sampler_count*36)
             colors = {}
             for k in range(sampler_count):
                 sampler = samplers+k*36
                 semantic = head.u32(sampler)
-                if semantic not in color_semantics:
+                if semantic not in (*color_semantics,0xab0d0064):
                     continue
                 # Sampler state begins at this declared parameter offset;
                 # its texture resource hash follows the 12-byte state header.
@@ -107,6 +120,8 @@ def preview_meshes(blocks):
                 matches = textures.get(head.u32(parameters+reference), [])
                 if len(matches) == 1:
                     colors[semantic] = matches[0]
+            if shader_hash==0x9bf5d4ae and 0xab0d0064 in colors:
+                lightmap_textures[j]=colors[0xab0d0064]
             for semantic in color_semantics:
                 if semantic in colors:
                     material_textures[j] = colors[semantic]
@@ -142,12 +157,18 @@ def preview_meshes(blocks):
             declaration = head.relative(off + 0x9c)
             head.slice(declaration, declaration_count * 64)
             position, uv, uv_format = None, None, None
+            color_decl=None;secondary_uv=None
             position_format = ">3f"
             position_transform = uv_transform = None
             position_stream = uv_stream = 0
             for j in range(declaration_count):
                 code = head.slice(declaration + j * 64 + 8, 8)
-                if code[0] not in (0x20,0x30) or code[2] >= stream_count or code[3] != 0:
+                if code[0] not in (0x20,0x30) or code[2] >= stream_count:
+                    continue
+                if code[3]==1 and code[4:]==bytes.fromhex('01020900'):
+                    secondary_uv=(code[1],code[2],'>2h')
+                    continue
+                if code[3] != 0:
                     continue
                 quantized = code[0] == 0x30
                 transform = None
@@ -161,6 +182,8 @@ def preview_meshes(blocks):
                     position_format='>4h';position_transform=transform
                 elif not quantized and code[4:] == bytes.fromhex('02030000'):
                     position, position_stream = code[1], code[2]
+                elif code[4:]==bytes.fromhex('02040300'):
+                    color_decl=(code[1],code[2])
                 elif code[4:] == bytes.fromhex('03020800'):
                     uv_stream = code[2]
                     uv, uv_format = code[1], '>2e'
@@ -191,7 +214,21 @@ def preview_meshes(blocks):
                         tex=tuple(x*scale[k]+bias[k] for k,x in enumerate(tex))
                 if not all(math.isfinite(x) and abs(x) < 1e8 for x in xyz + tex):
                     raise ValueError("non-finite or excessive vertex values")
-                points.append(xyz + tex)
+                extra=()
+                if color_decl or secondary_uv:
+                    color=(1.,1.,1.,1.);tex1=tex
+                    if color_decl:
+                        color_offset,color_stream=color_decl;stride,data=streams[color_stream]
+                        if color_offset+16>stride:raise ValueError('Color declaration exceeds vertex stride')
+                        color=struct.unpack_from('>4f',data,v*stride+color_offset)
+                    if secondary_uv:
+                        uv_offset,uv_index,fmt=secondary_uv;stride,data=streams[uv_index]
+                        if uv_offset+4>stride:raise ValueError('Lightmap UV exceeds vertex stride')
+                        tex1=tuple(max(-1.,x/32767.) for x in struct.unpack_from(fmt,data,v*stride+uv_offset))
+                    if not all(math.isfinite(x) and abs(x)<1e8 for x in (*color,*tex1)):
+                        raise ValueError('Invalid vertex colour/lightmap coordinates')
+                    extra=(*color,*tex1)
+                points.append(xyz + tex + extra)
             if head.u32(off + 0xa4) != (0x10 if embedded else 0x20000010):
                 raise ValueError("index format is unsupported")
             index_count = head.u32(off + 0xa8)
@@ -231,9 +268,12 @@ def preview_meshes(blocks):
                     batches.append({'first': batch_start, 'count': len(triangles)-batch_start,
                                     'texture_index': material_textures.get(head.u32(run+32)),
                                     'material_index': head.u32(run+32),
+                                    'lightmap_index':lightmap_textures.get(head.u32(run+32)) if secondary_uv else None,
+                                    'shader_mode':material_shader_modes.get(head.u32(run+32)) if color_decl else None,
                                     'material_name': material_names.get(head.u32(run+32)),
                                     'material_hash': material_hashes.get(head.u32(run+32)),
-                                    'supports_diffuse_color': head.u32(run+32) in diffuse_materials})
+                                    'supports_diffuse_color': head.u32(run+32) in diffuse_materials,
+                                    'diffuse_color':material_colors.get(head.u32(run+32))})
                 if total_vertices + len(triangles) > 1500000:
                     raise ValueError("scene exceeds preview triangle budget")
             if triangles:

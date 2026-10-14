@@ -22,7 +22,7 @@ preserve ZIP/decrypted wrappers; Export game roster IFF uses the loaded JB wrapp
 Unchanged bad name characters warn; invalid pointers/new corruption still block.
 
 The active scale branch uses copy-on-write UTF-16 text growth instead of equal
-length/unshared storage. Verified first/last game text-entry limits are used;
+length/unshared storage. Verified player and Edit Schools text-entry limits are used;
 other unresolved per-field engine limits are identified, not guessed from
 existing names. See ROSTER_SCALE_AND_PREVIEWS.md; this work is not yet released.
 Verified references,
@@ -60,7 +60,7 @@ see projects/06-declone-d1-teams.md for current scope and limits.
 
 All 30 attribute names are linked through localized UI registration metadata to the game's getters and setters. Ratings occupy player +0x3C through +0x76 as big-endian u16 values. The getter displays clamp(floor(raw / 100), 35, 99); edits store rating * 100, while untouched fractional values remain byte-exact. Player attributes shows these named channels. Four byte tendencies follow at +0x78..+0x7B. Potential is at +0x7F; confidence at +0x80. Packed weight and handedness edits preserve neighboring bits. Named appearance/equipment fields are readable; their enum choice meanings remain incomplete.
 
-Edit Schools displays team records separately from players. The color dialog distinguishes raw palette slot numbers from the game's color-control indices. The observed getter/setter arrays expose 22 controls targeting slots 2–10, 12–15 and 18–26. All 22 exact English captions are traced through menu selection callbacks to their RGBA getters/setters. Repeated Primary and Secondary captions are kept literal and distinguished by control and raw slot. Court material IDs now route to the verified roster getters and DiffuseColor uniform; arena mask-channel routes remain unresolved. Other palette words are preserved and can be inspected. Labels for the other nine slots remain explicitly provisional.
+Edit Schools displays team records separately from players. The color dialog distinguishes raw palette slot numbers from the game's color-control indices. The observed getter/setter arrays expose 22 controls targeting slots 2–10, 12–15 and 18–26. All 22 exact English captions are traced through menu selection callbacks to their RGBA getters/setters. Repeated Primary and Secondary captions are kept literal and distinguished by control and raw slot. Court material IDs now route to the verified roster getters and DiffuseColor uniform; arena mask-channel routes remain unresolved. Other palette words are preserved and can be inspected. Slots 0/1/11 have verified runtime roles; 16/17 are school-colour runtime copies. Slots 27–30 remain unresolved.
 
 Full roster semantic reversal is not complete. The local evidence ledger retains executable traces and unresolved questions; proprietary executable and language payload copies remain private. Public methodological references: [RPCS3 SELF implementation](https://github.com/RPCS3/rpcs3/blob/master/rpcs3/Crypto/unself.cpp) and [community conference parser](https://github.com/bphit4/CH2k8-Roster-Editor/blob/main/Conference_Parser.py). External offsets were checked against the stock roster rather than copied without validation.
 
@@ -68,7 +68,7 @@ Confirmed control captions in order: Key Circle Outer, Center Line, Outer Line, 
 
 Court preview uses a unique matching asset ID in the explicitly loaded roster, including unsaved edits. Verified RGB values are converted from sRGB to linear color; the runtime gray sentinel (RGB 190/190/190) leaves the authored preview unchanged. This reproduces the color binding with simplified preview lighting, not the full game shader.
 
-Jersey number is the byte at player row +0x1B (name-anchor +0x0B), corroborated by its localized UI increment callback. The adjacent byte at +0x1A contains flags in some records and is preserved by number edits. Jersey-number material/color shader routing remains unresolved.
+Jersey number is the byte at player row +0x1B (name-anchor +0x0B), corroborated by its localized UI increment callback. The adjacent byte at +0x1A contains flags in some records and is preserved by number edits. Static number previews use authored font colours and placement; full dynamic recolouring remains unresolved.
 
 In Team palette, select a swatch and choose Pick selected color (or double-click it). The picker provides numeric RGB inputs, visual color selection, and an alpha control initialized from the existing value. Accept applies an undoable edit; Cancel leaves the roster unchanged. Hex RGBA remains visible in the palette table.
 
@@ -77,3 +77,9 @@ U/V/V triangle/triangle/wishbone and selectors are editable. Alternate 1/2/3
 availability controls remove/restore counted records; explicit builders may add
 assets/links. Restored unlock IDs remain intact. Handedness uses L/R, booleans
 Yes/No, home socks Black/White; unknown enums remain explicit. See project tracker.
+
+Jersey side tabs offer numbers 0–99/00 or the selected player’s roster number, with authored Reborn surname lettering. Preview choices do not edit roster data.
+
+Additional appearance/tattoo/post/free-throw fields and all 112 jump-shot captions are now supported; see ROSTER_SEMANTICS.md. Arena vertex-colour/alpha, lightmap, glow and flare routing is implemented; see ARENA_SHADER_MASKS.md for evidence and remaining runtime effects.
+
+Text edits now grow beyond old allocations and keyboard entry capacities. The UI separates advisory game-keyboard sizes from unproved engine ceilings; structural pointer/UTF-16/adapter guards still apply.

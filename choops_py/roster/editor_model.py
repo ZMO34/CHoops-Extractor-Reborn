@@ -21,11 +21,7 @@ class EditorModel:
             field=issue['field_offset'];ranges=[(field,field+4)]
             target=field+struct.unpack_from('>i',self.original,field)[0]
             if 0<=target<len(self.original):
-                end=target
-                for _ in range(256):
-                    if end+2>len(self.original):break
-                    value=self.original[end:end+2];end+=2
-                    if value==b'\0\0':break
+                end=self.string_ranges.get(target,target)
                 ranges.append((target,end))
             self.source_string_issues.append((dict(issue),ranges))
     @classmethod
@@ -121,10 +117,16 @@ class EditorModel:
             unchanged=any(issue==old and all(self.data[start:end]==self.original[start:end] for start,end in ranges)
                           for old,ranges in self.source_string_issues)
             (preserved if unchanged else errors).append(issue)
-        return {'valid':not errors,'issues':errors,'preserved_source_string_issues':preserved,'source_type':self.source.kind,'counts':{name:len(rows) for name,rows in self.rows.items()},'unsaved_edits':len(self.edits),'read_only_fields':['skin tone','prestige','unknown appearance bytes','long strings','unconfirmed palette roles']}
+        return {'valid':not errors,'issues':errors,'preserved_source_string_issues':preserved,'source_type':self.source.kind,'counts':{name:len(rows) for name,rows in self.rows.items()},'unsaved_edits':len(self.edits),'read_only_fields':['unconfirmed roster bytes','independent secondary position','unconfirmed palette roles']}
     def name_capacity(self,table,index,field):
+        from .text_limits import ENGINE_LIMITS
+        return ENGINE_LIMITS.get((table,field))
+    def text_entry_capacity(self,table,field):
         from .text_limits import INPUT_LIMITS
         return INPUT_LIMITS.get((table,field))
+    def text_hint(self,table,field):
+        entry=self.text_entry_capacity(table,field)
+        return 'UTF-16 storage grows; engine ceiling unproved'+(f'; game keyboard allows {entry} units' if entry is not None else '')
     def edit(self,table,index,field,value,slot=None):
         if field not in EDITABLE.get(table,()):raise ToolError('roster_field_read_only',f'{table}.{field} is not a confirmed writable field')
         if table=='teams' and field=='roster_slots':return self.edit_school_roster_slot(index,slot,value)
@@ -142,7 +144,7 @@ class EditorModel:
             encoded=str(value).encode('utf-16-le');old=str(old_value).encode('utf-16-le')
             capacity=self.string_capacities.get(target,len(old))
             limit=self.name_capacity(table,index,field)
-            if limit is not None and len(encoded)//2>limit:raise ToolError('string_length_mismatch',f'The game text editor allows {limit} UTF-16 units for this field')
+            if limit is not None and len(encoded)//2>limit:raise ToolError('string_length_mismatch',f'Confirmed engine storage ceiling: {limit} UTF-16 units')
             if any(ord(c)<32 for c in str(value)):raise ToolError('invalid_roster_name','Control characters are blocked')
             end=target+capacity+2
             if delta not in (0,-1) and any(target<start+count*size and start<end for start,count,size in self.tables.values()):

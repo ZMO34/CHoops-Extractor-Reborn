@@ -239,6 +239,11 @@ def decode_preview_asset(asset, max_size=2048):
     from PIL import Image
     from ..texture_tools.external_converters import convert
     info = asset.texture.info()
+    if info['format']=='L8' and info['remap']==0x5500:
+        from ..formats.indexed_font import atlas
+        image=atlas(asset.texture)
+        image.thumbnail((max_size,max_size))
+        return image.size,image.tobytes()
     work = OUTPUT / 'temp' / ('preview_' + uuid.uuid4().hex)
     work.mkdir(parents=True)
     try:
@@ -257,7 +262,21 @@ def decode_preview_asset(asset, max_size=2048):
         shutil.rmtree(work)
 
 
-def inspect_scene_preview(source: Path, record_index: int, include_all=False, job=None):
+def scene_record_index(records, index, name):
+    """Resolve a unique scene name after an override reorders its archive."""
+    if name is None:
+        return index
+    matches=[r for r in records if r['type']=='SCNE' and r['name']==name]
+    if len(matches)==1:
+        return matches[0]['index']
+    if not matches:
+        raise ValueError('Selected SCNE is missing from this preview source: '+name)
+    if any(r['index']==index for r in matches):
+        return index
+    raise ValueError('Selected SCNE is ambiguous in this preview source: '+name)
+
+
+def inspect_scene_preview(source: Path, record_index: int, include_all=False, job=None, *, record_name=None):
     from ..texture_tools.pipeline import Container
     from ..formats.standard_iff_writer import record_blocks
     from ..formats.compression import decode
@@ -269,6 +288,8 @@ def inspect_scene_preview(source: Path, record_index: int, include_all=False, jo
     cdf = source.with_suffix('.cdf')
     container = Container(source, cdf if cdf.exists() else None)
     records = container.iff.records if container.iff else container.pair.records if container.pair else []
+    if records and not include_all:
+        record_index=scene_record_index(records,record_index,record_name)
     scene_records = [r for r in records if r['type'] == 'SCNE']
     # Same-name records in cloth packages are alternative rest-pose/LOD
     # sections, not separate arena/floor components to superimpose.
@@ -302,6 +323,7 @@ def inspect_scene_preview(source: Path, record_index: int, include_all=False, jo
             mesh['name'] = rec['name'] + '/' + mesh['name']
             for batch in mesh['batches']:
                 batch['texture'] = by_index.get(batch['texture_index'])
+                batch['lightmap_texture']=by_index.get(batch.get('lightmap_index'))
                 # This runtime-injected court pass repeats the wood geometry;
                 # a neutral diffuse fallback would cover every court decal.
                 if mesh['court_surface'] and batch.get('material_hash') == 0xe16ecb73 and batch['texture'] is None:
@@ -309,7 +331,7 @@ def inspect_scene_preview(source: Path, record_index: int, include_all=False, jo
                     scene['warnings'].append('Court runtime-only material 0xe16ecb73 omitted from color preview')
         result['meshes'].extend(scene['meshes'])
         result['warnings'].extend(scene['warnings'])
-    needed = {batch['texture'] for mesh in result['meshes'] for batch in mesh['batches'] if batch['texture']}
+    needed = {batch[key] for mesh in result['meshes'] for batch in mesh['batches'] for key in ('texture','lightmap_texture') if batch.get(key)}
     asset_lookup = {a.name:a for a in container.assets if a.texture}
     decoded_bytes = 0
     for i, name in enumerate(sorted(needed)):
@@ -327,6 +349,41 @@ def inspect_scene_preview(source: Path, record_index: int, include_all=False, jo
     job.progress(len(needed), len(needed), 'Scene loaded')
     return result
 
+
+def inspect_number_artwork(source, number, size=(256,128)):
+    """Compose authored glyph colours using NAME metrics and the indexed atlas."""
+    from ..texture_tools.pipeline import Container
+    from ..formats.standard_iff_writer import record_blocks
+    from ..formats.indexed_font import atlas,number_metrics,number_image
+    container=Container(Path(source))
+    if not container.iff:
+        raise ValueError('Number artwork requires a complete uniform IFF')
+    records=[r for r in container.iff.records if r['type']=='NAME' and r['name']=='numbers']
+    if len(records)!=1:
+        raise ValueError('Uniform number metrics are missing or ambiguous')
+    blocks=record_blocks(container.iff,records[0])
+    if len(blocks)!=1:
+        raise ValueError('Unsupported number metrics block layout')
+    image=atlas(container.select('jersey_numbers').texture)
+    metrics=number_metrics(blocks[0][3],image.width)
+    result=number_image(image,metrics,number,size)
+    return result.size,result.tobytes()
+
+
+
+def inspect_name_artwork(source, text='Reborn', size=(256,32)):
+    from ..texture_tools.pipeline import Container
+    from ..formats.standard_iff_writer import record_blocks
+    from ..formats.indexed_font import atlas,name_metrics,name_image
+    container=Container(Path(source))
+    if not container.iff:raise ValueError('Surname artwork requires a complete uniform IFF')
+    records=[r for r in container.iff.records if r['type']=='NAME' and r['name']=='names']
+    if len(records)!=1:raise ValueError('Surname metrics are missing or ambiguous')
+    blocks=record_blocks(container.iff,records[0])
+    if len(blocks)!=1:raise ValueError('Unsupported surname metrics block layout')
+    image=atlas(container.select('names').texture)
+    result=name_image(image,name_metrics(blocks[0][3],image.width),text,size)
+    return result.size,result.tobytes()
 
 def inspect_uniform_preview(source, job=None):
     """Render authored uniform RGB artwork; normal/number atlases stay separate."""
@@ -367,6 +424,46 @@ def inspect_jersey_preview(archive,uniform,neck,build,shorts,parts=0,job=None):
     source=Path(uniform['preview_path']) if uniform.get('preview_path') else materialize(archive,entry(asset_name(uniform)))
     artwork=inspect_uniform_preview(source,job)
     result=dict(meshes=[],textures=[],images={},warnings=['Static top/shorts preview; runtime cloth, skinning, numbers and player body are not reproduced.'])
+    number_transform=None;back_number_transform=None;name_transform=None;name_scale=None;global_iff=None
+    if uniform.get('preview_number') is not None:
+        try:
+            from ..formats.standard_iff_writer import record_blocks
+            from ..formats.indexed_font import number_uv
+            from ..formats.txtr import TXTR
+            global_iff=StandardIFF(materialize(archive,entry('global.iff')).read_bytes())
+            records=[r for r in global_iff.records if r['type']=='UnAD' and r['name']=='unidata']
+            if len(records)!=1:raise ValueError('Uniform number placement is missing or ambiguous')
+            blocks=record_blocks(global_iff,records[0])
+            if len(blocks)!=1:raise ValueError('Unsupported number placement blocks')
+            number_transform=number_uv(blocks[0][3])
+            back_number_transform=number_uv(blocks[0][3],0x2c)
+            templates=[r for r in global_iff.records if r['type']=='TXTR' and r['name']=='jerseynum00']
+            if len(templates)!=1:raise ValueError('Number template is missing or ambiguous')
+            template=TXTR([b[3] for b in record_blocks(global_iff,templates[0])]).info()
+            result['images']['__number']=inspect_number_artwork(source,uniform['preview_number'],(template['width'],template['height']))
+            result['warnings'][0]='Static top/shorts preview with authored front/back numbers; cloth, skinning and player body are not reproduced.'
+        except (ValueError,AttributeError) as error:
+            result['warnings'].append('Number preview: '+str(error))
+            number_transform=None
+    if uniform.get('preview_name'):
+        try:
+            from ..formats.indexed_font import name_placement
+            from ..formats.standard_iff_writer import record_blocks
+            from ..formats.txtr import TXTR
+            if global_iff is None:
+                global_iff=StandardIFF(materialize(archive,entry('global.iff')).read_bytes())
+            records=[r for r in global_iff.records if r['type']=='UnAD' and r['name']=='unidata']
+            if len(records)!=1:raise ValueError('Surname placement is missing or ambiguous')
+            blocks=record_blocks(global_iff,records[0])
+            if len(blocks)!=1:raise ValueError('Unsupported surname placement blocks')
+            name_transform,name_scale=name_placement(blocks[0][3])
+            templates=[r for r in global_iff.records if r['type']=='TXTR' and r['name']=='jerseyname00']
+            if len(templates)!=1:raise ValueError('Surname template is missing or ambiguous')
+            template=TXTR([b[3] for b in record_blocks(global_iff,templates[0])]).info()
+            result['images']['__name']=inspect_name_artwork(source,uniform['preview_name'],(template['width'],template['height']))
+            result['warnings'].append('Surname preview: '+uniform['preview_name']+' (authored font and curved placement).')
+        except (ValueError,AttributeError) as error:
+            result['warnings'].append('Surname preview: '+str(error));name_transform=None
     selected=[]
     if parts in (0,1):
         name=f'cloth_{shapes[neck]}_{build}.iff'
@@ -382,7 +479,12 @@ def inspect_jersey_preview(archive,uniform,neck,build,shorts,parts=0,job=None):
         image_name='__uniform_'+role;result['images'][image_name]=artwork[role]
         for mesh in scene['meshes']:
             mesh['uniform_surface']=role;mesh['name']=role+'/'+mesh['name']
-            for batch in mesh['batches']:batch['texture']=image_name
+            for batch in mesh['batches']:
+                batch['texture']=image_name
+                if role=='jersey' and number_transform is not None:
+                    batch['number_texture']='__number';batch['number_uv']=number_transform;batch['back_number_uv']=back_number_transform
+                if role=='jersey' and name_transform is not None:
+                    batch['name_texture']='__name';batch['name_placement']=name_transform;batch['name_scale']=name_scale
         result['meshes'].extend(scene['meshes']);result['warnings'].extend(scene['warnings'])
         result['textures'].append(image_name)
     return source,result

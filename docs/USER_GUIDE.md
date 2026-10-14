@@ -7,6 +7,13 @@ Class and Redshirt choices join the Player panel; Conference History holds the
 supported record scalars. Save a copy after editing. Name growth preserves old
 storage and uses verified game input limits where mapped.
 
+The continuation maps school/short names (16 UTF-16 units), abbreviation (4),
+plural mascot (16), event name (64), student section (32), and stadium name (15)
+to the game's entry capacities. Existing longer text is preserved until edited.
+Jump shot animation uses confirmed IDs 0–111; descriptive animation names remain
+under research. In Explorer, teamselectlogo's nested logoNNN records show their
+school references. Source switching resolves unique SCNE names after reordering.
+
 The Preview source toolbar switches SCNE and textures between Source JB and
 Selected overrides. Stage the chosen overrides first; no JB build is needed.
 The same choice applies to shoes and uniforms. Named/hashed counterparts reload;
@@ -115,3 +122,9 @@ All non-stadium banks import artwork into the selected base JB texture's dimensi
 Models / Courts now includes **Prepare single-texture court…** for the supplied full-court ZIP. It produces a separate floor SCNE and two DDS overrides, with extra floor surfaces disabled and arena assets untouched. See [single-surface court preparation and memory limits](SINGLE_SURFACE_COURT.md). This creates template files, not a JB build; gameplay compatibility still needs a manual check.
 
 Override staging displays an informational popup when DDS prioritization and preflight finish. A separate popup reports a completed JB build and its output path. Cancelled operations and dry runs do not show success popups. During processing, the status bar distinguishes DDS conversion, archive compression, source validation and staged-archive preflight.
+
+Jersey side-panel previews render front/back numbers: choose 0–99/00 or follow the selected player’s roster number. Preview choices do not change the roster. Reborn lettering uses the uniform’s surname font and curved placement. Source JB / selected overrides also applies to glyphs; missing font records produce a warning.
+
+Additional appearance/tattoo/post/free-throw fields and all 112 jump-shot captions are now supported; see ROSTER_SEMANTICS.md. Arena vertex-colour/alpha, lightmap, glow and flare routing is implemented; see ARENA_SHADER_MASKS.md for evidence and remaining runtime effects.
+
+Text edits now grow beyond old allocations and keyboard entry capacities. The UI separates advisory game-keyboard sizes from unproved engine ceilings; structural pointer/UTF-16/adapter guards still apply.

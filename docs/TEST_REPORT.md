@@ -1,5 +1,35 @@
+# Combined roster/arena continuation verification
+
+Portable runner: **461 passed, 7 skipped, 2 deselected**. Seven rendered-pixel
+checks are skipped only by Qt offscreen; native Windows targeted verification:
+**144 passed**, including all seven rendered shader paths. Source/Qt/CLI startup,
+compilation, Ruff, mypy and handoff checks passed. Synthetic appearance tests
+check shared packed-word neighbours, bounds, readback and undo for all 12 fields.
+Read-only S256 hidden rendering: 119 parts, 180 lightmapped batches, no shader
+errors. No RPCS3, testing JB or EBOOT edits. Proprietary fixtures stay private.
+
+# Uniform lettering continuation verification
+
+`python tools/dev/verify.py`: **448 passed, 4 skipped, 2 deselected**. Skips
+are rendered-pixel GL checks on Qt offscreen. Compilation, CLI/Qt startup,
+Ruff, mypy (11 files), handoff and diff checks passed.
+Native Windows targeted check: indexed_font, scene_number_gl, scene_preview and
+roster_side_panels: **128 passed**. GL tests read actual front/back/name/palette
+pixels. All 101 number codes are exercised. Private read-only source inspection
+and hidden rendering confirmed authored Reborn above the back number, and front
+and back 23. No assets/screenshots enter Git. Inputs remained immutable.
+No RPCS3/gameplay, EBOOT editing or full testing JB was performed.
+
 # Development verification
 
+## Roster / preview continuation checks
+
+Final integrated `python tools/dev/verify.py`: 341 passed, 2 intentional
+deselections; compile, CLI/Qt startup, lint/type and handoff checks passed.
+Final targeted preview/bulk/GUI run: 27 passed. Regressions include reordered
+conference references, entire long-string warning preservation, exact menu logo
+ownership, game entry capacities and isolated jump-shot writes/undo. No
+RPCS3, EBOOT writes or testing JB. Evidence is in ROSTER_SCALE_AND_PREVIEWS.md.
 ## PR #11 independent integration review — 2026-10-14
 
 Inspected exact original head 81cd1665c26ce8798c025f5bfbd2d20f98cf213f in

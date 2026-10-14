@@ -132,7 +132,7 @@ for prop in PLAYER_PROPERTIES:
     ENUM_CHOICES[key]=options
 
 # These are verified runtime/material roles, not extra Edit Schools captions.
-CONFIRMED_PALETTE_ROLES = {0:'Home team equipment color',1:'Non-home team equipment color',11:'Key Circle Inner'}
+CONFIRMED_PALETTE_ROLES = {0:'Home team equipment color',1:'Non-home team equipment color',11:'Key Circle Inner',16:'School primary runtime copy',17:'School secondary runtime copy'}
 PALETTE_HINTS.update(CONFIRMED_PALETTE_ROLES)
 
 TEAM_TYPE_OFFSET=0x2ec  # Name-anchor +0x2BC, the final word of the physical row.
@@ -158,3 +158,26 @@ ENUM_CHOICES['redshirt_code']={0:'None',1:'Normal',2:'Transfer',3:'Medical'}
 ENUM_CHOICES['redshirt_used']={0:'No',1:'Yes'}
 ENUM_CHOICES['jersey_number']={**{i:str(i) for i in range(100)},100:'00'}
 EDITABLE['players']=(*EDITABLE['players'],'class_code','redshirt_code','redshirt_used','confidence')
+
+# Jump-shot animation getter/setter 0x69E938/0x69E94C, constructor bounds 0..111.
+# Exact localized animation captions remain unresolved; preserve the real IDs.
+PLAYER_SCALARS['jump_shot_code']=(0x83,1,0,8,0,111)
+ENUM_CHOICES['jump_shot_code']={i:f'Animation {i}' for i in range(112)}
+EDITABLE['players']=(*EDITABLE['players'],'jump_shot_code')
+
+
+# Additional localized menu options and paired packed setters, read-only EBOOT
+# evidence in ROSTER_SEMANTICS.md. Unmapped source values remain preserved.
+from .appearance import FIELDS as EXTRA_PLAYER_FIELDS
+PLAYER_PROPERTIES=(*PLAYER_PROPERTIES,*EXTRA_PLAYER_FIELDS)
+for prop in EXTRA_PLAYER_FIELDS:
+    key=prop['name'].lower().replace(' ','_')+'_code'
+    PROPERTY_FIELDS[prop['name']]=key
+    choices=dict(enumerate(prop['options']))
+    PROPERTY_CHOICES[prop['name']]=choices
+    ENUM_CHOICES[key]=choices
+    PLAYER_SCALARS[key]=(prop['offset'],prop['size'],prop['shift'],prop['bits'],0,len(choices)-1)
+    EDITABLE['players']=(*EDITABLE['players'],key)
+
+from .appearance import JUMP_SHOT_NAMES
+ENUM_CHOICES["jump_shot_code"]=dict(enumerate(JUMP_SHOT_NAMES))

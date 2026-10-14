@@ -85,3 +85,20 @@ def test_coach_string_edit_preserves_old_functionality_and_selection(
     )
     panel.edit_item(item, 1)
     assert model.rows["coaches"][0]["coach_name"] == "Smith" and panel.index == 0
+
+
+def test_jersey_side_panel_all_numbers_and_preview_only_selection(qtbot,monkeypatch):
+    from choops_py.studio.roster_panels import JerseyTab
+    window=Window();qtbot.addWidget(window)
+    data,_=header_roster();model=EditorModel(load_bytes(bytes(data)))
+    window.display_roster(model);window.archive=object()
+    panel=JerseyTab(window);qtbot.addWidget(panel)
+    assert [panel.number.itemData(i) for i in range(1,102)]==list(range(101))
+    panel.player_index=0;panel.uniform.addItem('Home',dict(uniform_asset_id=256,variant_code=0,jersey_shape_code=0))
+    captured=[];monkeypatch.setattr(window,'preview_jersey',lambda *args:captured.append(args))
+    panel.number.setCurrentIndex(panel.number.findData(99));panel.preview()
+    assert captured[-1][0]['preview_number']==99 and captured[-1][0]['preview_player_index'] is None
+    assert captured[-1][0]['preview_name']=='Reborn'
+    panel.number.setCurrentIndex(0);panel.preview()
+    assert captured[-1][0]['preview_player_index']==0
+    assert captured[-1][0]['preview_number']==model.rows['players'][0]['jersey_number']

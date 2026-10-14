@@ -906,9 +906,11 @@ class Window(QMainWindow):
 
         entry = entries[0]
 
+        try: archive = self.preview_archive()
+        except ValueError as error: return self.show_error(str(error))
         self.run_job(
             "Read and inspect asset",
-            lambda job: inspect_asset(materialize(self.preview_archive(), entry)),
+            lambda job: inspect_asset(materialize(archive, entry)),
             self.display_asset,
         )
 
@@ -932,19 +934,20 @@ class Window(QMainWindow):
 
     def preview_archive(self):
         from .preview_source import PreviewArchive
+        if not self.archive:return None
         if not self.preview_overrides.isChecked():return self.archive
         mod=getattr(self,'preview_mod',None) or self.mod_path.text()
         if not (Path(mod)/'overrides.json').is_file():raise ValueError('Select and stage an overrides folder before using override previews')
         return PreviewArchive(self.archive,mod)
 
-    def preview_file(self,source):
-        if not self.archive:return source
-        matches=[e for e in self.archive.entries if e.get('name')==Path(source).name]
+    def preview_file(self,source,archive=None):
+        if archive is None:return source
+        matches=[e for e in archive.entries if e.get('name')==Path(source).name]
         if Path(source).name.lower().startswith('hash_'):
             from ..archive.hash_names import replacement_hash
-            try:matches=[e for e in self.archive.entries if e['hash']==replacement_hash(Path(source).name)]
+            try:matches=[e for e in archive.entries if e['hash']==replacement_hash(Path(source).name)]
             except ValueError:pass
-        if len(matches)==1:return materialize(self.preview_archive(),matches[0])
+        if len(matches)==1:return materialize(archive,matches[0])
         return source
 
     def reload_preview_source(self,*_):
@@ -952,18 +955,23 @@ class Window(QMainWindow):
             QTimer.singleShot(100,self.reload_preview_source);return
         if getattr(self,'_jersey_preview_row',None):return self.refresh_jersey_preview()
         if getattr(self,'_shoe_preview_active',False):return self.preview_shoes()
+        try: archive=self.preview_archive()
+        except ValueError as error:return self.show_error(str(error))
         if getattr(self,'_scene_record_index',None) is not None and hasattr(self,'scene_source'):
             from .services import inspect_scene_preview
             index=self._scene_record_index
             include_all=self.scene_complete.isChecked()
+            scene_source=self.scene_source
+            record_name=getattr(self,'_scene_record_name',None)
             def load(job):
-                source=self.preview_file(self.scene_source)
-                return source,inspect_scene_preview(source,index,include_all,job)
+                source=self.preview_file(scene_source,archive)
+                return source,inspect_scene_preview(source,index,include_all,job,record_name=record_name)
             def display(value):
                 source,result=value;self.scene_parts.clear();self.scene_textures.clear();self.show_scene_preview(result,source)
             self.run_job('Reload scene from selected preview source',load,display,cancellable=True)
         elif self.asset_path:
-            self.run_job('Reload textures from selected preview source',lambda job:inspect_asset(self.preview_file(self.asset_path)),self.display_asset)
+            source=self.asset_path
+            self.run_job('Reload textures from selected preview source',lambda job:inspect_asset(self.preview_file(source,archive)),self.display_asset)
 
     def display_asset(self, result):
 
@@ -973,10 +981,14 @@ class Window(QMainWindow):
 
         self.nested.clear()
 
-        for rec in result["records"]:
+        from ..archive.catalog import record_references
+        records=record_references(self.asset_path.name,result['records'],self.roster)
+        self.nested.setHeaderLabels(['Record','Type','Index','Referenced by schools'])
+
+        for rec in records:
             QTreeWidgetItem(
                 self.nested,
-                [rec.get("name", ""), rec.get("type", ""), str(rec["index"])],
+                [rec.get("name", ""), rec.get("type", ""), str(rec["index"]),rec['references']],
             )
 
         set_rows(
@@ -1135,11 +1147,13 @@ class Window(QMainWindow):
 
     def decode_texture_preview(self, selector, target):
         source = self.asset_path
+        try: archive=self.preview_archive()
+        except ValueError as error:return self.show_error(str(error))
         target.setText("Loading texture preview…")
 
         def decode(job):
             from .services import decode_texture_preview
-            return decode_texture_preview(self.preview_file(source), selector)
+            return decode_texture_preview(self.preview_file(source,archive), selector)
 
         def display(result):
 
@@ -1329,11 +1343,21 @@ class Window(QMainWindow):
         )
 
     def display_roster(self, model):
+        same_roster=self.roster is model
+        context=getattr(self,'_jersey_preview_row',None)
+        if context and context.get('preview_player_index') is not None:
+            if not same_roster:
+                self._jersey_preview_row={**context,'preview_player_index':None,'preview_number':None}
+                for mesh in getattr(self,'scene_meshes',[]):
+                    for batch in mesh['batches']:
+                        for field in ('number_texture','number_uv','back_number_uv'):batch.pop(field,None)
+            elif context.get('preview_number')!=model.rows['players'][context['preview_player_index']]['jersey_number']:
+                QTimer.singleShot(0,self.reload_preview_source)
         keep={name:[r['index'] for r in selected(view)] if view.model() and self.roster is model else [] for name,view in self.roster_views.items() if name!='schools'}
         self._roster_refreshing=True
         self.roster = model
         self.refresh_catalog()
-        school_filter=self.player_school_filter.currentData()
+        school_filter=self.player_school_filter.currentData() if same_roster else None
         self.player_school_filter.blockSignals(True);self.player_school_filter.clear();self.player_school_filter.addItem('All schools',None)
         owners={}
         for school in model.rows.get('teams',[]):
@@ -1343,7 +1367,7 @@ class Window(QMainWindow):
         self.player_school_filter.setCurrentIndex(max(0,self.player_school_filter.findData(school_filter)));self.player_school_filter.blockSignals(False)
         self.refresh_uniform_list()
         if hasattr(self,'scene_school'):
-            previous=self.scene_school.currentData();self.scene_school.blockSignals(True);self.scene_school.clear();self.scene_school.addItem('Automatic school association',None)
+            previous=self.scene_school.currentData() if same_roster else None;self.scene_school.blockSignals(True);self.scene_school.clear();self.scene_school.addItem('Automatic school association',None)
             for school in model.rows.get('teams',[]):self.scene_school.addItem(school['school_name'],school['index'])
             self.scene_school.setCurrentIndex(max(0,self.scene_school.findData(previous)));self.scene_school.blockSignals(False)
         if getattr(self, "scene_meshes", None):
@@ -1641,6 +1665,9 @@ class Window(QMainWindow):
         index=self.scene_shoes.currentData()
         if index is None:return self.log('Choose a shoe texture package first.')
         from .services import inspect_shoe_preview
+        try: archive=self.preview_archive()
+        except ValueError as error:return self.show_error(str(error))
+        entry=self.archive.entries[index]
         def display(value):
             self._shoe_preview_active=True;self._scene_record_index=None
             source,result=value
@@ -1649,7 +1676,7 @@ class Window(QMainWindow):
             self.scene_view.set_meshes([]);self.scene_view.set_image(None)
             self.scene_parts.clear();self.scene_textures.clear()
             self.show_scene_preview(result,source)
-        self.run_job('Preview shoe geometry and artwork',lambda job:inspect_shoe_preview(self.preview_archive(),self.archive.entries[index],job),display,cancellable=True)
+        self.run_job('Preview shoe geometry and artwork',lambda job:inspect_shoe_preview(archive,entry,job),display,cancellable=True)
 
     def refresh_uniform_list(self):
         import re
@@ -1690,6 +1717,7 @@ class Window(QMainWindow):
             match=re.fullmatch(r'u([haxyz])(\d+)\.iff',entry['name'] or '',re.IGNORECASE)
             if match:
                 uniform={'variant_code':'haxyz'.index(match[1].lower()),'uniform_asset_id':int(match[2])}
+                uniform.update({key:self._jersey_preview_row.get(key) for key in ('preview_number','preview_player_index','preview_name')})
                 self.preview_jersey(uniform,self.jersey_neck.currentData(),self.jersey_build.currentData(),self.jersey_shorts.currentData(),self.jersey_parts.currentIndex())
                 return
         self.load_scene_uniform(None,entry)
@@ -1701,8 +1729,10 @@ class Window(QMainWindow):
         if not any(m.get('uniform_surface') for m in self.scene_meshes):
             return self.log('Preview a cloth jersey or shorts scene first.')
         from .services import inspect_uniform_preview
+        try: archive=self.preview_archive()
+        except ValueError as error:return self.show_error(str(error))
         def work(job):
-            path=materialize(self.preview_archive(),entry) if entry is not None else self.preview_file(source)
+            path=materialize(archive,entry) if entry is not None else self.preview_file(source,archive)
             return inspect_uniform_preview(path,job)
         def display(images):
             self.scene_uniform_images={role:QImage(raw,w,h,w*4,QImage.Format.Format_RGBA8888).copy()
@@ -1728,6 +1758,10 @@ class Window(QMainWindow):
         else:
             return self.log("Select a SCNE record in the Explorer nested list.")
         source = self.asset_path
+        self._scene_record_name=items[0].text(0) if items and items[0].text(1)=='SCNE' else None
+        try: archive=self.preview_archive()
+        except ValueError as error:return self.show_error(str(error))
+        record_name=self._scene_record_name
         self._scene_record_index=index;self._shoe_preview_active=False
         self._jersey_preview_row=None;self.jersey_shape_controls.hide()
         self.navigate_to('Models / Courts')
@@ -1741,8 +1775,8 @@ class Window(QMainWindow):
         from .services import inspect_scene_preview
         include_all = self.scene_complete.isChecked()
         def load(job):
-            path=self.preview_file(source)
-            return path,inspect_scene_preview(path,index,include_all,job)
+            path=self.preview_file(source,archive)
+            return path,inspect_scene_preview(path,index,include_all,job,record_name=record_name)
         self.run_job('Decode scene geometry and textures',load,lambda value:self.show_scene_preview(value[1],value[0]),cancellable=True)
 
     def preview_jersey(self,uniform,neck,build,shorts,parts=0):
@@ -1751,8 +1785,14 @@ class Window(QMainWindow):
         try:archive=self.preview_archive()
         except ValueError as error:return self.show_error(str(error))
         uniform=dict(uniform)
+        uniform.setdefault('preview_number',23)
+        uniform.setdefault('preview_name','Reborn')
+        if uniform.get('preview_player_index') is not None and self.roster:
+            index=uniform['preview_player_index']
+            if not 0<=index<len(self.roster.rows['players']):return self.show_error('Preview player no longer exists in the loaded roster')
+            uniform['preview_number']=self.roster.rows['players'][index]['jersey_number']
         if uniform.get('preview_path'):
-            try:uniform['preview_path']=str(self.preview_file(Path(uniform['preview_path'])))
+            try:uniform['preview_path']=str(self.preview_file(Path(uniform['preview_path']),archive))
             except (ValueError,OSError) as error:return self.show_error(str(error))
         def display(value):
             source,result=value;self._jersey_preview_row=dict(uniform)
