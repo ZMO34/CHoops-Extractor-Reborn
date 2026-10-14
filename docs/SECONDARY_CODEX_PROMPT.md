@@ -86,6 +86,17 @@ Embedded source: docs/CURRENT_STATUS.md
 
 # Current project status
 
+Authored jersey lettering continuation (PR #13): front/back numbers 0–99/00,
+roster-linked or preview-only number choices, and curved Reborn surname rendering
+use actual indexed fonts/metrics and placement. Declared material DiffuseColor
+and integer shader switches are fixed. Palette 16/17 runtime-copy roles are
+confirmed. Full roster semantics, secondary positions and arena mask routes
+remain under research. No guessed writers, EBOOT edits, RPCS3 or testing JB.
+Verification: 448 passed, 4 offscreen-OpenGL skips, 2 deselected; native hidden
+OpenGL checks separately passed. Source startup, CLI, lint/type checks passed.
+This continuation is not yet a published release.
+
+
 ## Roster / preview continuation
 
 v1.12 is published from merged PR #12. Continuation source fixes worker source
@@ -347,25 +358,6 @@ selection clears Redshirt Used at row +0x9C bit 30. Used controls
 0x68F64C/0x68F518 toggle that bit; setting it clears active Redshirt. Scholarship
 bit 31 and weight bits 11–19 remain untouched. Tests cover these coupled effects.
 
-Runtime number formatter 0x4E7C8C treats 100 as **00**; this sentinel exists in
-stock data and now displays/edits as 00. NAME/numbers contains ten big-endian
-(atlas x, glyph width) u16 pairs. The formatter aligns glyph widths to four pixels
-and centers copies into a generated jersey-number texture. Exact references:
-atlas 0x4E80EC, generated resource 0x4E8144,
-player-number call 0x4E81C0–0x4E81D0. Geometry placement and shader color consumers
-are still being traced; authored glyph rendering is not yet exposed as completed.
-
-Further read-only tracing found global.iff's 256×128 jersey-number templates
-(the runtime identifier is `jerseynum00` through `jerseynum23`) and its UnAD
-`unidata` record. Function 0x4DCD5C uses +0x1C/+0x20 as number centre and
-+0x24/+0x28 as number width/height, setting semantic hash 0x1B951FD0 to
-(1/width, 1/height, 0.5-centreX/width, 0.5-centreY/height).
-The number texture binds `NumberMap` (CRC32 0x7FF175D8) at 0x4E0C80/0x4E3174.
-The program still needs the vertex UV and fragment mask/colour route; do not
-substitute guessed placement. Embedded `PS_Jersey` Cg program headers were located
-for continued read-only RSX analysis using published instruction definitions:
-https://github.com/RPCS3/rpcs3/blob/master/rpcs3/Emu/RSX/Program/RSXFragmentProgram.h.
-
 Confidence callbacks 0x69E910/0x69E924 read/write anchor +0x70, row +0x80.
 Constructor metadata exposes bounds 35 and 99; source values outside those bounds
 are preserved until explicitly edited. Jump-shot getter/setter +0x83 and its 0–111
@@ -397,7 +389,7 @@ need proof before automatic jersey recolouring is implemented.
 
 Full roster semantic reverse engineering, independent secondary positions,
 remaining school/coach/player records, complete per-field engine text limits,
-arena channel-to-palette masks, jersey-number geometry/shading and full menu asset
+arena channel-to-palette masks, complete jersey lighting and full menu asset
 subrecord links remain unfinished. No secondary position control appears in the
 traced localized player bindings; the confirmed position is a whole byte at +0x3B.
 Class/Redshirt findings do not justify guessing those other bits. Body shape and
@@ -407,6 +399,42 @@ Existing conference-parser reference:
 https://github.com/bphit4/CH2k8-Roster-Editor/blob/main/Conference_Parser.py.
 Executable evidence is retained privately, read-only; no proprietary bytes/assets
 or workstation paths are distributed. NEVER launch RPCS3 or make testing JB copies.
+
+## Authored jersey lettering (PR #13 continuation)
+
+The Jersey side panel supports every preview number 0–99 and **00**. A selected
+player can follow the roster number or use a preview-only number; neither preview
+numbers nor the requested **Reborn** surname alter roster data. Source/override
+selection applies to glyph artwork as well as cloth/texture records.
+
+Font TXTRs jersey_numbers/names use indexed L8, remap 0x5500, and a 256-entry
+ARGB palette after the four-byte-aligned mip payload. The remap forces GPU ones;
+CPU path 0x7A87B4/0x79F33C uses the palette instead. Preview decoding preserves
+that authored RGBA and rejects missing palettes rather than using a system font.
+NAME/numbers holds ten BE (x,width) u16 pairs; aligned copies/advances reproduce
+0x4E7C8C, including sentinel 100 -> 00. Global jerseynum00 supplies the template.
+UnAD/unidata +1C..28 places front numbers and +2C..38 places back numbers;
+**the latter is not a surname transform**. 0x4DCD5C sets their reciprocal-extent
+UV transforms; NumberMap is CRC32 0x7FF175D8.
+
+Surname consumer 0x4E7F0C calls 0x520898. 0x520740 maps apostrophe/hyphen to
+indices 0/1 and A–Z/a–z to 2–27; spaces advance without copying. NAME/names
+metrics and 0x5207B8/0x520898 supply aligned spacing and centering. Global
+jerseyname00 supplies the template (stock 256×32). UnAD +08..18 supplies the
+polar horizontal/vertical centre, radius, angular width and radial scale.
+The preview renders Reborn with authored uppercase glyphs and curved placement.
+GLSL atan/length evaluates the polar transform rather than reproducing the
+game's half-precision atan approximation; full cloth/lighting is not simulated.
+RSX instruction definitions used for read-only interpretation:
+https://github.com/RPCS3/rpcs3/blob/master/rpcs3/Emu/RSX/Program/RSXFragmentProgram.h.
+
+Explicit glUniform1i corrects Qt scalar overloads for sampler/bool uniforms;
+rendered-pixel tests cover front/back numbers, names and palette switches.
+Supported material DiffuseColor is read at the shader-declared CPU offset;
+confirmed court palette edits replace it. Arena channels are not assigned
+unproven palette roles. Edit Schools save 0x6D0CC0..0x6D0CD0 copies slots 14/15
+to 16/17; these are labelled school primary/secondary runtime copies. Slots
+27–30 and independent secondary positions remain unresolved, not writable guesses.
 
 ---
 
@@ -973,7 +1001,7 @@ AUDO segment headers can carry a payload length at +18; interleaved audio banks 
 
 2kTl is BE magic 326B546C, header size, u16 type ID, u16 block count, BE u32 sizes, concatenated blocks. Header size = 12+4*count. Use numeric type IDs; no unvalidated semantic ID mapping. Strictly reject trailing/truncated wrapper bytes.
 
-Standard TXTR often uses separate header and payload blocks; exports preserve individual blocks plus record manifest. Uniform jersey_numbers and names are embedded TXTR subfiles, with separate NAME records possible. Atlas glyph layout is not validated. Validated TXTR descriptor: +58 format byte, +59 mip count, +5A dimension, +5B cube flag, +60 width u16, +62 height u16, +64 depth u16, +68 pitch u32; +A4 is payload offset+1. Unknown variants remain raw-preserved and blocked for DDS edits.
+Standard TXTR often uses separate header and payload blocks; exports preserve individual blocks plus record manifest. Uniform jersey_numbers and names are embedded TXTR subfiles, with separate NAME records possible. Indexed font glyph metrics and static placement are validated; see ROSTER_SCALE_AND_PREVIEWS.md. Validated TXTR descriptor: +58 format byte, +59 mip count, +5A dimension, +5B cube flag, +60 width u16, +62 height u16, +64 depth u16, +68 pitch u32; +A4 is payload offset+1. Unknown variants remain raw-preserved and blocked for DDS edits.
 
 ## SCNE / courts
 
@@ -1033,7 +1061,7 @@ Embedded source: docs/projects/01-uniform-preview.md
 
 Implemented. Open a cloth SCNE, choose a searchable home/away/alternate uniform from the loaded JB folder, or choose Open uniform IFF. The preview uses the selected source's `unifregion`/`shortregion` authored RGB; `unif`/`short` are fallback records. Normal maps and number atlases are not substituted for color artwork. Material-data alpha is made opaque only in the preview copy.
 
-Jersey and shorts use their corresponding images. Same-name cloth SCNE sections are alternatives, rather than superimposed geometry. Player names, numbers, cloth simulation and full game material shading are not reproduced. The original assets remain unchanged.
+Jersey and shorts use their corresponding images. Same-name cloth SCNE sections are alternatives, rather than superimposed geometry. Authored front/back numbers 0–99/00 and curved Reborn surname lettering now render. Cloth simulation and full game material shading are not reproduced. See ../ROSTER_SCALE_AND_PREVIEWS.md. The original assets remain unchanged.
 
 Verified with a native OpenGL jersey render and synthetic sampler-selection tests.
 
@@ -1304,6 +1332,18 @@ Updated 2026-10-11. CURRENT_STATUS.md and TEST_REPORT.md are the living evidence
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+# Uniform lettering continuation verification
+
+`python tools/dev/verify.py`: **448 passed, 4 skipped, 2 deselected**. Skips
+are rendered-pixel GL checks on Qt offscreen. Compilation, CLI/Qt startup,
+Ruff, mypy (11 files), handoff and diff checks passed.
+Native Windows targeted check: indexed_font, scene_number_gl, scene_preview and
+roster_side_panels: **128 passed**. GL tests read actual front/back/name/palette
+pixels. All 101 number codes are exercised. Private read-only source inspection
+and hidden rendering confirmed authored Reborn above the back number, and front
+and back 23. No assets/screenshots enter Git. Inputs remained immutable.
+No RPCS3/gameplay, EBOOT editing or full testing JB was performed.
 
 # Development verification
 

@@ -1,3 +1,15 @@
+# Uniform lettering continuation verification
+
+`python tools/dev/verify.py`: **448 passed, 4 skipped, 2 deselected**. Skips
+are rendered-pixel GL checks on Qt offscreen. Compilation, CLI/Qt startup,
+Ruff, mypy (11 files), handoff and diff checks passed.
+Native Windows targeted check: indexed_font, scene_number_gl, scene_preview and
+roster_side_panels: **128 passed**. GL tests read actual front/back/name/palette
+pixels. All 101 number codes are exercised. Private read-only source inspection
+and hidden rendering confirmed authored Reborn above the back number, and front
+and back 23. No assets/screenshots enter Git. Inputs remained immutable.
+No RPCS3/gameplay, EBOOT editing or full testing JB was performed.
+
 # Development verification
 
 ## Roster / preview continuation checks

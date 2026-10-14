@@ -29,6 +29,7 @@ def preview_meshes(blocks):
     material_hashes = {}
     material_names = {}
     diffuse_materials = set()
+    material_colors = {}
     transforms = {}
     instance_count = head.u32(0x3c)
     if instance_count:
@@ -91,6 +92,14 @@ def preview_meshes(blocks):
                 continue
             parameters = head.relative(material+32)
             head.slice(parameters, length)
+            for k in range(uniform_count):
+                uniform=uniforms+k*44
+                if head.u32(uniform)!=0x9015351f:continue
+                color_offset=head.u16(uniform+20)
+                if color_offset+16>length:raise ValueError('DiffuseColor extends outside material parameters')
+                color=struct.unpack('>4f',head.slice(parameters+color_offset,16))
+                if not all(math.isfinite(v) and 0<=v<=1 for v in color):raise ValueError('Unsupported DiffuseColor value')
+                material_colors[j]=color
             samplers = head.relative(shader+28) if sampler_count else 0
             head.slice(samplers, sampler_count*36)
             colors = {}
@@ -233,7 +242,8 @@ def preview_meshes(blocks):
                                     'material_index': head.u32(run+32),
                                     'material_name': material_names.get(head.u32(run+32)),
                                     'material_hash': material_hashes.get(head.u32(run+32)),
-                                    'supports_diffuse_color': head.u32(run+32) in diffuse_materials})
+                                    'supports_diffuse_color': head.u32(run+32) in diffuse_materials,
+                                    'diffuse_color':material_colors.get(head.u32(run+32))})
                 if total_vertices + len(triangles) > 1500000:
                     raise ValueError("scene exceeds preview triangle budget")
             if triangles:

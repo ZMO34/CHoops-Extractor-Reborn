@@ -1344,6 +1344,15 @@ class Window(QMainWindow):
 
     def display_roster(self, model):
         same_roster=self.roster is model
+        context=getattr(self,'_jersey_preview_row',None)
+        if context and context.get('preview_player_index') is not None:
+            if not same_roster:
+                self._jersey_preview_row={**context,'preview_player_index':None,'preview_number':None}
+                for mesh in getattr(self,'scene_meshes',[]):
+                    for batch in mesh['batches']:
+                        for field in ('number_texture','number_uv','back_number_uv'):batch.pop(field,None)
+            elif context.get('preview_number')!=model.rows['players'][context['preview_player_index']]['jersey_number']:
+                QTimer.singleShot(0,self.reload_preview_source)
         keep={name:[r['index'] for r in selected(view)] if view.model() and self.roster is model else [] for name,view in self.roster_views.items() if name!='schools'}
         self._roster_refreshing=True
         self.roster = model
@@ -1708,6 +1717,7 @@ class Window(QMainWindow):
             match=re.fullmatch(r'u([haxyz])(\d+)\.iff',entry['name'] or '',re.IGNORECASE)
             if match:
                 uniform={'variant_code':'haxyz'.index(match[1].lower()),'uniform_asset_id':int(match[2])}
+                uniform.update({key:self._jersey_preview_row.get(key) for key in ('preview_number','preview_player_index','preview_name')})
                 self.preview_jersey(uniform,self.jersey_neck.currentData(),self.jersey_build.currentData(),self.jersey_shorts.currentData(),self.jersey_parts.currentIndex())
                 return
         self.load_scene_uniform(None,entry)
@@ -1775,6 +1785,12 @@ class Window(QMainWindow):
         try:archive=self.preview_archive()
         except ValueError as error:return self.show_error(str(error))
         uniform=dict(uniform)
+        uniform.setdefault('preview_number',23)
+        uniform.setdefault('preview_name','Reborn')
+        if uniform.get('preview_player_index') is not None and self.roster:
+            index=uniform['preview_player_index']
+            if not 0<=index<len(self.roster.rows['players']):return self.show_error('Preview player no longer exists in the loaded roster')
+            uniform['preview_number']=self.roster.rows['players'][index]['jersey_number']
         if uniform.get('preview_path'):
             try:uniform['preview_path']=str(self.preview_file(Path(uniform['preview_path']),archive))
             except (ValueError,OSError) as error:return self.show_error(str(error))

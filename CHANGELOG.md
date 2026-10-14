@@ -1,3 +1,10 @@
+# Uniform lettering continuation (PR #13)
+
+- Authored indexed font decoding, front/back numbers 0–99/00 and curved Reborn surnames.
+- Roster-linked or preview-only number selection; source/override glyph consistency.
+- Correct sampler/bool uploads and declared material DiffuseColor.
+- Confirmed palette 16/17 school-colour runtime-copy labels.
+
 # Change log
 
 ## Unreleased — roster / preview continuation

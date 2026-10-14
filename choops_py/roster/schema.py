@@ -132,7 +132,7 @@ for prop in PLAYER_PROPERTIES:
     ENUM_CHOICES[key]=options
 
 # These are verified runtime/material roles, not extra Edit Schools captions.
-CONFIRMED_PALETTE_ROLES = {0:'Home team equipment color',1:'Non-home team equipment color',11:'Key Circle Inner'}
+CONFIRMED_PALETTE_ROLES = {0:'Home team equipment color',1:'Non-home team equipment color',11:'Key Circle Inner',16:'School primary runtime copy',17:'School secondary runtime copy'}
 PALETTE_HINTS.update(CONFIRMED_PALETTE_ROLES)
 
 TEAM_TYPE_OFFSET=0x2ec  # Name-anchor +0x2BC, the final word of the physical row.

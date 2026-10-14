@@ -1,5 +1,16 @@
 # Current project status
 
+Authored jersey lettering continuation (PR #13): front/back numbers 0–99/00,
+roster-linked or preview-only number choices, and curved Reborn surname rendering
+use actual indexed fonts/metrics and placement. Declared material DiffuseColor
+and integer shader switches are fixed. Palette 16/17 runtime-copy roles are
+confirmed. Full roster semantics, secondary positions and arena mask routes
+remain under research. No guessed writers, EBOOT edits, RPCS3 or testing JB.
+Verification: 448 passed, 4 offscreen-OpenGL skips, 2 deselected; native hidden
+OpenGL checks separately passed. Source startup, CLI, lint/type checks passed.
+This continuation is not yet a published release.
+
+
 ## Roster / preview continuation
 
 v1.12 is published from merged PR #12. Continuation source fixes worker source

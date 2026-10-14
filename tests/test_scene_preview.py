@@ -199,3 +199,19 @@ def test_embedded_external_material_names_are_decoded():
     result=preview_meshes([bytes(head)+data])
     assert not result['warnings']
     assert result['meshes'][0]['batches'][0]['material_name']=='sole_mat'
+
+
+def test_authored_diffuse_color_uses_declared_offset_and_preserves_scene():
+    head,data=material_fixture();head=bytearray(head)
+    struct.pack_into('>I',head,1408,(1<<16)|2)
+    struct.pack_into('>I',head,1424,2000-1424+1)
+    struct.pack_into('>I',head,2000,0x9015351f)
+    struct.pack_into('>H',head,2020,48)
+    struct.pack_into('>4f',head,1848,.25,.5,.75,1)
+    blocks=[bytes(head),data]
+    result=preview_meshes(blocks)
+    assert result['warnings']==[]
+    assert result['meshes'][0]['batches'][0]['diffuse_color']==(.25,.5,.75,1)
+    assert blocks==[bytes(head),data]
+    struct.pack_into('>H',head,2020,90)
+    assert 'DiffuseColor extends' in preview_meshes([bytes(head),data])['warnings'][0]
