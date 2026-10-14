@@ -1,3 +1,13 @@
+# Combined roster/arena continuation verification
+
+Portable runner: **461 passed, 7 skipped, 2 deselected**. Seven rendered-pixel
+checks are skipped only by Qt offscreen; native Windows targeted verification:
+**144 passed**, including all seven rendered shader paths. Source/Qt/CLI startup,
+compilation, Ruff, mypy and handoff checks passed. Synthetic appearance tests
+check shared packed-word neighbours, bounds, readback and undo for all 12 fields.
+Read-only S256 hidden rendering: 119 parts, 180 lightmapped batches, no shader
+errors. No RPCS3, testing JB or EBOOT edits. Proprietary fixtures stay private.
+
 # Uniform lettering continuation verification
 
 `python tools/dev/verify.py`: **448 passed, 4 skipped, 2 deselected**. Skips

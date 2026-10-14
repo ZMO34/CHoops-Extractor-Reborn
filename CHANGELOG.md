@@ -1,3 +1,9 @@
+# Roster and arena continuation
+
+- Twelve additional confirmed appearance/tattoo/signature fields and all jump-shot captions.
+- Authored arena vertex colour/alpha, secondary UV lightmaps, glow and flare masks.
+- No guessed secondary positions or unproved palette assignments.
+
 # Uniform lettering continuation (PR #13)
 
 - Authored indexed font decoding, front/back numbers 0–99/00 and curved Reborn surnames.

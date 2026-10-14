@@ -117,7 +117,7 @@ class EditorModel:
             unchanged=any(issue==old and all(self.data[start:end]==self.original[start:end] for start,end in ranges)
                           for old,ranges in self.source_string_issues)
             (preserved if unchanged else errors).append(issue)
-        return {'valid':not errors,'issues':errors,'preserved_source_string_issues':preserved,'source_type':self.source.kind,'counts':{name:len(rows) for name,rows in self.rows.items()},'unsaved_edits':len(self.edits),'read_only_fields':['skin tone','prestige','unknown appearance bytes','long strings','unconfirmed palette roles']}
+        return {'valid':not errors,'issues':errors,'preserved_source_string_issues':preserved,'source_type':self.source.kind,'counts':{name:len(rows) for name,rows in self.rows.items()},'unsaved_edits':len(self.edits),'read_only_fields':['unconfirmed roster bytes','independent secondary position','unconfirmed palette roles']}
     def name_capacity(self,table,index,field):
         from .text_limits import INPUT_LIMITS
         return INPUT_LIMITS.get((table,field))

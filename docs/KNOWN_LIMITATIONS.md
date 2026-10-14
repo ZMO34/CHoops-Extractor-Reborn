@@ -1,3 +1,13 @@
+# Current evidence boundary
+
+Arena vertex colour/alpha, lightmap, glow and flare masks are now supported;
+ARENA_SHADER_MASKS.md distinguishes them from unimplemented dynamic lighting/AO.
+ROSTER_SEMANTICS.md records new appearance, tattoo and signature edits. Complete
+semantics for all roster bytes, independent secondary positions, all engine text
+ceilings and remaining runtime palette links are not certified. Earlier notes
+that describe these newly mapped controls as unavailable are superseded by these
+evidence documents. Source data, EBOOT and unknown bits remain preserved.
+
 # Current limitations
 
 The scale branch remains incomplete semantic reverse engineering. Confirmed Edit

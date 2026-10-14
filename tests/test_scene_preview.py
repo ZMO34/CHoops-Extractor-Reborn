@@ -215,3 +215,18 @@ def test_authored_diffuse_color_uses_declared_offset_and_preserves_scene():
     assert blocks==[bytes(head),data]
     struct.pack_into('>H',head,2020,90)
     assert 'DiffuseColor extends' in preview_meshes([bytes(head),data])['warnings'][0]
+
+
+def test_arena_vertex_colour_and_secondary_uv_are_kept_with_triangle_indices():
+    head,data=scene_fixture();head=bytearray(head)
+    struct.pack_into('>I',head,0x54+0x94,4)
+    struct.pack_into('>I',head,332,36);struct.pack_into('>I',head,336,4*36)
+    head[536:544]=bytes.fromhex('2010000002040300')
+    head[600:608]=bytes.fromhex('2020000101020900')
+    # Move draw records away from the larger declaration array.
+    struct.pack_into('>I',head,0x54+0x80,700-(0x54+0x80)+1)
+    struct.pack_into('>3I',head,700,6,0,4)
+    points=[struct.unpack_from('>3f2e',data,8+i*16) for i in range(4)]
+    data=data[:8]+b''.join(struct.pack('>3f2e4f2h',*p,.25,.5,.75,1,32767,0) for p in points)
+    result=preview_meshes([bytes(head),data]);assert result['warnings']==[]
+    assert result['meshes'][0]['vertices'][0][5:]==(.25,.5,.75,1,1,0)

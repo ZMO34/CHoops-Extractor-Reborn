@@ -167,3 +167,5 @@ confirmed court palette edits replace it. Arena channels are not assigned
 unproven palette roles. Edit Schools save 0x6D0CC0..0x6D0CD0 copies slots 14/15
 to 16/17; these are labelled school primary/secondary runtime copies. Slots
 27–30 and independent secondary positions remain unresolved, not writable guesses.
+
+Additional appearance/tattoo/post/free-throw fields and all 112 jump-shot captions are now supported; see ROSTER_SEMANTICS.md. Arena vertex-colour/alpha, lightmap, glow and flare routing is implemented; see ARENA_SHADER_MASKS.md for evidence and remaining runtime effects.

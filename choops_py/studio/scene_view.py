@@ -83,12 +83,12 @@ class SceneView(QOpenGLWidget):
         self.gl.initializeOpenGLFunctions()
         self.program = QOpenGLShaderProgram(self)
         vertex = """#version 110
-        attribute vec3 position; attribute vec2 uv; attribute vec3 normal;
+        attribute vec3 position; attribute vec2 uv; attribute vec3 normal; attribute vec4 vertexColor; attribute vec2 uv1; varying vec4 vColor; varying vec2 lightUV;
         uniform mat4 mvp; varying vec2 texcoord; varying float lighting;
-        void main(){gl_Position=mvp*vec4(position,1.0);texcoord=uv;lighting=0.55+0.45*abs(dot(normalize(normal),normalize(vec3(0.4,1.0,0.3))));}"""
+        void main(){vColor=vertexColor;lightUV=uv1;gl_Position=mvp*vec4(position,1.0);texcoord=uv;lighting=0.55+0.45*abs(dot(normalize(normal),normalize(vec3(0.4,1.0,0.3))));}"""
         fragment = """#version 110
-        uniform sampler2D diffuse; uniform sampler2D numberMap; uniform sampler2D nameMap; uniform vec4 namePlacement; uniform float nameScale; uniform bool useName; uniform vec4 numberUV; uniform vec4 backNumberUV; uniform bool useNumber; uniform bool useBackNumber; uniform vec4 paletteTint; uniform bool usePalette; varying vec2 texcoord; varying float lighting;
-        void main(){vec4 color=texture2D(diffuse,texcoord);if(color.a<0.1)discard;if(usePalette){vec3 low=color.rgb/12.92;vec3 high=pow((color.rgb+0.055)/1.055,vec3(2.4));vec3 linear=mix(low,high,step(vec3(0.04045),color.rgb))*paletteTint.rgb;vec3 encoded=mix(linear*12.92,1.055*pow(linear,vec3(1.0/2.4))-0.055,step(vec3(0.0031308),linear));color=vec4(encoded,color.a*paletteTint.a);}vec2 n=texcoord*numberUV.xy+numberUV.zw;if(useNumber&&n.x>=0.0&&n.x<=1.0&&n.y>=0.0&&n.y<=1.0){vec4 glyph=texture2D(numberMap,n);color.rgb=mix(color.rgb,glyph.rgb,glyph.a);}vec2 b=texcoord*backNumberUV.xy+backNumberUV.zw;if(useBackNumber&&b.x>=0.0&&b.x<=1.0&&b.y>=0.0&&b.y<=1.0){vec4 glyph=texture2D(numberMap,b);color.rgb=mix(color.rgb,glyph.rgb,glyph.a);}if(useName){vec2 p=vec2(2.0*(texcoord.x-namePlacement.x),namePlacement.y-texcoord.y);vec2 q=vec2(0.5+atan(p.x,p.y)*0.5/namePlacement.w,1.0+(namePlacement.z-length(p))*nameScale);if(q.x>=0.0&&q.x<=1.0&&q.y>=0.0&&q.y<=1.0){vec4 glyph=texture2D(nameMap,q);color.rgb=mix(color.rgb,glyph.rgb,glyph.a);}}gl_FragColor=vec4(color.rgb*lighting,color.a);}"""
+        uniform sampler2D lightMap; uniform bool useLightmap; uniform int arenaMode; varying vec4 vColor; varying vec2 lightUV; uniform sampler2D diffuse; uniform sampler2D numberMap; uniform sampler2D nameMap; uniform vec4 namePlacement; uniform float nameScale; uniform bool useName; uniform vec4 numberUV; uniform vec4 backNumberUV; uniform bool useNumber; uniform bool useBackNumber; uniform vec4 paletteTint; uniform bool usePalette; varying vec2 texcoord; varying float lighting;
+        void main(){vec4 color=texture2D(diffuse,texcoord);if(arenaMode==1){color*=vColor;if(useLightmap)color*=texture2D(lightMap,lightUV);}else if(arenaMode==2){color.rgb*=vColor.rgb*(1.0+color.a);color.a=vColor.a;}else if(arenaMode==3){color.rgb*=vColor.rgb;}if(color.a<0.001)discard;if(usePalette){vec3 low=color.rgb/12.92;vec3 high=pow((color.rgb+0.055)/1.055,vec3(2.4));vec3 linear=mix(low,high,step(vec3(0.04045),color.rgb))*paletteTint.rgb;vec3 encoded=mix(linear*12.92,1.055*pow(linear,vec3(1.0/2.4))-0.055,step(vec3(0.0031308),linear));color=vec4(encoded,color.a*paletteTint.a);}vec2 n=texcoord*numberUV.xy+numberUV.zw;if(useNumber&&n.x>=0.0&&n.x<=1.0&&n.y>=0.0&&n.y<=1.0){vec4 glyph=texture2D(numberMap,n);color.rgb=mix(color.rgb,glyph.rgb,glyph.a);}vec2 b=texcoord*backNumberUV.xy+backNumberUV.zw;if(useBackNumber&&b.x>=0.0&&b.x<=1.0&&b.y>=0.0&&b.y<=1.0){vec4 glyph=texture2D(numberMap,b);color.rgb=mix(color.rgb,glyph.rgb,glyph.a);}if(useName){vec2 p=vec2(2.0*(texcoord.x-namePlacement.x),namePlacement.y-texcoord.y);vec2 q=vec2(0.5+atan(p.x,p.y)*0.5/namePlacement.w,1.0+(namePlacement.z-length(p))*nameScale);if(q.x>=0.0&&q.x<=1.0&&q.y>=0.0&&q.y<=1.0){vec4 glyph=texture2D(nameMap,q);color.rgb=mix(color.rgb,glyph.rgb,glyph.a);}}gl_FragColor=vec4(color.rgb*(arenaMode>0?1.0:lighting),color.a);}"""
         if not (self.program.addShaderFromSourceCode(QOpenGLShader.ShaderTypeBit.Vertex, vertex)
                 and self.program.addShaderFromSourceCode(QOpenGLShader.ShaderTypeBit.Fragment, fragment)
                 and self.program.link()):
@@ -128,7 +128,7 @@ class SceneView(QOpenGLWidget):
                 length = math.sqrt(sum(x*x for x in normal))
                 normal = [x/length for x in normal] if length else [0.,1.,0.]
                 for vertex in (a,b,c):
-                    packed.extend(struct.pack('8f', *vertex, *normal))
+                    packed.extend(struct.pack('14f', *vertex[:5], *normal, *(vertex[5:11] if len(vertex)>=11 else (1.,1.,1.,1.,*vertex[3:5]))))
             data = bytes(packed)
             self.buffer.allocate(data, len(data))
             self.buffer.release()
@@ -172,11 +172,12 @@ class SceneView(QOpenGLWidget):
         gl.glUniform1i(self.program.uniformLocation('diffuse'),0)
         gl.glUniform1i(self.program.uniformLocation('numberMap'),1)
         gl.glUniform1i(self.program.uniformLocation('nameMap'),2)
+        gl.glUniform1i(self.program.uniformLocation('lightMap'),3)
         self.texture.bind(0)
         self.buffer.bind()
-        for name, offset, size in [('position',0,3),('uv',12,2),('normal',20,3)]:
+        for name, offset, size in [('position',0,3),('uv',12,2),('normal',20,3),('vertexColor',32,4),('uv1',48,2)]:
             self.program.enableAttributeArray(name)
-            self.program.setAttributeBuffer(name, 0x1406, offset, size, 32)
+            self.program.setAttributeBuffer(name, 0x1406, offset, size, 56)
         for batch in self.batches:
             if batch.get('omit_preview'):
                 continue
@@ -196,6 +197,10 @@ class SceneView(QOpenGLWidget):
             self.program.setUniformValue('numberUV',QVector4D(*(batch.get('number_uv') or (1.,1.,0.,0.))))
             gl.glUniform1i(self.program.uniformLocation('useBackNumber'),int(number is not None and batch.get('back_number_uv') is not None))
             self.program.setUniformValue('backNumberUV',QVector4D(*(batch.get('back_number_uv') or (1.,1.,0.,0.))))
+            lightmap=self.gl_textures.get(batch.get('lightmap_texture')) if self.automatic else None
+            gl.glUniform1i(self.program.uniformLocation('useLightmap'),int(lightmap is not None))
+            gl.glUniform1i(self.program.uniformLocation('arenaMode'),{'prelit':1,'glow':2,'flare':3}.get(batch.get('shader_mode'),0) if self.automatic else 0)
+            (lightmap or self.texture).bind(3)
             name=self.gl_textures.get(batch.get('name_texture')) if self.automatic else None
             gl.glUniform1i(self.program.uniformLocation('useName'),int(name is not None))
             self.program.setUniformValue('namePlacement',QVector4D(*(batch.get('name_placement') or (0.,0.,1.,1.))))
@@ -205,6 +210,7 @@ class SceneView(QOpenGLWidget):
             gl.glDrawArrays(0x0004, batch['first'], batch['count'])
             (number or self.texture).release(1)
             (name or self.texture).release(2)
+            (lightmap or self.texture).release(3)
             texture.release()
         gl.glDisable(0x8037)
         self.buffer.release()

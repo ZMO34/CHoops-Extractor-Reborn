@@ -124,3 +124,5 @@ Models / Courts now includes **Prepare single-texture court…** for the supplie
 Override staging displays an informational popup when DDS prioritization and preflight finish. A separate popup reports a completed JB build and its output path. Cancelled operations and dry runs do not show success popups. During processing, the status bar distinguishes DDS conversion, archive compression, source validation and staged-archive preflight.
 
 Jersey side-panel previews render front/back numbers: choose 0–99/00 or follow the selected player’s roster number. Preview choices do not change the roster. Reborn lettering uses the uniform’s surname font and curved placement. Source JB / selected overrides also applies to glyphs; missing font records produce a warning.
+
+Additional appearance/tattoo/post/free-throw fields and all 112 jump-shot captions are now supported; see ROSTER_SEMANTICS.md. Arena vertex-colour/alpha, lightmap, glow and flare routing is implemented; see ARENA_SHADER_MASKS.md for evidence and remaining runtime effects.

@@ -164,3 +164,20 @@ EDITABLE['players']=(*EDITABLE['players'],'class_code','redshirt_code','redshirt
 PLAYER_SCALARS['jump_shot_code']=(0x83,1,0,8,0,111)
 ENUM_CHOICES['jump_shot_code']={i:f'Animation {i}' for i in range(112)}
 EDITABLE['players']=(*EDITABLE['players'],'jump_shot_code')
+
+
+# Additional localized menu options and paired packed setters, read-only EBOOT
+# evidence in ROSTER_SEMANTICS.md. Unmapped source values remain preserved.
+from .appearance import FIELDS as EXTRA_PLAYER_FIELDS
+PLAYER_PROPERTIES=(*PLAYER_PROPERTIES,*EXTRA_PLAYER_FIELDS)
+for prop in EXTRA_PLAYER_FIELDS:
+    key=prop['name'].lower().replace(' ','_')+'_code'
+    PROPERTY_FIELDS[prop['name']]=key
+    choices=dict(enumerate(prop['options']))
+    PROPERTY_CHOICES[prop['name']]=choices
+    ENUM_CHOICES[key]=choices
+    PLAYER_SCALARS[key]=(prop['offset'],prop['size'],prop['shift'],prop['bits'],0,len(choices)-1)
+    EDITABLE['players']=(*EDITABLE['players'],key)
+
+from .appearance import JUMP_SHOT_NAMES
+ENUM_CHOICES["jump_shot_code"]=dict(enumerate(JUMP_SHOT_NAMES))

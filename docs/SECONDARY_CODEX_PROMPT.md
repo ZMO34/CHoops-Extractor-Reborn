@@ -86,6 +86,15 @@ Embedded source: docs/CURRENT_STATUS.md
 
 # Current project status
 
+PR #13 combined roster/arena continuation: twelve additional appearance/tattoo/
+signature fields with verified inclusive option bounds, all 112 jump-shot labels,
+and authored arena vertex-colour/alpha, second-UV lightmaps, glow/flare masks.
+461 portable tests passed (7 offscreen GL skips, 2 deselected); 144 native
+checks passed. See ROSTER_SEMANTICS.md and ARENA_SHADER_MASKS.md. Complete
+remaining roster bytes, independent secondary positions, per-field engine ceilings
+and every runtime shader/palette mode remain unproved; no guessed edits are added.
+
+
 Authored jersey lettering continuation (PR #13): front/back numbers 0–99/00,
 roster-linked or preview-only number choices, and curved Reborn surname rendering
 use actual indexed fonts/metrics and placement. Declared material DiffuseColor
@@ -262,6 +271,8 @@ All game inputs, rosters, templates, private reverse-engineering helpers and raw
 audio are local and absent from Git. A fresh PC must supply its own authorized
 fixtures. Do not assume a generated court template or any old local build exists.
 
+Additional appearance/tattoo/post/free-throw fields and all 112 jump-shot captions are now supported; see ROSTER_SEMANTICS.md. Arena vertex-colour/alpha, lightmap, glow and flare routing is implemented; see ARENA_SHADER_MASKS.md for evidence and remaining runtime effects.
+
 ---
 
 Embedded source: docs/ROSTER_SCALE_AND_PREVIEWS.md
@@ -435,6 +446,99 @@ confirmed court palette edits replace it. Arena channels are not assigned
 unproven palette roles. Edit Schools save 0x6D0CC0..0x6D0CD0 copies slots 14/15
 to 16/17; these are labelled school primary/secondary runtime copies. Slots
 27–30 and independent secondary positions remain unresolved, not writable guesses.
+
+Additional appearance/tattoo/post/free-throw fields and all 112 jump-shot captions are now supported; see ROSTER_SEMANTICS.md. Arena vertex-colour/alpha, lightmap, glow and flare routing is implemented; see ARENA_SHADER_MASKS.md for evidence and remaining runtime effects.
+
+---
+
+Embedded source: docs/ROSTER_SEMANTICS.md
+
+# Roster semantic evidence and supported edits
+
+## Appearance and signature controls
+
+Read-only executable registration metadata links localized captions, paired
+getters/setters, maximum option indices and caption arrays. +0x34 is the maximum
+**index**, not the number of entries: adjacent array addresses corroborate the
+inclusive last option (Bald, Red, Beard Style 6, Sideburns 3, Tattoo 12, Strong,
+Freethrow 23 and Bigs 19). Unknown source codes remain unchanged until edited.
+No new assets or executable modifications are required.
+
+| Field | Raw player offset | Bits | Writable options | Getter |
+|---|---|---|---|---|
+| Hairstyle | 0x8C u32 | 7..12 | 0..36 | 0x69ED94 |
+| Hair colour | 0x90 u32 | 13..15 | 0..4 | 0x69EF54 |
+| Beard | 0x90 u32 | 21..23 | 0..6 | 0x69EE94 |
+| Sideburns | 0x90 u16 | 0..1 | 0..3 | 0x69EF14 |
+| Left shoulder tattoo | 0x84 u32 | 17..20 | 0..12 | 0x69E9DC |
+| Right shoulder tattoo | 0x84 u32 | 13..16 | 0..12 | 0x69EA1C |
+| Left biceps tattoo | 0x84 u32 | 9..12 | 0..12 | 0x69EA5C |
+| Right biceps tattoo | 0x84 u32 | 5..8 | 0..12 | 0x69EA9C |
+| Left forearm tattoo | 0x84 u32 | 1..4 | 0..12 | 0x69EADC |
+| Right forearm tattoo | 0x88 u32 | 28..31 | 0..12 | 0x69EB1C |
+| Post animation | 0x84 u32 | 21..25 | 0..7 | 0x69E99C |
+| Free-throw animation | 0x84 u32 | 26..31 | 0..21 | 0x69E960 |
+
+Jump shots at 0x83 now use all 112 exact game labels (Generic, Athletic, Guards,
+Bigs); writable IDs remain 0..111. Free-throw captions deliberately skip 16,
+as the game's table does. Tattoos and signature animations share packed words;
+mask-preservation/undo tests guard every neighbouring field. Existing body build,
+muscle tone, complexion, equipment, scholarship, class and redshirt controls remain.
+All new scalars automatically participate in source-bound CSV and selective
+comparison through the shared backend. No personal input data is included.
+
+## Position and text evidence boundary
+
+0x69DAA8/0x69DABC read/write the complete position byte at raw +0x3B. Adjacent
++0x3C begins scaled shooting ratings, not a secondary position. The localized
+player bindings contain one Position control. This establishes the supported
+primary field; it does not establish another independent field or prove that
+none exists elsewhere. No speculative secondary writer is supplied.
+
+Confirmed text-entry capacities and copy-on-write growth are described in
+ROSTER_SCALE_AND_PREVIEWS.md. Entry-buffer capacities are not a universal renderer
+ceiling. Fields without confirmed engine limits are not capped to the old string
+allocation. Complete semantics for every remaining byte are not claimed.
+
+---
+
+Embedded source: docs/ARENA_SHADER_MASKS.md
+
+# Arena shader colour and alpha routing
+
+The stadium SCNE contains embedded Cg programs; it is unnecessary to modify EBOOT
+or load a complete game to inspect these shader families. The sampled source
+programs establish these operations (RGBA multiplication, not guessed school
+colours):
+
+| SCNE shader hash | Embedded fragment program | Static preview |
+|---|---|---|
+| 0x9BF5D4AE | BasePrelitPixelShader | Diffuse × vertex RGBA |
+| 0x9BF5D4AE | BaseLightmapPixelShader | Diffuse × vertex RGBA × lightmap RGBA |
+| 0xAD91D4DE | GlowSignsPixelShader | RGB = diffuse RGB × vertex RGB × (1 + diffuse alpha); alpha = vertex alpha |
+| 0xB3DC3294 | LightFlarePixelShader | RGB = diffuse RGB × vertex RGB; alpha = diffuse alpha |
+
+Float4 COLOR declarations (usage 3) are preserved including HDR values. The
+second signed-normalized TEXCOORD channel (usage 9) supplies lightmap coordinates;
+base UVs are not reused when the second declaration is present. For the verified
+prelit family, sampler 0xAB0D0064 is a lightmap, **not a normal map**. Other shader
+families do not acquire that role merely by having the same sampler hash.
+Material CPU offsets still select DiffuseColor; confirmed court palette uniforms
+continue to follow loaded roster/selected school state. Prelit materials do not
+receive a second artificial directional-light multiplier.
+
+Source/selected overrides supply SCNE and all sampled texture records through the
+same snapshot. Single archives remain usable. Tests verify declared attribute
+bounds and actual rendered lightmap/colour/alpha pixels. Hidden read-only S256
+inspection rendered 119 supported parts and 180 lightmapped batches without
+shader errors. No RPCS3 or testing JB was involved.
+
+This is static preview support. Reflection/environment lighting, full fake-bump
+lighting, screen-space AO, dynamic arena illumination, cloth and every runtime
+palette mode are not reproduced. Palette slots 24–26 must not be assigned to
+seating from colour similarity: Edit Schools also includes cheerleader colours.
+Unproved channel-to-roster links remain unassigned. Complete GPU/game shader
+emulation and full roster reverse engineering are not claimed.
 
 ---
 
@@ -1280,6 +1384,16 @@ in the repository or Windows release.
 
 Embedded source: docs/KNOWN_LIMITATIONS.md
 
+# Current evidence boundary
+
+Arena vertex colour/alpha, lightmap, glow and flare masks are now supported;
+ARENA_SHADER_MASKS.md distinguishes them from unimplemented dynamic lighting/AO.
+ROSTER_SEMANTICS.md records new appearance, tattoo and signature edits. Complete
+semantics for all roster bytes, independent secondary positions, all engine text
+ceilings and remaining runtime palette links are not certified. Earlier notes
+that describe these newly mapped controls as unavailable are superseded by these
+evidence documents. Source data, EBOOT and unknown bits remain preserved.
+
 # Current limitations
 
 The scale branch remains incomplete semantic reverse engineering. Confirmed Edit
@@ -1332,6 +1446,16 @@ Updated 2026-10-11. CURRENT_STATUS.md and TEST_REPORT.md are the living evidence
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+# Combined roster/arena continuation verification
+
+Portable runner: **461 passed, 7 skipped, 2 deselected**. Seven rendered-pixel
+checks are skipped only by Qt offscreen; native Windows targeted verification:
+**144 passed**, including all seven rendered shader paths. Source/Qt/CLI startup,
+compilation, Ruff, mypy and handoff checks passed. Synthetic appearance tests
+check shared packed-word neighbours, bounds, readback and undo for all 12 fields.
+Read-only S256 hidden rendering: 119 parts, 180 lightmapped batches, no shader
+errors. No RPCS3, testing JB or EBOOT edits. Proprietary fixtures stay private.
 
 # Uniform lettering continuation verification
 

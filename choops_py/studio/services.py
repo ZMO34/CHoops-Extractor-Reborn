@@ -323,6 +323,7 @@ def inspect_scene_preview(source: Path, record_index: int, include_all=False, jo
             mesh['name'] = rec['name'] + '/' + mesh['name']
             for batch in mesh['batches']:
                 batch['texture'] = by_index.get(batch['texture_index'])
+                batch['lightmap_texture']=by_index.get(batch.get('lightmap_index'))
                 # This runtime-injected court pass repeats the wood geometry;
                 # a neutral diffuse fallback would cover every court decal.
                 if mesh['court_surface'] and batch.get('material_hash') == 0xe16ecb73 and batch['texture'] is None:
@@ -330,7 +331,7 @@ def inspect_scene_preview(source: Path, record_index: int, include_all=False, jo
                     scene['warnings'].append('Court runtime-only material 0xe16ecb73 omitted from color preview')
         result['meshes'].extend(scene['meshes'])
         result['warnings'].extend(scene['warnings'])
-    needed = {batch['texture'] for mesh in result['meshes'] for batch in mesh['batches'] if batch['texture']}
+    needed = {batch[key] for mesh in result['meshes'] for batch in mesh['batches'] for key in ('texture','lightmap_texture') if batch.get(key)}
     asset_lookup = {a.name:a for a in container.assets if a.texture}
     decoded_bytes = 0
     for i, name in enumerate(sorted(needed)):

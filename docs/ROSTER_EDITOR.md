@@ -79,3 +79,5 @@ assets/links. Restored unlock IDs remain intact. Handedness uses L/R, booleans
 Yes/No, home socks Black/White; unknown enums remain explicit. See project tracker.
 
 Jersey side tabs offer numbers 0–99/00 or the selected player’s roster number, with authored Reborn surname lettering. Preview choices do not edit roster data.
+
+Additional appearance/tattoo/post/free-throw fields and all 112 jump-shot captions are now supported; see ROSTER_SEMANTICS.md. Arena vertex-colour/alpha, lightmap, glow and flare routing is implemented; see ARENA_SHADER_MASKS.md for evidence and remaining runtime effects.

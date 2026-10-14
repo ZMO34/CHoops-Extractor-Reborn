@@ -1,5 +1,14 @@
 # Current project status
 
+PR #13 combined roster/arena continuation: twelve additional appearance/tattoo/
+signature fields with verified inclusive option bounds, all 112 jump-shot labels,
+and authored arena vertex-colour/alpha, second-UV lightmaps, glow/flare masks.
+461 portable tests passed (7 offscreen GL skips, 2 deselected); 144 native
+checks passed. See ROSTER_SEMANTICS.md and ARENA_SHADER_MASKS.md. Complete
+remaining roster bytes, independent secondary positions, per-field engine ceilings
+and every runtime shader/palette mode remain unproved; no guessed edits are added.
+
+
 Authored jersey lettering continuation (PR #13): front/back numbers 0–99/00,
 roster-linked or preview-only number choices, and curved Reborn surname rendering
 use actual indexed fonts/metrics and placement. Declared material DiffuseColor
@@ -175,3 +184,5 @@ round trip on `e149790005fdaeb14d0a1b79689d0a3de3b8f2da`; see TEST_REPORT.md.
 All game inputs, rosters, templates, private reverse-engineering helpers and raw
 audio are local and absent from Git. A fresh PC must supply its own authorized
 fixtures. Do not assume a generated court template or any old local build exists.
+
+Additional appearance/tattoo/post/free-throw fields and all 112 jump-shot captions are now supported; see ROSTER_SEMANTICS.md. Arena vertex-colour/alpha, lightmap, glow and flare routing is implemented; see ARENA_SHADER_MASKS.md for evidence and remaining runtime effects.
