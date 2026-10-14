@@ -7,6 +7,36 @@ from choops_py.roster import bulk
 pytestmark=pytest.mark.unit
 
 
+def test_comparison_maps_reordered_conferences_and_rejects_unnamed_records():
+    left,right=roster_fixture(),roster_fixture()
+    left.rows['teams'][0]['school_name']=right.rows['teams'][0]['school_name']='School'
+    left.rows['conferences']=[dict(index=0,conference_name='Alpha'),dict(index=1,conference_name='Beta')]
+    right.rows['conferences']=[dict(index=0,conference_name='Beta'),dict(index=1,conference_name='Alpha')]
+    left.rows['teams'][0]['conference_index']=0
+    right.rows['teams'][0]['conference_index']=1
+    assert not any(c['field']=='conference_index' for c in bulk.compare(left,right)['changes'])
+    right.rows['teams'][0]['conference_index']=0
+    changes=bulk.compare(left,right)['changes']
+    assert next(c for c in changes if c['field']=='conference_index')['value']==1
+    left.rows['coaches'][0]['coach_name']='';right.rows['coaches'][0]['coach_name']=''
+    result=bulk.compare(left,right)
+    assert any('coaches:' in note for note in result['unmatched'])
+
+
+def test_preserved_source_string_warning_checks_the_entire_long_string():
+    import struct
+    from choops_py.roster.editor_model import EditorModel
+    from choops_py.roster.adapters import load_bytes
+    base=roster_fixture();raw=bytearray(base.data)
+    field=base.row_offset('players',0)+0x14;target=len(raw)
+    raw+=('A'*300+'\x01'+'B'*50).encode('utf-16-le')+b'\0\0'
+    struct.pack_into('>i',raw,field,target-field)
+    model=EditorModel(load_bytes(bytes(raw)),base.tables)
+    assert model.validate()['valid']
+    model.data[target+650:target+652]=b'C\0'
+    assert not model.validate()['valid']
+
+
 def test_jump_shot_write_preserves_all_other_bytes_and_undo():
     model=roster_fixture();before=bytes(model.data)
     model.edit('players',0,'jump_shot_code',111)

@@ -94,6 +94,8 @@ reset and menu-logo subrecord references. Confirmed Edit Schools text capacities
 are mapped to roster fields, and the jump-shot animation ID is editable with
 confirmed bounds. See ROSTER_SCALE_AND_PREVIEWS.md for evidence and unfinished
 semantics. This continuation is not a published release.
+Combined with merged PR #11: 341 tests passed, 2 deselected; source/Qt startup,
+lint/type and documentation checks passed. No RPCS3, EBOOT edits or testing JB.
 ## Latest release and single-slice integration
 
 v1.12 publishes merged PR #12 at master 4f0eec7f95f9d624ff0fe09b4aac489ba4cf058e.
@@ -1252,8 +1254,9 @@ Embedded source: docs/KNOWN_LIMITATIONS.md
 
 # Current limitations
 
-The scale branch remains incomplete semantic reverse engineering. School and
-conference engine text caps, arena shader channels, number geometry/colour and
+The scale branch remains incomplete semantic reverse engineering. Confirmed Edit
+Schools entry capacities are mapped; conference/coach/singular-mascot limits and
+the renderer's broader text ceiling, arena shader channels, number geometry/colour and
 independent secondary positions remain unresolved. CSV/comparison use supported
 writers and exclude ambiguous references. Text growth is structurally tested;
 game runtime remains unverified. See ROSTER_SCALE_AND_PREVIEWS.md.
@@ -1306,9 +1309,11 @@ Embedded source: docs/TEST_REPORT.md
 
 ## Roster / preview continuation checks
 
-Targeted preview/bulk/GUI checks passed 17 tests; subsequent text-capacity,
-jump-shot and GUI tests passed 20 tests. New menu/subrecord reference checks and
-the final integrated full suite require verification before publication. No
+Final integrated `python tools/dev/verify.py`: 341 passed, 2 intentional
+deselections; compile, CLI/Qt startup, lint/type and handoff checks passed.
+Final targeted preview/bulk/GUI run: 27 passed. Regressions include reordered
+conference references, entire long-string warning preservation, exact menu logo
+ownership, game entry capacities and isolated jump-shot writes/undo. No
 RPCS3, EBOOT writes or testing JB. Evidence is in ROSTER_SCALE_AND_PREVIEWS.md.
 ## PR #11 independent integration review — 2026-10-14
 

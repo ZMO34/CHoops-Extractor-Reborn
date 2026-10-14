@@ -21,11 +21,7 @@ class EditorModel:
             field=issue['field_offset'];ranges=[(field,field+4)]
             target=field+struct.unpack_from('>i',self.original,field)[0]
             if 0<=target<len(self.original):
-                end=target
-                for _ in range(256):
-                    if end+2>len(self.original):break
-                    value=self.original[end:end+2];end+=2
-                    if value==b'\0\0':break
+                end=self.string_ranges.get(target,target)
                 ranges.append((target,end))
             self.source_string_issues.append((dict(issue),ranges))
     @classmethod

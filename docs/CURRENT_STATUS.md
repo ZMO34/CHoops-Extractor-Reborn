@@ -8,6 +8,8 @@ reset and menu-logo subrecord references. Confirmed Edit Schools text capacities
 are mapped to roster fields, and the jump-shot animation ID is editable with
 confirmed bounds. See ROSTER_SCALE_AND_PREVIEWS.md for evidence and unfinished
 semantics. This continuation is not a published release.
+Combined with merged PR #11: 341 tests passed, 2 deselected; source/Qt startup,
+lint/type and documentation checks passed. No RPCS3, EBOOT edits or testing JB.
 ## Latest release and single-slice integration
 
 v1.12 publishes merged PR #12 at master 4f0eec7f95f9d624ff0fe09b4aac489ba4cf058e.

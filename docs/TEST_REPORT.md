@@ -2,9 +2,11 @@
 
 ## Roster / preview continuation checks
 
-Targeted preview/bulk/GUI checks passed 17 tests; subsequent text-capacity,
-jump-shot and GUI tests passed 20 tests. New menu/subrecord reference checks and
-the final integrated full suite require verification before publication. No
+Final integrated `python tools/dev/verify.py`: 341 passed, 2 intentional
+deselections; compile, CLI/Qt startup, lint/type and handoff checks passed.
+Final targeted preview/bulk/GUI run: 27 passed. Regressions include reordered
+conference references, entire long-string warning preservation, exact menu logo
+ownership, game entry capacities and isolated jump-shot writes/undo. No
 RPCS3, EBOOT writes or testing JB. Evidence is in ROSTER_SCALE_AND_PREVIEWS.md.
 ## PR #11 independent integration review — 2026-10-14
 

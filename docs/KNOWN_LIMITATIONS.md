@@ -1,7 +1,8 @@
 # Current limitations
 
-The scale branch remains incomplete semantic reverse engineering. School and
-conference engine text caps, arena shader channels, number geometry/colour and
+The scale branch remains incomplete semantic reverse engineering. Confirmed Edit
+Schools entry capacities are mapped; conference/coach/singular-mascot limits and
+the renderer's broader text ceiling, arena shader channels, number geometry/colour and
 independent secondary positions remain unresolved. CSV/comparison use supported
 writers and exclude ambiguous references. Text growth is structurally tested;
 game runtime remains unverified. See ROSTER_SCALE_AND_PREVIEWS.md.

@@ -22,7 +22,7 @@ preserve ZIP/decrypted wrappers; Export game roster IFF uses the loaded JB wrapp
 Unchanged bad name characters warn; invalid pointers/new corruption still block.
 
 The active scale branch uses copy-on-write UTF-16 text growth instead of equal
-length/unshared storage. Verified first/last game text-entry limits are used;
+length/unshared storage. Verified player and Edit Schools text-entry limits are used;
 other unresolved per-field engine limits are identified, not guessed from
 existing names. See ROSTER_SCALE_AND_PREVIEWS.md; this work is not yet released.
 Verified references,

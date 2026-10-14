@@ -7,6 +7,13 @@ Class and Redshirt choices join the Player panel; Conference History holds the
 supported record scalars. Save a copy after editing. Name growth preserves old
 storage and uses verified game input limits where mapped.
 
+The continuation maps school/short names (16 UTF-16 units), abbreviation (4),
+plural mascot (16), event name (64), student section (32), and stadium name (15)
+to the game's entry capacities. Existing longer text is preserved until edited.
+Jump shot animation uses confirmed IDs 0–111; descriptive animation names remain
+under research. In Explorer, teamselectlogo's nested logoNNN records show their
+school references. Source switching resolves unique SCNE names after reordering.
+
 The Preview source toolbar switches SCNE and textures between Source JB and
 Selected overrides. Stage the chosen overrides first; no JB build is needed.
 The same choice applies to shoes and uniforms. Named/hashed counterparts reload;
