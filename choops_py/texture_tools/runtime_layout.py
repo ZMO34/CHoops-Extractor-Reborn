@@ -8,6 +8,18 @@ from . import dds
 
 
 def conform(data,layout,job=None):
+    import json
+    from .conversion_cache import cached_conversion
+    source=dds.inspect(data)
+    keys=('width','height','format','mip_count','cubemap')
+    if all(source[k]==layout[k] for k in keys):return data,False
+    if job:job.check()
+    identity=json.dumps({key:layout[key] for key in keys},sort_keys=True)
+    result,_=cached_conversion('base-layout/'+identity,data,False,lambda:_conform(data,layout,job)[0])
+    return result,True
+
+
+def _conform(data,layout,job=None):
     source=dds.inspect(data)
     keys=('width','height','format','mip_count','cubemap')
     if all(source[k]==layout[k] for k in keys):return data,False

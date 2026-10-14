@@ -1,5 +1,18 @@
 # Native studio user guide (development build)
 
+Active development: Export > Roster CSV exports editable cells. Import / compare
+opens a review with field checkboxes before applying changes. Ratings edit inline;
+Copy ratings/Paste to selected players supports school-filtered batch work.
+Class and Redshirt choices join the Player panel; Conference History holds the
+supported record scalars. Save a copy after editing. Name growth preserves old
+storage and uses verified game input limits where mapped.
+
+The Preview source toolbar switches SCNE and textures between Source JB and
+Selected overrides. Stage the chosen overrides first; no JB build is needed.
+The same choice applies to shoes and uniforms. Named/hashed counterparts reload;
+unrelated standalone files retain their own source. Archive categories and roster
+reference columns support sorting/filtering. See ROSTER_SCALE_AND_PREVIEWS.md.
+
 v1.11: select a row in any roster category for the right-side editor. Schools have
 References, Players, Palette, Shoes and Jersey tabs. Players add Shoes, Jersey and
 School assignment tabs. Footwear edits/previews and jersey previews are now in

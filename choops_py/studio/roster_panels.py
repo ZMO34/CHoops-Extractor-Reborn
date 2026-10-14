@@ -295,6 +295,7 @@ class RecordDetails(QTabWidget):
         self.addTab(self.links, "References") if table == "teams" else None
         if table == "conferences":
             self.addTab(self.links, "Schools")
+            self.history_view=self.tree('History / record');self.addTab(self.history_view,'History')
         if table == "teams":
             self.roster = self.tree("Roster slot")
             self.addTab(self.roster, "Players")
@@ -326,6 +327,7 @@ class RecordDetails(QTabWidget):
         self.setEnabled(row is not None)
         self.general.clear()
         self.links.clear()
+        if self.table=='conferences':self.history_view.clear()
         if self.table == "teams":
             self.roster.clear()
             self.palette_view.clear()
@@ -365,8 +367,9 @@ class RecordDetails(QTabWidget):
                 )
                 continue
             label = ENUM_CHOICES.get(key, {}).get(value, value)
+            history_fields={'founded_year','champs_order','final_fours','prev_yr_bids','rank','last_champ_order'}
             self.item(
-                self.general,
+                self.history_view if self.table=='conferences' and key in history_fields else self.general,
                 key.replace("_", " ").title(),
                 label,
                 key if writable else None,
@@ -436,8 +439,9 @@ class RecordDetails(QTabWidget):
             if ok:
                 self.apply(key, value, slot)
         elif key in STRING_FIELDS.get(self.table, {}):
+            capacity=model.name_capacity(self.table,self.index,key)
             value, ok = QInputDialog.getText(
-                self, "Edit " + item.text(0), "Keep encoded string length", text=current
+                self, "Edit " + item.text(0), f"Game text entry: up to {capacity} UTF-16 units" if capacity is not None else "Variable UTF-16 text; field-specific engine limit unresolved", text=current
             )
             if ok:
                 self.apply(key, value)

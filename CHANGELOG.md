@@ -1,5 +1,14 @@
 # Change log
 
+## Unreleased — roster scale and preview source checkpoint
+
+Inline ratings, atomic multi-player ratings paste, source-bound CSV and selective
+roster comparison; school filtering, Class/Redshirt controls and growing text
+storage. Shared source/override previews, archive categories/references, bounded
+conversion cache and concise GUI build summaries. This is in-progress work;
+remaining engine limits and shader/number routing are documented, not claimed
+complete. Comparison review uses a table model for large change sets.
+
 ## v1.11 — record side panels and previews
 
 Side editors for every category; integrated palettes, footwear and jersey preview.

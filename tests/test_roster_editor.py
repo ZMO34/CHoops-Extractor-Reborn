@@ -14,12 +14,13 @@ class RosterTests(WorkspaceTest):
         m.undo();self.assertEqual(m.rows['players'][0]['position_code'],0);m.revert();self.assertEqual(bytes(m.data),before)
     def test_same_length_name_and_invalid_edit(self):
         m=roster_fixture();m.edit('players',0,'first_name','Ann');self.assertEqual(m.rows['players'][0]['first_name'],'Ann')
-        with self.assertRaises(ToolError):m.edit('players',0,'first_name','Alex')
+        m.edit('players',0,'first_name','Alex');self.assertEqual(m.rows['players'][0]['first_name'],'Alex')
+        with self.assertRaises(ToolError):m.edit('players',0,'first_name','A'*17)
         with self.assertRaises(ToolError):m.edit('players',0,'position_code',8)
         with self.assertRaises(ToolError):m.edit('players',0,'skin_tone',1)
     def test_shared_string_and_invalid_pointer_validation(self):
         m=roster_fixture();target=0x40+0x14+struct.unpack_from('>i',m.data,0x40+0x14)[0];field=0x40+308+0x14;struct.pack_into('>i',m.data,field,target-field);m.reload()
-        with self.assertRaises(ToolError):m.edit('players',0,'first_name','Ann')
+        m.edit('players',0,'first_name','Ann');self.assertEqual(m.rows['players'][1]['first_name'],'Ana')
         struct.pack_into('>i',m.data,0x40+0x10,0x7fffffff);self.assertFalse(m.validate()['valid'])
     def test_team_assignments_and_reference_bias(self):
         m=roster_fixture();m.edit('teams',0,'roster_slots',1,slot=0);self.assertEqual(m.rows['teams'][0]['roster_slots'][0],1)
@@ -45,8 +46,10 @@ class RosterTests(WorkspaceTest):
     def test_overlapping_string_storage_is_blocked(self):
         m=roster_fixture();field=0x40+0x14;target=field+struct.unpack_from('>i',m.data,field)[0]
         other=0x40+308+0x14;struct.pack_into('>i',m.data,other,target+2-other);m.reload();before=bytes(m.data)
-        with self.assertRaises(ToolError):m.edit('players',1,'first_name','XY')
-        self.assertEqual(bytes(m.data),before)
+        m.edit('players',1,'first_name','XY')
+        self.assertEqual(m.rows['players'][0]['first_name'],'Ana')
+        self.assertEqual(m.rows['players'][1]['first_name'],'XY')
+        self.assertEqual(m.data[target:target+8],before[target:target+8])
 
     def test_preexisting_bad_string_allows_rating_edit_and_save_unchanged(self):
         original=roster_fixture();data=bytearray(original.original)

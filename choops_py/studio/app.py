@@ -52,6 +52,7 @@ from PySide6.QtWidgets import (
     QTreeWidgetItem,
     QVBoxLayout,
     QWidget,
+    QToolButton,
 )
 
 from ..archive.manifests import OUTPUT
@@ -192,9 +193,21 @@ def table():
     return view
 
 
+class CategoryProxy(QSortFilterProxyModel):
+    category='All'
+    school=None
+    def filterAcceptsRow(self,row,parent):
+        data=self.sourceModel().rows[row]
+        return (self.category=='All' or data.get('category')==self.category) and (self.school is None or self.school in data.get('school_indices',[])) and super().filterAcceptsRow(row,parent)
+    def choose_category(self,category):
+        self.category=category;self.invalidate()
+    def choose_school(self,school):
+        self.school=school;self.invalidate()
+
+
 def set_rows(view, rows, columns, query=""):
 
-    proxy = QSortFilterProxyModel(view)
+    proxy = CategoryProxy(view)
 
     proxy.setSourceModel(Rows(rows, columns))
     proxy.setSortRole(Qt.ItemDataRole.UserRole)
@@ -347,6 +360,12 @@ class Window(QMainWindow):
         self.statusBar().addPermanentWidget(self.cancel)
 
         menu = self.menuBar().addMenu("File")
+        self.preview_overrides=QAction('Selected overrides',self)
+        self.preview_overrides.setCheckable(True)
+        self.preview_overrides.toggled.connect(self.reload_preview_source)
+        preview_toolbar=self.addToolBar('Preview source')
+        preview_toolbar.addWidget(QLabel('Preview source: Source JB / '))
+        source_button=QToolButton();source_button.setDefaultAction(self.preview_overrides);preview_toolbar.addWidget(source_button)
 
         for text, handler, shortcut in [
             ("Open game…", self.choose_game, "Ctrl+O"),
@@ -731,14 +750,19 @@ class Window(QMainWindow):
             self.scene_palette_state.setText("No roster associated; load the current JB folder roster")
 
             self.source = path
+            self.preview_mod=None
+            self._scene_record_index=None;self._shoe_preview_active=False
+            self.preview_overrides.blockSignals(True);self.preview_overrides.setChecked(False);self.preview_overrides.blockSignals(False)
 
             self.settings.setValue("game", str(path))
 
             self.explorer_proxy = set_rows(
                 self.explorer,
-                archive.entries,
+                self.catalog_rows(),
                 [
                     ("name", "Asset"),
+                    ("category", "Category"),
+                    ("references", "Roster references"),
                     ("size", "Bytes"),
                     ("hash", "CRC32"),
                     ("index", "TOC index"),
@@ -762,7 +786,7 @@ class Window(QMainWindow):
         from ..archive.identity import recover,apply
         def display(result):
             apply(self.archive,result['identities'])
-            self.explorer.model().sourceModel().layoutChanged.emit()
+            self.refresh_catalog()
             self.refresh_uniform_list();self.refresh_shoe_list()
             self.log(f"{result['matched_names']} canonical filenames verified by CRC32; {result['internal_labels']} internal-record labels. Labels preserve original hash identities.")
         self.run_job('Recover archive identities',lambda job:recover(self.archive,candidates,job),display,cancellable=True)
@@ -776,6 +800,15 @@ class Window(QMainWindow):
             candidates=Path(path).read_text(encoding='utf-8-sig').splitlines()
             self.identify_asset_names(candidates)
         except (ValueError,OSError) as error:QMessageBox.warning(self,'Filename list blocked',str(error))
+
+    def catalog_rows(self):
+        from ..archive.catalog import catalog
+        return catalog(self.archive.entries,self.roster)
+
+    def refresh_catalog(self):
+        if not self.archive or not self.explorer.model():return
+        model=self.explorer.model().sourceModel();model.beginResetModel();model.rows=self.catalog_rows();model.endResetModel()
+        self.explorer.model().choose_category(self.archive_category.currentText())
 
     def create_explorer(self):
 
@@ -812,6 +845,9 @@ class Window(QMainWindow):
         )
 
         layout.addWidget(self.search)
+        self.archive_category=QComboBox();self.archive_category.addItems(['All','Stadiums','Uniforms','Cloth geometry','Shoes','Logos','Players','Audio','Menus','Rosters','Other / unresolved'])
+        self.archive_category.currentTextChanged.connect(lambda category:self.explorer.model().choose_category(category) if self.explorer.model() else None)
+        layout.addWidget(self.archive_category)
 
         self.explorer = table()
 
@@ -872,7 +908,7 @@ class Window(QMainWindow):
 
         self.run_job(
             "Read and inspect asset",
-            lambda job: inspect_asset(materialize(self.archive, entry)),
+            lambda job: inspect_asset(materialize(self.preview_archive(), entry)),
             self.display_asset,
         )
 
@@ -893,6 +929,41 @@ class Window(QMainWindow):
                 lambda job: inspect_asset(Path(path)),
                 self.display_asset,
             )
+
+    def preview_archive(self):
+        from .preview_source import PreviewArchive
+        if not self.preview_overrides.isChecked():return self.archive
+        mod=getattr(self,'preview_mod',None) or self.mod_path.text()
+        if not (Path(mod)/'overrides.json').is_file():raise ValueError('Select and stage an overrides folder before using override previews')
+        return PreviewArchive(self.archive,mod)
+
+    def preview_file(self,source):
+        if not self.archive:return source
+        matches=[e for e in self.archive.entries if e.get('name')==Path(source).name]
+        if Path(source).name.lower().startswith('hash_'):
+            from ..archive.hash_names import replacement_hash
+            try:matches=[e for e in self.archive.entries if e['hash']==replacement_hash(Path(source).name)]
+            except ValueError:pass
+        if len(matches)==1:return materialize(self.preview_archive(),matches[0])
+        return source
+
+    def reload_preview_source(self,*_):
+        if self.active:
+            QTimer.singleShot(100,self.reload_preview_source);return
+        if getattr(self,'_jersey_preview_row',None):return self.refresh_jersey_preview()
+        if getattr(self,'_shoe_preview_active',False):return self.preview_shoes()
+        if getattr(self,'_scene_record_index',None) is not None and hasattr(self,'scene_source'):
+            from .services import inspect_scene_preview
+            index=self._scene_record_index
+            include_all=self.scene_complete.isChecked()
+            def load(job):
+                source=self.preview_file(self.scene_source)
+                return source,inspect_scene_preview(source,index,include_all,job)
+            def display(value):
+                source,result=value;self.scene_parts.clear();self.scene_textures.clear();self.show_scene_preview(result,source)
+            self.run_job('Reload scene from selected preview source',load,display,cancellable=True)
+        elif self.asset_path:
+            self.run_job('Reload textures from selected preview source',lambda job:inspect_asset(self.preview_file(self.asset_path)),self.display_asset)
 
     def display_asset(self, result):
 
@@ -1068,7 +1139,7 @@ class Window(QMainWindow):
 
         def decode(job):
             from .services import decode_texture_preview
-            return decode_texture_preview(source, selector)
+            return decode_texture_preview(self.preview_file(source), selector)
 
         def display(result):
 
@@ -1158,7 +1229,13 @@ class Window(QMainWindow):
         extra=QHBoxLayout()
         export_button=QPushButton('Export…');export_menu=QMenu(export_button)
         export_menu.addAction('Game roster IFF…',self.export_game_roster)
+        from .roster_bulk import export_csv,import_csv,compare_roster
+        export_menu.addAction('Roster CSV…',lambda:export_csv(self))
         export_button.setMenu(export_menu);extra.addWidget(export_button);extra.addStretch()
+        import_button=QPushButton('Import / compare…');import_menu=QMenu(import_button)
+        import_menu.addAction('Edited CSV…',lambda:import_csv(self))
+        import_menu.addAction('Compare another roster…',lambda:compare_roster(self))
+        import_button.setMenu(import_menu);extra.addWidget(import_button)
         layout.addLayout(extra)
 
         self.roster_search = QLineEdit()
@@ -1168,6 +1245,9 @@ class Window(QMainWindow):
         self.roster_search.textChanged.connect(lambda value: self.filter_roster(value))
 
         layout.addWidget(self.roster_search)
+        self.player_school_filter=QComboBox();self.player_school_filter.addItem('All schools',None)
+        self.player_school_filter.currentIndexChanged.connect(lambda _:self.roster_views['players'].model().choose_school(self.player_school_filter.currentData()) if self.roster_views['players'].model() else None)
+        layout.addWidget(self.player_school_filter)
 
         self.roster_tabs = QTabWidget()
 
@@ -1252,7 +1332,20 @@ class Window(QMainWindow):
         keep={name:[r['index'] for r in selected(view)] if view.model() and self.roster is model else [] for name,view in self.roster_views.items() if name!='schools'}
         self._roster_refreshing=True
         self.roster = model
+        self.refresh_catalog()
+        school_filter=self.player_school_filter.currentData()
+        self.player_school_filter.blockSignals(True);self.player_school_filter.clear();self.player_school_filter.addItem('All schools',None)
+        owners={}
+        for school in model.rows.get('teams',[]):
+            self.player_school_filter.addItem(school['school_name'],school['index'])
+            for player in school['roster_slots']:
+                if player is not None:owners.setdefault(player,[]).append(school['index'])
+        self.player_school_filter.setCurrentIndex(max(0,self.player_school_filter.findData(school_filter)));self.player_school_filter.blockSignals(False)
         self.refresh_uniform_list()
+        if hasattr(self,'scene_school'):
+            previous=self.scene_school.currentData();self.scene_school.blockSignals(True);self.scene_school.clear();self.scene_school.addItem('Automatic school association',None)
+            for school in model.rows.get('teams',[]):self.scene_school.addItem(school['school_name'],school['index'])
+            self.scene_school.setCurrentIndex(max(0,self.scene_school.findData(previous)));self.scene_school.blockSignals(False)
         if getattr(self, "scene_meshes", None):
             self.select_scene_part()
 
@@ -1273,12 +1366,14 @@ class Window(QMainWindow):
             identity = 'display_name' if name=='players' else 'school_name' if name in ('teams','schools') else 'arena_name' if name=='arenas' else 'coach_name' if name=='coaches' else 'conference_name'
             columns.sort(key=lambda col: (0 if col[0]==identity else 1 if col[0]=='index' else 2))
             if name=='players':
-                columns=[('display_name','Player'),('jersey_number','Number'),('height_inches','Height'),('position_code','Position'),('scholarship_status','Scholarship'),('weight_lbs','Weight'),('hand_code','Hand')]
+                rows=[dict(row,school_indices=owners.get(row['index'],[]),school_name=' / '.join(model.rows['teams'][i]['school_name'] for i in owners.get(row['index'],[]))) for row in rows]
+                columns=[('display_name','Player'),('school_name','School'),('jersey_number','Number'),('height_inches','Height'),('position_code','Position'),('scholarship_status','Scholarship'),('weight_lbs','Weight'),('hand_code','Hand')]
             elif name=='teams':
                 conferences={r['index']:r['conference_name'] for r in model.rows.get('conferences',[])}
                 rows=[dict(r,conference_name=conferences.get(r.get('conference_index'),'None')) for r in rows]
                 columns=[('school_name','School'),('abbreviation','Abbreviation'),('conference_name','Conference'),('asset_id','Asset ID')]
             set_rows(view, rows, columns, self.roster_search.text())
+            if name=='players':view.model().choose_school(school_filter)
             view.selectionModel().selectionChanged.connect(lambda *_:self.update_player_details())
             if len(keep.get(name,[]))==1:
                 selected_index=keep[name][0]
@@ -1445,6 +1540,9 @@ class Window(QMainWindow):
             "Select a SCNE record in Explorer, then Preview scene. Left-drag: orbit; right-drag: look around; middle-drag or Shift-drag: pan. WASD: move; Q/E: down/up; Shift: faster; Ctrl: slower; wheel: zoom; F: fit. Material textures load automatically. Use cutaway to see inside; game shader effects are not reproduced.",
         )
         self.buttons(layout, [("Preview selected SCNE", self.inspect_scene), ("Prepare single-texture court…", self.prepare_court_template)])
+        self.scene_school=QComboBox();self.scene_school.addItem('Automatic school association',None)
+        self.scene_school.currentIndexChanged.connect(lambda _:self.select_scene_part() if getattr(self,'scene_meshes',None) else None)
+        layout.addWidget(self.scene_school)
         self.jersey_shape_controls=QWidget();shape_form=QFormLayout(self.jersey_shape_controls)
         self.jersey_neck=QComboBox()
         from ..roster.schema import JERSEY_SHAPES
@@ -1544,13 +1642,14 @@ class Window(QMainWindow):
         if index is None:return self.log('Choose a shoe texture package first.')
         from .services import inspect_shoe_preview
         def display(value):
+            self._shoe_preview_active=True;self._scene_record_index=None
             source,result=value
             self._jersey_preview_row=None;self.jersey_shape_controls.hide()
             self.navigate_to('Models / Courts')
             self.scene_view.set_meshes([]);self.scene_view.set_image(None)
             self.scene_parts.clear();self.scene_textures.clear()
             self.show_scene_preview(result,source)
-        self.run_job('Preview shoe geometry and artwork',lambda job:inspect_shoe_preview(self.archive,self.archive.entries[index],job),display,cancellable=True)
+        self.run_job('Preview shoe geometry and artwork',lambda job:inspect_shoe_preview(self.preview_archive(),self.archive.entries[index],job),display,cancellable=True)
 
     def refresh_uniform_list(self):
         import re
@@ -1603,7 +1702,7 @@ class Window(QMainWindow):
             return self.log('Preview a cloth jersey or shorts scene first.')
         from .services import inspect_uniform_preview
         def work(job):
-            path=materialize(self.archive,entry) if entry is not None else source
+            path=materialize(self.preview_archive(),entry) if entry is not None else self.preview_file(source)
             return inspect_uniform_preview(path,job)
         def display(images):
             self.scene_uniform_images={role:QImage(raw,w,h,w*4,QImage.Format.Format_RGBA8888).copy()
@@ -1629,6 +1728,7 @@ class Window(QMainWindow):
         else:
             return self.log("Select a SCNE record in the Explorer nested list.")
         source = self.asset_path
+        self._scene_record_index=index;self._shoe_preview_active=False
         self._jersey_preview_row=None;self.jersey_shape_controls.hide()
         self.navigate_to('Models / Courts')
         self.scene_meshes = []
@@ -1640,14 +1740,24 @@ class Window(QMainWindow):
         self.model_details.setPlainText("Loading scene…")
         from .services import inspect_scene_preview
         include_all = self.scene_complete.isChecked()
-        self.run_job('Decode scene geometry and textures', lambda job: inspect_scene_preview(source, index, include_all, job), lambda result:self.show_scene_preview(result,source), cancellable=True)
+        def load(job):
+            path=self.preview_file(source)
+            return path,inspect_scene_preview(path,index,include_all,job)
+        self.run_job('Decode scene geometry and textures',load,lambda value:self.show_scene_preview(value[1],value[0]),cancellable=True)
 
     def preview_jersey(self,uniform,neck,build,shorts,parts=0):
         if self.active or not self.archive:return
         from .services import inspect_jersey_preview
-        archive=self.archive
+        try:archive=self.preview_archive()
+        except ValueError as error:return self.show_error(str(error))
+        uniform=dict(uniform)
+        if uniform.get('preview_path'):
+            try:uniform['preview_path']=str(self.preview_file(Path(uniform['preview_path'])))
+            except (ValueError,OSError) as error:return self.show_error(str(error))
         def display(value):
             source,result=value;self._jersey_preview_row=dict(uniform)
+            self._shoe_preview_active=False;self._scene_record_index=None
+            self.scene_parts.clear();self.scene_textures.clear()
             self.jersey_neck.setCurrentIndex(self.jersey_neck.findData(neck));self.jersey_build.setCurrentIndex(self.jersey_build.findData(build));self.jersey_shorts.setCurrentIndex(self.jersey_shorts.findData(shorts));self.jersey_parts.setCurrentIndex(parts)
             self.navigate_to('Models / Courts');self.show_scene_preview(result,source);self.jersey_shape_controls.show()
         self.run_job('Preview jersey and shorts',lambda job:inspect_jersey_preview(archive,uniform,neck,build,shorts,parts,job),display,cancellable=True)
@@ -1687,6 +1797,8 @@ class Window(QMainWindow):
         import re
         match = re.fullmatch(r's(\d+)', self.scene_source.stem, re.IGNORECASE) if hasattr(self, 'scene_source') else None
         teams = [team for team in self.roster.rows['teams'] if match and team['asset_id'] == int(match[1])] if self.roster else []
+        school=self.scene_school.currentData()
+        if self.roster and school is not None:teams=[self.roster.rows['teams'][school]]
         colors = teams[0]['palette_colors'] if len(teams) == 1 else None
         meshes = associate_palette(meshes, colors)
         if self.scene_uniform_images:
@@ -1830,10 +1942,13 @@ class Window(QMainWindow):
         )
 
     def builder_completed(self, result, operation):
-        self.build_details.setPlainText(json.dumps(result, indent=2))
+        from .build_summary import summary
+        self.build_details.setPlainText(summary(result))
         if result.get("status") == "cancelled" or operation == "preflight":
             return
         if operation == "staging":
+            self.preview_mod=result.get('mod')
+            self.preview_overrides.setChecked(True)
             title = "DDS prioritization complete"
             message = "Override staging and DDS prioritization are complete.\n\n"
             message += f"Staged archives: {result.get('staged', 0)}\nWorkspace: {result.get('mod', '')}"

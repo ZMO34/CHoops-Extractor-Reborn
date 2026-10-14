@@ -1,7 +1,7 @@
 """Read-only structural coverage and contextual palette research."""
 import struct
 from collections import Counter
-from .schema import STRING_FIELDS, REFERENCES, PALETTE_OFFSET, PALETTE_COUNT, PALETTE_HINTS, CONFIRMED_PALETTE_ROLES, CONFIRMED_PALETTE_CAPTIONS, SCHOOL_COLOR_CONTROL_SLOTS, RATING_NAMES, RATING_OFFSET, RATING_COUNT
+from .schema import STRING_FIELDS, REFERENCES, PALETTE_OFFSET, PALETTE_COUNT, PALETTE_HINTS, CONFIRMED_PALETTE_ROLES, CONFIRMED_PALETTE_CAPTIONS, SCHOOL_COLOR_CONTROL_SLOTS, RATING_NAMES, RATING_OFFSET, RATING_COUNT,PLAYER_SCALARS,ROSTER_SLOT_COUNT
 
 
 def palette_rows(model, team_index):
@@ -29,6 +29,7 @@ def analyze(model):
             for i in range(offset,offset+length):known[i]=label
         for field,offset in STRING_FIELDS.get(name,{}).items():mark(offset,4,field+' relative UTF-16LE pointer')
         if name=='players':
+            for field,(offset,size,shift,bits,_,_) in PLAYER_SCALARS.items():mark(offset,size,f'{field}: bits {shift}..{shift+bits-1}; preserves neighboring bits')
             mark(0x18,2,'Player identifier');mark(0x1b,1,'Jersey number; adjacent flags preserved')
             mark(0x3a,1,'Height inches');mark(0x3b,1,'Position code')
             for i,attribute_name in enumerate(RATING_NAMES):mark(RATING_OFFSET+i*2,2,attribute_name+' rating, u16 scaled by 100')
@@ -36,7 +37,7 @@ def analyze(model):
             mark(0x7f,1,'Potential');mark(0x80,1,'Confidence')
         if name=='teams':
             for field,(offset,_,_) in REFERENCES.items():mark(offset,4,field)
-            mark(0x6c,64,'Sixteen player references')
+            mark(0x6c,ROSTER_SLOT_COUNT*4,'Eighteen player references');mark(0x188,2,'Active roster count')
             mark(0x18c,2,'Asset family ID');mark(0x18e,2,'Identity/check index')
             mark(0x190,2,'Asset ID repeat');mark(0x192,2,'Mascot asset candidate')
             mark(0x194,2,'Asset ID repeat')

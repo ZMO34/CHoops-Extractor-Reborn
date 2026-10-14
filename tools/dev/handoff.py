@@ -6,6 +6,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 DOCUMENTS = (
     "CURRENT_STATUS.md",
+    "ROSTER_SCALE_AND_PREVIEWS.md",
     "ROSTER_SIDE_PANELS.md",
     "PLAYER_QOL_RESEARCH.md",
     "COLLABORATION.md",

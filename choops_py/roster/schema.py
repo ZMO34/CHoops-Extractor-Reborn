@@ -149,3 +149,12 @@ ENUM_CHOICES['home_shoe_color_code']=COLORS
 ENUM_CHOICES['away_shoe_color_code']=COLORS
 ENUM_CHOICES['shoe_style_code']={i:f'Style {i}' for i in range(4)}
 for table,fields in SHOE_FIELDS.items():EDITABLE[table]=(*EDITABLE[table],*fields)
+
+# Class formatter 0x68F4D0 -> 0x1C0054; initializer 0x1C7248 maps
+# HS FR..SR to 0..3, college FR..SR to 4..7, Graduate to 8 (read-only).
+PLAYER_SCALARS.update(class_code=(0x94,4,28,4,0,7),redshirt_code=(0x94,4,26,2,0,3),redshirt_used=(0x9c,4,30,1,0,1),confidence=(0x80,1,0,8,35,99))
+ENUM_CHOICES['class_code']=dict(enumerate(('HS Freshman','HS Sophomore','HS Junior','HS Senior','Freshman','Sophomore','Junior','Senior')))
+ENUM_CHOICES['redshirt_code']={0:'None',1:'Normal',2:'Transfer',3:'Medical'}
+ENUM_CHOICES['redshirt_used']={0:'No',1:'Yes'}
+ENUM_CHOICES['jersey_number']={**{i:str(i) for i in range(100)},100:'00'}
+EDITABLE['players']=(*EDITABLE['players'],'class_code','redshirt_code','redshirt_used','confidence')
