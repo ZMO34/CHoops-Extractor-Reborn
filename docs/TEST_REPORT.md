@@ -284,3 +284,5 @@ selection preserves previous snapshots, skips occupied numbered workspaces,
 compiles current artwork, cleans only its failed temporary workspace and updates
 GUI build/preview destinations together. No RPCS3 or automatic/testing JB build.
 Current continuation: 482 portable tests passed, 9 offscreen GL skips, 2 deselected; 28 native targeted checks passed after them. Guide tests verify flat colour with transparent textures, zero palette tint, glow mode and both automatic/manual texture selection. Runtime BE text tests independently check field+delta-1 and save/reopen/undo. No RPCS3 or JB build.
+
+Combined v1.14 preview release checks: 491 portable tests passed, 9 offscreen OpenGL skips, 2 deselected; 37 native Qt/OpenGL targeted checks passed. Direct jersey launch, captured source/override stadium selection, scene-mode identity and reload behavior are covered. No RPCS3 or JB build.

@@ -103,3 +103,5 @@ Native Qt studio; streaming cancelable raw extraction; precomputed IFF spans; re
 
 Override selection fix: automatically choose a fresh numbered workspace when the configured folder exists; update build and preview paths together. Rename the GUI action to Select overrides folder… and remove staging wording from GUI messages. Preserve previous workspaces on failure.
 Continuation: optional stock-court alignment guides default off and leave floor shader/palette rendering intact. Correct ROST runtime UTF-16BE string fixup, protect the 65,535-unit descriptor count, and remove Qt’s unrelated input ceiling.
+
+v1.14: direct jersey, shoe and stadium/floor selectors use Source JB or selected overrides without manual IFF opening. Jersey selection initializes the mesh; stadium modes choose combined, floor or arena. Source switching reloads the active direct preview.

@@ -752,7 +752,7 @@ class Window(QMainWindow):
 
             self.source = path
             self.preview_mod=None
-            self._scene_record_index=None;self._shoe_preview_active=False
+            self._scene_record_index=None;self._shoe_preview_active=False;self._direct_stadium_active=False
             self.preview_overrides.blockSignals(True);self.preview_overrides.setChecked(False);self.preview_overrides.blockSignals(False)
 
             self.settings.setValue("game", str(path))
