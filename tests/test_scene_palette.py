@@ -3,6 +3,41 @@ from choops_py.formats.scene_palette import associate_palette, palette_tint
 from choops_py.roster.schema import CONFIRMED_PALETTE_CAPTIONS
 
 
+def test_floor_layers_preserve_arena_vertices_and_unknown_materials():
+    from choops_py.formats.scene_palette import floor_layers
+    batches = [{'material_hash': h, 'first': i * 3, 'count': 3} for i, h in
+               enumerate((2310823066, 2600458314, 2218775043, 123))]
+    source = [{'court_surface': True, 'vertices': [(0, 0, 0)], 'batches': batches},
+              {'court_surface': False, 'vertices': [(1, 2, 3)], 'batches': batches}]
+    filtered = floor_layers(source, False, False)
+    assert filtered[0]['batches'] == batches
+    assert filtered[1]['batches'] == batches
+    assert filtered[0]['vertices'] is source[0]['vertices']
+    assert source[0]['batches'] == batches
+    assert floor_layers(source)[0]['batches'] == batches
+
+
+def test_missing_floor_layers_use_authored_game_coordinates_not_apron_bounds():
+    from choops_py.formats.scene_palette import supplement_floor_layers, floor_layers
+    apron = {'court_surface': True, 'name': 'floor/floor', 'vertices': [(-500, 0, -500)],
+             'batches': [{'material_hash': 123, 'first': 0, 'count': 1}]}
+    lines = {'court_surface': True, 'name': 'floor/lines', 'vertices': [(17, 0, 4), (18, 0, 5)],
+             'batches': [{'material_hash': 2310823066, 'first': 0, 'count': 1, 'texture': 'ink'},
+                         {'material_hash': 2218775043, 'first': 1, 'count': 1, 'texture': 'ink'}]}
+    selected = {'meshes': [apron], 'images': {'wood': b'art'}, 'warnings': []}
+    original = {'meshes': [lines], 'images': {'ink': b'lines'}, 'warnings': []}
+    result = supplement_floor_layers(selected, original)
+    overlay = result['meshes'][1]
+    assert overlay['vertices'] == [(17, 1, 4), (18, 1, 5)]
+    assert lines['vertices'] == [(17, 0, 4), (18, 0, 5)]
+    assert overlay['batches'][0]['texture'] is None
+    assert overlay['batches'][0]['reference_overlay'] is True
+    assert result['images'] == selected['images']
+    assert floor_layers(result['meshes'], False, True)[1]['batches'][0]['first'] == 1
+    assert len(supplement_floor_layers(result, original)['meshes']) == 2
+    assert len(selected['meshes']) == 1 and lines['batches'][0]['texture'] == 'ink'
+
+
 def test_runtime_material_route_uses_current_palette_and_preserves_source():
     colors = ['#BEBEBEFF']*31
     colors[19] = '#80400080'

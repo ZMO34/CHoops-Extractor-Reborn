@@ -72,6 +72,16 @@ def test_header_derived_tables_and_reciprocal_conference_membership():
     with pytest.raises(ValueError):EditorModel(load_bytes(bytes(broken)))
 
 
+@pytest.mark.parametrize('school,conference', [(-1, 0), (2, 0), (True, 0), (0, -1), (0, 2), (0, True)])
+def test_conference_assignment_rejects_invalid_indices_atomically(school, conference):
+    data, _ = header_roster()
+    model = EditorModel(load_bytes(bytes(data)))
+    before = bytes(model.data)
+    with pytest.raises(ToolError):
+        model.move_team_to_conference(school, conference)
+    assert bytes(model.data) == before and not model.history and not model.edits
+
+
 def test_edit_schools_color_callback_indices_remain_distinct_from_palette_slots():
     from choops_py.roster.research import palette_rows
     rows=palette_rows(roster_fixture(),0)

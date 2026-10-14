@@ -32,7 +32,7 @@ class SceneView(QOpenGLWidget):
         self.texture = None
         self.error = ''
 
-    def set_meshes(self, meshes):
+    def set_meshes(self, meshes, fit=True):
         self.vertices = []
         self.batches = []
         for mesh in meshes:
@@ -40,7 +40,8 @@ class SceneView(QOpenGLWidget):
             self.vertices.extend(mesh['vertices'])
             layer = {'floor':1, 'paint':2, '|centerlogo':3, 'centerlogo':3, 'lines':4}.get(mesh['name'].split('/')[-1].lower(), 2) if mesh.get('court_surface') else 0
             self.batches.extend({**b, 'court_layer':layer, 'first':b['first']+start} for b in mesh.get('batches', [{'first':0,'count':len(mesh['vertices']), 'texture':None}]))
-        self.fit_camera()
+        if fit:
+            self.fit_camera()
         self.dirty = True
         self.update()
 
@@ -87,8 +88,8 @@ class SceneView(QOpenGLWidget):
         uniform mat4 mvp; varying vec2 texcoord; varying float lighting;
         void main(){vColor=vertexColor;lightUV=uv1;gl_Position=mvp*vec4(position,1.0);texcoord=uv;lighting=0.55+0.45*abs(dot(normalize(normal),normalize(vec3(0.4,1.0,0.3))));}"""
         fragment = """#version 110
-        uniform sampler2D lightMap; uniform bool useLightmap; uniform int arenaMode; varying vec4 vColor; varying vec2 lightUV; uniform sampler2D diffuse; uniform sampler2D numberMap; uniform sampler2D nameMap; uniform vec4 namePlacement; uniform float nameScale; uniform bool useName; uniform vec4 numberUV; uniform vec4 backNumberUV; uniform bool useNumber; uniform bool useBackNumber; uniform vec4 paletteTint; uniform bool usePalette; varying vec2 texcoord; varying float lighting;
-        void main(){vec4 color=texture2D(diffuse,texcoord);if(arenaMode==1){color*=vColor;if(useLightmap)color*=texture2D(lightMap,lightUV);}else if(arenaMode==2){color.rgb*=vColor.rgb*(1.0+color.a);color.a=vColor.a;}else if(arenaMode==3){color.rgb*=vColor.rgb;}if(color.a<0.001)discard;if(usePalette){vec3 low=color.rgb/12.92;vec3 high=pow((color.rgb+0.055)/1.055,vec3(2.4));vec3 linear=mix(low,high,step(vec3(0.04045),color.rgb))*paletteTint.rgb;vec3 encoded=mix(linear*12.92,1.055*pow(linear,vec3(1.0/2.4))-0.055,step(vec3(0.0031308),linear));color=vec4(encoded,color.a*paletteTint.a);}vec2 n=texcoord*numberUV.xy+numberUV.zw;if(useNumber&&n.x>=0.0&&n.x<=1.0&&n.y>=0.0&&n.y<=1.0){vec4 glyph=texture2D(numberMap,n);color.rgb=mix(color.rgb,glyph.rgb,glyph.a);}vec2 b=texcoord*backNumberUV.xy+backNumberUV.zw;if(useBackNumber&&b.x>=0.0&&b.x<=1.0&&b.y>=0.0&&b.y<=1.0){vec4 glyph=texture2D(numberMap,b);color.rgb=mix(color.rgb,glyph.rgb,glyph.a);}if(useName){vec2 p=vec2(2.0*(texcoord.x-namePlacement.x),namePlacement.y-texcoord.y);vec2 q=vec2(0.5+atan(p.x,p.y)*0.5/namePlacement.w,1.0+(namePlacement.z-length(p))*nameScale);if(q.x>=0.0&&q.x<=1.0&&q.y>=0.0&&q.y<=1.0){vec4 glyph=texture2D(nameMap,q);color.rgb=mix(color.rgb,glyph.rgb,glyph.a);}}gl_FragColor=vec4(color.rgb*(arenaMode>0?1.0:lighting),color.a);}"""
+        uniform bool referenceOverlay; uniform int referenceAxis; uniform sampler2D lightMap; uniform bool useLightmap; uniform int arenaMode; varying vec4 vColor; varying vec2 lightUV; uniform sampler2D diffuse; uniform sampler2D numberMap; uniform sampler2D nameMap; uniform vec4 namePlacement; uniform float nameScale; uniform bool useName; uniform vec4 numberUV; uniform vec4 backNumberUV; uniform bool useNumber; uniform bool useBackNumber; uniform vec4 paletteTint; uniform bool usePalette; varying vec2 texcoord; varying float lighting;
+        void main(){if(referenceOverlay){float crossline=referenceAxis==1?texcoord.x:texcoord.y;if(referenceAxis>0&&(crossline<0.45||crossline>0.55))discard;gl_FragColor=vec4(1.0,0.75,0.15,1.0);return;}vec4 color=texture2D(diffuse,texcoord);if(arenaMode==1){color*=vColor;if(useLightmap)color*=texture2D(lightMap,lightUV);}else if(arenaMode==2){color.rgb*=vColor.rgb*(1.0+color.a);color.a=vColor.a;}else if(arenaMode==3){color.rgb*=vColor.rgb;}if(color.a<0.001)discard;if(usePalette){vec3 low=color.rgb/12.92;vec3 high=pow((color.rgb+0.055)/1.055,vec3(2.4));vec3 linear=mix(low,high,step(vec3(0.04045),color.rgb))*paletteTint.rgb;vec3 encoded=mix(linear*12.92,1.055*pow(linear,vec3(1.0/2.4))-0.055,step(vec3(0.0031308),linear));color=vec4(encoded,color.a*paletteTint.a);}vec2 n=texcoord*numberUV.xy+numberUV.zw;if(useNumber&&n.x>=0.0&&n.x<=1.0&&n.y>=0.0&&n.y<=1.0){vec4 glyph=texture2D(numberMap,n);color.rgb=mix(color.rgb,glyph.rgb,glyph.a);}vec2 b=texcoord*backNumberUV.xy+backNumberUV.zw;if(useBackNumber&&b.x>=0.0&&b.x<=1.0&&b.y>=0.0&&b.y<=1.0){vec4 glyph=texture2D(numberMap,b);color.rgb=mix(color.rgb,glyph.rgb,glyph.a);}if(useName){vec2 p=vec2(2.0*(texcoord.x-namePlacement.x),namePlacement.y-texcoord.y);vec2 q=vec2(0.5+atan(p.x,p.y)*0.5/namePlacement.w,1.0+(namePlacement.z-length(p))*nameScale);if(q.x>=0.0&&q.x<=1.0&&q.y>=0.0&&q.y<=1.0){vec4 glyph=texture2D(nameMap,q);color.rgb=mix(color.rgb,glyph.rgb,glyph.a);}}gl_FragColor=vec4(color.rgb*(arenaMode>0?1.0:lighting),color.a);}"""
         if not (self.program.addShaderFromSourceCode(QOpenGLShader.ShaderTypeBit.Vertex, vertex)
                 and self.program.addShaderFromSourceCode(QOpenGLShader.ShaderTypeBit.Fragment, fragment)
                 and self.program.link()):
@@ -181,7 +182,9 @@ class SceneView(QOpenGLWidget):
         for batch in self.batches:
             if batch.get('omit_preview'):
                 continue
-            layer = batch.get('court_layer', 0)
+            gl.glUniform1i(self.program.uniformLocation('referenceOverlay'), int(batch.get('reference_overlay', False)))
+            gl.glUniform1i(self.program.uniformLocation('referenceAxis'), int(batch.get('reference_axis', 0)))
+            layer = 5 if batch.get('reference_overlay') else batch.get('court_layer', 0)
             if layer:
                 gl.glEnable(0x8037)  # GL_POLYGON_OFFSET_FILL
                 gl.glPolygonOffset(-float(layer), -8.*layer)

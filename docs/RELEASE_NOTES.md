@@ -1,3 +1,27 @@
+# v1.14 — direct previews and override selection
+
+Select jerseys, shoes and stadium/floor packages directly from the loaded JB
+folder in Models / Courts. No manual IFF opening is required. The source toggle
+selects JB or prepared overrides for both mesh and textures. Jersey neck/build,
+shorts cut and top/shorts choices remain available. Stadium modes include arena
+and floor together, floor only and arena only.
+
+Select overrides folder… replaces staging terminology in the GUI. Existing
+workspaces are preserved and a new numbered workspace is selected automatically.
+The builder and previews use the successful new selection.
+
+Includes thin optional stock-S256 court alignment guides independent of floor
+materials and palettes; correct UTF-16BE roster string fixup, shared descriptor
+length protection and advisory keyboard warnings; exact conference-logo editor
+routing and raw SingleMoCap inspection/export. Secondary positions are closed
+by owner confirmation. Remaining unknown roster bits, smaller engine display
+ceilings, reflection/fake-bump/AO and all dynamic runtime modes remain unresolved.
+No alternate assets, EBOOT edits, RPCS3 or testing JB builds.
+
+Windows: extract the entire CHoops-Studio-v1.14-windows-x64.zip and run
+CHoops-Studio.exe. Keep _internal alongside it. No Python or external texture
+converters are needed. Included audio helpers retain sources and licence notices.
+
 # Release notes
 
 ## v1.11 — side-panel editing and uniform previews

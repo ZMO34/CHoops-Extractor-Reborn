@@ -305,6 +305,16 @@ class RecordDetails(QTabWidget):
         if table == "conferences":
             self.addTab(self.links, "Schools")
             self.history_view=self.tree('History / record');self.addTab(self.history_view,'History')
+            logo = QWidget()
+            logo_layout = QVBoxLayout(logo)
+            logo_layout.addWidget(QLabel('Each conference uses its own logo900 + conference index record.\n'
+                                         'Open it below to preview or import replacement DDS artwork.\n'
+                                         'Save the replacement bank, then stage it for your manual JB build.'))
+            button = QPushButton('Edit / preview conference logo…')
+            button.clicked.connect(lambda: self.owner.open_conference_logo(self.index))
+            logo_layout.addWidget(button)
+            logo_layout.addStretch()
+            self.addTab(logo, 'Logo')
         if table == "teams":
             self.roster = self.tree("Roster slot")
             self.addTab(self.roster, "Players")
@@ -371,7 +381,7 @@ class RecordDetails(QTabWidget):
                 self.item(
                     self.links,
                     key.replace("_index", "").replace("_", " ").title(),
-                    label,
+                    label + (f' [#{value}]' if value is not None else ''),
                     key if writable or key == "conference_index" else None,
                 )
                 continue
@@ -379,7 +389,7 @@ class RecordDetails(QTabWidget):
             history_fields={'founded_year','champs_order','final_fours','prev_yr_bids','rank','last_champ_order'}
             self.item(
                 self.history_view if self.table=='conferences' and key in history_fields else self.general,
-                key.replace("_", " ").title(),
+                'Tournament index (legacy presentation_id)' if self.table == 'conferences' and key == 'presentation_id' else key.replace("_", " ").title(),
                 label,
                 key if writable else None,
             )
@@ -448,9 +458,9 @@ class RecordDetails(QTabWidget):
             if ok:
                 self.apply(key, value, slot)
         elif key in STRING_FIELDS.get(self.table, {}):
-            value, ok = QInputDialog.getText(
-                self, "Edit " + item.text(0), model.text_hint(self.table,key), text=current
-            )
+            from .text_edit import edit_roster_text
+            value, ok = edit_roster_text(self, model, self.table, key,
+                                        "Edit " + item.text(0), current)
             if ok:
                 self.apply(key, value)
         elif key in ENUM_CHOICES or key in ("asset_id", "uniform_asset_id"):

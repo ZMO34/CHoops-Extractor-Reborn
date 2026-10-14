@@ -444,7 +444,7 @@ class Window(QMainWindow):
 
         layout = self.page(
             "Audio workspace",
-            "Browse Licensed Music and Fight Songs from the selected JB. WAV exports and replacement folders are prepared under output/ for you to stage and build manually.",
+            "Browse Licensed Music and Fight Songs from the selected JB. WAV exports and replacement folders are prepared under output/ for you to select as overrides and build manually.",
         )
 
         self.audio_state = QLabel("Open a JB folder, then load its audio catalog.")
@@ -742,6 +742,7 @@ class Window(QMainWindow):
             self.roster = None
             self.refresh_uniform_list()
             self.refresh_shoe_list()
+            self.refresh_stadium_list()
             for view in self.roster_views.values():
                 view.setModel(None)
             self.roster_state.setText('No roster loaded; load the current JB folder roster')
@@ -751,7 +752,7 @@ class Window(QMainWindow):
 
             self.source = path
             self.preview_mod=None
-            self._scene_record_index=None;self._shoe_preview_active=False
+            self._scene_record_index=None;self._shoe_preview_active=False;self._direct_stadium_active=False
             self.preview_overrides.blockSignals(True);self.preview_overrides.setChecked(False);self.preview_overrides.blockSignals(False)
 
             self.settings.setValue("game", str(path))
@@ -787,7 +788,7 @@ class Window(QMainWindow):
         def display(result):
             apply(self.archive,result['identities'])
             self.refresh_catalog()
-            self.refresh_uniform_list();self.refresh_shoe_list()
+            self.refresh_uniform_list();self.refresh_shoe_list();self.refresh_stadium_list()
             self.log(f"{result['matched_names']} canonical filenames verified by CRC32; {result['internal_labels']} internal-record labels. Labels preserve original hash identities.")
         self.run_job('Recover archive identities',lambda job:recover(self.archive,candidates,job),display,cancellable=True)
 
@@ -845,7 +846,7 @@ class Window(QMainWindow):
         )
 
         layout.addWidget(self.search)
-        self.archive_category=QComboBox();self.archive_category.addItems(['All','Stadiums','Uniforms','Cloth geometry','Shoes','Logos','Players','Audio','Menus','Rosters','Other / unresolved'])
+        self.archive_category=QComboBox();self.archive_category.addItems(['All','Stadiums','Uniforms','Cloth geometry','Shoes','Logos','Players','Audio','Menus','Rosters','Animation banks','Other / unresolved'])
         self.archive_category.currentTextChanged.connect(lambda category:self.explorer.model().choose_category(category) if self.explorer.model() else None)
         layout.addWidget(self.archive_category)
 
@@ -937,7 +938,7 @@ class Window(QMainWindow):
         if not self.archive:return None
         if not self.preview_overrides.isChecked():return self.archive
         mod=getattr(self,'preview_mod',None) or self.mod_path.text()
-        if not (Path(mod)/'overrides.json').is_file():raise ValueError('Select and stage an overrides folder before using override previews')
+        if not (Path(mod)/'overrides.json').is_file():raise ValueError('Select an overrides folder before using override previews')
         return PreviewArchive(self.archive,mod)
 
     def preview_file(self,source,archive=None):
@@ -955,17 +956,18 @@ class Window(QMainWindow):
             QTimer.singleShot(100,self.reload_preview_source);return
         if getattr(self,'_jersey_preview_row',None):return self.refresh_jersey_preview()
         if getattr(self,'_shoe_preview_active',False):return self.preview_shoes()
+        if getattr(self, '_direct_stadium_active', False):return self.preview_stadium()
         try: archive=self.preview_archive()
         except ValueError as error:return self.show_error(str(error))
         if getattr(self,'_scene_record_index',None) is not None and hasattr(self,'scene_source'):
-            from .services import inspect_scene_preview
+            from .services import inspect_scene_with_game_layers
             index=self._scene_record_index
             include_all=self.scene_complete.isChecked()
             scene_source=self.scene_source
             record_name=getattr(self,'_scene_record_name',None)
             def load(job):
                 source=self.preview_file(scene_source,archive)
-                return source,inspect_scene_preview(source,index,include_all,job,record_name=record_name)
+                return source,inspect_scene_with_game_layers(source,index,archive,include_all,job,record_name=record_name)
             def display(value):
                 source,result=value;self.scene_parts.clear();self.scene_textures.clear();self.show_scene_preview(result,source)
             self.run_job('Reload scene from selected preview source',load,display,cancellable=True)
@@ -1179,6 +1181,48 @@ class Window(QMainWindow):
 
         self.run_job("Preview selected texture", decode_with_status, display_with_status)
 
+    def open_conference_logo(self, index):
+        if self.active or index is None:
+            return
+        from ..roster.conference_assets import logo_record
+        try:
+            name = logo_record(index)
+            archive = self.preview_archive()
+            if archive is None:
+                raise ValueError('Open a source JB folder first')
+            matches = [e for e in archive.entries if e.get('name') == 'teamselectlogo.iff']
+            if len(matches) != 1:
+                raise ValueError('No unique teamselectlogo.iff bank in the selected preview source')
+        except ValueError as error:
+            return self.show_error(str(error))
+
+        def inspect(job):
+            result = inspect_asset(materialize(archive, matches[0]))
+            if sum(row['name'] == name for row in result['textures']) != 1:
+                raise ValueError(f'No unique {name} texture in the selected logo bank')
+            return result
+
+        def display(result):
+            self.display_asset(result)
+            self._scene_record_index = None
+            self._shoe_preview_active = False
+            self._jersey_preview_row = None
+            for row in range(self.textures.model().rowCount()):
+                if self.textures.model().index(row, 0).data(Qt.ItemDataRole.UserRole) == name:
+                    self.textures.selectRow(row)
+                    break
+            self.explorer_texture.setCurrentIndex(self.explorer_texture.findData(name))
+            self.navigate_to('Texture Editor')
+            def preview_when_idle():
+                if self.asset_path != result['path']:
+                    return
+                if self.active:
+                    QTimer.singleShot(20, preview_when_idle)
+                else:
+                    self.decode_texture_preview(name, self.image)
+            QTimer.singleShot(0, preview_when_idle)
+        self.run_job('Open conference logo ' + name, inspect, display)
+
     def import_dds(self):
 
         rows = selected(self.textures)
@@ -1225,7 +1269,7 @@ class Window(QMainWindow):
 
         layout = self.page(
             "Roster editor",
-            "Edit supported roster and conference records. Save a copy, reopen it, then stage it for a separate JB build.",
+            "Edit supported roster and conference records. Save a copy, reopen it, then select it as an override for a separate JB build.",
         )
 
         self.buttons(
@@ -1521,7 +1565,7 @@ class Window(QMainWindow):
         if not self.archive:return self.log('Open the destination JB folder first.')
         entries=[entry for entry in self.archive.entries if entry['name']=='roster_english.iff']
         if len(entries)!=1:return self.log('The loaded JB has no unique roster_english.iff.')
-        output,_=QFileDialog.getSaveFileName(self,'Export edited roster for manual JB staging',str(OUTPUT/'rosters'/'roster_english.iff'),'Game roster (*.iff)')
+        output,_=QFileDialog.getSaveFileName(self,'Export edited roster for manual JB overrides',str(OUTPUT/'rosters'/'roster_english.iff'),'Game roster (*.iff)')
         if not output:return
         from ..roster.workflow import export_game_roster
         self.run_job('Export game roster IFF',lambda job:export_game_roster(self.roster,self.archive.read(entries[0]),output))
@@ -1585,6 +1629,12 @@ class Window(QMainWindow):
         self.scene_cutaway.setChecked(True)
         self.scene_cutaway.toggled.connect(self.select_scene_part)
         layout.addWidget(self.scene_cutaway)
+        self.scene_three_point = QCheckBox('Alignment guide: 3-point lines')
+        self.scene_border = QCheckBox('Alignment guide: out-of-bounds borders')
+        for box in (self.scene_three_point, self.scene_border):
+            box.setChecked(False)
+            box.toggled.connect(self.select_scene_part)
+            layout.addWidget(box)
         self.scene_parts = QComboBox()
         self.scene_parts.activated.connect(self.select_scene_part)
         layout.addWidget(self.scene_parts)
@@ -1615,7 +1665,7 @@ class Window(QMainWindow):
         self.scene_uniforms.completer().setFilterMode(Qt.MatchFlag.MatchContains)
         self.scene_uniforms.activated.connect(self.select_scene_uniform)
         layout.addWidget(self.scene_uniforms)
-        self.buttons(layout, [('Open uniform IFF…', self.choose_scene_uniform_file)])
+        self.buttons(layout, [('Preview selected jersey', self.select_scene_uniform), ('Open uniform IFF…', self.choose_scene_uniform_file)])
         self.refresh_uniform_list()
         self.scene_shoes=QComboBox()
         self.scene_shoes.setEditable(True);self.scene_shoes.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
@@ -1624,6 +1674,17 @@ class Window(QMainWindow):
         layout.addWidget(self.scene_shoes)
         self.buttons(layout,[('Preview selected shoes',self.preview_shoes)])
         self.refresh_shoe_list()
+        self.scene_stadiums = QComboBox()
+        self.scene_stadiums.setEditable(True)
+        self.scene_stadiums.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
+        self.scene_stadiums.completer().setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
+        self.scene_stadiums.completer().setFilterMode(Qt.MatchFlag.MatchContains)
+        layout.addWidget(self.scene_stadiums)
+        self.scene_stadium_mode = QComboBox()
+        self.scene_stadium_mode.addItems(['Arena and floor', 'Floor only', 'Arena only'])
+        layout.addWidget(self.scene_stadium_mode)
+        self.buttons(layout, [('Preview selected stadium / floor', self.preview_stadium)])
+        self.refresh_stadium_list()
         self.scene_palette_state = QLabel('No roster associated; embedded material textures only')
         layout.addWidget(self.scene_palette_state)
 
@@ -1645,10 +1706,52 @@ class Window(QMainWindow):
         self.scene_shoes.setCurrentIndex(self.scene_shoes.findData(entry['index']))
         self.preview_shoes()
 
+    def refresh_stadium_list(self):
+        import re
+        if not hasattr(self, 'scene_stadiums'):return
+        current = self.scene_stadiums.currentData()
+        self.scene_stadiums.clear()
+        self.scene_stadiums.addItem('Choose a stadium from the loaded JB / overrides', None)
+        teams = {}
+        if self.roster:
+            for row in self.roster.rows['teams']:
+                teams.setdefault(row['asset_id'], []).append(row['school_name'])
+        if self.archive:
+            for entry in sorted(self.archive.entries, key=lambda e:e['name'] or ''):
+                match = re.fullmatch(r's(\d+)\.iff', entry['name'] or '', re.IGNORECASE)
+                if not match:continue
+                names = teams.get(int(match[1]), [])
+                label = (names[0] + ' — ') if len(names) == 1 else ''
+                self.scene_stadiums.addItem(label + entry['name'], entry['index'])
+        self.scene_stadiums.setCurrentIndex(max(0, self.scene_stadiums.findData(current)))
+
+    def preview_stadium(self):
+        if self.active or not self.archive:return
+        index = self.scene_stadiums.currentData()
+        if index is None:return self.log('Choose a stadium package first.')
+        try:archive = self.preview_archive()
+        except ValueError as error:return self.show_error(str(error))
+        from .services import inspect_stadium_preview
+        entry = next(e for e in archive.entries if e['index'] == index)
+        mode = self.scene_stadium_mode.currentIndex()
+        def display(value):
+            source, result = value
+            self._direct_stadium_active = True
+            self._jersey_preview_row = None
+            self._shoe_preview_active = False
+            self._scene_record_index = None
+            self.jersey_shape_controls.hide()
+            self.scene_parts.clear();self.scene_textures.clear()
+            self.scene_view.set_image(None)
+            self.navigate_to('Models / Courts')
+            self.show_scene_preview(result, source)
+        self.run_job('Preview stadium geometry and textures',
+                     lambda job:inspect_stadium_preview(archive, entry, mode, job), display, cancellable=True)
+
     def refresh_shoe_list(self):
         import re
         self.scene_shoes.clear()
-        self.scene_shoes.addItem('Choose shoe artwork from the loaded JB folder',None)
+        self.scene_shoes.addItem('Choose shoes from the loaded JB / overrides',None)
         if not self.archive:return
         from ..roster.shoes import BRANDS,COLORS
         for entry in sorted(self.archive.entries,key=lambda e:e['name'] or ''):
@@ -1669,6 +1772,7 @@ class Window(QMainWindow):
         except ValueError as error:return self.show_error(str(error))
         entry=self.archive.entries[index]
         def display(value):
+            self._direct_stadium_active=False
             self._shoe_preview_active=True;self._scene_record_index=None
             source,result=value
             self._jersey_preview_row=None;self.jersey_shape_controls.hide()
@@ -1682,7 +1786,7 @@ class Window(QMainWindow):
         import re
         selected_id = self.scene_uniforms.currentData()
         self.scene_uniforms.clear()
-        self.scene_uniforms.addItem('Choose a uniform from the loaded JB folder', None)
+        self.scene_uniforms.addItem('Choose a uniform from the loaded JB / overrides', None)
         teams = {}
         if self.roster:
             for team in self.roster.rows['teams']:
@@ -1712,15 +1816,15 @@ class Window(QMainWindow):
         entry_index=self.scene_uniforms.currentData()
         if entry_index is None or not self.archive:return
         entry=self.archive.entries[entry_index]
+        import re
+        match = re.fullmatch(r'u([haxyz])(\d+)\.iff', entry['name'] or '', re.IGNORECASE)
+        if not match:return self.log('Choose a uniform package first.')
+        uniform = {'variant_code': 'haxyz'.index(match[1].lower()), 'uniform_asset_id': int(match[2])}
         if self._jersey_preview_row:
-            import re
-            match=re.fullmatch(r'u([haxyz])(\d+)\.iff',entry['name'] or '',re.IGNORECASE)
-            if match:
-                uniform={'variant_code':'haxyz'.index(match[1].lower()),'uniform_asset_id':int(match[2])}
-                uniform.update({key:self._jersey_preview_row.get(key) for key in ('preview_number','preview_player_index','preview_name')})
-                self.preview_jersey(uniform,self.jersey_neck.currentData(),self.jersey_build.currentData(),self.jersey_shorts.currentData(),self.jersey_parts.currentIndex())
-                return
-        self.load_scene_uniform(None,entry)
+            uniform.update({key:self._jersey_preview_row.get(key) for key in ('preview_number','preview_player_index','preview_name')})
+        self.preview_jersey(uniform, self.jersey_neck.currentData(), self.jersey_build.currentData(),
+                           self.jersey_shorts.currentData(), self.jersey_parts.currentIndex())
+
 
     def load_scene_uniform(self, source, entry=None):
         if source is not None and self._jersey_preview_row:
@@ -1762,6 +1866,7 @@ class Window(QMainWindow):
         try: archive=self.preview_archive()
         except ValueError as error:return self.show_error(str(error))
         record_name=self._scene_record_name
+        self._direct_stadium_active=False
         self._scene_record_index=index;self._shoe_preview_active=False
         self._jersey_preview_row=None;self.jersey_shape_controls.hide()
         self.navigate_to('Models / Courts')
@@ -1772,11 +1877,11 @@ class Window(QMainWindow):
         self.scene_parts.clear()
         self.scene_textures.clear()
         self.model_details.setPlainText("Loading scene…")
-        from .services import inspect_scene_preview
+        from .services import inspect_scene_with_game_layers
         include_all = self.scene_complete.isChecked()
         def load(job):
             path=self.preview_file(source,archive)
-            return path,inspect_scene_preview(path,index,include_all,job,record_name=record_name)
+            return path,inspect_scene_with_game_layers(path,index,archive,include_all,job,record_name=record_name)
         self.run_job('Decode scene geometry and textures',load,lambda value:self.show_scene_preview(value[1],value[0]),cancellable=True)
 
     def preview_jersey(self,uniform,neck,build,shorts,parts=0):
@@ -1796,6 +1901,7 @@ class Window(QMainWindow):
             except (ValueError,OSError) as error:return self.show_error(str(error))
         def display(value):
             source,result=value;self._jersey_preview_row=dict(uniform)
+            self._direct_stadium_active=False
             self._shoe_preview_active=False;self._scene_record_index=None
             self.scene_parts.clear();self.scene_textures.clear()
             self.jersey_neck.setCurrentIndex(self.jersey_neck.findData(neck));self.jersey_build.setCurrentIndex(self.jersey_build.findData(build));self.jersey_shorts.setCurrentIndex(self.jersey_shorts.findData(shorts));self.jersey_parts.setCurrentIndex(parts)
@@ -1808,6 +1914,13 @@ class Window(QMainWindow):
     def show_scene_preview(self,result,source):
         self.scene_source = source
         self.scene_meshes = result['meshes']
+        from ..formats.scene_palette import COURT_PALETTE_ROUTES
+        layers = {b.get('reference_slot')
+                  for m in self.scene_meshes if m.get('game_floor_layer') for b in m.get('batches', [])}
+        for box, slot in ((self.scene_three_point, 18), (self.scene_border, 4)):
+            box.setEnabled(slot in layers)
+            box.setToolTip('Fixed stock court alignment guide, raised 1 game unit. '
+                           'Independent of roster palettes and floor artwork.')
         self.scene_parts.addItem('All supported parts', -1)
         for i, mesh in enumerate(self.scene_meshes):
             self.scene_parts.addItem(mesh['name'], i)
@@ -1831,9 +1944,11 @@ class Window(QMainWindow):
     def select_scene_part(self, index=None):
         part = self.scene_parts.currentData()
         meshes = self.scene_meshes if part == -1 else [self.scene_meshes[part]] if part is not None else []
+        if part not in (-1, None) and meshes and meshes[0].get('court_surface'):
+            meshes = meshes + [m for m in self.scene_meshes if m.get('game_floor_layer')]
         if part == -1 and self.scene_cutaway.isChecked():
             meshes = [m for m in meshes if not m.get('hidden_by_default')]
-        from ..formats.scene_palette import associate_palette
+        from ..formats.scene_palette import associate_palette, floor_layers
         import re
         match = re.fullmatch(r's(\d+)', self.scene_source.stem, re.IGNORECASE) if hasattr(self, 'scene_source') else None
         teams = [team for team in self.roster.rows['teams'] if match and team['asset_id'] == int(match[1])] if self.roster else []
@@ -1841,16 +1956,17 @@ class Window(QMainWindow):
         if self.roster and school is not None:teams=[self.roster.rows['teams'][school]]
         colors = teams[0]['palette_colors'] if len(teams) == 1 else None
         meshes = associate_palette(meshes, colors)
+        meshes = floor_layers(meshes, self.scene_three_point.isChecked(), self.scene_border.isChecked())
         if self.scene_uniform_images:
             meshes = [{**mesh,'batches':[{**batch,'texture':'__uniform_'+mesh['uniform_surface'], 'palette_tint':None}
                                         for batch in mesh['batches']]}
                       if mesh.get('uniform_surface') in self.scene_uniform_images else mesh for mesh in meshes]
         if colors is not None:
             count = sum(batch['palette_tint'] is not None for mesh in meshes for batch in mesh['batches'])
-            self.scene_palette_state.setText(f"Associated roster: {self.roster.source.source_path or 'current JB folder roster'}; {teams[0]['school_name']}; {count} court color bindings. Arena shader masks are unresolved.")
+            self.scene_palette_state.setText(f"Associated roster: {self.roster.source.source_path or 'current JB folder roster'}; {teams[0]['school_name']}; {count} court color bindings. Authored arena color/lightmap masks enabled; runtime effects remain under research.")
         else:
             self.scene_palette_state.setText('No unique roster/team association; embedded material textures only. Use Associate roster to select a matching roster.')
-        self.scene_view.set_meshes(meshes)
+        self.scene_view.set_meshes(meshes, fit=not isinstance(index, bool))
 
     def select_scene_texture(self, index=None):
         name = self.scene_textures.currentData()
@@ -1888,7 +2004,7 @@ class Window(QMainWindow):
         self.buttons(
             layout,
             [
-                ("Stage replacement folder…", self.stage_replacements),
+                ("Select overrides folder…", self.stage_replacements),
                 ("Export mod patch…", self.export_mod_patch),
                 ("Import mod patch…", self.import_mod_patch),
                 ("Dry run", lambda: self.build_game(True)),
@@ -1915,7 +2031,7 @@ class Window(QMainWindow):
             mod = Path(self.mod_path.text())
 
             self.run_job(
-                "Stage and preflight replacement folder",
+                "Load overrides folder and check compatibility",
                 lambda job: stage_folder(self.source, Path(path), mod, job),
                 lambda result: self.builder_completed(result, "staging"),
                 cancellable=True,
@@ -1961,7 +2077,7 @@ class Window(QMainWindow):
             source, mod = self.source, Path(self.mod_path.text())
 
             self.run_job(
-                "Validate and stage mod patch",
+                "Check and load mod patch",
                 lambda job: import_patch(source, Path(package), mod),
             )
 
@@ -1987,11 +2103,14 @@ class Window(QMainWindow):
         if result.get("status") == "cancelled" or operation == "preflight":
             return
         if operation == "staging":
+            self.mod_path.setText(str(result['mod']))
             self.preview_mod=result.get('mod')
             self.preview_overrides.setChecked(True)
             title = "DDS prioritization complete"
-            message = "Override staging and DDS prioritization are complete.\n\n"
-            message += f"Staged archives: {result.get('staged', 0)}\nWorkspace: {result.get('mod', '')}"
+            message = "Overrides are ready. DDS prioritization is complete.\n\n"
+            message += f"Prepared archives: {result.get('staged', 0)}\nWorkspace: {result.get('mod', '')}"
+            if result.get('workspace_changed'):
+                message += '\nA new workspace was selected automatically; the existing folder was preserved.'
             unapplied = len(result.get("unapplied_overrides", []))
             if unapplied:
                 message += f"\n\n{unapplied} overrides could not be applied. Review the details before building."

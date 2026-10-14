@@ -33,3 +33,17 @@ palette mode are not reproduced. Palette slots 24–26 must not be assigned to
 seating from colour similarity: Edit Schools also includes cheerleader colours.
 Unproved channel-to-roster links remain unassigned. Complete GPU/game shader
 emulation and full roster reverse engineering are not claimed.
+
+## Floor alignment guides
+
+The optional 3-point and out-of-bounds guides are for positioning one-texture
+court artwork only. They copy the verified line draw coordinates from the fixed
+stock S256 floor, raised by 1 game unit. Guide depth bias is ordered above the existing coplanar floor passes.
+The guide shader is flat amber and
+independent of roster palettes, floor layout, texture overrides and lighting.
+The floor itself keeps every original draw and its confirmed material/palette
+behavior. Toggling guides never removes actual court markings. No bounds-based
+apron geometry is invented; without the stock reference guides are unavailable.
+These controls change no SCNE, roster or build data and retain the camera.
+
+Reference guide width uses the central 10% of the authored strip UV: U across both 3-point and boundary strips. This thins guides without moving their centerlines or modifying floor geometry.

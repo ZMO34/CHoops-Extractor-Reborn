@@ -6,6 +6,8 @@ class Command:
     options: tuple = ()
     output_file: bool = False
 COMMANDS={
+    'inspect-animations':Command(('input','output')),
+    'export-animations':Command(('input','output')),
     'audio-catalog':Command(('source','output'),(),True),
     'export-soundtrack':Command(('source','output'),('audio-category',)),
     'replace-song':Command(('source','bank','index','wav_file','output')),

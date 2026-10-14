@@ -1,16 +1,16 @@
 """Conference scalar writes preserve all unrelated bytes and undo exactly."""
 import pytest
+from test_roster_semantics import header_roster
 
 from choops_py.core.errors import ToolError
 from choops_py.roster.adapters import load_bytes
 from choops_py.roster.editor_model import EditorModel
-from choops_py.roster.schema import CONFERENCE_SCALARS
-from test_roster_semantics import header_roster
+from choops_py.roster.schema import CONFERENCE_SCALARS, EDITABLE
 
 pytestmark = pytest.mark.unit
 
 
-@pytest.mark.parametrize('field', CONFERENCE_SCALARS)
+@pytest.mark.parametrize('field', [f for f in CONFERENCE_SCALARS if f in EDITABLE['conferences']])
 def test_conference_scalar_preserves_neighbors_and_reopens(field):
     data, starts = header_roster()
     model = EditorModel(load_bytes(bytes(data)))
@@ -29,7 +29,7 @@ def test_conference_scalar_preserves_neighbors_and_reopens(field):
     assert bytes(model.data) == before
 
 
-@pytest.mark.parametrize('field', CONFERENCE_SCALARS)
+@pytest.mark.parametrize('field', [f for f in CONFERENCE_SCALARS if f in EDITABLE['conferences']])
 @pytest.mark.parametrize('overflow', [False, True])
 def test_conference_bounds_reject_without_mutation(field, overflow):
     data, _ = header_roster()

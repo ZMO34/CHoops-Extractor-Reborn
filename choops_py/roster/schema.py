@@ -35,6 +35,10 @@ CONFERENCE_SCALARS = {
     'color_red':(0x20,1), 'color_green':(0x21,1), 'color_blue':(0x22,1),
 }
 EDITABLE['conferences'] = (*STRING_FIELDS['conferences'], *CONFERENCE_SCALARS)
+# +0x1A is the conference tournament index (getter 0x73D808 -> 0x58F74C),
+# not a logo ID. Preserve the legacy read key, but prevent unvalidated bracket
+# reassignment until all tournament backlinks have a writer.
+EDITABLE['conferences'] = tuple(f for f in EDITABLE['conferences'] if f != 'presentation_id')
 # Assignment requires reciprocal member-list updates; expose the link read-only.
 HEADER_TABLES = {'players':(8,17,308,65535),'arenas':(0x20,25,28,8192),
                  'teams':(0x28,49,704,8192),'coaches':(0x38,21,44,65535),
@@ -135,7 +139,7 @@ for prop in PLAYER_PROPERTIES:
 CONFIRMED_PALETTE_ROLES = {0:'Home team equipment color',1:'Non-home team equipment color',11:'Key Circle Inner',16:'School primary runtime copy',17:'School secondary runtime copy'}
 PALETTE_HINTS.update(CONFIRMED_PALETTE_ROLES)
 
-TEAM_TYPE_OFFSET=0x2ec  # Name-anchor +0x2BC, the final word of the physical row.
+TEAM_TYPE_OFFSET=0x2ec  # Logical name-anchor +0x2BC; raw rows have a 0x30-byte prefix bias.
 TEAM_TYPES={0:'Current D1',1:'Classic / All-Time',2:'Created',4:'Special'}
 ENUM_CHOICES['team_type_code']=TEAM_TYPES
 EDITABLE['teams']=(*EDITABLE['teams'],'team_type_code')
@@ -160,7 +164,7 @@ ENUM_CHOICES['jersey_number']={**{i:str(i) for i in range(100)},100:'00'}
 EDITABLE['players']=(*EDITABLE['players'],'class_code','redshirt_code','redshirt_used','confidence')
 
 # Jump-shot animation getter/setter 0x69E938/0x69E94C, constructor bounds 0..111.
-# Exact localized animation captions remain unresolved; preserve the real IDs.
+# Localized captions are supplied by appearance.py below; preserve unmapped IDs.
 PLAYER_SCALARS['jump_shot_code']=(0x83,1,0,8,0,111)
 ENUM_CHOICES['jump_shot_code']={i:f'Animation {i}' for i in range(112)}
 EDITABLE['players']=(*EDITABLE['players'],'jump_shot_code')

@@ -76,7 +76,7 @@ def test_coach_string_edit_preserves_old_functionality_and_selection(
     window.roster_views["coaches"].selectRow(0)
     panel = window.record_panels["coaches"]
     monkeypatch.setattr(
-        QInputDialog, "getText", lambda *args, **kwargs: ("Smith", True)
+        'choops_py.studio.text_edit.edit_roster_text', lambda *args, **kwargs: ("Smith", True)
     )
     item = next(
         panel.general.topLevelItem(i)

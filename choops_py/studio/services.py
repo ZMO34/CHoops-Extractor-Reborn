@@ -186,7 +186,12 @@ def stage_folder(source: Path, folder: Path, mod: Path, job=None) -> dict:
     from ..archive.build_copy import preflight
     from ..archive.manifests import write_bytes
     archive=Archive(source);folder=Path(folder);mod=safe_output(mod,[source,folder])
-    if mod.exists():raise ValueError('Choose a new mod directory')
+    requested_mod = mod
+    # Staging creates a complete snapshot. Never merge with or erase an old one.
+    suffix = 2
+    while mod.exists():
+        mod = safe_output(requested_mod.with_name(requested_mod.name + '_' + str(suffix)), [source, folder])
+        suffix += 1
     job=job or JobContext();discovery=discover(archive,folder,job)
     work=mod.parent/('.mod_'+uuid.uuid4().hex);rows: list[dict]=[];conditions=[];growth=[];unchanged=0
     details=[];unapplied: list[dict]=[]
@@ -212,13 +217,13 @@ def stage_folder(source: Path, folder: Path, mod: Path, job=None) -> dict:
                 if len(payload)>len(before):growth.append(dict(archive=name,old_bytes=len(before),new_bytes=len(payload)))
         names=[row['archive'].casefold() for row in rows]
         if len(names)!=len(set(names)):raise ValueError('A paired CDF texture import conflicts with a complete CDF replacement')
-        if not rows:raise ValueError('All discovered overrides match the selected game; no changes to stage')
+        if not rows:raise ValueError('All discovered overrides match the selected game; no changed overrides to prepare')
         save_json(work/'overrides.json',rows,[source,folder])
         save_json(work/'source_preconditions.json',dict(schema=1,entries=conditions),[source,folder])
         save_json(work/'import_options.json',dict(schema=1,allow_archive_growth=True,dds_priority=True,scne_priority=True),[source,folder])
-        report=dict(staged=len(rows),mod=str(mod),detected_formats=discovery['detected_formats'],scanned_files=discovery['scanned_files'],dds_files=discovery['dds_files'],binary_records=discovery['binary_records'],ignored_files=discovery['ignored_files'],shadowed_dds=discovery['shadowed_dds'],resolved_targets=discovery['resolved_targets'],unapplied_overrides=unapplied,unchanged_archives=unchanged,growing_archives=growth,dds_priority=True,scne_priority=True,imports=details)
+        report=dict(staged=len(rows),mod=str(mod),requested_mod=str(requested_mod),workspace_changed=mod != requested_mod,detected_formats=discovery['detected_formats'],scanned_files=discovery['scanned_files'],dds_files=discovery['dds_files'],binary_records=discovery['binary_records'],ignored_files=discovery['ignored_files'],shadowed_dds=discovery['shadowed_dds'],resolved_targets=discovery['resolved_targets'],unapplied_overrides=unapplied,unchanged_archives=unchanged,growing_archives=growth,dds_priority=True,scne_priority=True,imports=details)
         save_json(work/'folder_import_report.json',report,[source,folder])
-        job.check();job.progress(0,1,'Validating staged overrides')
+        job.check();job.progress(0,1,'Checking override compatibility')
         _,patches=preflight(source,work,job)
         work.rename(mod)
         return report
@@ -274,6 +279,29 @@ def scene_record_index(records, index, name):
     if any(r['index']==index for r in matches):
         return index
     raise ValueError('Selected SCNE is ambiguous in this preview source: '+name)
+
+
+def inspect_scene_with_game_layers(source, record_index, archive, include_all=False, job=None, *, record_name=None):
+    """Preview floor artwork unchanged, with independent stock alignment guides."""
+    import re
+    result = inspect_scene_preview(source, record_index, include_all, job, record_name=record_name)
+    if archive is None or not re.fullmatch(r's\d+\.iff', source.name, re.IGNORECASE) or not any(m.get('court_surface') for m in result['meshes']):
+        return result
+    from ..formats.scene_palette import supplement_floor_layers
+    base = getattr(archive, 'base', archive)
+    # Fixed reference court, independent of selected school and override layout.
+    matches = [e for e in base.entries if e.get('name', '').lower() == 's256.iff']
+    if len(matches) != 1:
+        return result
+    original_path = materialize(base, matches[0])
+    from ..formats.standard_iff import StandardIFF
+    iff = StandardIFF(original_path.read_bytes())
+    floors = [r for r in iff.records if r['type'] == 'SCNE' and r['name'].lower() == 'floor']
+    if len(floors) != 1:
+        result['warnings'].append('No unique stock reference floor; alignment guides are unavailable')
+        return result
+    original = inspect_scene_preview(original_path, floors[0]['index'], False, job)
+    return supplement_floor_layers(result, original)
 
 
 def inspect_scene_preview(source: Path, record_index: int, include_all=False, job=None, *, record_name=None):
@@ -536,3 +564,16 @@ def inspect_shoe_preview(archive,texture_entry,job=None):
     result['images'].update(images);result['textures']=list(images)
     result['warnings'].append('Standalone shoe rest pose; texture family does not change the authored shoe silhouette')
     return source,result
+
+
+def inspect_stadium_preview(archive, entry, mode=0, job=None):
+    """Load scene geometry and textures directly from the captured preview source."""
+    from ..formats.standard_iff import StandardIFF
+    source = materialize(archive, entry)
+    iff = StandardIFF(source.read_bytes())
+    name = 'arena' if mode == 2 else 'floor'
+    matches = [r for r in iff.records if r['type'] == 'SCNE' and r['name'].lower() == name]
+    if len(matches) != 1:
+        raise ValueError('The selected stadium has no unique ' + name + ' SCNE')
+    record = matches[0]
+    return source, inspect_scene_with_game_layers(source, record['index'], archive, mode == 0, job, record_name=record['name'])

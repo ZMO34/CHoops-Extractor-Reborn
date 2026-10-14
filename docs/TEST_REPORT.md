@@ -1,3 +1,18 @@
+# Roster / game-line / animation continuation verification
+
+Portable final runner: **473 passed, 7 skipped, 2 deselected**. Native Windows
+targeted checks: **17 passed**, including seven rendered shader paths, keyboard
+warnings, exact conference-logo selection and authored line supplementation.
+Read-only hidden S256 floor rendering restored two verified line draws with the
+original coordinates/UVs and no OpenGL error; source SHA was unchanged. Appearance
+and unknown-bit coverage checks passed. No RPCS3, EBOOT changes or testing JB.
+
+Regressions cover UTF-16 supplementary characters, advisory warning reset,
+invalid conference index rollback, protected tournament links, exact logo900+
+index identity, compressed raw motion span extraction, unchanged arena/apron
+geometry and no duplicate supplemental draws. Source/Qt/CLI startup, compile,
+Ruff/mypy and generated documentation checks are part of the final runner.
+
 # Combined roster/arena continuation verification
 
 Portable runner: **461 passed, 7 skipped, 2 deselected**. Seven rendered-pixel
@@ -259,3 +274,15 @@ single-slice storage and continues to reject deeper volumes. The existing
 volume fixture now covers acceptance at depth one and rejection at depth two.
 Automated checks were not run for this change; no RPCS3 or gameplay validation
 was performed.
+
+## Override-folder selection regression
+
+Python 3.12.14 on Windows: tools/dev/verify.py passed with 464 tests, 7
+offscreen GL skips and 2 deselected checks. Compile, CLI/Qt smoke, Ruff, mypy,
+handoff and diff checks passed. Targeted override tests: 26 passed. Repeated
+selection preserves previous snapshots, skips occupied numbered workspaces,
+compiles current artwork, cleans only its failed temporary workspace and updates
+GUI build/preview destinations together. No RPCS3 or automatic/testing JB build.
+Current continuation: 482 portable tests passed, 9 offscreen GL skips, 2 deselected; 28 native targeted checks passed after them. Guide tests verify flat colour with transparent textures, zero palette tint, glow mode and both automatic/manual texture selection. Runtime BE text tests independently check field+delta-1 and save/reopen/undo. No RPCS3 or JB build.
+
+Combined v1.14 preview release checks: 491 portable tests passed, 9 offscreen OpenGL skips, 2 deselected; 37 native Qt/OpenGL targeted checks passed. Direct jersey launch, captured source/override stadium selection, scene-mode identity and reload behavior are covered. No RPCS3 or JB build.

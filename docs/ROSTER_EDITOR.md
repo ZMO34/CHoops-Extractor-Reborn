@@ -1,3 +1,9 @@
+Current continuation: text edits warn in orange beyond known game keyboard
+capacity without truncation. School References exposes the guarded Conference
+index. Conference Logo opens its exact bank record for preview/DDS replacement.
+The tournament link remains read-only. Research byte coverage now separates
+known and unknown bits within packed words. See CONFERENCE_ASSETS.md.
+
 # Roster editor
 
 v1.11 supersedes earlier dialog/16-slot descriptions: every category uses a side

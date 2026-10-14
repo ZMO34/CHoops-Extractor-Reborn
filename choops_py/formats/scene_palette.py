@@ -25,3 +25,35 @@ def associate_palette(meshes, colors):
     return [{**mesh, 'batches': [{**batch, 'palette_tint':
         palette_tint(batch.get('material_hash'), colors) if batch.get('supports_diffuse_color') else None} for batch in mesh.get('batches', [{'first':0, 'count':len(mesh.get('vertices', [])), 'texture':None}])]}
         for mesh in meshes]
+
+
+def floor_layers(meshes, three_point=True, borders=True):
+    """Toggle reference guides only; never suppress the court's actual draws."""
+    enabled = {18: three_point, 4: borders}
+    return [{**mesh, 'batches': [b for b in mesh.get('batches', [])
+             if enabled.get(b.get('reference_slot'), True)]} for mesh in meshes]
+
+
+def supplement_floor_layers(result, original):
+    """Add raised, flat guides from a fixed stock court, without its shaders."""
+    if any(m.get('game_floor_layer') for m in result['meshes']):
+        return result
+    added = []
+    for mesh in original['meshes']:
+        if not mesh.get('court_surface'):
+            continue
+        batches = []
+        for batch in mesh.get('batches', []):
+            slot = COURT_PALETTE_ROUTES.get(batch.get('material_hash'))
+            if slot in (4, 18):
+                batches.append({'first': batch['first'], 'count': batch['count'],
+                                'reference_slot': slot, 'reference_overlay': True,
+                                'reference_axis': 1,
+                                'texture': None})
+        if batches:
+            vertices = [(v[0], v[1] + 1.0, *v[2:]) for v in mesh['vertices']]
+            added.append({'name': '__reference/stock_court_lines', 'vertices': vertices,
+                          'batches': batches, 'game_floor_layer': True,
+                          'court_surface': False})
+    return {**result, 'meshes': result['meshes'] + added,
+            'warnings': result['warnings'] + (['Alignment guides use fixed stock court coordinates, raised 1 game unit; floor materials are unchanged.'] if added else [])}
