@@ -10,6 +10,10 @@ class RosterTextDialog(QDialog):
         layout = QVBoxLayout(self)
         layout.addWidget(QLabel(hint))
         self.editor = QLineEdit(text)
+        # Qt's default 32,767 is not the game's ceiling. Keep the full input;
+        # backend checks the traced descriptor limit without silent truncation.
+        self.editor.setMaxLength(0x7FFFFFFF)
+        self.editor.setText(text)
         layout.addWidget(self.editor)
         self.warning = QLabel()
         self.warning.setWordWrap(True)

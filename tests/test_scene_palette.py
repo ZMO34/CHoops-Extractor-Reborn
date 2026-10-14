@@ -10,7 +10,7 @@ def test_floor_layers_preserve_arena_vertices_and_unknown_materials():
     source = [{'court_surface': True, 'vertices': [(0, 0, 0)], 'batches': batches},
               {'court_surface': False, 'vertices': [(1, 2, 3)], 'batches': batches}]
     filtered = floor_layers(source, False, False)
-    assert filtered[0]['batches'] == batches[3:]
+    assert filtered[0]['batches'] == batches
     assert filtered[1]['batches'] == batches
     assert filtered[0]['vertices'] is source[0]['vertices']
     assert source[0]['batches'] == batches
@@ -28,9 +28,11 @@ def test_missing_floor_layers_use_authored_game_coordinates_not_apron_bounds():
     original = {'meshes': [lines], 'images': {'ink': b'lines'}, 'warnings': []}
     result = supplement_floor_layers(selected, original)
     overlay = result['meshes'][1]
-    assert overlay['vertices'] is lines['vertices']
-    assert overlay['batches'][0]['texture'] == '__game_floor_lines/ink'
-    assert result['images']['__game_floor_lines/ink'] == b'lines'
+    assert overlay['vertices'] == [(17, 1, 4), (18, 1, 5)]
+    assert lines['vertices'] == [(17, 0, 4), (18, 0, 5)]
+    assert overlay['batches'][0]['texture'] is None
+    assert overlay['batches'][0]['reference_overlay'] is True
+    assert result['images'] == selected['images']
     assert floor_layers(result['meshes'], False, True)[1]['batches'][0]['first'] == 1
     assert len(supplement_floor_layers(result, original)['meshes']) == 2
     assert len(selected['meshes']) == 1 and lines['batches'][0]['texture'] == 'ink'

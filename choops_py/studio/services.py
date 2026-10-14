@@ -277,18 +277,15 @@ def scene_record_index(records, index, name):
 
 
 def inspect_scene_with_game_layers(source, record_index, archive, include_all=False, job=None, *, record_name=None):
-    """Preview selected artwork plus absent authored game court-line draws."""
+    """Preview floor artwork unchanged, with independent stock alignment guides."""
     import re
     result = inspect_scene_preview(source, record_index, include_all, job, record_name=record_name)
     if archive is None or not re.fullmatch(r's\d+\.iff', source.name, re.IGNORECASE) or not any(m.get('court_surface') for m in result['meshes']):
         return result
-    from ..formats.scene_palette import COURT_PALETTE_ROUTES, supplement_floor_layers
-    present = {COURT_PALETTE_ROUTES.get(b.get('material_hash')) for m in result['meshes']
-               if m.get('court_surface') for b in m.get('batches', [])}
-    if {4, 18} <= present:
-        return result
+    from ..formats.scene_palette import supplement_floor_layers
     base = getattr(archive, 'base', archive)
-    matches = [e for e in base.entries if e.get('name') == source.name]
+    # Fixed reference court, independent of selected school and override layout.
+    matches = [e for e in base.entries if e.get('name', '').lower() == 's256.iff']
     if len(matches) != 1:
         return result
     original_path = materialize(base, matches[0])
@@ -296,7 +293,7 @@ def inspect_scene_with_game_layers(source, record_index, archive, include_all=Fa
     iff = StandardIFF(original_path.read_bytes())
     floors = [r for r in iff.records if r['type'] == 'SCNE' and r['name'].lower() == 'floor']
     if len(floors) != 1:
-        result['warnings'].append('No unique matching source floor; game-line layers are unavailable')
+        result['warnings'].append('No unique stock reference floor; alignment guides are unavailable')
         return result
     original = inspect_scene_preview(original_path, floors[0]['index'], False, job)
     return supplement_floor_layers(result, original)

@@ -30,3 +30,33 @@ def test_number_sampler_uses_integer_uniforms_and_authored_colour(qtbot,kind):
     qtbot.waitUntil(view.isValid,timeout=5000)
     frame=view.grabFramebuffer();colour=frame.pixelColor(150,150)
     assert not view.error and colour.red()>100 and colour.green()<10 and colour.blue()<10
+
+
+@pytest.mark.parametrize('automatic', [True, False])
+def test_alignment_guide_ignores_texture_palette_and_lighting(qtbot, automatic):
+    context = QOpenGLContext()
+    if not context.create():
+        pytest.skip('OpenGL context unavailable on this Qt platform')
+    view = SceneView()
+    qtbot.addWidget(view)
+    view.setAttribute(Qt.WidgetAttribute.WA_DontShowOnScreen, True)
+    view.resize(300, 300)
+    vertices = [(-1,-1,0,0,1),(1,-1,0,1,1),(1,1,0,1,0),
+                (-1,-1,0,0,1),(1,1,0,1,0),(-1,1,0,0,0)]
+    batch = dict(first=0, count=6, texture='transparent', reference_overlay=True,
+                 palette_tint=(0,0,0,0), shader_mode='glow', reference_axis=2)
+    image = QImage(1,1,QImage.Format.Format_RGBA8888)
+    image.fill(Qt.GlobalColor.transparent)
+    view.set_meshes([dict(name='guide', vertices=vertices, batches=[batch])])
+    view.set_material_images({'transparent':image})
+    view.set_image(image)
+    view.automatic = automatic
+    view.yaw = view.pitch = 0
+    view.fit_camera()
+    view.show()
+    qtbot.waitUntil(view.isValid, timeout=5000)
+    colour = view.grabFramebuffer().pixelColor(150,150)
+    assert not view.error
+    assert colour.red() > 250 and 185 < colour.green() < 198 and 32 < colour.blue() < 45
+    outside = view.grabFramebuffer().pixelColor(150, 110)
+    assert outside.red() < 100

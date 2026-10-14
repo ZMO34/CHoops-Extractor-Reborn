@@ -1,8 +1,9 @@
 ## Current continuation evidence
 
-Game floor-line toggles use authored court batches, including matching source-JB
-draws when absent from a replacement floor. Baked texture pixels cannot be hidden
-individually. Conference logos have verified logo900+index routing; the separate
+Floor alignment guides are independent flat-colour stock S256 reference geometry,
+raised 1 game unit. They never hide real floor materials or apply roster colours.
+Without the source reference they are unavailable.
+Conference logos have verified logo900+index routing; the separate
 tournament index is protected pending a backlink writer. Animation clips can be
 identified/extracted as raw SingleMoCap blocks, without decoded skeletal tracks.
 Orange text warnings concern confirmed keyboard buffers, not proven engine caps.

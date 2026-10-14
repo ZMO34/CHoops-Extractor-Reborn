@@ -35,7 +35,7 @@ def analyze(model):
                     masks[i]=masks.get(i,0)|(1<<(bit%8))
                     previous=known.get(i,'')
                     if label not in previous:known[i]=(previous+'; ' if previous else '')+label
-        for field,offset in STRING_FIELDS.get(name,{}).items():mark(offset,4,field+' relative UTF-16LE pointer')
+        for field,offset in STRING_FIELDS.get(name,{}).items():mark(offset,4,field+' relative UTF-16BE pointer (displacement includes +1)')
         if name=='players':
             for field,(offset,size,shift,bits,_,_) in PLAYER_SCALARS.items():packed(offset,size,shift,bits,f'{field}: bits {shift}..{shift+bits-1}')
             from .shoes import FIELDS

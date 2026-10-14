@@ -22,3 +22,11 @@ def test_unestablished_keyboard_limit_has_no_invented_warning(qtbot):
     qtbot.addWidget(dialog)
     assert not dialog.editor.property('keyboardLimitExceeded')
     assert dialog.editor.text() == 'A' * 100
+
+
+def test_qt_default_character_limit_does_not_truncate_roster_input(qtbot):
+    text = 'A' * 40000
+    dialog = RosterTextDialog(None, 'Name', 'Descriptor limit', text, 16)
+    qtbot.addWidget(dialog)
+    assert dialog.editor.text() == text
+    assert dialog.editor.property('keyboardLimitExceeded')

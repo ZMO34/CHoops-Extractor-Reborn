@@ -92,9 +92,8 @@ v1.13 is published from master 9e18f32aed8d0e3f81c2cfb05e0346d8854320b9:
 https://github.com/ZMO34/CHoops-Extractor-Reborn/releases/tag/v1.13.
 Its Windows package passed Windows/Linux CI and local frozen startup/audio checks.
 
-The next feature branch adds orange advisory keyboard-limit warnings, authored
-game floor-line toggles (including missing-line geometry from the matching source
-JB), safer conference index validation, exact conference-logo editor routing and
+The next feature branch adds orange advisory keyboard-limit warnings, independent raised
+alignment guides from fixed stock S256 court coordinates, safer conference index validation, exact conference-logo editor routing and
 read-only motion-record discovery/export. Byte coverage now reports unresolved
 bits within packed words. Conference +0x1A is a tournament index, not a logo ID;
 its unsafe generic writer is protected. See CONFERENCE_ASSETS.md and
@@ -105,15 +104,15 @@ fake-bump/AO and all dynamic palette modes remain unestablished. This continuati
 does not claim completion of those research goals or gameplay certification.
 No RPCS3, EBOOT edits, added alternates or testing JB folders.
 
-Continuation verification: 473 portable tests passed (7 offscreen GL skips,
-2 deselected), 17 native Qt/OpenGL checks passed, plus hidden read-only S256 line
+Continuation verification: 482 portable tests passed (9 offscreen GL skips,
+2 deselected), 28 native Qt/OpenGL checks passed, plus hidden read-only S256 line
 rendering. Compile, CLI/Qt startup, Ruff, mypy and handoff checks passed.
 
 
 PR #13 combined roster/arena continuation: twelve additional appearance/tattoo/
 signature fields with verified inclusive option bounds, all 112 jump-shot labels,
 and authored arena vertex-colour/alpha, second-UV lightmaps, glow/flare masks.
-461 portable tests passed (7 offscreen GL skips, 2 deselected); 144 native
+461 portable tests passed (9 offscreen GL skips, 2 deselected); 144 native
 checks passed. See ROSTER_SEMANTICS.md and ARENA_SHADER_MASKS.md. Complete
 remaining roster bytes, per-field engine ceilings
 and every runtime shader/palette mode remain unproved; no guessed edits are added.
@@ -299,6 +298,12 @@ Additional appearance/tattoo/post/free-throw fields and all 112 jump-shot captio
 
 Text edits now grow beyond old allocations and keyboard entry capacities. The UI separates advisory game-keyboard sizes from unproved engine ceilings; structural pointer/UTF-16/adapter guards still apply.
 
+ROST string fixup 77FB1C computes field + signed delta - 1; 7C5818
+consumes big-endian wide characters. The previous shifted LE view only happened
+to work for ASCII. Copy-on-write now preserves non-Latin text and aligned targets.
+The shared formatter count is limited to 65,535 UTF-16 units; smaller display
+ceilings remain unresolved. Qt's unrelated 32,767-character cap is removed.
+
 ---
 
 Embedded source: docs/ROSTER_SCALE_AND_PREVIEWS.md
@@ -354,7 +359,7 @@ old setup draft is superseded, not new code to merge.
 ## Text growth and actual text-entry evidence
 
 Strings no longer require the original encoded length or unique shared storage.
-Copy-on-write appends a terminated UTF-16LE entry and updates only the selected
+Copy-on-write appends a terminated UTF-16BE entry (stored delta includes +1) and updates only the selected
 signed-relative pointer. Original strings, aliases, table positions and unknown
 bytes remain intact. USERDATA length prefixes, type-21 wrappers, decrypted ZIP
 members and sole-ROST/single-block IFF lengths rebuild and reparse. Unsupported
@@ -532,6 +537,22 @@ allocation. Complete semantics for every remaining byte are not claimed.
 
 Keyboard-entry limits are displayed as advisory values rather than enforced as engine ceilings. External text edits grow the string heap safely; the tool does not claim a universal game rendering limit.
 
+## Shared formatter representation ceiling
+
+Read-only tracing establishes an upper representation bound of **65,535 UTF-16
+units**, excluding NUL, for the common text-argument descriptor. Conference name
+formatter 0x73FF00 calls 0x49E1B4 → 0x1E1610 → 0x1E2634. The latter obtains a
+unit count via 0x11DF0 → 0x7C5818 (lhz until NUL, pointer difference divided by
+two) and stores it with `sth` at descriptor +0xA. Serializer 0x1E1C00/0x1E1C4C
+retains that u16. A count of 65,536 wraps to zero rather than retaining the text.
+
+The shared backend therefore blocks larger new text values, including CSV and
+comparison edits, with no mutation. This bound is separate from the adapter's
+file-size guard and each keyboard buffer. It does not prove that every menu can
+display 65,535 units, or establish smaller field-specific/combined-name limits.
+Qt's default QLineEdit limit of 32,767 is removed so it cannot silently truncate
+text before backend validation. Existing unchanged source values stay preserved.
+
 ## Current conference and coverage continuation
 
 See CONFERENCE_ASSETS.md for the exact conference-logo route and newly traced
@@ -583,21 +604,19 @@ seating from colour similarity: Edit Schools also includes cheerleader colours.
 Unproved channel-to-roster links remain unassigned. Complete GPU/game shader
 emulation and full roster reverse engineering are not claimed.
 
-## Floor line layers
+## Floor alignment guides
 
-Preview toggles use existing draw batches routed by the game's court initializer:
-slot 18 has materials 2310823066 / 2600458314 (3-point lines); slot 4 has material
-2218775043 (outer line). Only floor draws are filtered; arena geometry stays
-intact. The controls do not generate lines from floor/apron bounds or change
-vertex heights. Camera position is retained when toggling layers.
+The optional 3-point and out-of-bounds guides are for positioning one-texture
+court artwork only. They copy the verified line draw coordinates from the fixed
+stock S256 floor, raised by 1 game unit. Guide depth bias is ordered above the existing coplanar floor passes.
+The guide shader is flat amber and
+independent of roster palettes, floor layout, texture overrides and lighting.
+The floor itself keeps every original draw and its confirmed material/palette
+behavior. Toggling guides never removes actual court markings. No bounds-based
+apron geometry is invented; without the stock reference guides are unavailable.
+These controls change no SCNE, roster or build data and retain the camera.
 
-When a replacement sXXX floor omits these draws, the preview reads its matching
-source JB floor and copies only those authored batches, coordinates and UVs.
-Copied texture bindings have distinct names; roster palette association still
-uses the confirmed material routes. Standalone files without matching source
-geometry do not acquire guessed line dimensions. Controls are disabled for absent
-routes. Lines baked into one floor texture cannot be erased independently by a
-mesh-layer toggle. This is preview-only and changes no SCNE/build data.
+Reference guide width uses the central 10% of the authored strip UV: U across both 3-point and boundary strips. This thins guides without moving their centerlines or modifying floor geometry.
 
 ---
 
@@ -670,6 +689,12 @@ identity, frame timing, quantization, channel tables and keyframe decoding remai
 under investigation. Do not infer a frame rate from a plausible float alone.
 Stadium CDAN records describe crowd placement candidates and are not relabeled
 as skeletal clips. Further extraction is currently lossless raw-block extraction.
+
+Further read-only inspection located 319 SingleMoCap records in the sampled
+standard-bank inventory. Candidate count/duration header relationships differ
+between presentation and crowd clips; mirrored entries can be only 64 bytes.
+Therefore a guessed universal frame rate or stand-alone BVH decoder is not
+exposed. Clip dependency/alias resolution must precede skeletal export.
 
 ---
 
@@ -1265,7 +1290,7 @@ remain unresolved; long string rebuilding and unknown fields remain blocked.
 
 Roster adapters support standard IFF ROST, raw ROST, type-21 wrapper, decrypted USERDATA with 4-byte prefix, and one-USERDATA decrypted ZIP. No encrypted-save decryption is provided. Known tables: players 0x0271AC/5685/308, arenas 0x1D5C84/379/28, teams 0x1D85E0/443/704, coaches 0x23F78C/1373/44.
 
-ROST pointers are field + signed delta (no standard-IFF minus one). Player last/first pointers +0x10/+0x14 use UTF-16LE; odd addresses are valid. Jersey number is byte +0x1B (preserve adjacent flags and player ID +0x18), height +0x3A, position +0x3B. Team roster references +0x6C, 18 slots, point to player row +0x11. Team arena +0x44 targets arena row +0x19, coaches +0x60/+0x64/+0x68 target coach row +0x15, rivals +0x4C/+0x50/+0x54 target team row +0x31. Asset IDs are high u16 at +0x18C/+0x190/+0x194; preserve low words and require consistent existing IDs. Conference record fields +0x0A..+0x22 are exposed with their source labels and original u16/RGB widths, based on the public CH2k8 roster parser and cross-checked against supplied USERDATA record values. The source labels identify founded year, championship-order values, Final Fours, prior-year bids, rank, tournament settings, and color; gameplay effects are not independently verified. Prestige and unknown appearance fields remain read-only. Names use copy-on-write UTF-16 growth with preserved aliases and fixed table locations; keyboard limits are advisory. Conference +0x1A is now confirmed as a tournament index and protected pending a backlink writer; logo routing uses 900 + conference index. See CONFERENCE_ASSETS.md.
+ROST runtime string pointers are field + signed delta - 1, consumed as UTF-16BE (77FB1C / 7C5818). Stored reference anchors retain the documented +1 biases. Player last/first pointers +0x10/+0x14 target aligned big-endian text; do not use the shifted ASCII-only LE interpretation. Jersey number is byte +0x1B (preserve adjacent flags and player ID +0x18), height +0x3A, position +0x3B. Team roster references +0x6C, 18 slots, point to player row +0x11. Team arena +0x44 targets arena row +0x19, coaches +0x60/+0x64/+0x68 target coach row +0x15, rivals +0x4C/+0x50/+0x54 target team row +0x31. Asset IDs are high u16 at +0x18C/+0x190/+0x194; preserve low words and require consistent existing IDs. Conference record fields +0x0A..+0x22 are exposed with their source labels and original u16/RGB widths, based on the public CH2k8 roster parser and cross-checked against supplied USERDATA record values. The source labels identify founded year, championship-order values, Final Fours, prior-year bids, rank, tournament settings, and color; gameplay effects are not independently verified. Prestige and unknown appearance fields remain read-only. Names use copy-on-write UTF-16 growth with preserved aliases and fixed table locations; keyboard limits are advisory. Conference +0x1A is now confirmed as a tournament index and protected pending a backlink writer; logo routing uses 900 + conference index. See CONFERENCE_ASSETS.md.
 
 Current TXTR descriptor +0x58 contains format, mips, dimension, cube, remap,
 width/height/depth and pitch. GTF wraps descriptor/image in a 0x30-byte header.
@@ -1517,9 +1542,10 @@ Embedded source: docs/KNOWN_LIMITATIONS.md
 
 ## Current continuation evidence
 
-Game floor-line toggles use authored court batches, including matching source-JB
-draws when absent from a replacement floor. Baked texture pixels cannot be hidden
-individually. Conference logos have verified logo900+index routing; the separate
+Floor alignment guides are independent flat-colour stock S256 reference geometry,
+raised 1 game unit. They never hide real floor materials or apply roster colours.
+Without the source reference they are unavailable.
+Conference logos have verified logo900+index routing; the separate
 tournament index is protected pending a backlink writer. Animation clips can be
 identified/extracted as raw SingleMoCap blocks, without decoded skeletal tracks.
 Orange text warnings concern confirmed keyboard buffers, not proven engine caps.
@@ -1865,3 +1891,5 @@ single-slice storage and continues to reject deeper volumes. The existing
 volume fixture now covers acceptance at depth one and rejection at depth two.
 Automated checks were not run for this change; no RPCS3 or gameplay validation
 was performed.
+
+Current continuation: 482 portable tests passed, 9 offscreen GL skips, 2 deselected; 28 native targeted checks passed after them. Guide tests verify flat colour with transparent textures, zero palette tint, glow mode and both automatic/manual texture selection. Runtime BE text tests independently check field+delta-1 and save/reopen/undo. No RPCS3 or JB build.

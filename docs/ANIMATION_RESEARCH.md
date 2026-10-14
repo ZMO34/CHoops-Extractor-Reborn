@@ -28,3 +28,9 @@ identity, frame timing, quantization, channel tables and keyframe decoding remai
 under investigation. Do not infer a frame rate from a plausible float alone.
 Stadium CDAN records describe crowd placement candidates and are not relabeled
 as skeletal clips. Further extraction is currently lossless raw-block extraction.
+
+Further read-only inspection located 319 SingleMoCap records in the sampled
+standard-bank inventory. Candidate count/duration header relationships differ
+between presentation and crowd clips; mirrored entries can be only 64 bytes.
+Therefore a guessed universal frame rate or stand-alone BVH decoder is not
+exposed. Clip dependency/alias resolution must precede skeletal export.

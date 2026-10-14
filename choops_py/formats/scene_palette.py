@@ -28,47 +28,32 @@ def associate_palette(meshes, colors):
 
 
 def floor_layers(meshes, three_point=True, borders=True):
-    """Hide verified court draws only; keep positions and all arena batches intact."""
-    hidden_slots = set()
-    if not three_point:
-        hidden_slots.add(18)
-    if not borders:
-        hidden_slots.add(4)
-    return [{**mesh, 'batches': [batch for batch in mesh.get('batches', [])
-             if not mesh.get('court_surface') or
-             COURT_PALETTE_ROUTES.get(batch.get('material_hash')) not in hidden_slots]}
-            for mesh in meshes]
+    """Toggle reference guides only; never suppress the court's actual draws."""
+    enabled = {18: three_point, 4: borders}
+    return [{**mesh, 'batches': [b for b in mesh.get('batches', [])
+             if enabled.get(b.get('reference_slot'), True)]} for mesh in meshes]
 
 
 def supplement_floor_layers(result, original):
-    """Restore missing line draws from the matching source court, never its bounds.
-
-    Replacement one-texture floors can omit the game's line geometry. Copy only
-    verified 3-point/outer-line batches, retaining authored coordinates and UVs.
-    """
-    present = {COURT_PALETTE_ROUTES.get(b.get('material_hash'))
-               for m in result['meshes'] if m.get('court_surface') for b in m.get('batches', [])}
-    missing = {4, 18} - present
+    """Add raised, flat guides from a fixed stock court, without its shaders."""
+    if any(m.get('game_floor_layer') for m in result['meshes']):
+        return result
     added = []
-    images = dict(result['images'])
     for mesh in original['meshes']:
         if not mesh.get('court_surface'):
             continue
         batches = []
         for batch in mesh.get('batches', []):
-            if COURT_PALETTE_ROUTES.get(batch.get('material_hash')) not in missing:
-                continue
-            batch = dict(batch)
-            for key in ('texture', 'lightmap_texture'):
-                name = batch.get(key)
-                if name is not None:
-                    alias = '__game_floor_lines/' + name
-                    if name in original['images']:
-                        images[alias] = original['images'][name]
-                    batch[key] = alias
-            batches.append(batch)
+            slot = COURT_PALETTE_ROUTES.get(batch.get('material_hash'))
+            if slot in (4, 18):
+                batches.append({'first': batch['first'], 'count': batch['count'],
+                                'reference_slot': slot, 'reference_overlay': True,
+                                'reference_axis': 1,
+                                'texture': None})
         if batches:
-            added.append({**mesh, 'name': '__game_floor_lines/lines', 'batches': batches,
-                          'game_floor_layer': True})
-    return {**result, 'meshes': result['meshes'] + added, 'images': images,
-            'warnings': result['warnings'] + (['Missing floor line layers use the matching source JB court geometry; apron edges are not used.'] if added else [])}
+            vertices = [(v[0], v[1] + 1.0, *v[2:]) for v in mesh['vertices']]
+            added.append({'name': '__reference/stock_court_lines', 'vertices': vertices,
+                          'batches': batches, 'game_floor_layer': True,
+                          'court_surface': False})
+    return {**result, 'meshes': result['meshes'] + added,
+            'warnings': result['warnings'] + (['Alignment guides use fixed stock court coordinates, raised 1 game unit; floor materials are unchanged.'] if added else [])}

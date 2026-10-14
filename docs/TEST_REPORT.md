@@ -274,3 +274,5 @@ single-slice storage and continues to reject deeper volumes. The existing
 volume fixture now covers acceptance at depth one and rejection at depth two.
 Automated checks were not run for this change; no RPCS3 or gameplay validation
 was performed.
+
+Current continuation: 482 portable tests passed, 9 offscreen GL skips, 2 deselected; 28 native targeted checks passed after them. Guide tests verify flat colour with transparent textures, zero palette tint, glow mode and both automatic/manual texture selection. Runtime BE text tests independently check field+delta-1 and save/reopen/undo. No RPCS3 or JB build.

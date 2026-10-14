@@ -6,9 +6,8 @@ v1.13 is published from master 9e18f32aed8d0e3f81c2cfb05e0346d8854320b9:
 https://github.com/ZMO34/CHoops-Extractor-Reborn/releases/tag/v1.13.
 Its Windows package passed Windows/Linux CI and local frozen startup/audio checks.
 
-The next feature branch adds orange advisory keyboard-limit warnings, authored
-game floor-line toggles (including missing-line geometry from the matching source
-JB), safer conference index validation, exact conference-logo editor routing and
+The next feature branch adds orange advisory keyboard-limit warnings, independent raised
+alignment guides from fixed stock S256 court coordinates, safer conference index validation, exact conference-logo editor routing and
 read-only motion-record discovery/export. Byte coverage now reports unresolved
 bits within packed words. Conference +0x1A is a tournament index, not a logo ID;
 its unsafe generic writer is protected. See CONFERENCE_ASSETS.md and
@@ -19,15 +18,15 @@ fake-bump/AO and all dynamic palette modes remain unestablished. This continuati
 does not claim completion of those research goals or gameplay certification.
 No RPCS3, EBOOT edits, added alternates or testing JB folders.
 
-Continuation verification: 473 portable tests passed (7 offscreen GL skips,
-2 deselected), 17 native Qt/OpenGL checks passed, plus hidden read-only S256 line
+Continuation verification: 482 portable tests passed (9 offscreen GL skips,
+2 deselected), 28 native Qt/OpenGL checks passed, plus hidden read-only S256 line
 rendering. Compile, CLI/Qt startup, Ruff, mypy and handoff checks passed.
 
 
 PR #13 combined roster/arena continuation: twelve additional appearance/tattoo/
 signature fields with verified inclusive option bounds, all 112 jump-shot labels,
 and authored arena vertex-colour/alpha, second-UV lightmaps, glow/flare masks.
-461 portable tests passed (7 offscreen GL skips, 2 deselected); 144 native
+461 portable tests passed (9 offscreen GL skips, 2 deselected); 144 native
 checks passed. See ROSTER_SEMANTICS.md and ARENA_SHADER_MASKS.md. Complete
 remaining roster bytes, per-field engine ceilings
 and every runtime shader/palette mode remain unproved; no guessed edits are added.
@@ -212,3 +211,9 @@ fixtures. Do not assume a generated court template or any old local build exists
 Additional appearance/tattoo/post/free-throw fields and all 112 jump-shot captions are now supported; see ROSTER_SEMANTICS.md. Arena vertex-colour/alpha, lightmap, glow and flare routing is implemented; see ARENA_SHADER_MASKS.md for evidence and remaining runtime effects.
 
 Text edits now grow beyond old allocations and keyboard entry capacities. The UI separates advisory game-keyboard sizes from unproved engine ceilings; structural pointer/UTF-16/adapter guards still apply.
+
+ROST string fixup 77FB1C computes field + signed delta - 1; 7C5818
+consumes big-endian wide characters. The previous shifted LE view only happened
+to work for ASCII. Copy-on-write now preserves non-Latin text and aligned targets.
+The shared formatter count is limited to 65,535 UTF-16 units; smaller display
+ceilings remain unresolved. Qt's unrelated 32,767-character cap is removed.

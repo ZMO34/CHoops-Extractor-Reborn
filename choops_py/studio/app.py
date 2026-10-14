@@ -1627,10 +1627,10 @@ class Window(QMainWindow):
         self.scene_cutaway.setChecked(True)
         self.scene_cutaway.toggled.connect(self.select_scene_part)
         layout.addWidget(self.scene_cutaway)
-        self.scene_three_point = QCheckBox('Floor layer: 3-point lines')
-        self.scene_border = QCheckBox('Floor layer: out-of-bounds borders')
+        self.scene_three_point = QCheckBox('Alignment guide: 3-point lines')
+        self.scene_border = QCheckBox('Alignment guide: out-of-bounds borders')
         for box in (self.scene_three_point, self.scene_border):
-            box.setChecked(True)
+            box.setChecked(False)
             box.toggled.connect(self.select_scene_part)
             layout.addWidget(box)
         self.scene_parts = QComboBox()
@@ -1857,12 +1857,12 @@ class Window(QMainWindow):
         self.scene_source = source
         self.scene_meshes = result['meshes']
         from ..formats.scene_palette import COURT_PALETTE_ROUTES
-        layers = {COURT_PALETTE_ROUTES.get(b.get('material_hash'))
-                  for m in self.scene_meshes if m.get('court_surface') for b in m.get('batches', [])}
+        layers = {b.get('reference_slot')
+                  for m in self.scene_meshes if m.get('game_floor_layer') for b in m.get('batches', [])}
         for box, slot in ((self.scene_three_point, 18), (self.scene_border, 4)):
             box.setEnabled(slot in layers)
-            box.setToolTip('Uses existing floor draws and verified runtime material routes. '
-                           'Lines baked into a replacement texture cannot be toggled separately.')
+            box.setToolTip('Fixed stock court alignment guide, raised 1 game unit. '
+                           'Independent of roster palettes and floor artwork.')
         self.scene_parts.addItem('All supported parts', -1)
         for i, mesh in enumerate(self.scene_meshes):
             self.scene_parts.addItem(mesh['name'], i)
@@ -1886,6 +1886,8 @@ class Window(QMainWindow):
     def select_scene_part(self, index=None):
         part = self.scene_parts.currentData()
         meshes = self.scene_meshes if part == -1 else [self.scene_meshes[part]] if part is not None else []
+        if part not in (-1, None) and meshes and meshes[0].get('court_surface'):
+            meshes = meshes + [m for m in self.scene_meshes if m.get('game_floor_layer')]
         if part == -1 and self.scene_cutaway.isChecked():
             meshes = [m for m in meshes if not m.get('hidden_by_default')]
         from ..formats.scene_palette import associate_palette, floor_layers

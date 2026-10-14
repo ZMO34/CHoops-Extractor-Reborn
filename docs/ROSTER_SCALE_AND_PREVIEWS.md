@@ -49,7 +49,7 @@ old setup draft is superseded, not new code to merge.
 ## Text growth and actual text-entry evidence
 
 Strings no longer require the original encoded length or unique shared storage.
-Copy-on-write appends a terminated UTF-16LE entry and updates only the selected
+Copy-on-write appends a terminated UTF-16BE entry (stored delta includes +1) and updates only the selected
 signed-relative pointer. Original strings, aliases, table positions and unknown
 bytes remain intact. USERDATA length prefixes, type-21 wrappers, decrypted ZIP
 members and sole-ROST/single-block IFF lengths rebuild and reparse. Unsupported

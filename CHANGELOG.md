@@ -1,5 +1,8 @@
 # Unreleased roster / game-line / motion continuation
 
+- Traced the shared 65,535-unit text descriptor bound; block count overflow and
+  remove Qt's unintended 32,767-character truncation.
+
 - Live orange warnings beyond verified UTF-16 keyboard entry capacity.
 - Authored 3-point/outer-border layers, source court supplementation, retained camera.
 - Guarded conference indices and exact conference-logo texture editor shortcut.
@@ -97,3 +100,5 @@ normalization. Dynamic supported stadium sizes retained; runtime budget unknown.
 ## 1.0b0 development (Git tag v1.0beta reserved, not created)
 
 Native Qt studio; streaming cancelable raw extraction; precomputed IFF spans; replacement-folder staging and source preconditions; verified unpatched build bytes; roster redo; source/packaged smoke tooling. CI branch deletion/release side effects removed. Historical higher-looking version tags remain untouched. This is a new rebuild train, not a replacement of preserved releases.
+
+Continuation: optional stock-court alignment guides default off and leave floor shader/palette rendering intact. Correct ROST runtime UTF-16BE string fixup, protect the 65,535-unit descriptor count, and remove Qt’s unrelated input ceiling.

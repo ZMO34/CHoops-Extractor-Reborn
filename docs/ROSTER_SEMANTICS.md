@@ -47,6 +47,22 @@ allocation. Complete semantics for every remaining byte are not claimed.
 
 Keyboard-entry limits are displayed as advisory values rather than enforced as engine ceilings. External text edits grow the string heap safely; the tool does not claim a universal game rendering limit.
 
+## Shared formatter representation ceiling
+
+Read-only tracing establishes an upper representation bound of **65,535 UTF-16
+units**, excluding NUL, for the common text-argument descriptor. Conference name
+formatter 0x73FF00 calls 0x49E1B4 → 0x1E1610 → 0x1E2634. The latter obtains a
+unit count via 0x11DF0 → 0x7C5818 (lhz until NUL, pointer difference divided by
+two) and stores it with `sth` at descriptor +0xA. Serializer 0x1E1C00/0x1E1C4C
+retains that u16. A count of 65,536 wraps to zero rather than retaining the text.
+
+The shared backend therefore blocks larger new text values, including CSV and
+comparison edits, with no mutation. This bound is separate from the adapter's
+file-size guard and each keyboard buffer. It does not prove that every menu can
+display 65,535 units, or establish smaller field-specific/combined-name limits.
+Qt's default QLineEdit limit of 32,767 is removed so it cannot silently truncate
+text before backend validation. Existing unchanged source values stay preserved.
+
 ## Current conference and coverage continuation
 
 See CONFERENCE_ASSETS.md for the exact conference-logo route and newly traced

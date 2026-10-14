@@ -34,18 +34,16 @@ seating from colour similarity: Edit Schools also includes cheerleader colours.
 Unproved channel-to-roster links remain unassigned. Complete GPU/game shader
 emulation and full roster reverse engineering are not claimed.
 
-## Floor line layers
+## Floor alignment guides
 
-Preview toggles use existing draw batches routed by the game's court initializer:
-slot 18 has materials 2310823066 / 2600458314 (3-point lines); slot 4 has material
-2218775043 (outer line). Only floor draws are filtered; arena geometry stays
-intact. The controls do not generate lines from floor/apron bounds or change
-vertex heights. Camera position is retained when toggling layers.
+The optional 3-point and out-of-bounds guides are for positioning one-texture
+court artwork only. They copy the verified line draw coordinates from the fixed
+stock S256 floor, raised by 1 game unit. Guide depth bias is ordered above the existing coplanar floor passes.
+The guide shader is flat amber and
+independent of roster palettes, floor layout, texture overrides and lighting.
+The floor itself keeps every original draw and its confirmed material/palette
+behavior. Toggling guides never removes actual court markings. No bounds-based
+apron geometry is invented; without the stock reference guides are unavailable.
+These controls change no SCNE, roster or build data and retain the camera.
 
-When a replacement sXXX floor omits these draws, the preview reads its matching
-source JB floor and copies only those authored batches, coordinates and UVs.
-Copied texture bindings have distinct names; roster palette association still
-uses the confirmed material routes. Standalone files without matching source
-geometry do not acquire guessed line dimensions. Controls are disabled for absent
-routes. Lines baked into one floor texture cannot be erased independently by a
-mesh-layer toggle. This is preview-only and changes no SCNE/build data.
+Reference guide width uses the central 10% of the authored strip UV: U across both 3-point and boundary strips. This thins guides without moving their centerlines or modifying floor geometry.

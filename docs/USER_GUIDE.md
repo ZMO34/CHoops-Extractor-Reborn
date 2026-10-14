@@ -138,3 +138,7 @@ save and stage that paired bank manually. Floor 3-point/outer-border toggles use
 the game's authored line geometry, including missing layers from the matching
 source JB. See CONFERENCE_ASSETS.md, ARENA_SHADER_MASKS.md and
 ANIMATION_RESEARCH.md for limitations and raw motion-extraction commands.
+
+Alignment guides start disabled. Use Alignment guide toggles only to position full-court texture artwork. Guides use fixed stock S256 coordinates raised 1 game unit, not apron bounds; toggling them leaves the real floor and palette rendering intact.
+
+Reference guide width uses the central 10% of the authored strip UV: U across both 3-point and boundary strips. This thins guides without moving their centerlines or modifying floor geometry.
