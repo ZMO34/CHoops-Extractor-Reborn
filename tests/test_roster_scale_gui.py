@@ -54,7 +54,9 @@ def test_source_toggle_reloads_scene_and_explorer_textures(qtbot,monkeypatch,tmp
     window._scene_record_index=2;window._jersey_preview_row=None
     called=[]
     monkeypatch.setattr(window,'run_job',lambda title,*args,**kwargs:called.append(title))
+    window.navigate_to('Models / Courts')
     window.preview_overrides.setChecked(True)
     assert called==['Reload scene from selected preview source']
+    window.navigate_to('Texture Editor')
     window._scene_record_index=None;window.preview_overrides.setChecked(False)
     assert called[-1]=='Reload textures from selected preview source'

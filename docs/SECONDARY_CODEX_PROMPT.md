@@ -84,6 +84,18 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# v1.14.1 preview source/list hotfix
+
+Release: https://github.com/ZMO34/CHoops-Extractor-Reborn/releases/tag/v1.14.1
+
+Top-toolbar Source JB / Selected overrides dropdown controls all previews.
+Models / Courts offers Jerseys, Shoes and Stadiums / Floors subtabs with pick-only
+lists, explicit Override / JB fallback labels and retained selections. Missing
+archive/scene names are handled safely. Switching sources keeps the active page.
+Read-only S258 preview succeeded with unchanged input. 494 portable tests and 22
+native GUI/GL checks passed; Windows frozen startup/audio checks passed.
+Broader roster/shader research remains incomplete as described below.
+
 # v1.14 release preparation
 
 Direct Models / Courts selectors now preview jerseys, shoes and stadium/floor
@@ -1932,3 +1944,5 @@ Combined v1.14 preview release checks: 491 portable tests passed, 9 offscreen Op
 v1.14.1 preview source/list hotfix: 493 portable tests passed (9 offscreen GL skips, 2 deselected); 17 native direct-preview/GL checks passed. Read-only stock S258 floor preview returned five parts and twelve textures; source hash unchanged. Shared source dropdown and pick-only category lists have regression coverage. No RPCS3 or JB build.
 
 Additional hotfix regression: global source switching preserves the active texture category rather than navigating to a prior 3D view. Final full suite: 494 passed, 9 offscreen GL skips, 2 deselected; nine direct-preview checks passed.
+
+Final v1.14.1 native preview/GL/roster-scale GUI suite: 22 passed. Packaged Windows startup and synthetic audio round-trip passed. Verified v1.13 audio helpers and matching source/licence archives reused.

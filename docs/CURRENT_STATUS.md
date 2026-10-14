@@ -1,3 +1,15 @@
+# v1.14.1 preview source/list hotfix
+
+Release: https://github.com/ZMO34/CHoops-Extractor-Reborn/releases/tag/v1.14.1
+
+Top-toolbar Source JB / Selected overrides dropdown controls all previews.
+Models / Courts offers Jerseys, Shoes and Stadiums / Floors subtabs with pick-only
+lists, explicit Override / JB fallback labels and retained selections. Missing
+archive/scene names are handled safely. Switching sources keeps the active page.
+Read-only S258 preview succeeded with unchanged input. 494 portable tests and 22
+native GUI/GL checks passed; Windows frozen startup/audio checks passed.
+Broader roster/shader research remains incomplete as described below.
+
 # v1.14 release preparation
 
 Direct Models / Courts selectors now preview jerseys, shoes and stadium/floor
