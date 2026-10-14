@@ -46,8 +46,9 @@ def test_fixed_length_school_string_edit_is_isolated():
     assert model.data[target+8:len(raw)]==raw[target+8:]
     model.edit('teams',0,'school_name','Longer')
     assert model.rows['teams'][0]['school_name']=='Longer'
-    model.edit('teams',0,'school_name','A'*24)
-    assert model.rows['teams'][0]['school_name']=='A'*24
+    model.edit('teams',0,'school_name','A'*16)
+    assert model.rows['teams'][0]['school_name']=='A'*16
+    with pytest.raises(ValueError):model.edit('teams',0,'school_name','A'*17)
 
 
 def test_research_report_covers_every_row_byte_without_claiming_completion():

@@ -1,5 +1,14 @@
 # Current project status
 
+## Roster / preview continuation
+
+v1.12 is published from merged PR #12. Continuation source fixes worker source
+snapshots and named SCNE identity, comparison reference matching, school-filter
+reset and menu-logo subrecord references. Confirmed Edit Schools text capacities
+are mapped to roster fields, and the jump-shot animation ID is editable with
+confirmed bounds. See ROSTER_SCALE_AND_PREVIEWS.md for evidence and unfinished
+semantics. This continuation is not a published release.
+
 ## Active roster scale / preview project
 
 The feature branch adds source-bound CSV editing, selective comparison, atomic

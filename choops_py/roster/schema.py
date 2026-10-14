@@ -158,3 +158,9 @@ ENUM_CHOICES['redshirt_code']={0:'None',1:'Normal',2:'Transfer',3:'Medical'}
 ENUM_CHOICES['redshirt_used']={0:'No',1:'Yes'}
 ENUM_CHOICES['jersey_number']={**{i:str(i) for i in range(100)},100:'00'}
 EDITABLE['players']=(*EDITABLE['players'],'class_code','redshirt_code','redshirt_used','confidence')
+
+# Jump-shot animation getter/setter 0x69E938/0x69E94C, constructor bounds 0..111.
+# Exact localized animation captions remain unresolved; preserve the real IDs.
+PLAYER_SCALARS['jump_shot_code']=(0x83,1,0,8,0,111)
+ENUM_CHOICES['jump_shot_code']={i:f'Animation {i}' for i in range(112)}
+EDITABLE['players']=(*EDITABLE['players'],'jump_shot_code')

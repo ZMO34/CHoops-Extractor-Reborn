@@ -130,6 +130,7 @@ class PlayerDetails(QTabWidget):
                 ("class_code", "Class"),
                 ("redshirt_code", "Redshirt"),
                 ("redshirt_used", "Redshirt used"),
+                ("jump_shot_code", "Jump shot animation"),
             ]:
                 value = (
                     height_text(row[key])

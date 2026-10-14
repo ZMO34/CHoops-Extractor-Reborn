@@ -60,10 +60,15 @@ Read-only EBOOT callbacks establish **game editor input capacities**, excluding
 the terminator: player first/last 16 (0x693F98/0x691ACC, buffer 0x11); School Name
 16 (0x6D17F8); Abbreviation 4 (0x6D18FC, buffer 5); Stadium Name 15 (0x6D1A00,
 buffer 0x10); Nickname 16 (0x6D1AF4); Student Section 32 (0x6D1CFC, buffer 0x21).
-Only the first/last-name mapping is currently enforced as a ROST input cap.
-School/arena callbacks operate on temporary C++ strings; exact correspondence to
-each serialized ROST text field still needs proof, so those values are not blindly
-applied to the roster fields. The text-buffer constructor is 0x7C708C through 0x1E3224; keyboard initialization
+The Edit Schools save path now connects those temporary strings to serialized
+fields: 0x6D09FC–0x6D0E5C writes team anchor +0/+8 (short/school name), +4
+(abbreviation), +0xC (plural mascot), +0x16C (event name) and +0x168 (student
+section). The team anchor bias is +0x30. Input caps now apply to these fields:
+16/16/4/16/64/32 UTF-16 units. Stadium-name temporary string 0x3140(r2) loads
+from arena anchor +0 at 0x6D605C, matching arena row +0x18; its entry cap is 15.
+Existing longer authored values remain unchanged unless edited. Singular mascot,
+conference and coach names are not assigned guessed caps.
+The text-buffer constructor is 0x7C708C through 0x1E3224; keyboard initialization
 0x1D8AAC uses that buffer descriptor. These are not claims that the renderer cannot
 display longer authored vanilla strings. Existing longer values are preserved.
 
@@ -107,7 +112,18 @@ https://github.com/RPCS3/rpcs3/blob/master/rpcs3/Emu/RSX/Program/RSXFragmentProg
 Confidence callbacks 0x69E910/0x69E924 read/write anchor +0x70, row +0x80.
 Constructor metadata exposes bounds 35 and 99; source values outside those bounds
 are preserved until explicitly edited. Jump-shot getter/setter +0x83 and its 0–111
-range were also located; exact option captions remain unimplemented.
+range were also located. The side panel now edits that animation ID with a
+bounded dropdown; exact localized animation captions remain unresolved.
+
+Continuation fixes: preview workers receive a source snapshot without reading Qt
+controls. Unique SCNE names survive archive record reordering; missing names are
+refused. Duplicate rest-pose records retain their explicit index and are not
+assigned invented identities. Comparison maps conference references by unique
+conference identity and excludes unnamed records. New rosters reset school
+filters/preview association to avoid carrying a previous roster's school index.
+Explorer nested records expose exact `teamselectlogo.iff/logoNNN` school links;
+stadium references follow the arena pointer/code rather than guessing from a
+school's asset ID. Other menu-bank subrecord routes remain under research.
 
 Read-only jersey colour tracing: 0x4DC8A0 binds semantic hashes 0x72251300
 (`CustomJerseyColor`) and 0xDC165DB5 (`CustomPipingColor`). Its normal team

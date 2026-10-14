@@ -257,7 +257,21 @@ def decode_preview_asset(asset, max_size=2048):
         shutil.rmtree(work)
 
 
-def inspect_scene_preview(source: Path, record_index: int, include_all=False, job=None):
+def scene_record_index(records, index, name):
+    """Resolve a unique scene name after an override reorders its archive."""
+    if name is None:
+        return index
+    matches=[r for r in records if r['type']=='SCNE' and r['name']==name]
+    if len(matches)==1:
+        return matches[0]['index']
+    if not matches:
+        raise ValueError('Selected SCNE is missing from this preview source: '+name)
+    if any(r['index']==index for r in matches):
+        return index
+    raise ValueError('Selected SCNE is ambiguous in this preview source: '+name)
+
+
+def inspect_scene_preview(source: Path, record_index: int, include_all=False, job=None, *, record_name=None):
     from ..texture_tools.pipeline import Container
     from ..formats.standard_iff_writer import record_blocks
     from ..formats.compression import decode
@@ -269,6 +283,8 @@ def inspect_scene_preview(source: Path, record_index: int, include_all=False, jo
     cdf = source.with_suffix('.cdf')
     container = Container(source, cdf if cdf.exists() else None)
     records = container.iff.records if container.iff else container.pair.records if container.pair else []
+    if records and not include_all:
+        record_index=scene_record_index(records,record_index,record_name)
     scene_records = [r for r in records if r['type'] == 'SCNE']
     # Same-name records in cloth packages are alternative rest-pose/LOD
     # sections, not separate arena/floor components to superimpose.

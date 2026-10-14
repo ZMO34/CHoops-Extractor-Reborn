@@ -165,11 +165,11 @@ def paste_ratings(model, indices, text):
     return apply_changes(model, changes)
 
 
-def identities(model, table):
+def identities(model, table, *, player_ids=True):
     result = defaultdict(list)
     owners = school_labels(model)
     ids=[row.get('player_id') for row in model.rows.get('players',[])]
-    stable_ids=bool(ids) and None not in ids and len(set(ids))==len(ids)
+    stable_ids=player_ids and bool(ids) and None not in ids and len(set(ids))==len(ids)
     for row in model.rows.get(table, []):
         if table == "players":
             # Name and school are required; changed names and transfers are ambiguous.
@@ -177,7 +177,7 @@ def identities(model, table):
         elif table == "uniforms":
             key = (row["team_asset_id"], row["variant_code"])
         else:
-            key = label(row).casefold()
+            key = next((str(row[k]).casefold() for k in ('school_name','conference_name','coach_name','arena_name') if row.get(k)),None)
         result[key].append(row["index"])
     return result
 
@@ -186,9 +186,13 @@ def compare(model, other):
     changes, unmatched = [], []
     owners=school_labels(model)
     maps = {}
+    def unique_player_ids(roster):
+        ids=[r.get('player_id') for r in roster.rows.get('players',[])]
+        return bool(ids) and None not in ids and len(set(ids))==len(ids)
+    player_ids=unique_player_ids(model) and unique_player_ids(other)
     for table in model.rows:
-        left, right = identities(model, table), identities(other, table)
-        maps[table] = {indices[0]: right[key][0] for key, indices in left.items() if len(indices) == 1 and len(right.get(key, [])) == 1}
+        left, right = identities(model, table,player_ids=player_ids), identities(other, table,player_ids=player_ids)
+        maps[table] = {indices[0]: right[key][0] for key, indices in left.items() if key is not None and len(indices) == 1 and len(right.get(key, [])) == 1}
         unmatched.extend(f"{table}: {label(model.rows[table][i])} (missing or ambiguous match)" for indices in left.values() for i in indices if i not in maps[table])
     for table, row, field, slot, old in cells(model):
         peer_index = maps[table].get(row["index"])
@@ -197,8 +201,8 @@ def compare(model, other):
         value = other.rows[table][peer_index][field]
         if slot is not None:
             value = value[slot]
-        if field in REFERENCES and value is not None:
-            target = REFERENCES[field][1]
+        target = REFERENCES[field][1] if field in REFERENCES else 'conferences' if table=='teams' and field=='conference_index' else None
+        if target is not None and value is not None:
             inverse = {v: k for k, v in maps.get(target, {}).items()}
             if value not in inverse:
                 unmatched.append(f"{table}: {label(row)} / {field} (unmatched reference)")

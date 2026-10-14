@@ -1,5 +1,11 @@
 # Change log
 
+## Unreleased — roster / preview continuation
+
+Named SCNE source switching, worker source snapshots, comparison reference guards,
+confirmed school text capacities and jump-shot animation ID editing. Nested menu
+logo records show school ownership; stadium labels use arena references.
+
 ## Unreleased — roster scale and preview source checkpoint
 
 Inline ratings, atomic multi-player ratings paste, source-bound CSV and selective

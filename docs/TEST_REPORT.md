@@ -1,5 +1,12 @@
 # Development verification
 
+## Roster / preview continuation checks
+
+Targeted preview/bulk/GUI checks passed 17 tests; subsequent text-capacity,
+jump-shot and GUI tests passed 20 tests. New menu/subrecord reference checks and
+the final integrated full suite require verification before publication. No
+RPCS3, EBOOT writes or testing JB. Evidence is in ROSTER_SCALE_AND_PREVIEWS.md.
+
 ## Roster scale / preview development checkpoint — 2026-10-13
 
 `python tools/dev/verify.py`: 326 passed, 2 intentional deselections. Compile,

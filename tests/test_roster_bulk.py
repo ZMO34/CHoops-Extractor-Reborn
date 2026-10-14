@@ -7,6 +7,26 @@ from choops_py.roster import bulk
 pytestmark=pytest.mark.unit
 
 
+def test_jump_shot_write_preserves_all_other_bytes_and_undo():
+    model=roster_fixture();before=bytes(model.data)
+    model.edit('players',0,'jump_shot_code',111)
+    changed=[i for i,(a,b) in enumerate(zip(before,model.data)) if a!=b]
+    assert changed==[model.row_offset('players',0)+0x83]
+    assert model.rows['players'][0]['jump_shot_code']==111
+    with pytest.raises(ValueError):model.edit('players',0,'jump_shot_code',112)
+    model.undo();assert bytes(model.data)==before
+
+
+@pytest.mark.parametrize('field,limit',[('short_name',16),('school_name',16),('abbreviation',4),('mascot_plural',16),('event_name',64),('student_section',32)])
+def test_school_text_uses_confirmed_game_capacity_not_existing_length(field,limit):
+    model=roster_fixture();before=bytes(model.data)
+    assert model.name_capacity('teams',0,field)==limit
+    model.edit('teams',0,field,'X'*limit)
+    assert model.rows['teams'][0][field]=='X'*limit
+    with pytest.raises(ValueError):model.edit('teams',0,field,'X'*(limit+1))
+    model.undo();assert bytes(model.data)==before
+
+
 @pytest.mark.parametrize('field,value', [('jersey_number','true'), ('first_name','["Ann"]'), ('first_name','{"name":"Ann"}')])
 def test_csv_rejects_wrong_json_types_without_mutating(field,value):
     model=roster_fixture();before=bytes(model.data)
