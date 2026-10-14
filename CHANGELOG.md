@@ -1,3 +1,5 @@
+- Dynamic UTF-16 edits no longer confuse keyboard entry capacities with engine storage ceilings.
+
 # Roster and arena continuation
 
 - Twelve additional confirmed appearance/tattoo/signature fields and all jump-shot captions.

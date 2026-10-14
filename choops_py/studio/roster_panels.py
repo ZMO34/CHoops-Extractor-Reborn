@@ -448,9 +448,8 @@ class RecordDetails(QTabWidget):
             if ok:
                 self.apply(key, value, slot)
         elif key in STRING_FIELDS.get(self.table, {}):
-            capacity=model.name_capacity(self.table,self.index,key)
             value, ok = QInputDialog.getText(
-                self, "Edit " + item.text(0), f"Game text entry: up to {capacity} UTF-16 units" if capacity is not None else "Variable UTF-16 text; field-specific engine limit unresolved", text=current
+                self, "Edit " + item.text(0), model.text_hint(self.table,key), text=current
             )
             if ok:
                 self.apply(key, value)

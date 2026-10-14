@@ -44,3 +44,5 @@ Confirmed text-entry capacities and copy-on-write growth are described in
 ROSTER_SCALE_AND_PREVIEWS.md. Entry-buffer capacities are not a universal renderer
 ceiling. Fields without confirmed engine limits are not capped to the old string
 allocation. Complete semantics for every remaining byte are not claimed.
+
+Keyboard-entry limits are displayed as advisory values rather than enforced as engine ceilings. External text edits grow the string heap safely; the tool does not claim a universal game rendering limit.

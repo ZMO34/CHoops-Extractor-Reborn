@@ -273,6 +273,8 @@ fixtures. Do not assume a generated court template or any old local build exists
 
 Additional appearance/tattoo/post/free-throw fields and all 112 jump-shot captions are now supported; see ROSTER_SEMANTICS.md. Arena vertex-colour/alpha, lightmap, glow and flare routing is implemented; see ARENA_SHADER_MASKS.md for evidence and remaining runtime effects.
 
+Text edits now grow beyond old allocations and keyboard entry capacities. The UI separates advisory game-keyboard sizes from unproved engine ceilings; structural pointer/UTF-16/adapter guards still apply.
+
 ---
 
 Embedded source: docs/ROSTER_SCALE_AND_PREVIEWS.md
@@ -342,10 +344,10 @@ buffer 0x10); Nickname 16 (0x6D1AF4); Student Section 32 (0x6D1CFC, buffer 0x21)
 The Edit Schools save path now connects those temporary strings to serialized
 fields: 0x6D09FC–0x6D0E5C writes team anchor +0/+8 (short/school name), +4
 (abbreviation), +0xC (plural mascot), +0x16C (event name) and +0x168 (student
-section). The team anchor bias is +0x30. Input caps now apply to these fields:
+section). The team anchor bias is +0x30. Keyboard capacities are advisory, not engine storage caps:
 16/16/4/16/64/32 UTF-16 units. Stadium-name temporary string 0x3140(r2) loads
 from arena anchor +0 at 0x6D605C, matching arena row +0x18; its entry cap is 15.
-Existing longer authored values remain unchanged unless edited. Singular mascot,
+Text storage may grow beyond those keyboard capacities; unknown engine ceilings are not guessed. Singular mascot,
 conference and coach names are not assigned guessed caps.
 The text-buffer constructor is 0x7C708C through 0x1E3224; keyboard initialization
 0x1D8AAC uses that buffer descriptor. These are not claims that the renderer cannot
@@ -449,6 +451,8 @@ to 16/17; these are labelled school primary/secondary runtime copies. Slots
 
 Additional appearance/tattoo/post/free-throw fields and all 112 jump-shot captions are now supported; see ROSTER_SEMANTICS.md. Arena vertex-colour/alpha, lightmap, glow and flare routing is implemented; see ARENA_SHADER_MASKS.md for evidence and remaining runtime effects.
 
+Keyboard limits no longer block external edits. Dynamic text uses copy-on-write UTF-16 storage, NUL/control-character checks, signed-relative-pointer bounds and the adapter’s 60 MiB safety guard. That guard is a tool limit, not a claimed engine maximum; gameplay compatibility of arbitrary long names remains unverified.
+
 ---
 
 Embedded source: docs/ROSTER_SEMANTICS.md
@@ -499,6 +503,8 @@ Confirmed text-entry capacities and copy-on-write growth are described in
 ROSTER_SCALE_AND_PREVIEWS.md. Entry-buffer capacities are not a universal renderer
 ceiling. Fields without confirmed engine limits are not capped to the old string
 allocation. Complete semantics for every remaining byte are not claimed.
+
+Keyboard-entry limits are displayed as advisory values rather than enforced as engine ceilings. External text edits grow the string heap safely; the tool does not claim a universal game rendering limit.
 
 ---
 

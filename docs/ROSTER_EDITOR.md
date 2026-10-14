@@ -81,3 +81,5 @@ Yes/No, home socks Black/White; unknown enums remain explicit. See project track
 Jersey side tabs offer numbers 0–99/00 or the selected player’s roster number, with authored Reborn surname lettering. Preview choices do not edit roster data.
 
 Additional appearance/tattoo/post/free-throw fields and all 112 jump-shot captions are now supported; see ROSTER_SEMANTICS.md. Arena vertex-colour/alpha, lightmap, glow and flare routing is implemented; see ARENA_SHADER_MASKS.md for evidence and remaining runtime effects.
+
+Text edits now grow beyond old allocations and keyboard entry capacities. The UI separates advisory game-keyboard sizes from unproved engine ceilings; structural pointer/UTF-16/adapter guards still apply.

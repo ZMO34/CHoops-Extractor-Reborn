@@ -48,13 +48,15 @@ def test_jump_shot_write_preserves_all_other_bytes_and_undo():
 
 
 @pytest.mark.parametrize('field,limit',[('short_name',16),('school_name',16),('abbreviation',4),('mascot_plural',16),('event_name',64),('student_section',32)])
-def test_school_text_uses_confirmed_game_capacity_not_existing_length(field,limit):
+def test_school_text_growth_separates_keyboard_capacity_from_storage(field,limit):
     model=roster_fixture();before=bytes(model.data)
-    assert model.name_capacity('teams',0,field)==limit
+    assert model.name_capacity('teams',0,field) is None
+    assert model.text_entry_capacity('teams',field)==limit
     model.edit('teams',0,field,'X'*limit)
     assert model.rows['teams'][0][field]=='X'*limit
-    with pytest.raises(ValueError):model.edit('teams',0,field,'X'*(limit+1))
-    model.undo();assert bytes(model.data)==before
+    model.edit('teams',0,field,'X'*(limit+1))
+    assert model.rows['teams'][0][field]=='X'*(limit+1)
+    model.undo();model.undo();assert bytes(model.data)==before
 
 
 @pytest.mark.parametrize('field,value', [('jersey_number','true'), ('first_name','["Ann"]'), ('first_name','{"name":"Ann"}')])
@@ -105,18 +107,22 @@ def test_compare_selected_compatible_fields():
     model.undo();assert bytes(model.data)==before
 
 
-def test_names_grow_to_game_entry_limit_with_undo():
+def test_names_grow_beyond_keyboard_limit_with_undo():
     model=roster_fixture();before=bytes(model.data)
-    assert model.name_capacity('players',0,'first_name')==16
+    assert model.name_capacity('players',0,'first_name') is None
+    assert model.text_entry_capacity('players','first_name')==16
     model.edit('players',0,'first_name','Al')
     assert model.rows['players'][0]['first_name']=='Al'
-    assert model.name_capacity('players',0,'first_name')==16
+    assert model.name_capacity('players',0,'first_name') is None
+    assert model.text_entry_capacity('players','first_name')==16
     model.edit('players',0,'first_name','Ann')
     assert model.rows['players'][0]['first_name']=='Ann'
     model.undo();model.undo();assert bytes(model.data)==before
     model.edit('players',0,'first_name','Alexandria')
     assert model.rows['players'][0]['first_name']=='Alexandria'
-    with pytest.raises(ValueError):model.edit('players',0,'first_name','A'*17)
+    model.edit('players',0,'first_name','A'*17)
+    assert model.rows['players'][0]['first_name']=='A'*17
+    with pytest.raises(ValueError):model.edit('players',0,'first_name','A\0B')
 
 
 def test_redshirt_controls_preserve_scholarship_weight_and_class():

@@ -11,3 +11,8 @@ INPUT_LIMITS.update({('teams','short_name'):16,('teams','school_name'):16,
     ('teams','abbreviation'):4,('teams','mascot_plural'):16,
     ('teams','event_name'):64,('teams','student_section'):32,
     ('arenas','arena_name'):15})
+
+
+# No smaller per-field storage/loader ceiling has been proved. Keyboard-entry
+# capacities above are advisory; they must not masquerade as engine hard limits.
+ENGINE_LIMITS = {}

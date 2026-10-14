@@ -250,9 +250,8 @@ class PlayerDetails(QTabWidget):
                 except ValueError as error:
                     QMessageBox.warning(self, "Height edit blocked", str(error))
         elif key in ("first_name", "last_name"):
-            capacity=self.owner.roster.name_capacity('players',self.player_index,key)
             value, ok = QInputDialog.getText(
-                self, "Edit " + item.text(0), f"Game text entry: up to {capacity} UTF-16 units" if capacity is not None else "Variable UTF-16 text; field-specific engine limit unresolved", text=row[key]
+                self, "Edit " + item.text(0), self.owner.roster.text_hint('players',key), text=row[key]
             )
             if ok:
                 self.apply(key, value)

@@ -15,7 +15,8 @@ class RosterTests(WorkspaceTest):
     def test_same_length_name_and_invalid_edit(self):
         m=roster_fixture();m.edit('players',0,'first_name','Ann');self.assertEqual(m.rows['players'][0]['first_name'],'Ann')
         m.edit('players',0,'first_name','Alex');self.assertEqual(m.rows['players'][0]['first_name'],'Alex')
-        with self.assertRaises(ToolError):m.edit('players',0,'first_name','A'*17)
+        m.edit('players',0,'first_name','A'*17);self.assertEqual(m.rows['players'][0]['first_name'],'A'*17)
+        with self.assertRaises(ToolError):m.edit('players',0,'first_name','A\0B')
         with self.assertRaises(ToolError):m.edit('players',0,'position_code',8)
         with self.assertRaises(ToolError):m.edit('players',0,'skin_tone',1)
     def test_shared_string_and_invalid_pointer_validation(self):
