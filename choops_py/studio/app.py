@@ -961,12 +961,14 @@ class Window(QMainWindow):
         if self.active:
             QTimer.singleShot(100,self.reload_preview_source);return
         self.refresh_preview_lists()
-        if getattr(self,'_jersey_preview_row',None):return self.refresh_jersey_preview()
-        if getattr(self,'_shoe_preview_active',False):return self.preview_shoes()
-        if getattr(self, '_direct_stadium_active', False):return self.preview_stadium()
+        item = self.navigation.currentItem()
+        models_visible = item is not None and item.text(0) == 'Models / Courts'
+        if models_visible and getattr(self,'_jersey_preview_row',None):return self.refresh_jersey_preview()
+        if models_visible and getattr(self,'_shoe_preview_active',False):return self.preview_shoes()
+        if models_visible and getattr(self, '_direct_stadium_active', False):return self.preview_stadium()
         try: archive=self.preview_archive()
         except ValueError as error:return self.show_error(str(error))
-        if getattr(self,'_scene_record_index',None) is not None and hasattr(self,'scene_source'):
+        if models_visible and getattr(self,'_scene_record_index',None) is not None and hasattr(self,'scene_source'):
             from .services import inspect_scene_with_game_layers
             index=self._scene_record_index
             include_all=self.scene_complete.isChecked()

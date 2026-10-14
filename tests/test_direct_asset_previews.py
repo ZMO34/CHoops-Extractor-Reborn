@@ -37,6 +37,7 @@ def test_stadium_selector_uses_captured_source_and_reloads_on_toggle(qtbot, monk
     window.preview_stadium()
     assert calls[0][0] is selected_archive and calls[0][1] is entry
     window._direct_stadium_active=True
+    window.navigate_to('Models / Courts')
     window.reload_preview_source()
     assert len(calls)==2
 
@@ -92,3 +93,15 @@ def test_stock_reference_lookup_skips_unnamed_archive_entries(tmp_path,monkeypat
     monkeypatch.setattr(services,'materialize',lambda a,e:reference)
     monkeypatch.setattr('choops_py.formats.standard_iff.StandardIFF',lambda raw:SimpleNamespace(records=[dict(index=0,type='SCNE',name=None),dict(index=1,type='SCNE',name='floor')]))
     assert services.inspect_scene_with_game_layers(source,0,archive)['meshes']==result['meshes']
+
+
+@pytest.mark.gui
+def test_source_switch_does_not_navigate_from_texture_category(qtbot,monkeypatch):
+    window=Window();qtbot.addWidget(window)
+    window.navigate_to('Texture Editor')
+    window._direct_stadium_active=True
+    calls=[]
+    monkeypatch.setattr(window,'preview_stadium',lambda:calls.append('stadium'))
+    window.reload_preview_source()
+    assert calls==[]
+    assert window.navigation.currentItem().text(0)=='Texture Editor'
