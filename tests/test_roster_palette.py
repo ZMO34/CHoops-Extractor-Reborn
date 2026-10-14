@@ -40,9 +40,14 @@ def test_fixed_length_school_string_edit_is_isolated():
     model=EditorModel(load_bytes(bytes(raw)),base.tables)
     model.edit('teams',0,'school_name','Demo')
     assert model.rows['teams'][0]['school_name']=='Demo'
-    assert model.data[:target]==raw[:target]
-    assert model.data[target+8:]==raw[target+8:]
-    with pytest.raises(ToolError):model.edit('teams',0,'school_name','Longer')
+    expected=bytearray(model.data[:len(raw)])
+    expected[pointer:pointer+4]=raw[pointer:pointer+4]
+    assert expected==raw
+    assert model.data[target+8:len(raw)]==raw[target+8:]
+    model.edit('teams',0,'school_name','Longer')
+    assert model.rows['teams'][0]['school_name']=='Longer'
+    model.edit('teams',0,'school_name','A'*24)
+    assert model.rows['teams'][0]['school_name']=='A'*24
 
 
 def test_research_report_covers_every_row_byte_without_claiming_completion():

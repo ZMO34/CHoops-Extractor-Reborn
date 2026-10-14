@@ -49,7 +49,7 @@ def encode_roster_iff(original, payload):
     """Grow only a single-record ROST logical block; preserve container metadata."""
     iff=StandardIFF(original)
     if len(iff.blocks)!=1 or len(iff.records)!=1 or iff.records[0]['type']!='ROST' or iff.records[0]['offsets']!=[0]:
-        raise ValueError('Uniform table growth requires a single-block, sole-ROST IFF')
+        raise ValueError('Roster payload growth requires a single-block, sole-ROST IFF')
     block=iff.blocks[0];stored=original[block['start']:block['start']+block['size']]
     if block['compressed']:
         stored=encode_greedy(stored,payload)

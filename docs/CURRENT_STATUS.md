@@ -1,5 +1,31 @@
 # Current project status
 
+## Latest release and single-slice integration
+
+v1.12 publishes merged PR #12 at master 4f0eec7f95f9d624ff0fe09b4aac489ba4cf058e.
+Windows ZIP and SHA256SUMS: https://github.com/ZMO34/CHoops-Extractor-Reborn/releases/tag/v1.12.
+Exact-head Windows/Linux CI and local packaged startup/audio checks passed.
+PR #11 is integrated with that source and independently tested: 329 passed,
+1 isolated native-audio skip, 2 deselected. Depth-one, non-cubemap 3D TXTRs
+support 2D DDS replacement while retaining their original descriptor; deeper
+volumes remain unsupported. See TEST_REPORT.md for exact review evidence.
+
+## Active roster scale / preview project
+
+The feature branch adds source-bound CSV editing, selective comparison, atomic
+ratings paste, inline rating boxes, school filtering, Class/Redshirt controls,
+growing UTF-16 text, shared source/override SCNE and texture previews, archive
+categories/references and bounded conversion/normalization caching. This remains
+an in-progress project, not a published release or completed reverse engineering.
+See ROSTER_SCALE_AND_PREVIEWS.md for exact behavior, evidence and remaining work.
+Development verification on 2026-10-13: 326 tests passed, 2 deselected; source/Qt
+startup, lint/type and generated handoff checks passed. No testing JB or gameplay.
+Draft checkpoint: https://github.com/ZMO34/CHoops-Extractor-Reborn/pull/12.
+Jersey colour constants now trace to slots 0/1 and a separate mode using 14/15;
+fragment routing and mode selection remain unfinished.
+Recent functional PRs were merged before work; baseline is v1.11/master
+7796fcbd72c127730f484c67a5b0de26440ed066.
+
 ## v1.11 side-panel update
 
 Every roster category has a right-side editor. School palettes, shoes and jersey

@@ -1,5 +1,31 @@
 # Development verification
 
+## PR #11 independent integration review — 2026-10-14
+
+Inspected exact original head 81cd1665c26ce8798c025f5bfbd2d20f98cf213f in
+an isolated checkout: 15 texture-layout tests passed. Merged v1.12 master into
+the branch, resolved the changelog conflict and regenerated the shared handoff.
+Added an actual DDS replacement/export check preserving the depth-one descriptor,
+header and payload extent, and rejection checks for depth zero, depth two and
+volume-plus-cubemap combinations. Integrated portable suite: 329 passed,
+1 native-audio skip (helpers absent in this isolated checkout), 2 intentional
+deselections. Compile, CLI/Qt startup, lint/type and handoff checks passed.
+No RPCS3, gameplay, EBOOT edits or testing JB. Sampler runtime behavior remains
+unverified; this change does not generalize to deeper volumes or DDS arrays.
+
+## Roster scale / preview development checkpoint — 2026-10-13
+
+`python tools/dev/verify.py`: 326 passed, 2 intentional deselections. Compile,
+CLI help, offscreen Qt startup, scoped Ruff, mypy (11 files), generated handoff
+and diff checks passed. The earlier targeted bulk/preview/cache/GUI run passed
+13 tests; three subsequent CSV scalar-type regressions passed in the full suite.
+Comparison selection survives filtering/sorting; bulk edits preserve one-step
+undo, source preconditions and coupled-field rollback. The comparison uses a
+table model rather than allocating a widget item for every changed cell.
+CSV rejects JSON objects, arrays and booleans in scalar text/numeric fields.
+No RPCS3, gameplay, EBOOT writes or testing JB build. Unfinished text-limit and
+shader research remains explicitly documented in ROSTER_SCALE_AND_PREVIEWS.md.
+
 ## v1.11 side-panel and membership verification
 
 The local source checkpoint passed 310 tests with 2 intentional deselections;

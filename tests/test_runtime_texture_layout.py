@@ -140,3 +140,24 @@ def test_real_volume_dimension_remains_rejected():
     assert TXTR([bytes(head),base[1]]).info()['width']==4
     struct.pack_into('>H',head,0x64,2)
     with pytest.raises(ValueError,match='dimension=3'):TXTR([bytes(head),base[1]]).info()
+
+
+def test_single_slice_dds_import_preserves_descriptor_and_payload_extent():
+    base=txtr_fixture(format=0x86,split=True)
+    head=bytearray(base[0]);head[0x5a]=3;base=[bytes(head),base[1]]
+    result,report=apply_dds(base,'TXTR','volume_slice',artwork(16,16,(0,0,255,255)),preserve_layout=True,reference=TXTR(base))
+    assert result[0]==base[0]
+    assert list(map(len,result))==list(map(len,base))
+    assert result[1]!=base[1]
+    assert TXTR(result).info()['width']==4 and report['storage_layout_preserved']
+    from choops_py.texture_tools.builtin_converter import to_dds
+    with Image.open(io.BytesIO(to_dds(TXTR(result).gtf()))) as image:
+        assert image.convert('RGBA').getpixel((0,0))==(0,0,255,255)
+
+
+@pytest.mark.parametrize('depth,cube',[(0,0),(2,0),(1,1)])
+def test_volume_depth_or_cube_flags_are_not_generalized(depth,cube):
+    base=txtr_fixture(format=0x86,split=True);head=bytearray(base[0])
+    head[0x5a]=3;head[0x5b]=cube;struct.pack_into('>H',head,0x64,depth)
+    with pytest.raises(ValueError,match='dimension=3'):
+        TXTR([bytes(head),base[1]]).info()

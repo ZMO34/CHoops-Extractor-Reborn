@@ -14,6 +14,7 @@ class EditorModel:
         self.edits=[];self.history=[];self.redo_history=[]
         for name,(start,count,size) in self.tables.items():Binary(self.data).slice(start,count*size)
         self.rows={};self.issues=[];self.string_users=defaultdict(list);self.reload()
+        self.string_capacities={target:end-target-2 for target,end in self.string_ranges.items()}
         self.source_string_issues=[]
         for issue in self.issues:
             if issue['kind']!='invalid_string_pointer' or issue['detail']!='Control character in roster string':continue
@@ -40,7 +41,7 @@ class EditorModel:
         target=field+value
         try:
             b=Binary(self.data);end=target
-            for _ in range(256):
+            for _ in range(max(0,(len(self.data)-target)//2)):
                 code=b.u16(end,'<')
                 if not code:
                     text=b.slice(target,end-target).decode('utf-16-le')
@@ -49,7 +50,7 @@ class EditorModel:
                         self.issues.append({'kind':'invalid_string_pointer','field_offset':field,'detail':'Control character in roster string'})
                     return text
                 end+=2
-            raise ValueError('String exceeds 256 characters')
+            raise ValueError('Unterminated roster string')
         except (ValueError,UnicodeError) as error:
             self.issues.append({'kind':'invalid_string_pointer','field_offset':field,'detail':str(error)});return ''
     def reference(self,field,table,bias,empty_player=False):
@@ -73,6 +74,7 @@ class EditorModel:
                 if table=='players':
                     from .shoes import player_fields
                     row.update(player_fields(b,off))
+                    row['player_id']=b.u16(off+0x18)
                     row.update(jersey_number=self.data[off+0x1b],height_inches=self.data[off+0x3a],position_code=self.data[off+0x3b]);row['display_name']=(row['first_name']+' '+row['last_name']).strip();row['position']=POSITIONS.get(row['position_code'],'Unknown')
                     row['attribute_ratings'] = [max(35,min(99,b.u16(off+RATING_OFFSET+i*2)//100)) for i in range(RATING_COUNT)]
                     row['shot_tendencies'] = list(b.slice(off+TENDENCY_OFFSET,len(TENDENCY_NAMES)))
@@ -120,6 +122,9 @@ class EditorModel:
                           for old,ranges in self.source_string_issues)
             (preserved if unchanged else errors).append(issue)
         return {'valid':not errors,'issues':errors,'preserved_source_string_issues':preserved,'source_type':self.source.kind,'counts':{name:len(rows) for name,rows in self.rows.items()},'unsaved_edits':len(self.edits),'read_only_fields':['skin tone','prestige','unknown appearance bytes','long strings','unconfirmed palette roles']}
+    def name_capacity(self,table,index,field):
+        from .text_limits import INPUT_LIMITS
+        return INPUT_LIMITS.get((table,field))
     def edit(self,table,index,field,value,slot=None):
         if field not in EDITABLE.get(table,()):raise ToolError('roster_field_read_only',f'{table}.{field} is not a confirmed writable field')
         if table=='teams' and field=='roster_slots':return self.edit_school_roster_slot(index,slot,value)
@@ -127,22 +132,28 @@ class EditorModel:
         if field in FIELDS.get(table,{}):
             row=self.rows[table][index];values={key:row[key] for key in FIELDS[table]};values[field]=self.integer(value)
             return self.edit_shoes(table,index,**values)
-        off=self.row_offset(table,index);before=bytes(self.data);old_row=self.rows[table][index];old_value=old_row[field]
+        batching=getattr(self,'_batch_writes',False)
+        off=self.row_offset(table,index);before=None if batching else bytes(self.data);old_row=self.rows[table][index];old_value=old_row[field]
+        if slot is None and value==old_value:return
         changes=[]
         if field in STRING_FIELDS.get(table, {}):
             rel=STRING_FIELDS[table][field];pos=off+rel;delta=struct.unpack_from('>i',self.data,pos)[0]
-            if delta in (0,-1):raise ToolError('missing_string_storage','Cannot create a string heap entry')
             target=pos+delta
             encoded=str(value).encode('utf-16-le');old=str(old_value).encode('utf-16-le')
-            if len(encoded)!=len(old):raise ToolError('string_length_mismatch','Names must retain their original UTF-16 byte length')
+            capacity=self.string_capacities.get(target,len(old))
+            limit=self.name_capacity(table,index,field)
+            if limit is not None and len(encoded)//2>limit:raise ToolError('string_length_mismatch',f'The game text editor allows {limit} UTF-16 units for this field')
             if any(ord(c)<32 for c in str(value)):raise ToolError('invalid_roster_name','Control characters are blocked')
-            if len(self.string_users.get(target,[]))!=1:raise ToolError('shared_string_write_blocked','This name storage is shared with other rows; heap relocation is not validated')
-            end=target+len(encoded)
-            if any(other!=target and target<limit and other<end for other,limit in self.string_ranges.items()):
-                raise ToolError('shared_string_write_blocked','This name overlaps another string storage range')
-            if any(target<start+count*size and start<end for start,count,size in self.tables.values()):
+            end=target+capacity+2
+            if delta not in (0,-1) and any(target<start+count*size and start<end for start,count,size in self.tables.values()):
                 raise ToolError('invalid_string_storage','Name storage overlaps a fixed roster table')
-            changes.append((target,encoded))
+            # Copy-on-write isolates known or unknown aliases; original heap bytes
+            # and all table locations remain intact. Pointer target is UTF-16LE.
+            relocated=(len(self.data)+1)&~1
+            if relocated+len(encoded)+2>60*1024*1024:raise ToolError('roster_too_large','Expanded roster exceeds adapter size guard')
+            padding=b'\0'*(relocated-len(self.data))
+            changes.append((pos,struct.pack('>i',relocated-pos)))
+            changes.append((len(self.data),padding+encoded+b'\0\0'))
         elif table=='teams' and field=='palette_colors':
             slot = self.integer(slot)
             if not 0 <= slot < PALETTE_COUNT:
@@ -159,6 +170,14 @@ class EditorModel:
             original=int.from_bytes(Binary(self.data).slice(off+rel,size),'big')
             mask=((1<<bits)-1)<<shift
             changes.append((off+rel,((original&~mask)|(value<<shift)).to_bytes(size,'big')))
+            # Match the game's coupled controls: active redshirt clears Used;
+            # Used clears current redshirt. Scholarship/weight remain intact.
+            if field=='redshirt_code' and value:
+                word=Binary(self.data).u32(off+0x9c)
+                changes.append((off+0x9c,(word&~(1<<30)).to_bytes(4,'big')))
+            elif field=='redshirt_used' and value:
+                word=Binary(self.data).u32(off+0x94)
+                changes.append((off+0x94,(word&~(3<<26)).to_bytes(4,'big')))
         elif table=='conferences' and field in CONFERENCE_SCALARS:
             value=self.integer(value)
             rel,size=CONFERENCE_SCALARS[field]
@@ -178,7 +197,7 @@ class EditorModel:
             old_value=old_value[slot]
             changes.append((off+RATING_OFFSET+slot*2,struct.pack('>H',value*100)))
         elif table=='players':
-            value=self.integer(value);ranges={'jersey_number':(0,99),'height_inches':(36,100),'position_code':(0,4)}
+            value=self.integer(value);ranges={'jersey_number':(0,100),'height_inches':(36,100),'position_code':(0,4)}
             lo,hi=ranges[field]
             if not lo<=value<=hi:raise ToolError('roster_value_out_of_range',f'{field} must be {lo}..{hi}')
             rel={'jersey_number':0x1b,'height_inches':0x3a,'position_code':0x3b}[field];changes.append((off+rel,bytes([value])))
@@ -218,7 +237,12 @@ class EditorModel:
             else:
                 target=self.row_offset(target_table,value)+bias;encoded=struct.pack('>i',target-pos)
             changes.append((pos,encoded))
-        for pos,data in changes:Binary(self.data).slice(pos,len(data));self.data[pos:pos+len(data)]=data
+        for pos,data in changes:
+            if pos!=len(self.data):Binary(self.data).slice(pos,len(data))
+            self.data[pos:pos+len(data)]=data
+        if batching:
+            self.edits.append({'table':table,'index':index,'field':field,'slot':slot,'old':old_value,'value':value})
+            return
         result=self.validate()
         # Pre-existing invalid data must not be silently blessed by the editor.
         if not result['valid']:

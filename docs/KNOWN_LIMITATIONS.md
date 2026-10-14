@@ -1,5 +1,11 @@
 # Current limitations
 
+The scale branch remains incomplete semantic reverse engineering. School and
+conference engine text caps, arena shader channels, number geometry/colour and
+independent secondary positions remain unresolved. CSV/comparison use supported
+writers and exclude ambiguous references. Text growth is structurally tested;
+game runtime remains unverified. See ROSTER_SCALE_AND_PREVIEWS.md.
+
 v1.11 transfers/brand propagation reject shared or inconsistent ownership and full
 18-player destinations. Whole-table older 16-slot JSON exports need refreshing.
 Static jersey preview has no runtime cloth, skinning, body or name/number overlays.

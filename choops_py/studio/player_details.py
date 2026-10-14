@@ -1,6 +1,6 @@
 """Always-visible player details, ratings and scholarship editor."""
 
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QTimer
 from PySide6.QtWidgets import (
     QComboBox,
     QInputDialog,
@@ -12,6 +12,10 @@ from PySide6.QtWidgets import (
     QTreeWidgetItem,
     QVBoxLayout,
     QWidget,
+    QApplication,
+    QHBoxLayout,
+    QStyledItemDelegate,
+    QSpinBox,
 )
 from ..roster.presentation import height_inches, height_text
 from ..roster.schema import (
@@ -20,7 +24,27 @@ from ..roster.schema import (
     PROPERTY_FIELDS,
     RATING_NAMES,
     TENDENCY_NAMES,
+    PLAYER_SCALARS,
 )
+
+
+class RatingDelegate(QStyledItemDelegate):
+    def __init__(self, panel):
+        super().__init__(panel)
+        self.panel=panel
+
+    def createEditor(self,parent,option,index):
+        target=index.siblingAtColumn(0).data(Qt.ItemDataRole.UserRole)
+        if index.column()!=1 or not target:return None
+        box=QSpinBox(parent);box.setRange(35 if target[0]=='attribute_ratings' else 0,99)
+        return box
+
+    def setEditorData(self,editor,index):editor.setValue(int(index.data()))
+
+    def setModelData(self,editor,model,index):
+        key,slot=index.siblingAtColumn(0).data(Qt.ItemDataRole.UserRole)
+        player=self.panel.player_index;value=editor.value()
+        QTimer.singleShot(0,lambda:self.panel.apply(key,value,slot) if self.panel.player_index==player else None)
 
 
 class PlayerDetails(QTabWidget):
@@ -35,8 +59,13 @@ class PlayerDetails(QTabWidget):
         self.addTab(self.details, "Player")
         self.ratings = QTreeWidget()
         self.ratings.setHeaderLabels(["Rating / tendency", "Value"])
-        self.ratings.itemDoubleClicked.connect(self.edit_item)
-        self.addTab(self.ratings, "Ratings")
+        self.ratings.setItemDelegateForColumn(1,RatingDelegate(self))
+        ratings_page=QWidget();rating_layout=QVBoxLayout(ratings_page);rating_layout.addWidget(self.ratings)
+        actions=QHBoxLayout()
+        for caption,callback in (("Copy ratings",self.copy_ratings),("Paste to selected players",self.paste_ratings)):
+            control=QPushButton(caption);control.clicked.connect(callback);actions.addWidget(control)
+        rating_layout.addLayout(actions)
+        self.addTab(ratings_page, "Ratings")
         scholarship = QWidget()
         layout = QVBoxLayout(scholarship)
         layout.addWidget(QLabel("Selected player scholarship status"))
@@ -70,6 +99,7 @@ class PlayerDetails(QTabWidget):
         item = QTreeWidgetItem(tree, [label, str(value)])
         if key:
             item.setData(0, Qt.ItemDataRole.UserRole, (key, slot))
+            if tree is self.ratings:item.setFlags(item.flags()|Qt.ItemFlag.ItemIsEditable)
         else:
             item.setToolTip(1, "Read-only: no confirmed writer for this field")
 
@@ -78,7 +108,9 @@ class PlayerDetails(QTabWidget):
         self.details.clear()
         self.ratings.clear()
         self.player_index = row["index"] if row else None
-        self.setEnabled(row is not None)
+        from .app import selected
+        multiple=bool(self.owner.roster and self.owner.roster_views['players'].model() and len(selected(self.owner.roster_views['players']))>1)
+        self.setEnabled(row is not None or multiple)
         self.shoes.show_record('players',row);self.jersey.show_record('players',row)
         self.school.clear()
         if row:
@@ -95,6 +127,9 @@ class PlayerDetails(QTabWidget):
                 ("jersey_number", "Number"),
                 ("height_inches", "Height"),
                 ("position_code", "Position"),
+                ("class_code", "Class"),
+                ("redshirt_code", "Redshirt"),
+                ("redshirt_used", "Redshirt used"),
             ]:
                 value = (
                     height_text(row[key])
@@ -102,11 +137,13 @@ class PlayerDetails(QTabWidget):
                     else ENUM_CHOICES.get(key, {}).get(row[key], row[key])
                 )
                 self.add(self.details, label, value, key)
+            self.add(self.details,'Player ID',row['player_id'])
             for label, value in row["properties"].items():
                 key = PROPERTY_FIELDS.get(label) or {
                     "Hand": "hand_code",
                     "Weight": "weight_lbs",
                     "Potential": "potential",
+                    "Confidence": "confidence",
                 }.get(label)
                 options = PROPERTY_CHOICES.get(label, {})
                 fallback = (
@@ -151,6 +188,20 @@ class PlayerDetails(QTabWidget):
     def apply_status(self):
         self.apply("scholarship_status", self.status.currentData())
 
+    def copy_ratings(self):
+        if self.player_index is None:return
+        from ..roster.bulk import rating_document
+        QApplication.clipboard().setText(rating_document(self.owner.roster.rows['players'][self.player_index]))
+
+    def paste_ratings(self):
+        if not self.owner.roster or self.owner.active:return
+        from .app import selected
+        from ..roster.bulk import paste_ratings
+        indices=[row['index'] for row in selected(self.owner.roster_views['players'])]
+        if not indices:return
+        text=QApplication.clipboard().text();model=self.owner.roster
+        self.owner.run_job('Paste ratings to selected players',lambda job:(paste_ratings(model,indices,text),model)[1],self.owner.display_roster)
+
     def apply_school(self):
         if self.player_index is None or self.owner.active:return
         try:
@@ -188,8 +239,9 @@ class PlayerDetails(QTabWidget):
                 if code != row[key]:
                     self.apply(key, code)
         elif key == "height_inches":
-            value, ok = QInputDialog.getText(
-                self, "Edit height", "Feet and inches", text=height_text(row[key])
+            heights=[height_text(n) for n in range(36,101)]
+            value, ok = QInputDialog.getItem(
+                self, "Edit height", "Feet and inches", heights,row[key]-36,False
             )
             if ok:
                 try:
@@ -197,11 +249,16 @@ class PlayerDetails(QTabWidget):
                 except ValueError as error:
                     QMessageBox.warning(self, "Height edit blocked", str(error))
         elif key in ("first_name", "last_name"):
+            capacity=self.owner.roster.name_capacity('players',self.player_index,key)
             value, ok = QInputDialog.getText(
-                self, "Edit " + item.text(0), "Same encoded name length", text=row[key]
+                self, "Edit " + item.text(0), f"Game text entry: up to {capacity} UTF-16 units" if capacity is not None else "Variable UTF-16 text; field-specific engine limit unresolved", text=row[key]
             )
             if ok:
                 self.apply(key, value)
+        elif key=='weight_lbs':
+            weights=[str(n)+' lb' for n in range(70,401)]
+            value,ok=QInputDialog.getItem(self,'Edit weight','Weight',weights,max(0,row[key]-70),False)
+            if ok:self.apply(key,int(value.split()[0]))
         else:
             current = row[key][slot] if slot is not None else row[key]
             value, ok = QInputDialog.getInt(
@@ -209,8 +266,8 @@ class PlayerDetails(QTabWidget):
                 "Edit " + item.text(0),
                 item.text(0),
                 current,
-                35 if key == "attribute_ratings" else 0,
-                400 if key == "weight_lbs" else 99,
+                PLAYER_SCALARS[key][4] if key in PLAYER_SCALARS else 35 if key == "attribute_ratings" else 0,
+                PLAYER_SCALARS[key][5] if key in PLAYER_SCALARS else 99,
             )
             if ok:
                 self.apply(key, value, slot)

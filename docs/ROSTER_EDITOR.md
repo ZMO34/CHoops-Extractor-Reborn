@@ -21,7 +21,11 @@ equipment, RGB palette choices and shoes are editable with undo/redo. Save copie
 preserve ZIP/decrypted wrappers; Export game roster IFF uses the loaded JB wrapper.
 Unchanged bad name characters warn; invalid pointers/new corruption still block.
 
-Names require equal UTF-16 length and unshared storage. Verified references,
+The active scale branch uses copy-on-write UTF-16 text growth instead of equal
+length/unshared storage. Verified first/last game text-entry limits are used;
+other unresolved per-field engine limits are identified, not guessed from
+existing names. See ROSTER_SCALE_AND_PREVIEWS.md; this work is not yet released.
+Verified references,
 ratings, attributes, packed equipment/appearance and school fields use their
 declared masks. Opaque fields remain read-only. Palettes have 22 exact captions,
 three additional runtime roles and six unresolved words. Optional D1/conference
