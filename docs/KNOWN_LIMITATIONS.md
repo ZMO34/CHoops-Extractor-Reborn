@@ -19,8 +19,10 @@ Updated 2026-10-11. CURRENT_STATUS.md and TEST_REPORT.md are the living evidence
 
 - Python/Qt checks do not establish game behavior. Agents never open RPCS3 or
   create testing JB folders; users build/test their own copies.
-- DDS/GTF conversion is built in. Unknown TXTR layouts, DX10 and true volumes
-  remain unsupported. Unused stored depth on declared 2D/cubes is tolerated.
+- DDS/GTF conversion is built in. Unknown TXTR layouts, DX10 and volumes with
+  more than one stored slice remain unsupported. Single-slice 3D descriptors
+  accept 2D artwork while preserving their descriptor. Unused stored depth on
+  declared 2D/cubes is tolerated.
 - Validated standard IFF/TXTR/SCNE growth and archive relocation exist. Unknown
   pointers and aliases remain blocked; general CDF virtual/physical growth is
   unresolved. Do not apply obsolete same-size rules to every supported writer.

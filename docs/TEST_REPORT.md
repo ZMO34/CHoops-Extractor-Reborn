@@ -1,5 +1,18 @@
 # Development verification
 
+## PR #11 independent integration review — 2026-10-14
+
+Inspected exact original head 81cd1665c26ce8798c025f5bfbd2d20f98cf213f in
+an isolated checkout: 15 texture-layout tests passed. Merged v1.12 master into
+the branch, resolved the changelog conflict and regenerated the shared handoff.
+Added an actual DDS replacement/export check preserving the depth-one descriptor,
+header and payload extent, and rejection checks for depth zero, depth two and
+volume-plus-cubemap combinations. Integrated portable suite: 329 passed,
+1 native-audio skip (helpers absent in this isolated checkout), 2 intentional
+deselections. Compile, CLI/Qt startup, lint/type and handoff checks passed.
+No RPCS3, gameplay, EBOOT edits or testing JB. Sampler runtime behavior remains
+unverified; this change does not generalize to deeper volumes or DDS arrays.
+
 ## Roster scale / preview development checkpoint — 2026-10-13
 
 `python tools/dev/verify.py`: 326 passed, 2 intentional deselections. Compile,
@@ -211,3 +224,8 @@ Commands: pytest, compileall, CLI --help, studio --smoke, studio --verify-game -
 Initial Ubuntu CI exposed missing libEGL.so.1; the workflow installs the required Qt runtime libraries and allows both platforms to complete independently. The corrected prior CI commit passed Windows/Linux and standalone packaging. Subsequent code requires its own observed checks.
 
 Original files were read only; output patch and untouched ranges were verified separately. Runtime PS3/RPCS3 verification: NOT RUN. Unsupported layouts, geometry import/export and unknown roster semantics remain documented limitations. This is not completion or publication of v1.0beta.
+The DDS importer now treats dimension-3 TXTRs with stored depth one as
+single-slice storage and continues to reject deeper volumes. The existing
+volume fixture now covers acceptance at depth one and rejection at depth two.
+Automated checks were not run for this change; no RPCS3 or gameplay validation
+was performed.

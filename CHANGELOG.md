@@ -1,5 +1,10 @@
 # Change log
 
+## Unreleased — single-slice DDS replacements
+
+Allow a 2D DDS replacement for dimension-3 TXTR descriptors whose stored depth
+is exactly one, preserving the original descriptor. Deeper volume textures stay
+blocked.
 ## Unreleased — roster scale and preview source checkpoint
 
 Inline ratings, atomic multi-player ratings paste, source-bound CSV and selective

@@ -86,6 +86,16 @@ Embedded source: docs/CURRENT_STATUS.md
 
 # Current project status
 
+## Latest release and single-slice integration
+
+v1.12 publishes merged PR #12 at master 4f0eec7f95f9d624ff0fe09b4aac489ba4cf058e.
+Windows ZIP and SHA256SUMS: https://github.com/ZMO34/CHoops-Extractor-Reborn/releases/tag/v1.12.
+Exact-head Windows/Linux CI and local packaged startup/audio checks passed.
+PR #11 is integrated with that source and independently tested: 329 passed,
+1 isolated native-audio skip, 2 deselected. Depth-one, non-cubemap 3D TXTRs
+support 2D DDS replacement while retaining their original descriptor; deeper
+volumes remain unsupported. See TEST_REPORT.md for exact review evidence.
+
 ## Active roster scale / preview project
 
 The feature branch adds source-bound CSV editing, selective comparison, atomic
@@ -123,7 +133,7 @@ conference realignment remains. No alternate work is authorized in this update.
 See PLAYER_QOL_RESEARCH.md; older feature descriptions below record historical
 backend capabilities rather than removed public actions.
 
-Updated 2026-10-12. Upstream: ZMO34/CHoops-Extractor-Reborn; base: master.
+Updated 2026-10-13. Upstream: ZMO34/CHoops-Extractor-Reborn; base: master.
 Baseline before this handoff: `e556e360d0091df0bb645da9eb1d279e9d8f9e3a`.
 Last published Windows feature release at that baseline: **v1.07**, commit
 `bf43d81b10ea2f16bab7df3e798edb64435ab6f4`.
@@ -139,6 +149,8 @@ not a permanently current HEAD assertion.
   raw TXTRs, replacement SCNE priority, dynamic supported stadium asset sizes.
 - Base-layout normalization outside sNNN stadiums; preserve source dimensions,
   format, mip count, remapping and layout. Use vanilla source for vanilla sizes.
+- DDS replacement accepts depth-one 3D TXTR descriptors as single-slice images,
+  preserving their descriptor; deeper volumes remain read-only.
 - Texture and geometry previews including arena, cloth and shoe selection;
   material texture routing, packed geometry, camera movement and RSX remapping.
   Basic previews do not reproduce every game shader. Artificial floor lift is
@@ -1234,8 +1246,10 @@ Updated 2026-10-11. CURRENT_STATUS.md and TEST_REPORT.md are the living evidence
 
 - Python/Qt checks do not establish game behavior. Agents never open RPCS3 or
   create testing JB folders; users build/test their own copies.
-- DDS/GTF conversion is built in. Unknown TXTR layouts, DX10 and true volumes
-  remain unsupported. Unused stored depth on declared 2D/cubes is tolerated.
+- DDS/GTF conversion is built in. Unknown TXTR layouts, DX10 and volumes with
+  more than one stored slice remain unsupported. Single-slice 3D descriptors
+  accept 2D artwork while preserving their descriptor. Unused stored depth on
+  declared 2D/cubes is tolerated.
 - Validated standard IFF/TXTR/SCNE growth and archive relocation exist. Unknown
   pointers and aliases remain blocked; general CDF virtual/physical growth is
   unresolved. Do not apply obsolete same-size rules to every supported writer.
@@ -1264,6 +1278,19 @@ Updated 2026-10-11. CURRENT_STATUS.md and TEST_REPORT.md are the living evidence
 Embedded source: docs/TEST_REPORT.md
 
 # Development verification
+
+## PR #11 independent integration review — 2026-10-14
+
+Inspected exact original head 81cd1665c26ce8798c025f5bfbd2d20f98cf213f in
+an isolated checkout: 15 texture-layout tests passed. Merged v1.12 master into
+the branch, resolved the changelog conflict and regenerated the shared handoff.
+Added an actual DDS replacement/export check preserving the depth-one descriptor,
+header and payload extent, and rejection checks for depth zero, depth two and
+volume-plus-cubemap combinations. Integrated portable suite: 329 passed,
+1 native-audio skip (helpers absent in this isolated checkout), 2 intentional
+deselections. Compile, CLI/Qt startup, lint/type and handoff checks passed.
+No RPCS3, gameplay, EBOOT edits or testing JB. Sampler runtime behavior remains
+unverified; this change does not generalize to deeper volumes or DDS arrays.
 
 ## Roster scale / preview development checkpoint — 2026-10-13
 
@@ -1476,3 +1503,8 @@ Commands: pytest, compileall, CLI --help, studio --smoke, studio --verify-game -
 Initial Ubuntu CI exposed missing libEGL.so.1; the workflow installs the required Qt runtime libraries and allows both platforms to complete independently. The corrected prior CI commit passed Windows/Linux and standalone packaging. Subsequent code requires its own observed checks.
 
 Original files were read only; output patch and untouched ranges were verified separately. Runtime PS3/RPCS3 verification: NOT RUN. Unsupported layouts, geometry import/export and unknown roster semantics remain documented limitations. This is not completion or publication of v1.0beta.
+The DDS importer now treats dimension-3 TXTRs with stored depth one as
+single-slice storage and continues to reject deeper volumes. The existing
+volume fixture now covers acceptance at depth one and rejection at depth two.
+Automated checks were not run for this change; no RPCS3 or gameplay validation
+was performed.
