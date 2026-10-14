@@ -32,7 +32,7 @@ class SceneView(QOpenGLWidget):
         self.texture = None
         self.error = ''
 
-    def set_meshes(self, meshes):
+    def set_meshes(self, meshes, fit=True):
         self.vertices = []
         self.batches = []
         for mesh in meshes:
@@ -40,7 +40,8 @@ class SceneView(QOpenGLWidget):
             self.vertices.extend(mesh['vertices'])
             layer = {'floor':1, 'paint':2, '|centerlogo':3, 'centerlogo':3, 'lines':4}.get(mesh['name'].split('/')[-1].lower(), 2) if mesh.get('court_surface') else 0
             self.batches.extend({**b, 'court_layer':layer, 'first':b['first']+start} for b in mesh.get('batches', [{'first':0,'count':len(mesh['vertices']), 'texture':None}]))
-        self.fit_camera()
+        if fit:
+            self.fit_camera()
         self.dirty = True
         self.update()
 

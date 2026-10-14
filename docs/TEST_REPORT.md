@@ -1,3 +1,18 @@
+# Roster / game-line / animation continuation verification
+
+Portable final runner: **473 passed, 7 skipped, 2 deselected**. Native Windows
+targeted checks: **17 passed**, including seven rendered shader paths, keyboard
+warnings, exact conference-logo selection and authored line supplementation.
+Read-only hidden S256 floor rendering restored two verified line draws with the
+original coordinates/UVs and no OpenGL error; source SHA was unchanged. Appearance
+and unknown-bit coverage checks passed. No RPCS3, EBOOT changes or testing JB.
+
+Regressions cover UTF-16 supplementary characters, advisory warning reset,
+invalid conference index rollback, protected tournament links, exact logo900+
+index identity, compressed raw motion span extraction, unchanged arena/apron
+geometry and no duplicate supplemental draws. Source/Qt/CLI startup, compile,
+Ruff/mypy and generated documentation checks are part of the final runner.
+
 # Combined roster/arena continuation verification
 
 Portable runner: **461 passed, 7 skipped, 2 deselected**. Seven rendered-pixel

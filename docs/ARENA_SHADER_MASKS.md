@@ -33,3 +33,19 @@ palette mode are not reproduced. Palette slots 24–26 must not be assigned to
 seating from colour similarity: Edit Schools also includes cheerleader colours.
 Unproved channel-to-roster links remain unassigned. Complete GPU/game shader
 emulation and full roster reverse engineering are not claimed.
+
+## Floor line layers
+
+Preview toggles use existing draw batches routed by the game's court initializer:
+slot 18 has materials 2310823066 / 2600458314 (3-point lines); slot 4 has material
+2218775043 (outer line). Only floor draws are filtered; arena geometry stays
+intact. The controls do not generate lines from floor/apron bounds or change
+vertex heights. Camera position is retained when toggling layers.
+
+When a replacement sXXX floor omits these draws, the preview reads its matching
+source JB floor and copies only those authored batches, coordinates and UVs.
+Copied texture bindings have distinct names; roster palette association still
+uses the confirmed material routes. Standalone files without matching source
+geometry do not acquire guessed line dimensions. Controls are disabled for absent
+routes. Lines baked into one floor texture cannot be erased independently by a
+mesh-layer toggle. This is preview-only and changes no SCNE/build data.

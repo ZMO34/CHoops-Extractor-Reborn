@@ -128,3 +128,13 @@ Jersey side-panel previews render front/back numbers: choose 0–99/00 or follow
 Additional appearance/tattoo/post/free-throw fields and all 112 jump-shot captions are now supported; see ROSTER_SEMANTICS.md. Arena vertex-colour/alpha, lightmap, glow and flare routing is implemented; see ARENA_SHADER_MASKS.md for evidence and remaining runtime effects.
 
 Text edits now grow beyond old allocations and keyboard entry capacities. The UI separates advisory game-keyboard sizes from unproved engine ceilings; structural pointer/UTF-16/adapter guards still apply.
+
+## Roster and preview continuation
+
+Text edits show an orange border beyond known game keyboard capacity; longer text
+remains allowed. School References includes the editable Conference index.
+Conference Logo opens its exact texture record for preview/DDS replacement;
+save and stage that paired bank manually. Floor 3-point/outer-border toggles use
+the game's authored line geometry, including missing layers from the matching
+source JB. See CONFERENCE_ASSETS.md, ARENA_SHADER_MASKS.md and
+ANIMATION_RESEARCH.md for limitations and raw motion-extraction commands.

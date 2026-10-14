@@ -119,7 +119,7 @@ need proof before automatic jersey recolouring is implemented.
 
 ## Outstanding work (do not claim complete)
 
-Full roster semantic reverse engineering, independent secondary positions,
+Full roster semantic reverse engineering,
 remaining school/coach/player records, complete per-field engine text limits,
 arena channel-to-palette masks, complete jersey lighting and full menu asset
 subrecord links remain unfinished. No secondary position control appears in the
@@ -166,8 +166,10 @@ Supported material DiffuseColor is read at the shader-declared CPU offset;
 confirmed court palette edits replace it. Arena channels are not assigned
 unproven palette roles. Edit Schools save 0x6D0CC0..0x6D0CD0 copies slots 14/15
 to 16/17; these are labelled school primary/secondary runtime copies. Slots
-27–30 and independent secondary positions remain unresolved, not writable guesses.
+27–30 remain unresolved, not writable guesses. Secondary positions are closed by owner confirmation.
 
 Additional appearance/tattoo/post/free-throw fields and all 112 jump-shot captions are now supported; see ROSTER_SEMANTICS.md. Arena vertex-colour/alpha, lightmap, glow and flare routing is implemented; see ARENA_SHADER_MASKS.md for evidence and remaining runtime effects.
 
 Keyboard limits no longer block external edits. Dynamic text uses copy-on-write UTF-16 storage, NUL/control-character checks, signed-relative-pointer bounds and the adapter’s 60 MiB safety guard. That guard is a tool limit, not a claimed engine maximum; gameplay compatibility of arbitrary long names remains unverified.
+
+Secondary-position search is closed by owner confirmation; only the primary position is exposed. See CONFERENCE_ASSETS.md for current index/logo behavior and tournament-link protection.

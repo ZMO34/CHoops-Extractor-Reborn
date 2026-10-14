@@ -250,9 +250,9 @@ class PlayerDetails(QTabWidget):
                 except ValueError as error:
                     QMessageBox.warning(self, "Height edit blocked", str(error))
         elif key in ("first_name", "last_name"):
-            value, ok = QInputDialog.getText(
-                self, "Edit " + item.text(0), self.owner.roster.text_hint('players',key), text=row[key]
-            )
+            from .text_edit import edit_roster_text
+            value, ok = edit_roster_text(self, self.owner.roster, 'players', key,
+                                        "Edit " + item.text(0), row[key])
             if ok:
                 self.apply(key, value)
         elif key=='weight_lbs':

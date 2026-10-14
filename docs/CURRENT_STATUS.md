@@ -1,11 +1,35 @@
 # Current project status
 
+## Active roster, floor-layer and animation continuation
+
+v1.13 is published from master 9e18f32aed8d0e3f81c2cfb05e0346d8854320b9:
+https://github.com/ZMO34/CHoops-Extractor-Reborn/releases/tag/v1.13.
+Its Windows package passed Windows/Linux CI and local frozen startup/audio checks.
+
+The next feature branch adds orange advisory keyboard-limit warnings, authored
+game floor-line toggles (including missing-line geometry from the matching source
+JB), safer conference index validation, exact conference-logo editor routing and
+read-only motion-record discovery/export. Byte coverage now reports unresolved
+bits within packed words. Conference +0x1A is a tournament index, not a logo ID;
+its unsafe generic writer is protected. See CONFERENCE_ASSETS.md and
+ANIMATION_RESEARCH.md. No secondary-position search: the owner closed that task.
+
+Complete remaining byte semantics, universal engine text ceilings, reflection,
+fake-bump/AO and all dynamic palette modes remain unestablished. This continuation
+does not claim completion of those research goals or gameplay certification.
+No RPCS3, EBOOT edits, added alternates or testing JB folders.
+
+Continuation verification: 473 portable tests passed (7 offscreen GL skips,
+2 deselected), 17 native Qt/OpenGL checks passed, plus hidden read-only S256 line
+rendering. Compile, CLI/Qt startup, Ruff, mypy and handoff checks passed.
+
+
 PR #13 combined roster/arena continuation: twelve additional appearance/tattoo/
 signature fields with verified inclusive option bounds, all 112 jump-shot labels,
 and authored arena vertex-colour/alpha, second-UV lightmaps, glow/flare masks.
 461 portable tests passed (7 offscreen GL skips, 2 deselected); 144 native
 checks passed. See ROSTER_SEMANTICS.md and ARENA_SHADER_MASKS.md. Complete
-remaining roster bytes, independent secondary positions, per-field engine ceilings
+remaining roster bytes, per-field engine ceilings
 and every runtime shader/palette mode remain unproved; no guessed edits are added.
 
 
@@ -13,11 +37,11 @@ Authored jersey lettering continuation (PR #13): front/back numbers 0–99/00,
 roster-linked or preview-only number choices, and curved Reborn surname rendering
 use actual indexed fonts/metrics and placement. Declared material DiffuseColor
 and integer shader switches are fixed. Palette 16/17 runtime-copy roles are
-confirmed. Full roster semantics, secondary positions and arena mask routes
+confirmed. Full roster semantics and remaining arena mask routes
 remain under research. No guessed writers, EBOOT edits, RPCS3 or testing JB.
 Verification: 448 passed, 4 offscreen-OpenGL skips, 2 deselected; native hidden
 OpenGL checks separately passed. Source startup, CLI, lint/type checks passed.
-This continuation is not yet a published release.
+The PR #13 continuation was published in v1.13; the active next branch above is unreleased.
 
 
 ## Roster / preview continuation

@@ -266,6 +266,10 @@ class EditorModel:
         self.edits.append({'table':'teams','index':team_index,'field':'alternate_enabled','slot':variant,'value':bool(enabled)})
 
     def move_team_to_conference(self, team_index, conference_index, make_d1=False):
+        if type(team_index) is not int or not 0 <= team_index < len(self.rows['teams']):
+            raise ToolError('invalid_school', 'Select an existing school index')
+        if type(conference_index) is not int or not 0 <= conference_index < len(self.rows['conferences']):
+            raise ToolError('invalid_conference', 'Select an existing conference index')
         before=bytes(self.data);old_edits=list(self.edits)
         team=self.rows['teams'][team_index];old=team.get('conference_index')
         if old is None:raise ToolError('missing_conference','Team has no verified source conference')

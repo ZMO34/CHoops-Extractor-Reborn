@@ -86,12 +86,36 @@ Embedded source: docs/CURRENT_STATUS.md
 
 # Current project status
 
+## Active roster, floor-layer and animation continuation
+
+v1.13 is published from master 9e18f32aed8d0e3f81c2cfb05e0346d8854320b9:
+https://github.com/ZMO34/CHoops-Extractor-Reborn/releases/tag/v1.13.
+Its Windows package passed Windows/Linux CI and local frozen startup/audio checks.
+
+The next feature branch adds orange advisory keyboard-limit warnings, authored
+game floor-line toggles (including missing-line geometry from the matching source
+JB), safer conference index validation, exact conference-logo editor routing and
+read-only motion-record discovery/export. Byte coverage now reports unresolved
+bits within packed words. Conference +0x1A is a tournament index, not a logo ID;
+its unsafe generic writer is protected. See CONFERENCE_ASSETS.md and
+ANIMATION_RESEARCH.md. No secondary-position search: the owner closed that task.
+
+Complete remaining byte semantics, universal engine text ceilings, reflection,
+fake-bump/AO and all dynamic palette modes remain unestablished. This continuation
+does not claim completion of those research goals or gameplay certification.
+No RPCS3, EBOOT edits, added alternates or testing JB folders.
+
+Continuation verification: 473 portable tests passed (7 offscreen GL skips,
+2 deselected), 17 native Qt/OpenGL checks passed, plus hidden read-only S256 line
+rendering. Compile, CLI/Qt startup, Ruff, mypy and handoff checks passed.
+
+
 PR #13 combined roster/arena continuation: twelve additional appearance/tattoo/
 signature fields with verified inclusive option bounds, all 112 jump-shot labels,
 and authored arena vertex-colour/alpha, second-UV lightmaps, glow/flare masks.
 461 portable tests passed (7 offscreen GL skips, 2 deselected); 144 native
 checks passed. See ROSTER_SEMANTICS.md and ARENA_SHADER_MASKS.md. Complete
-remaining roster bytes, independent secondary positions, per-field engine ceilings
+remaining roster bytes, per-field engine ceilings
 and every runtime shader/palette mode remain unproved; no guessed edits are added.
 
 
@@ -99,11 +123,11 @@ Authored jersey lettering continuation (PR #13): front/back numbers 0–99/00,
 roster-linked or preview-only number choices, and curved Reborn surname rendering
 use actual indexed fonts/metrics and placement. Declared material DiffuseColor
 and integer shader switches are fixed. Palette 16/17 runtime-copy roles are
-confirmed. Full roster semantics, secondary positions and arena mask routes
+confirmed. Full roster semantics and remaining arena mask routes
 remain under research. No guessed writers, EBOOT edits, RPCS3 or testing JB.
 Verification: 448 passed, 4 offscreen-OpenGL skips, 2 deselected; native hidden
 OpenGL checks separately passed. Source startup, CLI, lint/type checks passed.
-This continuation is not yet a published release.
+The PR #13 continuation was published in v1.13; the active next branch above is unreleased.
 
 
 ## Roster / preview continuation
@@ -400,7 +424,7 @@ need proof before automatic jersey recolouring is implemented.
 
 ## Outstanding work (do not claim complete)
 
-Full roster semantic reverse engineering, independent secondary positions,
+Full roster semantic reverse engineering,
 remaining school/coach/player records, complete per-field engine text limits,
 arena channel-to-palette masks, complete jersey lighting and full menu asset
 subrecord links remain unfinished. No secondary position control appears in the
@@ -447,11 +471,13 @@ Supported material DiffuseColor is read at the shader-declared CPU offset;
 confirmed court palette edits replace it. Arena channels are not assigned
 unproven palette roles. Edit Schools save 0x6D0CC0..0x6D0CD0 copies slots 14/15
 to 16/17; these are labelled school primary/secondary runtime copies. Slots
-27–30 and independent secondary positions remain unresolved, not writable guesses.
+27–30 remain unresolved, not writable guesses. Secondary positions are closed by owner confirmation.
 
 Additional appearance/tattoo/post/free-throw fields and all 112 jump-shot captions are now supported; see ROSTER_SEMANTICS.md. Arena vertex-colour/alpha, lightmap, glow and flare routing is implemented; see ARENA_SHADER_MASKS.md for evidence and remaining runtime effects.
 
 Keyboard limits no longer block external edits. Dynamic text uses copy-on-write UTF-16 storage, NUL/control-character checks, signed-relative-pointer bounds and the adapter’s 60 MiB safety guard. That guard is a tool limit, not a claimed engine maximum; gameplay compatibility of arbitrary long names remains unverified.
+
+Secondary-position search is closed by owner confirmation; only the primary position is exposed. See CONFERENCE_ASSETS.md for current index/logo behavior and tournament-link protection.
 
 ---
 
@@ -496,8 +522,8 @@ comparison through the shared backend. No personal input data is included.
 0x69DAA8/0x69DABC read/write the complete position byte at raw +0x3B. Adjacent
 +0x3C begins scaled shooting ratings, not a secondary position. The localized
 player bindings contain one Position control. This establishes the supported
-primary field; it does not establish another independent field or prove that
-none exists elsewhere. No speculative secondary writer is supplied.
+primary field. The owner confirmed that secondary positions do not exist; that
+search is closed and no secondary-position writer is supplied.
 
 Confirmed text-entry capacities and copy-on-write growth are described in
 ROSTER_SCALE_AND_PREVIEWS.md. Entry-buffer capacities are not a universal renderer
@@ -505,6 +531,17 @@ ceiling. Fields without confirmed engine limits are not capped to the old string
 allocation. Complete semantics for every remaining byte are not claimed.
 
 Keyboard-entry limits are displayed as advisory values rather than enforced as engine ceilings. External text edits grow the string heap safely; the tool does not claim a universal game rendering limit.
+
+## Current conference and coverage continuation
+
+See CONFERENCE_ASSETS.md for the exact conference-logo route and newly traced
+tournament index. Research coverage records `known_bit_mask` and
+`unresolved_bit_mask` for every row byte, including packed player properties and
+shoes. Fully known bytes, partially known bytes and known bit counts are separate;
+unknown bits remain protected. Structural pointer classification is not proof of
+all history/legacy meaning. Roster text dialogs show a live orange border beyond
+confirmed game keyboard limits, measured in UTF-16 units. The warning does not
+truncate text or impose an invented engine limit.
 
 ---
 
@@ -545,6 +582,94 @@ palette mode are not reproduced. Palette slots 24–26 must not be assigned to
 seating from colour similarity: Edit Schools also includes cheerleader colours.
 Unproved channel-to-roster links remain unassigned. Complete GPU/game shader
 emulation and full roster reverse engineering are not claimed.
+
+## Floor line layers
+
+Preview toggles use existing draw batches routed by the game's court initializer:
+slot 18 has materials 2310823066 / 2600458314 (3-point lines); slot 4 has material
+2218775043 (outer line). Only floor draws are filtered; arena geometry stays
+intact. The controls do not generate lines from floor/apron bounds or change
+vertex heights. Camera position is retained when toggling layers.
+
+When a replacement sXXX floor omits these draws, the preview reads its matching
+source JB floor and copies only those authored batches, coordinates and UVs.
+Copied texture bindings have distinct names; roster palette association still
+uses the confirmed material routes. Standalone files without matching source
+geometry do not acquire guessed line dimensions. Controls are disabled for absent
+routes. Lines baked into one floor texture cannot be erased independently by a
+mesh-layer toggle. This is preview-only and changes no SCNE/build data.
+
+---
+
+Embedded source: docs/CONFERENCE_ASSETS.md
+
+# Conference assignment, logos and tournament evidence
+
+School → References → Conference shows the name and numeric index. Double-click
+to choose an existing conference. This updates the school pointer, both member
+arrays and their counts together, reparses and validates every reciprocal link,
+and provides one undo step. Negative, out-of-range and Boolean indices are
+rejected without changing bytes. Conference row ordering is preserved.
+
+Conference → Logo → Edit / preview conference logo opens its exact
+`teamselectlogo.iff` record in the texture editor. Use Import edited DDS to assign
+different artwork, save a new paired bank, then stage that folder for your manual
+JB build. The source/overrides preview selector controls the opened bank. This
+changes artwork in the existing asset, without changing the conference identity
+or adding executable/asset entries.
+
+Read-only executable evidence: menu helper 0x6A0734 reads the selected conference
+through 0x6A0668, adds 900 and calls the 0x4A1294 thunk to 0x7FD80. That formatter
+uses `logo%3d` (TOC 0xA54AC8 − 0x6D28). 0x6E7120 repeats the same routing. Stock
+records `logo900` through `logo938` corroborate the 39 conference indices. Higher
+indices are not assigned speculative logo names. Explorer subrecord references
+now include conference owners as well as schools.
+
+Do not confuse this with conference raw +0x1A. Getter 0x73D808 resolves the
+conference through 0x4A1FF4 → 0x1BD9E0 and loads that u16. Its consumers include
+0x65A1E8 → 0x58F74C and 0x73D840 → 0x58C420, indexing a 97-entry tournament
+table with stride 0xAC. The legacy `presentation_id` read key is retained for
+compatibility, but its displayed label is corrected to Tournament index and
+editing is protected until tournament backlinks have a validated writer.
+
+These traces establish asset naming and structural assignment behavior. They do
+not certify gameplay or establish full tournament/history semantics. No RPCS3,
+EBOOT changes or automatic/testing JB folders are involved.
+
+---
+
+Embedded source: docs/ANIMATION_RESEARCH.md
+
+# Motion-capture extraction research
+
+Stock embedded NAME metadata identifies record hash 0x60900D71 as `SingleMoCap`.
+Located banks include crowd, gumbel, kellogg, playercreate, gameintro_cameras,
+gamedata and global. These are mixed banks: discovering clips does not mean every
+record in the bank is an animation. Explorer adds an Animation banks category for
+the confirmed focused banks; unknown filenames may retain researched internal
+labels. The standard IFF type fallback now recognizes SingleMoCap even without
+an appended NAME table.
+
+Use these commands on an extracted standard IFF:
+
+```powershell
+python -m choops_py.cli inspect-animations bank.iff output/temp/motion_inspection
+python -m choops_py.cli export-animations bank.iff output/rips/motion_records
+```
+
+Inspection reports clip identities and decoded block sizes. Export extracts only
+SingleMoCap records, decompresses their containing blocks, and retains each
+record's exact byte span. The manifest explicitly says skeletal tracks have not
+been decoded. A record with conflicting hash and embedded type name is rejected.
+Original inputs remain immutable; no animation writer or FBX/BVH conversion is
+claimed.
+
+Initial motion blocks contain a compact header followed by packed streams; two
+examined gumbel clips had different lengths but a common header structure. Bone
+identity, frame timing, quantization, channel tables and keyframe decoding remain
+under investigation. Do not infer a frame rate from a plausible float alone.
+Stadium CDAN records describe crowd placement candidates and are not relabeled
+as skeletal clips. Further extraction is currently lossless raw-block extraction.
 
 ---
 
@@ -1140,7 +1265,7 @@ remain unresolved; long string rebuilding and unknown fields remain blocked.
 
 Roster adapters support standard IFF ROST, raw ROST, type-21 wrapper, decrypted USERDATA with 4-byte prefix, and one-USERDATA decrypted ZIP. No encrypted-save decryption is provided. Known tables: players 0x0271AC/5685/308, arenas 0x1D5C84/379/28, teams 0x1D85E0/443/704, coaches 0x23F78C/1373/44.
 
-ROST pointers are field + signed delta (no standard-IFF minus one). Player last/first pointers +0x10/+0x14 use UTF-16LE; odd addresses are valid. Jersey is u16 +0x1A (preserve high ID +0x18), height +0x3A, position +0x3B. Team roster references +0x6C, 16 slots, point to player row +0x11. Team arena +0x44 targets arena row +0x19, coaches +0x60/+0x64/+0x68 target coach row +0x15, rivals +0x4C/+0x50/+0x54 target team row +0x31. Asset IDs are high u16 at +0x18C/+0x190/+0x194; preserve low words and require consistent existing IDs. Conference record fields +0x0A..+0x22 are exposed with their source labels and original u16/RGB widths, based on the public CH2k8 roster parser and cross-checked against supplied USERDATA record values. The source labels identify founded year, championship-order values, Final Fours, prior-year bids, rank, presentation/tournament settings, and color; gameplay effects are not independently verified. Prestige and unknown appearance fields remain read-only. Names require same UTF-16 byte length and unshared storage.
+ROST pointers are field + signed delta (no standard-IFF minus one). Player last/first pointers +0x10/+0x14 use UTF-16LE; odd addresses are valid. Jersey number is byte +0x1B (preserve adjacent flags and player ID +0x18), height +0x3A, position +0x3B. Team roster references +0x6C, 18 slots, point to player row +0x11. Team arena +0x44 targets arena row +0x19, coaches +0x60/+0x64/+0x68 target coach row +0x15, rivals +0x4C/+0x50/+0x54 target team row +0x31. Asset IDs are high u16 at +0x18C/+0x190/+0x194; preserve low words and require consistent existing IDs. Conference record fields +0x0A..+0x22 are exposed with their source labels and original u16/RGB widths, based on the public CH2k8 roster parser and cross-checked against supplied USERDATA record values. The source labels identify founded year, championship-order values, Final Fours, prior-year bids, rank, tournament settings, and color; gameplay effects are not independently verified. Prestige and unknown appearance fields remain read-only. Names use copy-on-write UTF-16 growth with preserved aliases and fixed table locations; keyboard limits are advisory. Conference +0x1A is now confirmed as a tournament index and protected pending a backlink writer; logo routing uses 900 + conference index. See CONFERENCE_ASSETS.md.
 
 Current TXTR descriptor +0x58 contains format, mips, dimension, cube, remap,
 width/height/depth and pitch. GTF wraps descriptor/image in a 0x30-byte header.
@@ -1390,13 +1515,24 @@ in the repository or Windows release.
 
 Embedded source: docs/KNOWN_LIMITATIONS.md
 
+## Current continuation evidence
+
+Game floor-line toggles use authored court batches, including matching source-JB
+draws when absent from a replacement floor. Baked texture pixels cannot be hidden
+individually. Conference logos have verified logo900+index routing; the separate
+tournament index is protected pending a backlink writer. Animation clips can be
+identified/extracted as raw SingleMoCap blocks, without decoded skeletal tracks.
+Orange text warnings concern confirmed keyboard buffers, not proven engine caps.
+Secondary positions are closed by owner confirmation and are not being searched.
+Unknown roster bits, reflection/fake-bump/AO and all runtime palette modes remain
+unestablished. See the current evidence docs; older dated limits below are history.
+
 # Current evidence boundary
 
 Arena vertex colour/alpha, lightmap, glow and flare masks are now supported;
 ARENA_SHADER_MASKS.md distinguishes them from unimplemented dynamic lighting/AO.
 ROSTER_SEMANTICS.md records new appearance, tattoo and signature edits. Complete
-semantics for all roster bytes, independent secondary positions, all engine text
-ceilings and remaining runtime palette links are not certified. Earlier notes
+semantics for all roster bytes, all engine text ceilings and remaining runtime palette links are not certified. Earlier notes
 that describe these newly mapped controls as unavailable are superseded by these
 evidence documents. Source data, EBOOT and unknown bits remain preserved.
 
@@ -1405,13 +1541,13 @@ evidence documents. Source data, EBOOT and unknown bits remain preserved.
 The scale branch remains incomplete semantic reverse engineering. Confirmed Edit
 Schools entry capacities are mapped; conference/coach/singular-mascot limits and
 the renderer's broader text ceiling, arena shader channels, number geometry/colour and
-independent secondary positions remain unresolved. CSV/comparison use supported
+Secondary-position research is closed by owner confirmation. CSV/comparison use supported
 writers and exclude ambiguous references. Text growth is structurally tested;
 game runtime remains unverified. See ROSTER_SCALE_AND_PREVIEWS.md.
 
 v1.11 transfers/brand propagation reject shared or inconsistent ownership and full
 18-player destinations. Whole-table older 16-slot JSON exports need refreshing.
-Static jersey preview has no runtime cloth, skinning, body or name/number overlays.
+Static jersey preview has authored number/Reborn overlays; runtime cloth, skinning and animated bodies are not reproduced.
 No automatic Legacy eligibility/scholarship enforcement or gameplay guarantee.
 
 v1.10 removes D1 conversion and new alternate/independent-asset actions from the
@@ -1452,6 +1588,21 @@ Updated 2026-10-11. CURRENT_STATUS.md and TEST_REPORT.md are the living evidence
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+# Roster / game-line / animation continuation verification
+
+Portable final runner: **473 passed, 7 skipped, 2 deselected**. Native Windows
+targeted checks: **17 passed**, including seven rendered shader paths, keyboard
+warnings, exact conference-logo selection and authored line supplementation.
+Read-only hidden S256 floor rendering restored two verified line draws with the
+original coordinates/UVs and no OpenGL error; source SHA was unchanged. Appearance
+and unknown-bit coverage checks passed. No RPCS3, EBOOT changes or testing JB.
+
+Regressions cover UTF-16 supplementary characters, advisory warning reset,
+invalid conference index rollback, protected tournament links, exact logo900+
+index identity, compressed raw motion span extraction, unchanged arena/apron
+geometry and no duplicate supplemental draws. Source/Qt/CLI startup, compile,
+Ruff/mypy and generated documentation checks are part of the final runner.
 
 # Combined roster/arena continuation verification
 

@@ -37,8 +37,8 @@ comparison through the shared backend. No personal input data is included.
 0x69DAA8/0x69DABC read/write the complete position byte at raw +0x3B. Adjacent
 +0x3C begins scaled shooting ratings, not a secondary position. The localized
 player bindings contain one Position control. This establishes the supported
-primary field; it does not establish another independent field or prove that
-none exists elsewhere. No speculative secondary writer is supplied.
+primary field. The owner confirmed that secondary positions do not exist; that
+search is closed and no secondary-position writer is supplied.
 
 Confirmed text-entry capacities and copy-on-write growth are described in
 ROSTER_SCALE_AND_PREVIEWS.md. Entry-buffer capacities are not a universal renderer
@@ -46,3 +46,14 @@ ceiling. Fields without confirmed engine limits are not capped to the old string
 allocation. Complete semantics for every remaining byte are not claimed.
 
 Keyboard-entry limits are displayed as advisory values rather than enforced as engine ceilings. External text edits grow the string heap safely; the tool does not claim a universal game rendering limit.
+
+## Current conference and coverage continuation
+
+See CONFERENCE_ASSETS.md for the exact conference-logo route and newly traced
+tournament index. Research coverage records `known_bit_mask` and
+`unresolved_bit_mask` for every row byte, including packed player properties and
+shoes. Fully known bytes, partially known bytes and known bit counts are separate;
+unknown bits remain protected. Structural pointer classification is not proof of
+all history/legacy meaning. Roster text dialogs show a live orange border beyond
+confirmed game keyboard limits, measured in UTF-16 units. The warning does not
+truncate text or impose an invented engine limit.

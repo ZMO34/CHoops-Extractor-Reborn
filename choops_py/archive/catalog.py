@@ -18,6 +18,9 @@ def category(entry):
     if any(word in name for word in ('music','jukebox','chant','sfx')):return 'Audio'
     if any(word in name for word in ('frontend','teamselect','loading','legalpage')):return 'Menus'
     if 'roster' in name:return 'Rosters'
+    if name in ('crowd.iff', 'gumbel.iff', 'kellogg.iff', 'gameintro_cameras.iff', 'playercreate.iff'):
+        return 'Animation banks'
+    if 'singlemocap' in hint:return 'Animation banks'
     return 'Other / unresolved'
 
 
@@ -55,4 +58,8 @@ def record_references(archive_name, records, model):
         for school in model.rows.get('teams',[]):
             if school.get('menu_logo_id') is not None:
                 owners[f"logo{school['menu_logo_id']:03d}"].add(school['school_name'])
+        from ..roster.conference_assets import logo_record
+        for conference in model.rows.get('conferences', []):
+            if 0 <= conference['index'] < 39:
+                owners[logo_record(conference['index'])].add(conference['conference_name'] or f"Conference #{conference['index']}")
     return [{**record,'references':'; '.join(sorted(owners[record.get('name','')]))} for record in records]

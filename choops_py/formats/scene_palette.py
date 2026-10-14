@@ -25,3 +25,50 @@ def associate_palette(meshes, colors):
     return [{**mesh, 'batches': [{**batch, 'palette_tint':
         palette_tint(batch.get('material_hash'), colors) if batch.get('supports_diffuse_color') else None} for batch in mesh.get('batches', [{'first':0, 'count':len(mesh.get('vertices', [])), 'texture':None}])]}
         for mesh in meshes]
+
+
+def floor_layers(meshes, three_point=True, borders=True):
+    """Hide verified court draws only; keep positions and all arena batches intact."""
+    hidden_slots = set()
+    if not three_point:
+        hidden_slots.add(18)
+    if not borders:
+        hidden_slots.add(4)
+    return [{**mesh, 'batches': [batch for batch in mesh.get('batches', [])
+             if not mesh.get('court_surface') or
+             COURT_PALETTE_ROUTES.get(batch.get('material_hash')) not in hidden_slots]}
+            for mesh in meshes]
+
+
+def supplement_floor_layers(result, original):
+    """Restore missing line draws from the matching source court, never its bounds.
+
+    Replacement one-texture floors can omit the game's line geometry. Copy only
+    verified 3-point/outer-line batches, retaining authored coordinates and UVs.
+    """
+    present = {COURT_PALETTE_ROUTES.get(b.get('material_hash'))
+               for m in result['meshes'] if m.get('court_surface') for b in m.get('batches', [])}
+    missing = {4, 18} - present
+    added = []
+    images = dict(result['images'])
+    for mesh in original['meshes']:
+        if not mesh.get('court_surface'):
+            continue
+        batches = []
+        for batch in mesh.get('batches', []):
+            if COURT_PALETTE_ROUTES.get(batch.get('material_hash')) not in missing:
+                continue
+            batch = dict(batch)
+            for key in ('texture', 'lightmap_texture'):
+                name = batch.get(key)
+                if name is not None:
+                    alias = '__game_floor_lines/' + name
+                    if name in original['images']:
+                        images[alias] = original['images'][name]
+                    batch[key] = alias
+            batches.append(batch)
+        if batches:
+            added.append({**mesh, 'name': '__game_floor_lines/lines', 'batches': batches,
+                          'game_floor_layer': True})
+    return {**result, 'meshes': result['meshes'] + added, 'images': images,
+            'warnings': result['warnings'] + (['Missing floor line layers use the matching source JB court geometry; apron edges are not used.'] if added else [])}

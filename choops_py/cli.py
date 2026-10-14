@@ -43,6 +43,15 @@ def execute(a):
         return launch([])
     sources=[getattr(a,key) for key in ('source','input','cdf','dds_file','wav_file','image','mod','modded','edited','patch') if getattr(a,key,None)]
     if hasattr(a,'output'):a.output=safe_output(a.output,sources)
+    if c in ('inspect-animations', 'export-animations'):
+        from .formats.animations import inspect_animations
+        raw = Path(a.input).read_bytes()
+        result = inspect_animations(raw)
+        if c == 'export-animations':
+            from .formats.standard_iff import StandardIFF
+            result['files'] = StandardIFF(raw).dump(a.output, types=('SingleMoCap',))
+        save_json(a.output/'animations.json', result, sources)
+        return result
     if c in ('audio-catalog','export-soundtrack','replace-song','import-audio-folder','export-audo','replace-audo','export-jukebox-art','replace-jukebox-art'):
         from .audio_tools import workflow as audio
         if c=='export-audo':return audio.export_audo(a.input,a.output)

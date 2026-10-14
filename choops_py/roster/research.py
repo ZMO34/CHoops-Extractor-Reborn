@@ -1,7 +1,7 @@
 """Read-only structural coverage and contextual palette research."""
 import struct
 from collections import Counter
-from .schema import STRING_FIELDS, REFERENCES, PALETTE_OFFSET, PALETTE_COUNT, PALETTE_HINTS, CONFIRMED_PALETTE_ROLES, CONFIRMED_PALETTE_CAPTIONS, SCHOOL_COLOR_CONTROL_SLOTS, RATING_NAMES, RATING_OFFSET, RATING_COUNT,PLAYER_SCALARS,ROSTER_SLOT_COUNT
+from .schema import STRING_FIELDS, REFERENCES, PALETTE_OFFSET, PALETTE_COUNT, PALETTE_HINTS, CONFIRMED_PALETTE_ROLES, CONFIRMED_PALETTE_CAPTIONS, SCHOOL_COLOR_CONTROL_SLOTS, RATING_NAMES, RATING_OFFSET, RATING_COUNT,PLAYER_SCALARS,ROSTER_SLOT_COUNT, CONFERENCE_SCALARS, CONFERENCE_MEMBERS, CONFERENCE_MEMBER_CAPACITY, CONFERENCE_MEMBER_COUNT
 
 
 def palette_rows(model, team_index):
@@ -24,12 +24,22 @@ def analyze(model):
                        'in_bounds':0<=target<len(data), 'meaning':'unassigned header table anchor'})
     tables = {}
     for name,(start,count,stride) in model.tables.items():
-        known = {}
+        known = {}; masks = {}
         def mark(offset,length,label):
-            for i in range(offset,offset+length):known[i]=label
+            for i in range(offset,min(offset+length,stride)):
+                known[i]=label;masks[i]=255
+        def packed(offset,size,shift,bits,label):
+            for bit in range(shift,shift+bits):
+                i=offset+size-1-bit//8
+                if 0<=i<stride:
+                    masks[i]=masks.get(i,0)|(1<<(bit%8))
+                    previous=known.get(i,'')
+                    if label not in previous:known[i]=(previous+'; ' if previous else '')+label
         for field,offset in STRING_FIELDS.get(name,{}).items():mark(offset,4,field+' relative UTF-16LE pointer')
         if name=='players':
-            for field,(offset,size,shift,bits,_,_) in PLAYER_SCALARS.items():mark(offset,size,f'{field}: bits {shift}..{shift+bits-1}; preserves neighboring bits')
+            for field,(offset,size,shift,bits,_,_) in PLAYER_SCALARS.items():packed(offset,size,shift,bits,f'{field}: bits {shift}..{shift+bits-1}')
+            from .shoes import FIELDS
+            for field,(offset,shift,bits) in FIELDS['players'].items():packed(offset,4,shift,bits,field)
             mark(0x18,2,'Player identifier');mark(0x1b,1,'Jersey number; adjacent flags preserved')
             mark(0x3a,1,'Height inches');mark(0x3b,1,'Position code')
             for i,attribute_name in enumerate(RATING_NAMES):mark(RATING_OFFSET+i*2,2,attribute_name+' rating, u16 scaled by 100')
@@ -42,17 +52,27 @@ def analyze(model):
             mark(0x190,2,'Asset ID repeat');mark(0x192,2,'Mascot asset candidate')
             mark(0x194,2,'Asset ID repeat')
             mark(PALETTE_OFFSET,PALETTE_COUNT*4,'RGBA team palette; 22 menu captions verified')
+        if name=='conferences':
+            for field,(offset,size) in CONFERENCE_SCALARS.items():
+                mark(offset,size,'Conference tournament index (legacy presentation_id)' if field=='presentation_id' else field)
+            mark(CONFERENCE_MEMBERS,CONFERENCE_MEMBER_CAPACITY*4,'Reciprocal school reference array')
+            mark(CONFERENCE_MEMBER_COUNT,2,'School member count')
         active = [r['index'] for r in model.rows[name] if r.get('display_name') or r.get('school_name') or r.get('arena_name') or r.get('coach_name')]
         sample = active or list(range(count))
         fields=[]
         for offset in range(stride):
             values=Counter(data[start+i*stride+offset] for i in sample)
             fields.append({'offset':offset,'meaning':known.get(offset,'Unknown byte; read-only'),
+                'known_bit_mask':masks.get(offset,0),
+                'unresolved_bit_mask':255^masks.get(offset,0),
                 'min':min(values,default=0),'max':max(values,default=0),'distinct':len(values),
                 'common':values.most_common(4),
                 'rating_candidate':name=='players' and offset not in known and len(values)>10 and max(values,default=0)<=100})
         tables[name]={'start':start,'count':count,'stride':stride,'end':start+count*stride,
-                      'classified_bytes_per_row':len(known),'unknown_bytes_per_row':stride-len(known),
+                      'classified_bytes_per_row':sum(mask==255 for mask in masks.values()),
+                      'partially_classified_bytes_per_row':sum(mask!=255 for mask in masks.values()),
+                      'unknown_bytes_per_row':stride-sum(mask==255 for mask in masks.values()),
+                      'classified_bits_per_row':sum(mask.bit_count() for mask in masks.values()),
                       'fields':fields}
     overlaps=[]
     for a,ta in tables.items():

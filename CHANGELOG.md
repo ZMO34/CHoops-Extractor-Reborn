@@ -1,3 +1,11 @@
+# Unreleased roster / game-line / motion continuation
+
+- Live orange warnings beyond verified UTF-16 keyboard entry capacity.
+- Authored 3-point/outer-border layers, source court supplementation, retained camera.
+- Guarded conference indices and exact conference-logo texture editor shortcut.
+- Corrected tournament-link semantics; unvalidated bracket editing protected.
+- Bit-accurate unresolved-byte coverage and lossless SingleMoCap inspection/export.
+
 - Dynamic UTF-16 edits no longer confuse keyboard entry capacities with engine storage ceilings.
 
 # Roster and arena continuation
