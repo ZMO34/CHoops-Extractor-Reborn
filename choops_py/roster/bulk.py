@@ -81,6 +81,11 @@ def csv_changes(model, text):
             current = current[slot]
         elif slot is not None:
             raise ValueError(f"CSV line {line}: unexpected channel")
+        # JSON arrays/objects and booleans must not be coerced into names or IDs.
+        expected = str if isinstance(current, str) else int
+        allowed = (int, type(None)) if current is None else (expected,)
+        if type(value) not in allowed or type(original) not in allowed:
+            raise ValueError(f"CSV line {line}: expected a JSON {expected.__name__} value")
         if original == value:
             continue
         if current != original:

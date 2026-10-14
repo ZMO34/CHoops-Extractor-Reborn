@@ -94,8 +94,11 @@ growing UTF-16 text, shared source/override SCNE and texture previews, archive
 categories/references and bounded conversion/normalization caching. This remains
 an in-progress project, not a published release or completed reverse engineering.
 See ROSTER_SCALE_AND_PREVIEWS.md for exact behavior, evidence and remaining work.
-Development verification on 2026-10-13: 323 tests passed, 2 deselected; source/Qt
+Development verification on 2026-10-13: 326 tests passed, 2 deselected; source/Qt
 startup, lint/type and generated handoff checks passed. No testing JB or gameplay.
+Draft checkpoint: https://github.com/ZMO34/CHoops-Extractor-Reborn/pull/12.
+Jersey colour constants now trace to slots 0/1 and a separate mode using 14/15;
+fragment routing and mode selection remain unfinished.
 Recent functional PRs were merged before work; baseline is v1.11/master
 7796fcbd72c127730f484c67a5b0de26440ed066.
 
@@ -339,6 +342,17 @@ Confidence callbacks 0x69E910/0x69E924 read/write anchor +0x70, row +0x80.
 Constructor metadata exposes bounds 35 and 99; source values outside those bounds
 are preserved until explicitly edited. Jump-shot getter/setter +0x83 and its 0–111
 range were also located; exact option captions remain unimplemented.
+
+Read-only jersey colour tracing: 0x4DC8A0 binds semantic hashes 0x72251300
+(`CustomJerseyColor`) and 0xDC165DB5 (`CustomPipingColor`). Its normal team
+object path reads anchor +0x170/+0x174, corresponding to palette slots 0/1 with
+the confirmed +0x30 team-anchor bias. It unpacks RGB through a lookup table and
+normalizes the low byte separately; do not assume the fragment channel masks.
+A separate mode calls 0x532C64, which uses getters 0x763DB0/0x763E00 at anchor
++0x1A8/+0x1AC (slots 14/15) and can swap their order based on team selection.
+Thus these shader constants reuse both equipment and school primary/secondary
+colours in different runtime paths. The enabling mode and fragment routing still
+need proof before automatic jersey recolouring is implemented.
 
 ## Outstanding work (do not claim complete)
 
@@ -1253,12 +1267,14 @@ Embedded source: docs/TEST_REPORT.md
 
 ## Roster scale / preview development checkpoint — 2026-10-13
 
-`python tools/dev/verify.py`: 323 passed, 2 intentional deselections. Compile,
+`python tools/dev/verify.py`: 326 passed, 2 intentional deselections. Compile,
 CLI help, offscreen Qt startup, scoped Ruff, mypy (11 files), generated handoff
-and diff checks passed. Targeted bulk/preview/cache/GUI tests: 13 passed.
+and diff checks passed. The earlier targeted bulk/preview/cache/GUI run passed
+13 tests; three subsequent CSV scalar-type regressions passed in the full suite.
 Comparison selection survives filtering/sorting; bulk edits preserve one-step
 undo, source preconditions and coupled-field rollback. The comparison uses a
 table model rather than allocating a widget item for every changed cell.
+CSV rejects JSON objects, arrays and booleans in scalar text/numeric fields.
 No RPCS3, gameplay, EBOOT writes or testing JB build. Unfinished text-limit and
 shader research remains explicitly documented in ROSTER_SCALE_AND_PREVIEWS.md.
 

@@ -8,8 +8,11 @@ growing UTF-16 text, shared source/override SCNE and texture previews, archive
 categories/references and bounded conversion/normalization caching. This remains
 an in-progress project, not a published release or completed reverse engineering.
 See ROSTER_SCALE_AND_PREVIEWS.md for exact behavior, evidence and remaining work.
-Development verification on 2026-10-13: 323 tests passed, 2 deselected; source/Qt
+Development verification on 2026-10-13: 326 tests passed, 2 deselected; source/Qt
 startup, lint/type and generated handoff checks passed. No testing JB or gameplay.
+Draft checkpoint: https://github.com/ZMO34/CHoops-Extractor-Reborn/pull/12.
+Jersey colour constants now trace to slots 0/1 and a separate mode using 14/15;
+fragment routing and mode selection remain unfinished.
 Recent functional PRs were merged before work; baseline is v1.11/master
 7796fcbd72c127730f484c67a5b0de26440ed066.
 

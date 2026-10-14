@@ -2,12 +2,14 @@
 
 ## Roster scale / preview development checkpoint — 2026-10-13
 
-`python tools/dev/verify.py`: 323 passed, 2 intentional deselections. Compile,
+`python tools/dev/verify.py`: 326 passed, 2 intentional deselections. Compile,
 CLI help, offscreen Qt startup, scoped Ruff, mypy (11 files), generated handoff
-and diff checks passed. Targeted bulk/preview/cache/GUI tests: 13 passed.
+and diff checks passed. The earlier targeted bulk/preview/cache/GUI run passed
+13 tests; three subsequent CSV scalar-type regressions passed in the full suite.
 Comparison selection survives filtering/sorting; bulk edits preserve one-step
 undo, source preconditions and coupled-field rollback. The comparison uses a
 table model rather than allocating a widget item for every changed cell.
+CSV rejects JSON objects, arrays and booleans in scalar text/numeric fields.
 No RPCS3, gameplay, EBOOT writes or testing JB build. Unfinished text-limit and
 shader research remains explicitly documented in ROSTER_SCALE_AND_PREVIEWS.md.
 

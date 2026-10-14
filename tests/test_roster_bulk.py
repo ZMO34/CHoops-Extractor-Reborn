@@ -7,6 +7,18 @@ from choops_py.roster import bulk
 pytestmark=pytest.mark.unit
 
 
+@pytest.mark.parametrize('field,value', [('jersey_number','true'), ('first_name','["Ann"]'), ('first_name','{"name":"Ann"}')])
+def test_csv_rejects_wrong_json_types_without_mutating(field,value):
+    model=roster_fixture();before=bytes(model.data)
+    rows=list(csv.DictReader(io.StringIO(bulk.export_csv(model))))
+    row=next(r for r in rows if r['table']=='players' and r['index']=='0' and r['field']==field)
+    row['value']=value
+    output=io.StringIO();writer=csv.DictWriter(output,bulk.CSV_COLUMNS);writer.writeheader();writer.writerows(rows)
+    with pytest.raises(ValueError,match='expected a JSON'):
+        bulk.csv_changes(model,output.getvalue())
+    assert bytes(model.data)==before
+
+
 def test_csv_round_trip_changes_rollback_and_conflict():
     model=roster_fixture();before=bytes(model.data)
     text=bulk.export_csv(model)

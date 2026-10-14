@@ -109,6 +109,17 @@ Constructor metadata exposes bounds 35 and 99; source values outside those bound
 are preserved until explicitly edited. Jump-shot getter/setter +0x83 and its 0–111
 range were also located; exact option captions remain unimplemented.
 
+Read-only jersey colour tracing: 0x4DC8A0 binds semantic hashes 0x72251300
+(`CustomJerseyColor`) and 0xDC165DB5 (`CustomPipingColor`). Its normal team
+object path reads anchor +0x170/+0x174, corresponding to palette slots 0/1 with
+the confirmed +0x30 team-anchor bias. It unpacks RGB through a lookup table and
+normalizes the low byte separately; do not assume the fragment channel masks.
+A separate mode calls 0x532C64, which uses getters 0x763DB0/0x763E00 at anchor
++0x1A8/+0x1AC (slots 14/15) and can swap their order based on team selection.
+Thus these shader constants reuse both equipment and school primary/secondary
+colours in different runtime paths. The enabling mode and fragment routing still
+need proof before automatic jersey recolouring is implemented.
+
 ## Outstanding work (do not claim complete)
 
 Full roster semantic reverse engineering, independent secondary positions,
