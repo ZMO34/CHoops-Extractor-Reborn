@@ -8,10 +8,13 @@ def descriptor_info(descriptor):
     code=descriptor[0];fmt=FORMATS.get(code&0x9f)
     if not fmt:raise ToolError('unsupported_texture_format',f'PS3 format 0x{code:02x}')
     width,height,mips=b.u16(8),b.u16(10),descriptor[1]
-    # The dimension selects a volume. RSX uses an effective depth of one for
-    # 2D/cube images; their unused stored depth is not a volume declaration.
-    if descriptor[2]!=2 or descriptor[3] not in (0,1):
-        raise ToolError('unsupported_texture_layout',f'Only 2D textures and complete cubemaps are writable (dimension={descriptor[2]}, cube={descriptor[3]}, stored_depth={b.u16(12)}, size={width}x{height})')
+    # The dimension selects a volume. A volume with one stored slice has the
+    # same payload extent as 2D art and can accept a 2D replacement while its
+    # original descriptor is preserved. Deeper volumes remain unsupported.
+    depth=b.u16(12)
+    single_slice_volume=descriptor[2]==3 and descriptor[3]==0 and depth==1
+    if (descriptor[2]!=2 and not single_slice_volume) or descriptor[3] not in (0,1):
+        raise ToolError('unsupported_texture_layout',f'Only 2D textures, single-slice volumes, and complete cubemaps are writable (dimension={descriptor[2]}, cube={descriptor[3]}, stored_depth={depth}, size={width}x{height})')
     cubemap=bool(descriptor[3])
     if cubemap and width!=height:raise ToolError('unsupported_texture_layout','Cubemap faces must be square')
     size=image_size(width,height,fmt,mips)

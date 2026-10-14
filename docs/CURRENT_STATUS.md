@@ -8,6 +8,15 @@ reset and menu-logo subrecord references. Confirmed Edit Schools text capacities
 are mapped to roster fields, and the jump-shot animation ID is editable with
 confirmed bounds. See ROSTER_SCALE_AND_PREVIEWS.md for evidence and unfinished
 semantics. This continuation is not a published release.
+## Latest release and single-slice integration
+
+v1.12 publishes merged PR #12 at master 4f0eec7f95f9d624ff0fe09b4aac489ba4cf058e.
+Windows ZIP and SHA256SUMS: https://github.com/ZMO34/CHoops-Extractor-Reborn/releases/tag/v1.12.
+Exact-head Windows/Linux CI and local packaged startup/audio checks passed.
+PR #11 is integrated with that source and independently tested: 329 passed,
+1 isolated native-audio skip, 2 deselected. Depth-one, non-cubemap 3D TXTRs
+support 2D DDS replacement while retaining their original descriptor; deeper
+volumes remain unsupported. See TEST_REPORT.md for exact review evidence.
 
 ## Active roster scale / preview project
 
@@ -15,11 +24,12 @@ The feature branch adds source-bound CSV editing, selective comparison, atomic
 ratings paste, inline rating boxes, school filtering, Class/Redshirt controls,
 growing UTF-16 text, shared source/override SCNE and texture previews, archive
 categories/references and bounded conversion/normalization caching. This remains
-an in-progress project, not a published release or completed reverse engineering.
+a continuing research project; its implemented checkpoint is published in v1.12,
+while full reverse engineering remains unfinished.
 See ROSTER_SCALE_AND_PREVIEWS.md for exact behavior, evidence and remaining work.
 Development verification on 2026-10-13: 326 tests passed, 2 deselected; source/Qt
 startup, lint/type and generated handoff checks passed. No testing JB or gameplay.
-Draft checkpoint: https://github.com/ZMO34/CHoops-Extractor-Reborn/pull/12.
+Merged checkpoint: https://github.com/ZMO34/CHoops-Extractor-Reborn/pull/12.
 Jersey colour constants now trace to slots 0/1 and a separate mode using 14/15;
 fragment routing and mode selection remain unfinished.
 Recent functional PRs were merged before work; baseline is v1.11/master
@@ -46,7 +56,7 @@ conference realignment remains. No alternate work is authorized in this update.
 See PLAYER_QOL_RESEARCH.md; older feature descriptions below record historical
 backend capabilities rather than removed public actions.
 
-Updated 2026-10-12. Upstream: ZMO34/CHoops-Extractor-Reborn; base: master.
+Updated 2026-10-13. Upstream: ZMO34/CHoops-Extractor-Reborn; base: master.
 Baseline before this handoff: `e556e360d0091df0bb645da9eb1d279e9d8f9e3a`.
 Last published Windows feature release at that baseline: **v1.07**, commit
 `bf43d81b10ea2f16bab7df3e798edb64435ab6f4`.
@@ -62,6 +72,8 @@ not a permanently current HEAD assertion.
   raw TXTRs, replacement SCNE priority, dynamic supported stadium asset sizes.
 - Base-layout normalization outside sNNN stadiums; preserve source dimensions,
   format, mip count, remapping and layout. Use vanilla source for vanilla sizes.
+- DDS replacement accepts depth-one 3D TXTR descriptors as single-slice images,
+  preserving their descriptor; deeper volumes remain read-only.
 - Texture and geometry previews including arena, cloth and shoe selection;
   material texture routing, packed geometry, camera movement and RSX remapping.
   Basic previews do not reproduce every game shader. Artificial floor lift is

@@ -6,7 +6,12 @@ Named SCNE source switching, worker source snapshots, comparison reference guard
 confirmed school text capacities and jump-shot animation ID editing. Nested menu
 logo records show school ownership; stadium labels use arena references.
 
-## Unreleased — roster scale and preview source checkpoint
+## Unreleased — single-slice DDS replacements
+
+Allow a 2D DDS replacement for dimension-3 TXTR descriptors whose stored depth
+is exactly one, preserving the original descriptor. Deeper volume textures stay
+blocked.
+## v1.12 — roster scale and preview source checkpoint
 
 Inline ratings, atomic multi-player ratings paste, source-bound CSV and selective
 roster comparison; school filtering, Class/Redshirt controls and growing text
