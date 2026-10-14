@@ -27,6 +27,14 @@ class RosterSource:
                 from .uniforms import encode_roster_iff
                 return encode_roster_iff(self.original,payload)
             if self.kind=='raw-rost':return payload
+            if self.kind=='userdata':return struct.pack('>I',len(payload))+payload
+            if self.kind=='tool-wrapper':return wrap(self.wrapper_type,[payload])
+            if self.kind=='save-zip':
+                new_userdata=self.inner.encode(payload);out=io.BytesIO()
+                with zipfile.ZipFile(io.BytesIO(self.original)) as old,zipfile.ZipFile(out,'w') as new:
+                    new.comment=old.comment
+                    for entry in old.infolist():new.writestr(copy.copy(entry),new_userdata if entry.filename==self.zip_member else old.read(entry))
+                return out.getvalue()
             raise ToolError('roster_size_change_blocked','Expanded alternate tables require a raw or single-record ROST IFF')
         if payload==self.payload:return self.original
         if self.kind=='raw-rost':return payload

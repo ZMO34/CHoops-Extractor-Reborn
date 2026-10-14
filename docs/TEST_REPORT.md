@@ -1,5 +1,16 @@
 # Development verification
 
+## Roster scale / preview development checkpoint — 2026-10-13
+
+`python tools/dev/verify.py`: 323 passed, 2 intentional deselections. Compile,
+CLI help, offscreen Qt startup, scoped Ruff, mypy (11 files), generated handoff
+and diff checks passed. Targeted bulk/preview/cache/GUI tests: 13 passed.
+Comparison selection survives filtering/sorting; bulk edits preserve one-step
+undo, source preconditions and coupled-field rollback. The comparison uses a
+table model rather than allocating a widget item for every changed cell.
+No RPCS3, gameplay, EBOOT writes or testing JB build. Unfinished text-limit and
+shader research remains explicitly documented in ROSTER_SCALE_AND_PREVIEWS.md.
+
 ## v1.11 side-panel and membership verification
 
 The local source checkpoint passed 310 tests with 2 intentional deselections;

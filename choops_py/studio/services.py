@@ -221,7 +221,7 @@ def stage_folder(source: Path, folder: Path, mod: Path, job=None) -> dict:
         job.check();job.progress(0,1,'Validating staged overrides')
         _,patches=preflight(source,work,job)
         work.rename(mod)
-        return {key:value for key,value in report.items() if key!='imports'}
+        return report
     except BaseException:
         if work.exists() and work.resolve().is_relative_to(OUTPUT.resolve()):shutil.rmtree(work)
         raise

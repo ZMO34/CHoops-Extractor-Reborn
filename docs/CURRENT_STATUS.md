@@ -1,5 +1,18 @@
 # Current project status
 
+## Active roster scale / preview project
+
+The feature branch adds source-bound CSV editing, selective comparison, atomic
+ratings paste, inline rating boxes, school filtering, Class/Redshirt controls,
+growing UTF-16 text, shared source/override SCNE and texture previews, archive
+categories/references and bounded conversion/normalization caching. This remains
+an in-progress project, not a published release or completed reverse engineering.
+See ROSTER_SCALE_AND_PREVIEWS.md for exact behavior, evidence and remaining work.
+Development verification on 2026-10-13: 323 tests passed, 2 deselected; source/Qt
+startup, lint/type and generated handoff checks passed. No testing JB or gameplay.
+Recent functional PRs were merged before work; baseline is v1.11/master
+7796fcbd72c127730f484c67a5b0de26440ed066.
+
 ## v1.11 side-panel update
 
 Every roster category has a right-side editor. School palettes, shoes and jersey

@@ -72,9 +72,10 @@ def convert(name,input_path,output_path,override=None,swizzle=False):
     output_path=safe_output(output_path,[input_path])
     if output_path.exists():raise ToolError('output_exists',str(output_path))
     source=Path(input_path).read_bytes()
-    converted=to_gtf(source,swizzle) if name=='dds2gtf' else to_dds(source)
+    from .conversion_cache import cached_conversion
+    converted,cache_hit=cached_conversion(name,source,swizzle,lambda:to_gtf(source,swizzle) if name=='dds2gtf' else to_dds(source))
     write_bytes(output_path,converted,[input_path])
-    result={'backend':'builtin-python','status':'success','returncode':0,'stdout':'','stderr':'','input':str(input_path),'output':str(output_path)}
+    result={'backend':'builtin-python','status':'success','returncode':0,'stdout':'','stderr':'','input':str(input_path),'output':str(output_path),'cache_hit':cache_hit}
     save_json(output_path.with_suffix(output_path.suffix+'.conversion.json'),result,[input_path])
     return result
 

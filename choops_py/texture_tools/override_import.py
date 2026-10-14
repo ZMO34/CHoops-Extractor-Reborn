@@ -39,7 +39,7 @@ def apply_dds(parts,kind,selector,source,job=None,converter=None,preserve_layout
             meta=dds.inspect(normalized)
         if max(meta['width'],meta['height'])>4096:raise ValueError('Texture exceeds the RSX 4096-pixel dimension ceiling')
         conversion_source=work/'input.dds';conversion_source.write_bytes(normalized)
-        external_converters.convert('dds2gtf',conversion_source,converted,override=converter,swizzle=not (reference.info()['linear'] if preserve_layout else old['linear']))
+        conversion=external_converters.convert('dds2gtf',conversion_source,converted,override=converter,swizzle=not (reference.info()['linear'] if preserve_layout else old['linear']))
         info,descriptor,image=gtf.parse(converted.read_bytes())
         for key in ('width','height','format','mip_count','cubemap'):
             if info[key]!=meta[key]:raise ValueError('DDS converter changed '+key)
@@ -110,6 +110,7 @@ def apply_dds(parts,kind,selector,source,job=None,converter=None,preserve_layout
             check=TXTR(result)
         if check.image()!=image:raise ValueError('DDS override failed texture round-trip')
         report={key:meta[key] for key in ('width','height','format','mip_count')}
+        report['cache_hit']=(conversion or {}).get('cache_hit',False)
         if preserve_layout:report.update(storage_layout_preserved=True,artwork_resampled=conformed,input_layout=input_meta)
         return [bytes(p) for p in result],report
     finally:
