@@ -364,8 +364,13 @@ class Window(QMainWindow):
         self.preview_overrides.setCheckable(True)
         self.preview_overrides.toggled.connect(self.reload_preview_source)
         preview_toolbar=self.addToolBar('Preview source')
-        preview_toolbar.addWidget(QLabel('Preview source: Source JB / '))
-        source_button=QToolButton();source_button.setDefaultAction(self.preview_overrides);preview_toolbar.addWidget(source_button)
+        preview_toolbar.addWidget(QLabel('Preview source: '))
+        self.preview_source_selector = QComboBox()
+        self.preview_source_selector.addItems(['Source JB', 'Selected overrides'])
+        self.preview_source_selector.setToolTip('Applies to all texture and 3D preview categories.')
+        preview_toolbar.addWidget(self.preview_source_selector)
+        self.preview_source_selector.activated.connect(lambda index:self.preview_overrides.setChecked(index == 1))
+        self.preview_overrides.toggled.connect(lambda checked:self.preview_source_selector.setCurrentIndex(int(checked)))
 
         for text, handler, shortcut in [
             ("Open game…", self.choose_game, "Ctrl+O"),
@@ -754,6 +759,7 @@ class Window(QMainWindow):
             self.preview_mod=None
             self._scene_record_index=None;self._shoe_preview_active=False;self._direct_stadium_active=False
             self.preview_overrides.blockSignals(True);self.preview_overrides.setChecked(False);self.preview_overrides.blockSignals(False)
+            self.preview_source_selector.setCurrentIndex(0)
 
             self.settings.setValue("game", str(path))
 
@@ -954,12 +960,15 @@ class Window(QMainWindow):
     def reload_preview_source(self,*_):
         if self.active:
             QTimer.singleShot(100,self.reload_preview_source);return
-        if getattr(self,'_jersey_preview_row',None):return self.refresh_jersey_preview()
-        if getattr(self,'_shoe_preview_active',False):return self.preview_shoes()
-        if getattr(self, '_direct_stadium_active', False):return self.preview_stadium()
+        self.refresh_preview_lists()
+        item = self.navigation.currentItem()
+        models_visible = item is not None and item.text(0) == 'Models / Courts'
+        if models_visible and getattr(self,'_jersey_preview_row',None):return self.refresh_jersey_preview()
+        if models_visible and getattr(self,'_shoe_preview_active',False):return self.preview_shoes()
+        if models_visible and getattr(self, '_direct_stadium_active', False):return self.preview_stadium()
         try: archive=self.preview_archive()
         except ValueError as error:return self.show_error(str(error))
-        if getattr(self,'_scene_record_index',None) is not None and hasattr(self,'scene_source'):
+        if models_visible and getattr(self,'_scene_record_index',None) is not None and hasattr(self,'scene_source'):
             from .services import inspect_scene_with_game_layers
             index=self._scene_record_index
             include_all=self.scene_complete.isChecked()
@@ -1658,32 +1667,34 @@ class Window(QMainWindow):
         self.scene_meshes = []
         self.scene_base_images = {}
         self.scene_uniform_images = {}
+        self.scene_asset_tabs = QTabWidget()
+        layout.insertWidget(layout.indexOf(self.scene_view), self.scene_asset_tabs)
+        uniform_page = QWidget();uniform_layout = QVBoxLayout(uniform_page)
+        shoe_page = QWidget();shoe_layout = QVBoxLayout(shoe_page)
+        stadium_page = QWidget();stadium_layout = QVBoxLayout(stadium_page)
+        self.scene_asset_tabs.addTab(uniform_page, 'Jerseys')
+        self.scene_asset_tabs.addTab(shoe_page, 'Shoes')
+        self.scene_asset_tabs.addTab(stadium_page, 'Stadiums / Floors')
         self.scene_uniforms = QComboBox()
-        self.scene_uniforms.setEditable(True)
+        self.scene_uniforms.setEditable(False)
         self.scene_uniforms.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
-        self.scene_uniforms.completer().setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
-        self.scene_uniforms.completer().setFilterMode(Qt.MatchFlag.MatchContains)
         self.scene_uniforms.activated.connect(self.select_scene_uniform)
-        layout.addWidget(self.scene_uniforms)
-        self.buttons(layout, [('Preview selected jersey', self.select_scene_uniform), ('Open uniform IFF…', self.choose_scene_uniform_file)])
+        uniform_layout.addWidget(self.scene_uniforms)
+        self.buttons(uniform_layout, [('Preview selected jersey', self.select_scene_uniform)])
         self.refresh_uniform_list()
         self.scene_shoes=QComboBox()
-        self.scene_shoes.setEditable(True);self.scene_shoes.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
-        self.scene_shoes.completer().setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
-        self.scene_shoes.completer().setFilterMode(Qt.MatchFlag.MatchContains)
-        layout.addWidget(self.scene_shoes)
-        self.buttons(layout,[('Preview selected shoes',self.preview_shoes)])
+        self.scene_shoes.setEditable(False)
+        shoe_layout.addWidget(self.scene_shoes)
+        self.buttons(shoe_layout,[('Preview selected shoes',self.preview_shoes)])
         self.refresh_shoe_list()
         self.scene_stadiums = QComboBox()
-        self.scene_stadiums.setEditable(True)
+        self.scene_stadiums.setEditable(False)
         self.scene_stadiums.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
-        self.scene_stadiums.completer().setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
-        self.scene_stadiums.completer().setFilterMode(Qt.MatchFlag.MatchContains)
-        layout.addWidget(self.scene_stadiums)
+        stadium_layout.addWidget(self.scene_stadiums)
         self.scene_stadium_mode = QComboBox()
         self.scene_stadium_mode.addItems(['Arena and floor', 'Floor only', 'Arena only'])
-        layout.addWidget(self.scene_stadium_mode)
-        self.buttons(layout, [('Preview selected stadium / floor', self.preview_stadium)])
+        stadium_layout.addWidget(self.scene_stadium_mode)
+        self.buttons(stadium_layout, [('Preview selected stadium / floor', self.preview_stadium)])
         self.refresh_stadium_list()
         self.scene_palette_state = QLabel('No roster associated; embedded material textures only')
         layout.addWidget(self.scene_palette_state)
@@ -1706,6 +1717,16 @@ class Window(QMainWindow):
         self.scene_shoes.setCurrentIndex(self.scene_shoes.findData(entry['index']))
         self.preview_shoes()
 
+    def preview_origin_label(self, entry):
+        if not self.preview_overrides.isChecked():return ''
+        return ' [Override]' if entry['index'] in getattr(self, '_preview_replacement_indices', set()) else ' [JB fallback]'
+
+    def refresh_preview_lists(self):
+        try:archive = self.preview_archive()
+        except ValueError:return
+        self._preview_replacement_indices = set(getattr(archive, 'replacements', {}))
+        self.refresh_uniform_list();self.refresh_shoe_list();self.refresh_stadium_list()
+
     def refresh_stadium_list(self):
         import re
         if not hasattr(self, 'scene_stadiums'):return
@@ -1722,7 +1743,7 @@ class Window(QMainWindow):
                 if not match:continue
                 names = teams.get(int(match[1]), [])
                 label = (names[0] + ' — ') if len(names) == 1 else ''
-                self.scene_stadiums.addItem(label + entry['name'], entry['index'])
+                self.scene_stadiums.addItem(label + entry['name'] + self.preview_origin_label(entry), entry['index'])
         self.scene_stadiums.setCurrentIndex(max(0, self.scene_stadiums.findData(current)))
 
     def preview_stadium(self):
@@ -1750,6 +1771,7 @@ class Window(QMainWindow):
 
     def refresh_shoe_list(self):
         import re
+        current = self.scene_shoes.currentData()
         self.scene_shoes.clear()
         self.scene_shoes.addItem('Choose shoes from the loaded JB / overrides',None)
         if not self.archive:return
@@ -1761,7 +1783,8 @@ class Window(QMainWindow):
             family=int(match[1]);color=match[2]
             brand=0 if color is None else {1:1,2:2,3:3,5:4}.get(family//100)
             label=BRANDS.get(brand,'Shoe')+' — '+COLORS.get(int(color) if color else family,'Color '+str(color))+' — '+name
-            self.scene_shoes.addItem(label,entry['index'])
+            self.scene_shoes.addItem(label + self.preview_origin_label(entry),entry['index'])
+        self.scene_shoes.setCurrentIndex(max(0, self.scene_shoes.findData(current)))
 
     def preview_shoes(self):
         if self.active or not self.archive:return
@@ -1805,7 +1828,7 @@ class Window(QMainWindow):
                 names=sorted(linked_names.get(entry['name'],teams.get(int(match[2]),[])))
                 label=(names[0]+' - ') if len(names)==1 else ''
                 label += {'h':'Home','a':'Away','x':'Alternate 1','y':'Alternate 2','z':'Alternate 3'}[match[1].lower()]+' - '+entry['name']
-                self.scene_uniforms.addItem(label,entry['index'])
+                self.scene_uniforms.addItem(label + self.preview_origin_label(entry),entry['index'])
         self.scene_uniforms.setCurrentIndex(max(0,self.scene_uniforms.findData(selected_id)))
 
     def choose_scene_uniform_file(self):

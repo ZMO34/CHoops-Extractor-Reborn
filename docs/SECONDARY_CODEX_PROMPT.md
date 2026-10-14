@@ -84,6 +84,18 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# v1.14.1 preview source/list hotfix
+
+Release: https://github.com/ZMO34/CHoops-Extractor-Reborn/releases/tag/v1.14.1
+
+Top-toolbar Source JB / Selected overrides dropdown controls all previews.
+Models / Courts offers Jerseys, Shoes and Stadiums / Floors subtabs with pick-only
+lists, explicit Override / JB fallback labels and retained selections. Missing
+archive/scene names are handled safely. Switching sources keeps the active page.
+Read-only S258 preview succeeded with unchanged input. 494 portable tests and 22
+native GUI/GL checks passed; Windows frozen startup/audio checks passed.
+Broader roster/shader research remains incomplete as described below.
+
 # v1.14 release preparation
 
 Direct Models / Courts selectors now preview jerseys, shoes and stadium/floor
@@ -320,6 +332,14 @@ consumes big-endian wide characters. The previous shifted LE view only happened
 to work for ASCII. Copy-on-write now preserves non-Latin text and aligned targets.
 The shared formatter count is limited to 65,535 UTF-16 units; smaller display
 ceilings remain unresolved. Qt's unrelated 32,767-character cap is removed.
+
+Preview source/list hotfix: the top toolbar dropdown selects Source JB or Selected
+overrides for every preview category. Models / Courts has Jerseys, Shoes and
+Stadiums / Floors subtabs with pick-only asset lists, preventing typed unmatched
+filenames. Override mode labels replaced assets and JB fallbacks explicitly.
+Unnamed archive entries no longer break stock court-reference lookup.
+v1.14 is published from 2158df982f43ba3dbb1e2df1cfcd2030fb0a25ea;
+this follow-up targets the reported missing-name error and source-list UX.
 
 ---
 
@@ -1920,3 +1940,9 @@ GUI build/preview destinations together. No RPCS3 or automatic/testing JB build.
 Current continuation: 482 portable tests passed, 9 offscreen GL skips, 2 deselected; 28 native targeted checks passed after them. Guide tests verify flat colour with transparent textures, zero palette tint, glow mode and both automatic/manual texture selection. Runtime BE text tests independently check field+delta-1 and save/reopen/undo. No RPCS3 or JB build.
 
 Combined v1.14 preview release checks: 491 portable tests passed, 9 offscreen OpenGL skips, 2 deselected; 37 native Qt/OpenGL targeted checks passed. Direct jersey launch, captured source/override stadium selection, scene-mode identity and reload behavior are covered. No RPCS3 or JB build.
+
+v1.14.1 preview source/list hotfix: 493 portable tests passed (9 offscreen GL skips, 2 deselected); 17 native direct-preview/GL checks passed. Read-only stock S258 floor preview returned five parts and twelve textures; source hash unchanged. Shared source dropdown and pick-only category lists have regression coverage. No RPCS3 or JB build.
+
+Additional hotfix regression: global source switching preserves the active texture category rather than navigating to a prior 3D view. Final full suite: 494 passed, 9 offscreen GL skips, 2 deselected; nine direct-preview checks passed.
+
+Final v1.14.1 native preview/GL/roster-scale GUI suite: 22 passed. Packaged Windows startup and synthetic audio round-trip passed. Verified v1.13 audio helpers and matching source/licence archives reused.

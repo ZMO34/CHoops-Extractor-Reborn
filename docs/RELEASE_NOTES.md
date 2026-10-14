@@ -1,3 +1,11 @@
+# v1.14.1 — preview source and asset lists
+
+Fixes NoneType.lower during S258 floor preview by skipping unnamed archive
+entries safely. The top toolbar uses one Source JB / Selected overrides dropdown
+for all preview categories. Models / Courts has Jerseys, Shoes and Stadiums /
+Floors subtabs with pick-only lists and explicit Override / JB fallback labels.
+Includes v1.14 functionality. No emulator or automatic JB build.
+
 # v1.14 — direct previews and override selection
 
 Select jerseys, shoes and stadium/floor packages directly from the loaded JB
