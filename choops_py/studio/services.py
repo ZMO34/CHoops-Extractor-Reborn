@@ -541,3 +541,16 @@ def inspect_shoe_preview(archive,texture_entry,job=None):
     result['images'].update(images);result['textures']=list(images)
     result['warnings'].append('Standalone shoe rest pose; texture family does not change the authored shoe silhouette')
     return source,result
+
+
+def inspect_stadium_preview(archive, entry, mode=0, job=None):
+    """Load scene geometry and textures directly from the captured preview source."""
+    from ..formats.standard_iff import StandardIFF
+    source = materialize(archive, entry)
+    iff = StandardIFF(source.read_bytes())
+    name = 'arena' if mode == 2 else 'floor'
+    matches = [r for r in iff.records if r['type'] == 'SCNE' and r['name'].lower() == name]
+    if len(matches) != 1:
+        raise ValueError('The selected stadium has no unique ' + name + ' SCNE')
+    record = matches[0]
+    return source, inspect_scene_preview(source, record['index'], mode == 0, job, record_name=record['name'])

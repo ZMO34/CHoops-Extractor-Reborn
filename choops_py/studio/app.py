@@ -742,6 +742,7 @@ class Window(QMainWindow):
             self.roster = None
             self.refresh_uniform_list()
             self.refresh_shoe_list()
+            self.refresh_stadium_list()
             for view in self.roster_views.values():
                 view.setModel(None)
             self.roster_state.setText('No roster loaded; load the current JB folder roster')
@@ -787,7 +788,7 @@ class Window(QMainWindow):
         def display(result):
             apply(self.archive,result['identities'])
             self.refresh_catalog()
-            self.refresh_uniform_list();self.refresh_shoe_list()
+            self.refresh_uniform_list();self.refresh_shoe_list();self.refresh_stadium_list()
             self.log(f"{result['matched_names']} canonical filenames verified by CRC32; {result['internal_labels']} internal-record labels. Labels preserve original hash identities.")
         self.run_job('Recover archive identities',lambda job:recover(self.archive,candidates,job),display,cancellable=True)
 
@@ -955,6 +956,7 @@ class Window(QMainWindow):
             QTimer.singleShot(100,self.reload_preview_source);return
         if getattr(self,'_jersey_preview_row',None):return self.refresh_jersey_preview()
         if getattr(self,'_shoe_preview_active',False):return self.preview_shoes()
+        if getattr(self, '_direct_stadium_active', False):return self.preview_stadium()
         try: archive=self.preview_archive()
         except ValueError as error:return self.show_error(str(error))
         if getattr(self,'_scene_record_index',None) is not None and hasattr(self,'scene_source'):
@@ -1615,7 +1617,7 @@ class Window(QMainWindow):
         self.scene_uniforms.completer().setFilterMode(Qt.MatchFlag.MatchContains)
         self.scene_uniforms.activated.connect(self.select_scene_uniform)
         layout.addWidget(self.scene_uniforms)
-        self.buttons(layout, [('Open uniform IFF…', self.choose_scene_uniform_file)])
+        self.buttons(layout, [('Preview selected jersey', self.select_scene_uniform), ('Open uniform IFF…', self.choose_scene_uniform_file)])
         self.refresh_uniform_list()
         self.scene_shoes=QComboBox()
         self.scene_shoes.setEditable(True);self.scene_shoes.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
@@ -1624,6 +1626,17 @@ class Window(QMainWindow):
         layout.addWidget(self.scene_shoes)
         self.buttons(layout,[('Preview selected shoes',self.preview_shoes)])
         self.refresh_shoe_list()
+        self.scene_stadiums = QComboBox()
+        self.scene_stadiums.setEditable(True)
+        self.scene_stadiums.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
+        self.scene_stadiums.completer().setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
+        self.scene_stadiums.completer().setFilterMode(Qt.MatchFlag.MatchContains)
+        layout.addWidget(self.scene_stadiums)
+        self.scene_stadium_mode = QComboBox()
+        self.scene_stadium_mode.addItems(['Arena and floor', 'Floor only', 'Arena only'])
+        layout.addWidget(self.scene_stadium_mode)
+        self.buttons(layout, [('Preview selected stadium / floor', self.preview_stadium)])
+        self.refresh_stadium_list()
         self.scene_palette_state = QLabel('No roster associated; embedded material textures only')
         layout.addWidget(self.scene_palette_state)
 
@@ -1645,10 +1658,52 @@ class Window(QMainWindow):
         self.scene_shoes.setCurrentIndex(self.scene_shoes.findData(entry['index']))
         self.preview_shoes()
 
+    def refresh_stadium_list(self):
+        import re
+        if not hasattr(self, 'scene_stadiums'):return
+        current = self.scene_stadiums.currentData()
+        self.scene_stadiums.clear()
+        self.scene_stadiums.addItem('Choose a stadium from the loaded JB / overrides', None)
+        teams = {}
+        if self.roster:
+            for row in self.roster.rows['teams']:
+                teams.setdefault(row['asset_id'], []).append(row['school_name'])
+        if self.archive:
+            for entry in sorted(self.archive.entries, key=lambda e:e['name'] or ''):
+                match = re.fullmatch(r's(\d+)\.iff', entry['name'] or '', re.IGNORECASE)
+                if not match:continue
+                names = teams.get(int(match[1]), [])
+                label = (names[0] + ' — ') if len(names) == 1 else ''
+                self.scene_stadiums.addItem(label + entry['name'], entry['index'])
+        self.scene_stadiums.setCurrentIndex(max(0, self.scene_stadiums.findData(current)))
+
+    def preview_stadium(self):
+        if self.active or not self.archive:return
+        index = self.scene_stadiums.currentData()
+        if index is None:return self.log('Choose a stadium package first.')
+        try:archive = self.preview_archive()
+        except ValueError as error:return self.show_error(str(error))
+        from .services import inspect_stadium_preview
+        entry = next(e for e in archive.entries if e['index'] == index)
+        mode = self.scene_stadium_mode.currentIndex()
+        def display(value):
+            source, result = value
+            self._direct_stadium_active = True
+            self._jersey_preview_row = None
+            self._shoe_preview_active = False
+            self._scene_record_index = None
+            self.jersey_shape_controls.hide()
+            self.scene_parts.clear();self.scene_textures.clear()
+            self.scene_view.set_image(None)
+            self.navigate_to('Models / Courts')
+            self.show_scene_preview(result, source)
+        self.run_job('Preview stadium geometry and textures',
+                     lambda job:inspect_stadium_preview(archive, entry, mode, job), display, cancellable=True)
+
     def refresh_shoe_list(self):
         import re
         self.scene_shoes.clear()
-        self.scene_shoes.addItem('Choose shoe artwork from the loaded JB folder',None)
+        self.scene_shoes.addItem('Choose shoes from the loaded JB / overrides',None)
         if not self.archive:return
         from ..roster.shoes import BRANDS,COLORS
         for entry in sorted(self.archive.entries,key=lambda e:e['name'] or ''):
@@ -1669,6 +1724,7 @@ class Window(QMainWindow):
         except ValueError as error:return self.show_error(str(error))
         entry=self.archive.entries[index]
         def display(value):
+            self._direct_stadium_active=False
             self._shoe_preview_active=True;self._scene_record_index=None
             source,result=value
             self._jersey_preview_row=None;self.jersey_shape_controls.hide()
@@ -1682,7 +1738,7 @@ class Window(QMainWindow):
         import re
         selected_id = self.scene_uniforms.currentData()
         self.scene_uniforms.clear()
-        self.scene_uniforms.addItem('Choose a uniform from the loaded JB folder', None)
+        self.scene_uniforms.addItem('Choose a uniform from the loaded JB / overrides', None)
         teams = {}
         if self.roster:
             for team in self.roster.rows['teams']:
@@ -1712,15 +1768,15 @@ class Window(QMainWindow):
         entry_index=self.scene_uniforms.currentData()
         if entry_index is None or not self.archive:return
         entry=self.archive.entries[entry_index]
+        import re
+        match = re.fullmatch(r'u([haxyz])(\d+)\.iff', entry['name'] or '', re.IGNORECASE)
+        if not match:return self.log('Choose a uniform package first.')
+        uniform = {'variant_code': 'haxyz'.index(match[1].lower()), 'uniform_asset_id': int(match[2])}
         if self._jersey_preview_row:
-            import re
-            match=re.fullmatch(r'u([haxyz])(\d+)\.iff',entry['name'] or '',re.IGNORECASE)
-            if match:
-                uniform={'variant_code':'haxyz'.index(match[1].lower()),'uniform_asset_id':int(match[2])}
-                uniform.update({key:self._jersey_preview_row.get(key) for key in ('preview_number','preview_player_index','preview_name')})
-                self.preview_jersey(uniform,self.jersey_neck.currentData(),self.jersey_build.currentData(),self.jersey_shorts.currentData(),self.jersey_parts.currentIndex())
-                return
-        self.load_scene_uniform(None,entry)
+            uniform.update({key:self._jersey_preview_row.get(key) for key in ('preview_number','preview_player_index','preview_name')})
+        self.preview_jersey(uniform, self.jersey_neck.currentData(), self.jersey_build.currentData(),
+                           self.jersey_shorts.currentData(), self.jersey_parts.currentIndex())
+
 
     def load_scene_uniform(self, source, entry=None):
         if source is not None and self._jersey_preview_row:
@@ -1762,6 +1818,7 @@ class Window(QMainWindow):
         try: archive=self.preview_archive()
         except ValueError as error:return self.show_error(str(error))
         record_name=self._scene_record_name
+        self._direct_stadium_active=False
         self._scene_record_index=index;self._shoe_preview_active=False
         self._jersey_preview_row=None;self.jersey_shape_controls.hide()
         self.navigate_to('Models / Courts')
@@ -1796,6 +1853,7 @@ class Window(QMainWindow):
             except (ValueError,OSError) as error:return self.show_error(str(error))
         def display(value):
             source,result=value;self._jersey_preview_row=dict(uniform)
+            self._direct_stadium_active=False
             self._shoe_preview_active=False;self._scene_record_index=None
             self.scene_parts.clear();self.scene_textures.clear()
             self.jersey_neck.setCurrentIndex(self.jersey_neck.findData(neck));self.jersey_build.setCurrentIndex(self.jersey_build.findData(build));self.jersey_shorts.setCurrentIndex(self.jersey_shorts.findData(shorts));self.jersey_parts.setCurrentIndex(parts)
