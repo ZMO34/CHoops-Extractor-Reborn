@@ -444,7 +444,7 @@ class Window(QMainWindow):
 
         layout = self.page(
             "Audio workspace",
-            "Browse Licensed Music and Fight Songs from the selected JB. WAV exports and replacement folders are prepared under output/ for you to stage and build manually.",
+            "Browse Licensed Music and Fight Songs from the selected JB. WAV exports and replacement folders are prepared under output/ for you to select as overrides and build manually.",
         )
 
         self.audio_state = QLabel("Open a JB folder, then load its audio catalog.")
@@ -937,7 +937,7 @@ class Window(QMainWindow):
         if not self.archive:return None
         if not self.preview_overrides.isChecked():return self.archive
         mod=getattr(self,'preview_mod',None) or self.mod_path.text()
-        if not (Path(mod)/'overrides.json').is_file():raise ValueError('Select and stage an overrides folder before using override previews')
+        if not (Path(mod)/'overrides.json').is_file():raise ValueError('Select an overrides folder before using override previews')
         return PreviewArchive(self.archive,mod)
 
     def preview_file(self,source,archive=None):
@@ -1225,7 +1225,7 @@ class Window(QMainWindow):
 
         layout = self.page(
             "Roster editor",
-            "Edit supported roster and conference records. Save a copy, reopen it, then stage it for a separate JB build.",
+            "Edit supported roster and conference records. Save a copy, reopen it, then select it as an override for a separate JB build.",
         )
 
         self.buttons(
@@ -1521,7 +1521,7 @@ class Window(QMainWindow):
         if not self.archive:return self.log('Open the destination JB folder first.')
         entries=[entry for entry in self.archive.entries if entry['name']=='roster_english.iff']
         if len(entries)!=1:return self.log('The loaded JB has no unique roster_english.iff.')
-        output,_=QFileDialog.getSaveFileName(self,'Export edited roster for manual JB staging',str(OUTPUT/'rosters'/'roster_english.iff'),'Game roster (*.iff)')
+        output,_=QFileDialog.getSaveFileName(self,'Export edited roster for manual JB overrides',str(OUTPUT/'rosters'/'roster_english.iff'),'Game roster (*.iff)')
         if not output:return
         from ..roster.workflow import export_game_roster
         self.run_job('Export game roster IFF',lambda job:export_game_roster(self.roster,self.archive.read(entries[0]),output))
@@ -1888,7 +1888,7 @@ class Window(QMainWindow):
         self.buttons(
             layout,
             [
-                ("Stage replacement folder…", self.stage_replacements),
+                ("Select overrides folder…", self.stage_replacements),
                 ("Export mod patch…", self.export_mod_patch),
                 ("Import mod patch…", self.import_mod_patch),
                 ("Dry run", lambda: self.build_game(True)),
@@ -1915,7 +1915,7 @@ class Window(QMainWindow):
             mod = Path(self.mod_path.text())
 
             self.run_job(
-                "Stage and preflight replacement folder",
+                "Load overrides folder and check compatibility",
                 lambda job: stage_folder(self.source, Path(path), mod, job),
                 lambda result: self.builder_completed(result, "staging"),
                 cancellable=True,
@@ -1961,7 +1961,7 @@ class Window(QMainWindow):
             source, mod = self.source, Path(self.mod_path.text())
 
             self.run_job(
-                "Validate and stage mod patch",
+                "Check and load mod patch",
                 lambda job: import_patch(source, Path(package), mod),
             )
 
@@ -1987,11 +1987,14 @@ class Window(QMainWindow):
         if result.get("status") == "cancelled" or operation == "preflight":
             return
         if operation == "staging":
+            self.mod_path.setText(str(result['mod']))
             self.preview_mod=result.get('mod')
             self.preview_overrides.setChecked(True)
             title = "DDS prioritization complete"
-            message = "Override staging and DDS prioritization are complete.\n\n"
-            message += f"Staged archives: {result.get('staged', 0)}\nWorkspace: {result.get('mod', '')}"
+            message = "Overrides are ready. DDS prioritization is complete.\n\n"
+            message += f"Prepared archives: {result.get('staged', 0)}\nWorkspace: {result.get('mod', '')}"
+            if result.get('workspace_changed'):
+                message += '\nA new workspace was selected automatically; the existing folder was preserved.'
             unapplied = len(result.get("unapplied_overrides", []))
             if unapplied:
                 message += f"\n\n{unapplied} overrides could not be applied. Review the details before building."

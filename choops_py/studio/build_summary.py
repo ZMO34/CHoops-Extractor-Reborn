@@ -15,5 +15,7 @@ def summary(result):
     if len(groups)>50:lines.append(f"… {len(groups)-50} more replaced archives")
     for item in problems[:30]:lines.append(f"Issue: {item.get('archive','')} / {item.get('selector','')}: {item.get('reason','unapplied')}")
     if len(problems)>30:lines.append(f"… {len(problems)-30} more unapplied overrides")
+    if result.get('mod'):lines.append('Workspace: '+str(result['mod']))
+    if result.get('workspace_changed'):lines.append('Existing workspace preserved; a new workspace was selected.')
     if result.get('output'):lines.append('Output: '+str(result['output']))
     return '\n'.join(lines)

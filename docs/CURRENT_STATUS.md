@@ -1,3 +1,12 @@
+# Override-folder selection fix
+
+The GUI action is now Select overrides folder… . Existing mod directories no
+longer cause Choose a new mod directory: selection prepares a fresh numbered
+workspace, preserving old folders, and updates both build and preview paths
+only after successful compatibility checks. Verification: 464 portable tests passed; 26 targeted override checks passed.
+Separate PR from the ongoing roster
+and shader research (#14); no emulator or automatic JB build.
+
 # Current project status
 
 PR #13 combined roster/arena continuation: twelve additional appearance/tattoo/

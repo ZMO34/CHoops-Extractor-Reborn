@@ -12,15 +12,15 @@ class PreviewArchive:
         root=Path(mod).resolve();manifest=root/'overrides.json'
         if not manifest.is_file():return
         conditions=root/'source_preconditions.json'
-        if not conditions.is_file():raise ValueError('Staged previews require source preconditions; stage this mod again')
+        if not conditions.is_file():raise ValueError('Override previews require source preconditions; select the overrides folder again')
         self.conditions={e['index']:e for e in json.loads(conditions.read_text(encoding='utf8'))['entries']}
         for row in json.loads(manifest.read_text(encoding='utf8')):
-            if row.get('subfile') is not None or row.get('kind')!='archive':raise ValueError('Stage complete archives before previewing this mod')
+            if row.get('subfile') is not None or row.get('kind')!='archive':raise ValueError('Select an overrides folder containing complete archives before previewing this mod')
             matches=[e for e in self.entries if e['hash']==replacement_hash(row['archive'])]
-            if len(matches)!=1:raise ValueError('Staged preview archive identity is ambiguous')
+            if len(matches)!=1:raise ValueError('Override preview archive identity is ambiguous')
             entry=matches[0];target=(root/row['path']).resolve()
-            if not target.is_relative_to(root) or not target.is_file():raise ValueError('Staged preview path is invalid')
-            if entry['index'] in self.replacements:raise ValueError('Duplicate staged archive')
+            if not target.is_relative_to(root) or not target.is_file():raise ValueError('Override preview path is invalid')
+            if entry['index'] in self.replacements:raise ValueError('Duplicate override archive')
             self.replacements[entry['index']]=(target,row['sha256'])
             entry['size']=target.stat().st_size
 
@@ -30,9 +30,9 @@ class PreviewArchive:
         expected=self.conditions.get(index)
         original=self.base.entries[index]
         if not expected or expected['hash']!=original['hash'] or expected['sha256']!=digest(self.base.read(original)):
-            raise ValueError('Staged previews belong to another or changed JB source')
+            raise ValueError('Override previews belong to another or changed JB source')
         path,checksum=self.replacements[index];data=path.read_bytes()
-        if digest(data)!=checksum:raise ValueError('Staged preview asset checksum changed; restage overrides')
+        if digest(data)!=checksum:raise ValueError('Override preview asset checksum changed; select the overrides folder again')
         return data
 
     def chunks(self,entry):

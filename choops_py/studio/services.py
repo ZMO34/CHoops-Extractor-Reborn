@@ -186,7 +186,12 @@ def stage_folder(source: Path, folder: Path, mod: Path, job=None) -> dict:
     from ..archive.build_copy import preflight
     from ..archive.manifests import write_bytes
     archive=Archive(source);folder=Path(folder);mod=safe_output(mod,[source,folder])
-    if mod.exists():raise ValueError('Choose a new mod directory')
+    requested_mod = mod
+    # Staging creates a complete snapshot. Never merge with or erase an old one.
+    suffix = 2
+    while mod.exists():
+        mod = safe_output(requested_mod.with_name(requested_mod.name + '_' + str(suffix)), [source, folder])
+        suffix += 1
     job=job or JobContext();discovery=discover(archive,folder,job)
     work=mod.parent/('.mod_'+uuid.uuid4().hex);rows: list[dict]=[];conditions=[];growth=[];unchanged=0
     details=[];unapplied: list[dict]=[]
@@ -212,13 +217,13 @@ def stage_folder(source: Path, folder: Path, mod: Path, job=None) -> dict:
                 if len(payload)>len(before):growth.append(dict(archive=name,old_bytes=len(before),new_bytes=len(payload)))
         names=[row['archive'].casefold() for row in rows]
         if len(names)!=len(set(names)):raise ValueError('A paired CDF texture import conflicts with a complete CDF replacement')
-        if not rows:raise ValueError('All discovered overrides match the selected game; no changes to stage')
+        if not rows:raise ValueError('All discovered overrides match the selected game; no changed overrides to prepare')
         save_json(work/'overrides.json',rows,[source,folder])
         save_json(work/'source_preconditions.json',dict(schema=1,entries=conditions),[source,folder])
         save_json(work/'import_options.json',dict(schema=1,allow_archive_growth=True,dds_priority=True,scne_priority=True),[source,folder])
-        report=dict(staged=len(rows),mod=str(mod),detected_formats=discovery['detected_formats'],scanned_files=discovery['scanned_files'],dds_files=discovery['dds_files'],binary_records=discovery['binary_records'],ignored_files=discovery['ignored_files'],shadowed_dds=discovery['shadowed_dds'],resolved_targets=discovery['resolved_targets'],unapplied_overrides=unapplied,unchanged_archives=unchanged,growing_archives=growth,dds_priority=True,scne_priority=True,imports=details)
+        report=dict(staged=len(rows),mod=str(mod),requested_mod=str(requested_mod),workspace_changed=mod != requested_mod,detected_formats=discovery['detected_formats'],scanned_files=discovery['scanned_files'],dds_files=discovery['dds_files'],binary_records=discovery['binary_records'],ignored_files=discovery['ignored_files'],shadowed_dds=discovery['shadowed_dds'],resolved_targets=discovery['resolved_targets'],unapplied_overrides=unapplied,unchanged_archives=unchanged,growing_archives=growth,dds_priority=True,scne_priority=True,imports=details)
         save_json(work/'folder_import_report.json',report,[source,folder])
-        job.check();job.progress(0,1,'Validating staged overrides')
+        job.check();job.progress(0,1,'Checking override compatibility')
         _,patches=preflight(source,work,job)
         work.rename(mod)
         return report

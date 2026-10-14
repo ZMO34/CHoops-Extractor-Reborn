@@ -259,3 +259,12 @@ single-slice storage and continues to reject deeper volumes. The existing
 volume fixture now covers acceptance at depth one and rejection at depth two.
 Automated checks were not run for this change; no RPCS3 or gameplay validation
 was performed.
+
+## Override-folder selection regression
+
+Python 3.12.14 on Windows: tools/dev/verify.py passed with 464 tests, 7
+offscreen GL skips and 2 deselected checks. Compile, CLI/Qt smoke, Ruff, mypy,
+handoff and diff checks passed. Targeted override tests: 26 passed. Repeated
+selection preserves previous snapshots, skips occupied numbered workspaces,
+compiles current artwork, cleans only its failed temporary workspace and updates
+GUI build/preview destinations together. No RPCS3 or automatic/testing JB build.
