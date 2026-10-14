@@ -105,3 +105,11 @@ Override selection fix: automatically choose a fresh numbered workspace when the
 Continuation: optional stock-court alignment guides default off and leave floor shader/palette rendering intact. Correct ROST runtime UTF-16BE string fixup, protect the 65,535-unit descriptor count, and remove Qt’s unrelated input ceiling.
 
 v1.14: direct jersey, shoe and stadium/floor selectors use Source JB or selected overrides without manual IFF opening. Jersey selection initializes the mesh; stadium modes choose combined, floor or arena. Source switching reloads the active direct preview.
+
+Preview source/list hotfix: the top toolbar dropdown selects Source JB or Selected
+overrides for every preview category. Models / Courts has Jerseys, Shoes and
+Stadiums / Floors subtabs with pick-only asset lists, preventing typed unmatched
+filenames. Override mode labels replaced assets and JB fallbacks explicitly.
+Unnamed archive entries no longer break stock court-reference lookup.
+v1.14 is published from 2158df982f43ba3dbb1e2df1cfcd2030fb0a25ea;
+this follow-up targets the reported missing-name error and source-list UX.

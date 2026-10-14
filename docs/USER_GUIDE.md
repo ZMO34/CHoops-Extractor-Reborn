@@ -162,3 +162,11 @@ both geometry and textures. Missing required cloth/shoe meshes are reported;
 no substitute geometry is guessed. Uniform top/shorts and shape dropdowns are
 available after a direct jersey preview. School labels appear when a roster is
 loaded, while archive selectors also work without a roster.
+
+Preview source/list hotfix: the top toolbar dropdown selects Source JB or Selected
+overrides for every preview category. Models / Courts has Jerseys, Shoes and
+Stadiums / Floors subtabs with pick-only asset lists, preventing typed unmatched
+filenames. Override mode labels replaced assets and JB fallbacks explicitly.
+Unnamed archive entries no longer break stock court-reference lookup.
+v1.14 is published from 2158df982f43ba3dbb1e2df1cfcd2030fb0a25ea;
+this follow-up targets the reported missing-name error and source-list UX.

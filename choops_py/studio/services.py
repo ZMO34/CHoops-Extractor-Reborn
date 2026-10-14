@@ -290,13 +290,13 @@ def inspect_scene_with_game_layers(source, record_index, archive, include_all=Fa
     from ..formats.scene_palette import supplement_floor_layers
     base = getattr(archive, 'base', archive)
     # Fixed reference court, independent of selected school and override layout.
-    matches = [e for e in base.entries if e.get('name', '').lower() == 's256.iff']
+    matches = [e for e in base.entries if (e.get('name') or '').lower() == 's256.iff']
     if len(matches) != 1:
         return result
     original_path = materialize(base, matches[0])
     from ..formats.standard_iff import StandardIFF
     iff = StandardIFF(original_path.read_bytes())
-    floors = [r for r in iff.records if r['type'] == 'SCNE' and r['name'].lower() == 'floor']
+    floors = [r for r in iff.records if r['type'] == 'SCNE' and (r.get('name') or '').lower() == 'floor']
     if len(floors) != 1:
         result['warnings'].append('No unique stock reference floor; alignment guides are unavailable')
         return result
@@ -346,9 +346,9 @@ def inspect_scene_preview(source: Path, record_index: int, include_all=False, jo
         by_index = {a.package_index: a.name for a in assets}
         result['textures'].extend(a.name for a in assets)
         for mesh in scene['meshes']:
-            mesh['uniform_surface'] = 'shorts' if 'short' in rec['name'].lower() or 'short' in source.stem.lower() else 'jersey' if 'jersey' in rec['name'].lower() or source.stem.lower().startswith('cloth') else None
-            mesh['court_surface'] = rec['name'].lower() == 'floor'
-            mesh['name'] = rec['name'] + '/' + mesh['name']
+            mesh['uniform_surface'] = 'shorts' if 'short' in (rec.get('name') or '').lower() or 'short' in source.stem.lower() else 'jersey' if 'jersey' in (rec.get('name') or '').lower() or source.stem.lower().startswith('cloth') else None
+            mesh['court_surface'] = (rec.get('name') or '').lower() == 'floor'
+            mesh['name'] = (rec.get('name') or 'SCNE ' + str(rec['index'])) + '/' + mesh['name']
             for batch in mesh['batches']:
                 batch['texture'] = by_index.get(batch['texture_index'])
                 batch['lightmap_texture']=by_index.get(batch.get('lightmap_index'))
@@ -572,7 +572,7 @@ def inspect_stadium_preview(archive, entry, mode=0, job=None):
     source = materialize(archive, entry)
     iff = StandardIFF(source.read_bytes())
     name = 'arena' if mode == 2 else 'floor'
-    matches = [r for r in iff.records if r['type'] == 'SCNE' and r['name'].lower() == name]
+    matches = [r for r in iff.records if r['type'] == 'SCNE' and (r.get('name') or '').lower() == name]
     if len(matches) != 1:
         raise ValueError('The selected stadium has no unique ' + name + ' SCNE')
     record = matches[0]
