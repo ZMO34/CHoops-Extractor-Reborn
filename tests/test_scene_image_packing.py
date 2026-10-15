@@ -66,3 +66,45 @@ def test_non_stadium_import_removes_old_oversized_images(tmp_path):
     for field,expected in [(520,b'FIRST STREAM!!!!'),(536,b'SECOND STREAM!!!'),(304+0xac,b'INDICES!')]:
         start=struct.unpack_from('>I',blocks[0],field)[0]-1
         assert blocks[1][start:start+len(expected)]==expected
+
+
+def inline_fixture():
+    original=fixture();header=bytearray(original[0]);payload=original[1]
+    for field,flags,length in [(520,0x40000002,16),(536,0x40000002,16),(304+0xac,0x10,8)]:
+        start=struct.unpack_from('>I',header,field)[0]-1
+        target=len(header);header.extend(payload[start:start+length])
+        struct.pack_into('>I',header,field,target-field+1)
+        struct.pack_into('>I',header,field-12 if field in (520,536) else 304+0xa4,flags)
+    return [bytes(header),payload]
+
+
+def test_inline_menu_geometry_is_not_confused_with_texture_payload():
+    original=inline_fixture()
+    imported=apply_raw_texture(original,'texture_0',txtr_fixture(format=0x88,width=32,height=32,split=True))
+    packed=repack_images(original,imported)
+    assert packed[0][304:]==original[0][304:]
+    for field,expected in [(520,b'FIRST STREAM!!!!'),(536,b'SECOND STREAM!!!'),(304+0xac,b'INDICES!')]:
+        start=field+struct.unpack_from('>I',packed[0],field)[0]-1
+        assert packed[0][start:start+len(expected)]==expected
+    assert TXTR([textures(packed)[0].header,textures(packed)[0].payload]).info()['width']==32
+
+
+def test_inline_geometry_changes_and_bad_ranges_still_fail_closed():
+    original=inline_fixture();changed=[bytearray(original[0]),original[1]]
+    changed[0][-1]^=1
+    with pytest.raises(ValueError,match='Inline geometry changed'):
+        repack_images(original,[bytes(changed[0]),changed[1]])
+    head=bytearray(original[0]);struct.pack_into('>I',head,520,0x7fffffff)
+    with pytest.raises(ValueError):repack_images([bytes(head),original[1]],[bytes(head),original[1]])
+
+
+def test_menu_gpu_stream_flag_remains_data_relative():
+    original=fixture();head=bytearray(original[0])
+    for field in (508,524):struct.pack_into('>I',head,field,0x40000003)
+    struct.pack_into('>I',head,304+0xa4,0x20000010)
+    original=[bytes(head),original[1]]
+    imported=apply_raw_texture(original,'texture_0',txtr_fixture(format=0x88,width=32,height=32,split=True))
+    packed=repack_images(original,imported)
+    for field,expected in [(520,b'FIRST STREAM!!!!'),(536,b'SECOND STREAM!!!'),(304+0xac,b'INDICES!')]:
+        start=struct.unpack_from('>I',packed[0],field)[0]-1
+        assert packed[1][start:start+len(expected)]==expected

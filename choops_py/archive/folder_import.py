@@ -338,7 +338,7 @@ def compile_group(archive,group,job=None):
                 matches=[t for t in package_textures(reference) if t.header[:4]==current.header[:4]]
                 if len(matches)!=1:raise ValueError('Scene texture has no unique base-JB identity: '+selector)
                 target=TXTR([matches[0].header,matches[0].payload])
-            options=dict(preserve_layout=True,reference=target)
+            options=dict(preserve_layout=True,reference=target,allow_single_cube_face=group.get('dds_rank',{}).get(selector,3)<3)
         try:changed,info=apply_dds(parts(rec),rec['type'],texture,file,job,**options)
         except (ValueError,OSError) as error:raise ValueError(selector+': '+str(error)) from error
         changes[rec['index']]=changed

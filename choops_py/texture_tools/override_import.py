@@ -9,7 +9,7 @@ from ..formats.binary import Binary
 from . import dds,gtf,external_converters
 
 
-def apply_dds(parts,kind,selector,source,job=None,converter=None,preserve_layout=False,reference=None):
+def apply_dds(parts,kind,selector,source,job=None,converter=None,preserve_layout=False,reference=None,allow_single_cube_face=False):
     source_data=bytes(source) if isinstance(source,(bytes,bytearray)) else Path(source).read_bytes()
     meta=dds.inspect(source_data)
     index=None
@@ -32,10 +32,14 @@ def apply_dds(parts,kind,selector,source,job=None,converter=None,preserve_layout
         converted=work/'converted.gtf'
         # Legacy exports use depth=1 for ordinary 2D DDS files. The native
         # converter incorrectly treats that header as a 3D texture.
-        normalized=dds.normalized_2d(source_data);input_meta=meta;conformed=False
+        normalized=dds.normalized_2d(source_data);input_meta=meta;conformed=False;single_face=False
         if preserve_layout:
             from .runtime_layout import conform
+            from .legacy_cube import replace_cube_first_face
+            if allow_single_cube_face and reference.info()['cubemap'] and not meta['cubemap']:
+                normalized=replace_cube_first_face(normalized,reference,job);single_face=True
             normalized,conformed=conform(normalized,reference.info(),job)
+            conformed=conformed or single_face
             meta=dds.inspect(normalized)
         if max(meta['width'],meta['height'])>4096:raise ValueError('Texture exceeds the RSX 4096-pixel dimension ceiling')
         conversion_source=work/'input.dds';conversion_source.write_bytes(normalized)
@@ -111,6 +115,7 @@ def apply_dds(parts,kind,selector,source,job=None,converter=None,preserve_layout
         if check.image()!=image:raise ValueError('DDS override failed texture round-trip')
         report={key:meta[key] for key in ('width','height','format','mip_count')}
         report['cache_hit']=(conversion or {}).get('cache_hit',False)
+        if single_face:report.update(cubemap_face_updated='+X',cubemap_faces_preserved=5)
         if preserve_layout:report.update(storage_layout_preserved=True,artwork_resampled=conformed,input_layout=input_meta)
         return [bytes(p) for p in result],report
     finally:

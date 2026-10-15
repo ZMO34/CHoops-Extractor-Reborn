@@ -352,3 +352,30 @@ Final portable suite: 520 passed, 9 offscreen GL skips, 2 deselected.
 Native source/preview/OpenGL suite: 36 passed. Compile, CLI/Qt smoke, Ruff,
 mypy, generated handoff and diff checks passed. Windows package startup/audio
 smoke runs before publication.
+
+## v1.15.3 frontend import reproduction
+
+Read-only frontend_sync import reproduced the false texture/geometry overlap.
+Header-relative streams had flag 0x40000002, pointer 5, valid header vertex floats
+and header-relative 16-bit indices (flag 0x10). GPU menu streams use 0x40000003
+and index flag 0x20000010. The fix imported frontend_sync successfully in memory.
+Synthetic tests preserve both inline vertex streams and indices through image
+packing, preserve GPU menu relocation, and reject real overlaps, invalid ranges
+and changed inline geometry. No RPCS3 or automatic/testing JB build.
+
+`python tools/dev/verify.py`: 523 passed, 9 offscreen GL skips, 2 deselected.
+Compile, CLI/Qt smoke, Ruff, mypy, handoff and diff checks passed.
+
+The broader check passed 13 of 14 non-stadium scene groups and exposed a second
+studio cubemap mismatch. Added a guarded legacy first-face import: regression
+checks retain the original descriptor and five other DDS faces exactly, with
+strict rejection retained for direct imports without this legacy policy.
+
+Final complete suite: 524 passed, 9 offscreen GL skips, 2 deselected;
+51 targeted import/packing/live-preview checks passed. Actual studio import
+completed with +X updated and five source faces preserved.
+
+Final read-only supplied-input run: all 14 non-stadium SCNE groups compiled
+successfully together, zero failures. Legacy cube handling is isolated in its
+own module so unchanged ordinary conversions retain their cache identities.
+The final portable verification command passed all 524 tests again.
