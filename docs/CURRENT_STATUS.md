@@ -1,4 +1,4 @@
-# Unreleased — faster override-folder preparation
+# v1.15.4 — faster override-folder preparation
 
 Override selection prepares independent archive groups in separate CPU worker
 processes (up to six, capped by cores and available RAM). A memory-weighted queue

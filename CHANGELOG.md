@@ -1,4 +1,4 @@
-# Unreleased
+# v1.15.4
 
 - Parallel CPU/RAM-bounded override preparation, completed-archive reuse, cheaper
   conversion-cache maintenance, deterministic outputs and cancellable workers.
