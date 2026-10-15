@@ -84,6 +84,29 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# v1.15.3 — frontend override import geometry fix
+
+Fixed folder selection aborting with `frontend_sync.iff: Geometry overlaps a
+texture image`. Menu SCNEs can store inline geometry in their header block and
+textures in a separate block. Image packing now distinguishes inline vertex
+stream flag 0x40000002 from GPU stream flag 0x40000003, and header-relative index
+flag 0x10 from data-relative 0x20000010. Inline geometry/pointers remain unchanged;
+GPU buffers retain relocation and byte-preservation checks. Real overlaps and
+out-of-bounds or modified inline geometry still fail closed.
+
+A failed folder import is atomic: it preserves the previous prepared workspace.
+That explains the old LSU preview after the failed reselection. Once import
+finishes successfully, the live source index and current S258 overrides activate.
+No source files, prepared snapshots, EBOOT or JB builds are modified by this fix.
+
+
+Legacy flat DDS artwork targeting a base cubemap is handled only in recognized
+legacy folder imports: it updates the first (+X) face, resampled to the original
+format, dimensions and mip chain; the other five faces are retained from source.
+The result remains a full cubemap and its descriptor is preserved. The GUI
+compatibility summary identifies this operation. Modern manifest-based imports
+and direct DDS imports still require matching complete cubemap inputs.
+
 # v1.15.2 — current override files in previews
 
 Folder-based previews now use current loose DDS, SCNE and archive inputs instead
@@ -2087,3 +2110,25 @@ Final portable suite: 520 passed, 9 offscreen GL skips, 2 deselected.
 Native source/preview/OpenGL suite: 36 passed. Compile, CLI/Qt smoke, Ruff,
 mypy, generated handoff and diff checks passed. Windows package startup/audio
 smoke runs before publication.
+
+## v1.15.3 frontend import reproduction
+
+Read-only frontend_sync import reproduced the false texture/geometry overlap.
+Header-relative streams had flag 0x40000002, pointer 5, valid header vertex floats
+and header-relative 16-bit indices (flag 0x10). GPU menu streams use 0x40000003
+and index flag 0x20000010. The fix imported frontend_sync successfully in memory.
+Synthetic tests preserve both inline vertex streams and indices through image
+packing, preserve GPU menu relocation, and reject real overlaps, invalid ranges
+and changed inline geometry. No RPCS3 or automatic/testing JB build.
+
+`python tools/dev/verify.py`: 523 passed, 9 offscreen GL skips, 2 deselected.
+Compile, CLI/Qt smoke, Ruff, mypy, handoff and diff checks passed.
+
+The broader check passed 13 of 14 non-stadium scene groups and exposed a second
+studio cubemap mismatch. Added a guarded legacy first-face import: regression
+checks retain the original descriptor and five other DDS faces exactly, with
+strict rejection retained for direct imports without this legacy policy.
+
+Final complete suite: 524 passed, 9 offscreen GL skips, 2 deselected;
+51 targeted import/packing/live-preview checks passed. Actual studio import
+completed with +X updated and five source faces preserved.

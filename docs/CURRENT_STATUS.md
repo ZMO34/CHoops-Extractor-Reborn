@@ -1,3 +1,26 @@
+# v1.15.3 — frontend override import geometry fix
+
+Fixed folder selection aborting with `frontend_sync.iff: Geometry overlaps a
+texture image`. Menu SCNEs can store inline geometry in their header block and
+textures in a separate block. Image packing now distinguishes inline vertex
+stream flag 0x40000002 from GPU stream flag 0x40000003, and header-relative index
+flag 0x10 from data-relative 0x20000010. Inline geometry/pointers remain unchanged;
+GPU buffers retain relocation and byte-preservation checks. Real overlaps and
+out-of-bounds or modified inline geometry still fail closed.
+
+A failed folder import is atomic: it preserves the previous prepared workspace.
+That explains the old LSU preview after the failed reselection. Once import
+finishes successfully, the live source index and current S258 overrides activate.
+No source files, prepared snapshots, EBOOT or JB builds are modified by this fix.
+
+
+Legacy flat DDS artwork targeting a base cubemap is handled only in recognized
+legacy folder imports: it updates the first (+X) face, resampled to the original
+format, dimensions and mip chain; the other five faces are retained from source.
+The result remains a full cubemap and its descriptor is preserved. The GUI
+compatibility summary identifies this operation. Modern manifest-based imports
+and direct DDS imports still require matching complete cubemap inputs.
+
 # v1.15.2 — current override files in previews
 
 Folder-based previews now use current loose DDS, SCNE and archive inputs instead

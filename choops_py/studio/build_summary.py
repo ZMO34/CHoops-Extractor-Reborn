@@ -13,6 +13,9 @@ def summary(result):
         resize=sum(bool(item.get('artwork_resampled')) for item in changed)
         lines.append(f"{group['archive']}: {group.get('binary_records',0)} records, {count} textures"+(f", {resize} resized to base layout" if resize else ''))
     if len(groups)>50:lines.append(f"… {len(groups)-50} more replaced archives")
+    cube_faces=[(group['archive'],item) for group in groups for item in group.get('dds_imports',[]) if item.get('cubemap_face_updated')]
+    for archive,item in cube_faces[:10]:
+        lines.append(f"Cubemap: {archive} / {item.get('selector','')}: legacy DDS updates +X; other five faces preserved")
     for item in problems[:30]:lines.append(f"Issue: {item.get('archive','')} / {item.get('selector','')}: {item.get('reason','unapplied')}")
     if len(problems)>30:lines.append(f"… {len(problems)-30} more unapplied overrides")
     if result.get('mod'):lines.append('Workspace: '+str(result['mod']))

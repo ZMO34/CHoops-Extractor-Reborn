@@ -161,3 +161,21 @@ def test_volume_depth_or_cube_flags_are_not_generalized(depth,cube):
     head[0x5a]=3;head[0x5b]=cube;struct.pack_into('>H',head,0x64,depth)
     with pytest.raises(ValueError,match='dimension=3'):
         TXTR([bytes(head),base[1]]).info()
+
+
+def test_legacy_flat_cube_import_updates_only_first_face_and_keeps_other_five():
+    from choops_py.texture_tools.builtin_converter import to_dds
+    header=bytearray(txtr_fixture(format=0xa5,split=True)[0])
+    header[0x5b]=1
+    struct.pack_into('>I',header,0x68,16)
+    faces=[bytes((i,20+i,40+i,255))*16 for i in range(6)]
+    source=TXTR([bytes(header),b''.join(faces)])
+    original=to_dds(source.gtf())
+    with pytest.raises(ValueError,match='cubemap faces'):
+        apply_dds(source.blocks,'TXTR','cube',artwork(4,4,(255,0,0,255)),preserve_layout=True)
+    result,report=apply_dds(source.blocks,'TXTR','cube',artwork(4,4,(255,0,0,255)),preserve_layout=True,allow_single_cube_face=True)
+    output=to_dds(TXTR(result).gtf())
+    assert TXTR(result).info()['cubemap'] and result[0]==source.blocks[0]
+    assert output[128+64:]==original[128+64:]
+    assert output[128:192]!=original[128:192]
+    assert report['cubemap_face_updated']=='+X' and report['cubemap_faces_preserved']==5

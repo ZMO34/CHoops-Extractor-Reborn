@@ -55,7 +55,7 @@ def repack_images(original,updated):
     for start,end in sorted(intervals):
         if merged and start<merged[-1][1]:merged[-1]=(merged[-1][0],max(end,merged[-1][1]))
         else:merged.append((start,end))
-    refs=[];count=b.u32(0x44);parts=b.relative(0x48) if count else 0
+    refs=[];inline_refs=[];count=b.u32(0x44);parts=b.relative(0x48) if count else 0
     if count>4096:raise ValueError('Scene part count exceeds limit')
     for i in range(count):
         part=parts+i*176;descriptors=b.u32(part+0x84)
@@ -65,9 +65,23 @@ def repack_images(original,updated):
             if not 1<=streams<=16:raise ValueError('Invalid vertex stream count')
             for j in range(streams):
                 entry=desc+28+j*16;length=b.u32(entry+8)
-                if length:refs.append((entry+12,b.u32(entry+12)-1,length))
+                if length:
+                    field=entry+12
+                    if b.u32(entry)==0x40000002:
+                        inline_refs.append((field,b.relative(field),length))
+                    else:refs.append((field,b.u32(field)-1,length))
         length=b.u32(part+0xa8)*2
-        if length:refs.append((part+0xac,b.u32(part+0xac)-1,length))
+        if length:
+            field=part+0xac
+            if b.u32(part+0xa4)==0x10:
+                inline_refs.append((field,b.relative(field),length))
+            else:refs.append((field,b.u32(field)-1,length))
+    # Menu SCNEs can keep CPU geometry in block zero while textures use block
+    # one. Those relative header pointers remain unchanged during image packing.
+    for field,start,length in inline_refs:
+        expected=b.slice(start,length)
+        if bytes(head[start:start+length])!=expected or bytes(head[field:field+4])!=b.slice(field,4):
+            raise ValueError('Inline geometry changed during texture import')
     for field,start,length in refs:
         if start<0 or start+length>len(old):raise ValueError('GPU buffer exceeds scene data')
         if any(start<end and begin<start+length for begin,end in merged):raise ValueError('Geometry overlaps a texture image')

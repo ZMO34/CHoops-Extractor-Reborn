@@ -1,3 +1,8 @@
+# v1.15.3
+
+- Fix frontend menu override imports misclassifying header-relative geometry as
+  texture data; preserve inline/GPU buffers and retain real overlap validation.
+
 # Unreleased roster / game-line / motion continuation
 
 - Traced the shared 65,535-unit text descriptor bound; block count overflow and
