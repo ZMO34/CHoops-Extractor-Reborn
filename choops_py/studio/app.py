@@ -284,7 +284,7 @@ class Window(QMainWindow):
 
         super().__init__()
 
-        self.setWindowTitle("CHoops Modding Studio • v1.15.1")
+        self.setWindowTitle("CHoops Modding Studio • v1.15.2")
 
         self.resize(1420, 900)
 
@@ -993,7 +993,8 @@ class Window(QMainWindow):
         if not (root/'overrides.json').is_file():raise ValueError('Select an overrides folder before using override previews')
         try:
             fingerprints=[]
-            for name in ('overrides.json','source_preconditions.json'):
+            for name in ('overrides.json','source_preconditions.json','preview_inputs.json'):
+                if name=='preview_inputs.json' and not (root/name).exists():continue
                 info=(root/name).stat()
                 fingerprints.append((info.st_size,info.st_mtime_ns,info.st_ino))
         except OSError as error:raise ValueError('Override workspace is incomplete; select the overrides folder again') from error
@@ -1834,7 +1835,7 @@ class Window(QMainWindow):
         self._preview_replacement_indices = set(getattr(archive, 'replacements', {}))
         if self.preview_overrides.isChecked():
             self.preview_source_info.setText('Overrides unavailable' if self._preview_origin_error else
-                                            str(len(self._preview_replacement_indices)) + ' archive overrides')
+                                            str(len(self._preview_replacement_indices)) + (' live archive overrides' if getattr(archive,'live',None) else ' prepared overrides — select folder again for live files'))
             self.preview_source_info.setToolTip(self.mod_path.text())
         else:
             self.preview_source_info.setText('Original JB assets')

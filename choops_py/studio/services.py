@@ -135,7 +135,8 @@ def materialize(archive: Archive, entry: dict, directory: Path | None = None) ->
         overrides=tuple((e['index'],str(replacements[e['index']][0]),replacements[e['index']][1],
                          _file_signature(replacements[e['index']][0]))
                         for e in selected if e['index'] in replacements)
-        key=(source,overrides,tuple((e['index'],e['name'],e['size']) for e in selected))
+        live=tuple((e['index'],archive.live.signature(e['index'])) for e in selected) if getattr(archive,'live',None) else ()
+        key=(source,overrides,live,tuple((e['index'],e['name'],e['size']) for e in selected))
         if key in cache:
             path,files=cache[key]
             try:
@@ -226,6 +227,7 @@ def stage_folder(source: Path, folder: Path, mod: Path, job=None) -> dict:
         for i,group in enumerate(discovery['groups']):
             job.check();job.progress(i,len(discovery['groups']),'Compile override '+group['name'])
             original=archive.read(group['entry'])
+            group['_preview_source_sha']=hashlib.sha256(original).hexdigest()
             try:data,imports=compile_group(archive,group,job)
             except (ValueError,OSError) as error:raise ValueError(group['name']+': '+str(error)) from error
             unapplied.extend(dict(archive=group['name'],**item) for item in imports if item.get('status')=='unmatched')
@@ -248,6 +250,8 @@ def stage_folder(source: Path, folder: Path, mod: Path, job=None) -> dict:
         save_json(work/'overrides.json',rows,[source,folder])
         save_json(work/'source_preconditions.json',dict(schema=1,entries=conditions),[source,folder])
         save_json(work/'import_options.json',dict(schema=1,allow_archive_growth=True,dds_priority=True,scne_priority=True),[source,folder])
+        from .live_overrides import describe_groups
+        save_json(work/'preview_inputs.json',describe_groups(discovery['groups'],folder,archive),[source,folder])
         report=dict(staged=len(rows),mod=str(mod),requested_mod=str(requested_mod),workspace_changed=mod != requested_mod,detected_formats=discovery['detected_formats'],scanned_files=discovery['scanned_files'],dds_files=discovery['dds_files'],binary_records=discovery['binary_records'],ignored_files=discovery['ignored_files'],shadowed_dds=discovery['shadowed_dds'],resolved_targets=discovery['resolved_targets'],unapplied_overrides=unapplied,unchanged_archives=unchanged,growing_archives=growth,dds_priority=True,scne_priority=True,imports=details)
         save_json(work/'folder_import_report.json',report,[source,folder])
         job.check();job.progress(0,1,'Checking override compatibility')

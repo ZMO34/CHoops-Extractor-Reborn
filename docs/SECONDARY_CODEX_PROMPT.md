@@ -84,6 +84,23 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# v1.15.2 — current override files in previews
+
+Folder-based previews now use current loose DDS, SCNE and archive inputs instead
+of treating an earlier prepared build snapshot as the selected folder. Only the
+requested archive is compiled for preview; unchanged inputs reuse a bounded
+64 MiB compiled cache. File changes invalidate materialized and decoded previews.
+Missing or incompatible live inputs raise an error rather than showing JB art.
+The same source applies to Explorer, texture, jersey, shoe and stadium previews.
+
+Select overrides folder once after upgrading to register live input locations.
+Older workspaces and imported patches remain usable prepared snapshots and are
+labelled accordingly. New or renamed files require selecting the folder again.
+After editing inputs, preview again (or switch sources) to reload. Select the
+folder again before building to prepare an updated build snapshot; previews do
+not change prepared builds or any original input. JB fallback applies only where
+no replacement exists. No emulator, testing JB or EBOOT changes.
+
 # v1.15.1 — resizable full-width 3D preview
 
 
@@ -2056,3 +2073,17 @@ diff checks passed. No RPCS3 or testing JB.
 
 Full `python tools/dev/verify.py`: 519 passed, 9 offscreen GL skips,
 2 deselected; compile, CLI/Qt startup, Ruff, mypy, handoff and diff checks passed.
+
+## v1.15.2 live preview reproduction
+
+Read-only S258 reproduction found a prepared snapshot's old floor image while
+current loose inputs compiled the Dayton court. The actual live PreviewArchive
+and stadium path now decoded that current 1024 x 512 preview with two floor mesh
+parts; unchanged materialization reused its cache. Source inputs were untouched.
+Synthetic regression verifies stale snapshot replacement, loose file edits,
+cache invalidation, source immutability and missing-file rejection. No JB build.
+
+Final portable suite: 520 passed, 9 offscreen GL skips, 2 deselected.
+Native source/preview/OpenGL suite: 36 passed. Compile, CLI/Qt smoke, Ruff,
+mypy, generated handoff and diff checks passed. Windows package startup/audio
+smoke runs before publication.

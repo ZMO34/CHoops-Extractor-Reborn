@@ -338,3 +338,17 @@ diff checks passed. No RPCS3 or testing JB.
 
 Full `python tools/dev/verify.py`: 519 passed, 9 offscreen GL skips,
 2 deselected; compile, CLI/Qt startup, Ruff, mypy, handoff and diff checks passed.
+
+## v1.15.2 live preview reproduction
+
+Read-only S258 reproduction found a prepared snapshot's old floor image while
+current loose inputs compiled the Dayton court. The actual live PreviewArchive
+and stadium path now decoded that current 1024 x 512 preview with two floor mesh
+parts; unchanged materialization reused its cache. Source inputs were untouched.
+Synthetic regression verifies stale snapshot replacement, loose file edits,
+cache invalidation, source immutability and missing-file rejection. No JB build.
+
+Final portable suite: 520 passed, 9 offscreen GL skips, 2 deselected.
+Native source/preview/OpenGL suite: 36 passed. Compile, CLI/Qt smoke, Ruff,
+mypy, generated handoff and diff checks passed. Windows package startup/audio
+smoke runs before publication.
