@@ -284,7 +284,7 @@ class Window(QMainWindow):
 
         super().__init__()
 
-        self.setWindowTitle("CHoops Modding Studio • v1.15")
+        self.setWindowTitle("CHoops Modding Studio • v1.15.1")
 
         self.resize(1420, 900)
 
@@ -1695,6 +1695,26 @@ class Window(QMainWindow):
             "Models / Courts • 3D preview",
             "Select a SCNE record in Explorer, then Preview scene. Left-drag: orbit; right-drag: look around; middle-drag or Shift-drag: pan. WASD: move; Q/E: down/up; Shift: faster; Ctrl: slower; wheel: zoom; F: fit. Material textures load automatically. Use cutaway to see inside; game shader effects are not reproduced.",
         )
+        page_layout=layout
+        controls=QWidget()
+        layout=QVBoxLayout(controls)
+        layout.setContentsMargins(4,4,4,4)
+        controls_scroll=QScrollArea()
+        controls_scroll.setWidgetResizable(True)
+        controls_scroll.setWidget(controls)
+        controls_scroll.setMinimumHeight(70)
+        preview=QWidget()
+        preview_layout=QVBoxLayout(preview)
+        preview_layout.setContentsMargins(0,0,0,0)
+        self.scene_splitter=QSplitter(Qt.Orientation.Vertical)
+        self.scene_splitter.setHandleWidth(9)
+        self.scene_splitter.setChildrenCollapsible(False)
+        self.scene_splitter.setToolTip('Drag the divider to resize the preview and controls')
+        self.scene_splitter.addWidget(controls_scroll)
+        self.scene_splitter.addWidget(preview)
+        self.scene_splitter.setStretchFactor(0,0)
+        self.scene_splitter.setStretchFactor(1,1)
+        page_layout.addWidget(self.scene_splitter,1)
         self.buttons(layout, [("Preview selected SCNE", self.inspect_scene), ("Prepare single-texture court…", self.prepare_court_template)])
         self.scene_school=QComboBox();self.scene_school.addItem('Automatic school association',None)
         self.scene_school.currentIndexChanged.connect(lambda _:self.select_scene_part() if getattr(self,'scene_meshes',None) else None)
@@ -1731,23 +1751,25 @@ class Window(QMainWindow):
         layout.addWidget(self.scene_textures)
         from .scene_view import SceneView
         self.scene_view = SceneView()
-        layout.addWidget(self.scene_view, 1)
+        self.scene_view.setMinimumSize(240,120)
+        self.scene_view.setSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Expanding)
+        preview_layout.addWidget(self.scene_view, 1)
         camera_speed = QDoubleSpinBox()
         camera_speed.setRange(.05, 10.)
         camera_speed.setValue(1.)
         camera_speed.setPrefix('Camera movement speed: ')
         camera_speed.valueChanged.connect(lambda value: setattr(self.scene_view, 'movement_speed', value))
-        layout.addWidget(camera_speed)
-        self.buttons(layout, [("Fit camera", self.scene_view.fit_camera), ("Linked roster palette…", self.scene_team_palette)])
+        preview_layout.addWidget(camera_speed)
+        self.buttons(preview_layout, [("Fit camera", self.scene_view.fit_camera), ("Linked roster palette…", self.scene_team_palette)])
         self.model_details = QPlainTextEdit()
         self.model_details.setReadOnly(True)
         self.model_details.setMaximumHeight(120)
-        layout.addWidget(self.model_details)
+        preview_layout.addWidget(self.model_details)
         self.scene_meshes = []
         self.scene_base_images = {}
         self.scene_uniform_images = {}
         self.scene_asset_tabs = QTabWidget()
-        layout.insertWidget(layout.indexOf(self.scene_view), self.scene_asset_tabs)
+        layout.addWidget(self.scene_asset_tabs)
         uniform_page = QWidget();uniform_layout = QVBoxLayout(uniform_page)
         shoe_page = QWidget();shoe_layout = QVBoxLayout(shoe_page)
         stadium_page = QWidget();stadium_layout = QVBoxLayout(stadium_page)
@@ -1776,7 +1798,9 @@ class Window(QMainWindow):
         self.buttons(stadium_layout, [('Preview selected stadium / floor', self.preview_stadium)])
         self.refresh_stadium_list()
         self.scene_palette_state = QLabel('No roster associated; embedded material textures only')
-        layout.addWidget(self.scene_palette_state)
+        preview_layout.addWidget(self.scene_palette_state)
+        layout.addStretch(1)
+        self.scene_splitter.setSizes([220,650])
 
     def edit_roster_shoes(self):
         self.update_player_details();panel=self.roster_detail_stack.currentWidget()

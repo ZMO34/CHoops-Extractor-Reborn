@@ -328,3 +328,13 @@ missing override roster rejection and IFF export without a loaded JB.
 Native Windows targeted preview, cache, CSV and roster I/O suite: 45 passed.
 Windows packaging additionally runs frozen startup and synthetic audio round trip.
 No emulator/gameplay tests or automatic/testing JB builds are performed.
+
+## v1.15.1 preview resizing
+
+18 native direct-preview/OpenGL regressions passed. Hidden Windows Qt resize
+check confirmed a 1,364-pixel-wide viewport and dragging the divider changed its
+height from 255 to 120 pixels without hiding controls. Qt startup, Ruff and
+diff checks passed. No RPCS3 or testing JB.
+
+Full `python tools/dev/verify.py`: 519 passed, 9 offscreen GL skips,
+2 deselected; compile, CLI/Qt startup, Ruff, mypy, handoff and diff checks passed.

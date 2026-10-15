@@ -206,3 +206,10 @@ other inputs use the loaded JB or a chosen IFF template. Save copy preserves the
 original wrapper, including other members of a loaded save ZIP. USERDATA export
 does not create encryption, PARAM files, or a complete console save package.
 All writers validate and reparse the result and protect the original input.
+
+## Resizable 3D preview
+
+Models / Courts reserves more height for the full-width preview. Drag the wide
+divider above it up or down to enlarge or shrink it. Controls scroll independently
+when space is reduced; the main application window can also be resized normally.
+Fit camera frames the model after changing the available viewing area.
