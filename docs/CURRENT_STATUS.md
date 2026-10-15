@@ -1,3 +1,12 @@
+# v1.15.1 — resizable full-width 3D preview
+
+
+## Resizable 3D preview
+
+Models / Courts reserves more height for the full-width preview. Drag the wide
+divider above it up or down to enlarge or shrink it. Controls scroll independently
+when space is reduced; the main application window can also be resized normally.
+Fit camera frames the model after changing the available viewing area.
 # v1.15 — Explorer overrides, references and cache fixes
 
 Roster controls explicitly open external roster IFF or decrypted USERDATA/USRDATA

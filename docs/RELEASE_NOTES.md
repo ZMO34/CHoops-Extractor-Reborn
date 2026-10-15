@@ -1,3 +1,10 @@
+# v1.15.1 — resizable 3D preview
+
+The full-width Models / Courts viewport has a draggable divider above it.
+Controls scroll independently so the preview can grow without losing controls.
+Resize the main window normally; Fit camera reframes the selected model.
+Includes all v1.15 roster, override and Explorer improvements.
+
 # v1.15 — Explorer overrides, references and cache fixes
 
 Roster controls explicitly open external roster IFF or decrypted USERDATA/USRDATA
