@@ -277,7 +277,9 @@ def compile_group(archive,group,job=None):
                 b=iff.blocks[block];decoded[block]=decode(iff.raw[b['start']:b['start']+b['size']],b['logical_size'])
             result.append(decoded[block][start:end])
         return result
+    dds_records={name.casefold() for name in group['dds'] if '/' not in name}
     for (name,typ),file in group['records'].items():
+        if typ=='TXTR' and name.casefold() in dds_records:continue
         if job:job.check()
         rec=find(name,typ)
         if isinstance(file,list):changes[rec['index']]=[p.read_bytes() for p in file]
@@ -285,8 +287,9 @@ def compile_group(archive,group,job=None):
             raw=file.read_bytes();changes[rec['index']]=unwrap(raw)[1] if raw[:4]==b'2kTl' else [raw]
     from ..texture_tools.override_import import apply_raw_texture
     from ..modding.court_template import active_slots
+    dds_selectors={selector.casefold() for selector in group['dds']}
     for selector,file in group['package_records'].items():
-        if selector in group['dds']:continue
+        if selector.casefold() in dds_selectors:continue
         name,texture=selector.split('/',1);rec=find(name,'SCNE')
         if preserve:scene_baselines.setdefault(rec['index'],parts(rec))
         allowed=active_slots(parts(rec))
@@ -382,7 +385,9 @@ def compile_cdf_group(archive,group,data,job=None):
     def parts(rec):
         return changes.get(rec['index']) or [decode(cdf[rec[k+'_offset']:rec[k+'_offset']+rec[k+'_length']]) for k in ('header','payload')]
     if group['package_records']:raise ValueError('CDF logo banks do not contain SCNE textures')
+    dds_records={name.casefold() for name in group['dds']}
     for (name,kind),file in group['records'].items():
+        if kind=='TXTR' and name.casefold() in dds_records:continue
         if kind!='TXTR':raise ValueError('CDF logo banks require TXTR records')
         rec=find(name);raw=file.read_bytes();changes[rec['index']]=unwrap(raw)[1] if raw[:4]==b'2kTl' else [raw]
     for name,file in group['dds'].items():

@@ -84,16 +84,24 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
-# v1.14.2 override-source refresh fix
+# v1.14.2 — Explorer overrides, references and cache fixes
 
 Release: https://github.com/ZMO34/CHoops-Extractor-Reborn/releases/tag/v1.14.2
 
-Fixes stale JB fallback labels after repeat override selection, uses the visible
-workspace for previews, and displays the loaded replacement count. A read-only
-legacy-folder audit resolved 1,824 archives. Its existing prepared workspace
-contained 1,825 replacements: the UI correctly showed 354 stadium and 727 uniform
-overrides. No shoe packages were supplied, so footwear retained JB fallbacks.
-No source/override files were renamed or modified; no JB was built.
+Select overrides folder… is in Explorer. The stale-fallback bug is fixed, source
+counts and source-aware asset rows are shown, and the visible workspace is used
+consistently. Dry run is removed from the GUI; JB builds still validate first.
+Confirmed roster ownership includes uniform selection menus, gameplay uniforms,
+cloth meshes, player/team footwear, stadiums and paired logo banks. Wider
+reference columns have full-text panels/tooltips. CSVs exclude UI/research
+fields and retain source/identity/stale-edit safety columns.
+
+Both JB and override indexes are retained. Separate validated scratch copies and
+a bounded 64 MiB decoded image cache support switching sources. DDS takes
+priority; raw TXTR is used only without a matching DDS. SCNE geometry remains
+supported. No user filenames or artwork were changed: the supplied names already
+resolved to 1,824 targets. Existing prepared data showed 354 stadium and 727
+uniform overrides; no shoe packages were supplied. No RPCS3 or testing JB build.
 
 # v1.14.1 preview source/list hotfix
 
@@ -359,6 +367,24 @@ workspace field, not an older cached path. The toolbar shows the loaded override
 count; an unavailable workspace is not mislabelled as JB fallback. Existing
 legacy DDS/SCNE folder names remain supported; no bulk rename is required.
 
+Explorer/workspace update: Select overrides folder… now lives in Explorer,
+with source-aware asset sizes and Override/JB labels. Dry run is removed from the
+GUI; Build JB copy still performs automatic validation. Roster references cover
+home/away/alternate selection menus (SELUA/H/X/Y/Z), gameplay uniform banks,
+confirmed cloth geometry, player/team shoes, stadiums, paired CDF payloads and
+conference/school logo banks. These links use the loaded roster. The wider
+reference column, full-text panel and tooltips preserve long references.
+Unsupported display metadata is reported without escaping the Qt result callback.
+
+JB and override indexes remain available together. Source-specific scratch files
+are reused while file fingerprints are unchanged; RGBA previews share a bounded
+64 MiB content cache. Changed manifests invalidate override snapshots; changed
+payloads still undergo source/checksum validation. DDS artwork skips the matching
+raw TXTR replacement; TXTR remains the fallback only when no DDS is present.
+SCNE replacements remain supported. CSVs use explicit binary-backed field
+whitelists: asset references, preview labels, research fields and row offsets are
+excluded, while source/stale-edit safety columns are retained.
+
 ---
 
 Embedded source: docs/ROSTER_SCALE_AND_PREVIEWS.md
@@ -538,6 +564,8 @@ Additional appearance/tattoo/post/free-throw fields and all 112 jump-shot captio
 Keyboard limits no longer block external edits. Dynamic text uses copy-on-write UTF-16 storage, NUL/control-character checks, signed-relative-pointer bounds and the adapter’s 60 MiB safety guard. That guard is a tool limit, not a claimed engine maximum; gameplay compatibility of arbitrary long names remains unverified.
 
 Secondary-position search is closed by owner confirmation; only the primary position is exposed. See CONFERENCE_ASSETS.md for current index/logo behavior and tournament-link protection.
+
+CSV boundary: both editable and per-table exports whitelist actual roster fields. Asset references, UI/source badges, research notes and row offsets do not enter CSV data. Editable CSV retains source SHA, table/index/slot identity and original values for safe import.
 
 ---
 
@@ -1976,3 +2004,16 @@ Read-only supplied-folder discovery resolved 1,824 archives, including S258;
 existing workspace had 1,825 replacements. Native GUI list verification showed
 354 stadium and 727 uniform overrides. No shoe packages were supplied. Names and
 contents of user inputs were unchanged. No RPCS3 or automatic/testing JB build.
+
+## Final v1.14.2 Explorer/cache/CSV verification
+
+515 portable tests passed (9 offscreen GL skips, 2 deselected), with compile,
+CLI/Qt smoke, Ruff, mypy and handoff checks. Native targeted suite: 41 passed.
+Hidden Explorer loaded the supplied SELUH258 override, showed five records and
+full roster references, and rendered its texture without errors. Read-only
+S258/SELUH258/UH258 override inspection and DDS preview decoding also passed.
+Cache tests retain both source variants, invalidate modified inputs, reject
+altered replacement payloads and enforce the image-memory bound. DDS tests skip
+a broken raw TXTR when DDS exists and correctly use TXTR when DDS is absent.
+CSV tests exclude injected UI metadata and reject unsupported import fields
+without changing roster bytes. No RPCS3, game launch or automatic/testing JB.

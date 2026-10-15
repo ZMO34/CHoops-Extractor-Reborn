@@ -304,3 +304,16 @@ Read-only supplied-folder discovery resolved 1,824 archives, including S258;
 existing workspace had 1,825 replacements. Native GUI list verification showed
 354 stadium and 727 uniform overrides. No shoe packages were supplied. Names and
 contents of user inputs were unchanged. No RPCS3 or automatic/testing JB build.
+
+## Final v1.14.2 Explorer/cache/CSV verification
+
+515 portable tests passed (9 offscreen GL skips, 2 deselected), with compile,
+CLI/Qt smoke, Ruff, mypy and handoff checks. Native targeted suite: 41 passed.
+Hidden Explorer loaded the supplied SELUH258 override, showed five records and
+full roster references, and rendered its texture without errors. Read-only
+S258/SELUH258/UH258 override inspection and DDS preview decoding also passed.
+Cache tests retain both source variants, invalidate modified inputs, reject
+altered replacement payloads and enforce the image-memory bound. DDS tests skip
+a broken raw TXTR when DDS exists and correctly use TXTR when DDS is absent.
+CSV tests exclude injected UI metadata and reject unsupported import fields
+without changing roster bytes. No RPCS3, game launch or automatic/testing JB.

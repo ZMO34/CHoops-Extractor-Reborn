@@ -16,10 +16,12 @@ def detect(path):
 def export_model(model,output):
     out=safe_output(output,[model.source.source_path.split('!')[0]] if model.source.source_path else []);out.mkdir(parents=True,exist_ok=True)
     save_json(out/'roster.json',model.document())
+    from .schema import CSV_GAME_FIELDS
     for name,rows in model.rows.items():
-        stream=io.StringIO(newline='');writer=csv.DictWriter(stream,fieldnames=list(rows[0]) if rows else [])
+        fields=['index', *(field for field in CSV_GAME_FIELDS.get(name, ()) if any(field in row for row in rows))]
+        stream=io.StringIO(newline='');writer=csv.DictWriter(stream,fieldnames=fields)
         writer.writeheader()
-        for row in rows:writer.writerow({k:json.dumps(v) if isinstance(v,list) else v for k,v in row.items()})
+        for row in rows:writer.writerow({key:json.dumps(row.get(key),ensure_ascii=False) if isinstance(row.get(key),(list,dict)) else row.get(key,'') for key in fields})
         write_bytes(out/(name+'.csv'),stream.getvalue().encode('utf-8'))
     save_json(out/'edit_report.json',{'source_type':model.source.kind,'edits':model.edits,'validation':model.validate()})
     return {'output':str(out),'counts':{name:len(rows) for name,rows in model.rows.items()}}

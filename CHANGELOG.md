@@ -120,3 +120,21 @@ the active preview after preparation. Preview loading uses the visible Mod
 workspace field, not an older cached path. The toolbar shows the loaded override
 count; an unavailable workspace is not mislabelled as JB fallback. Existing
 legacy DDS/SCNE folder names remain supported; no bulk rename is required.
+
+Explorer/workspace update: Select overrides folder… now lives in Explorer,
+with source-aware asset sizes and Override/JB labels. Dry run is removed from the
+GUI; Build JB copy still performs automatic validation. Roster references cover
+home/away/alternate selection menus (SELUA/H/X/Y/Z), gameplay uniform banks,
+confirmed cloth geometry, player/team shoes, stadiums, paired CDF payloads and
+conference/school logo banks. These links use the loaded roster. The wider
+reference column, full-text panel and tooltips preserve long references.
+Unsupported display metadata is reported without escaping the Qt result callback.
+
+JB and override indexes remain available together. Source-specific scratch files
+are reused while file fingerprints are unchanged; RGBA previews share a bounded
+64 MiB content cache. Changed manifests invalidate override snapshots; changed
+payloads still undergo source/checksum validation. DDS artwork skips the matching
+raw TXTR replacement; TXTR remains the fallback only when no DDS is present.
+SCNE replacements remain supported. CSVs use explicit binary-backed field
+whitelists: asset references, preview labels, research fields and row offsets are
+excluded, while source/stale-edit safety columns are retained.

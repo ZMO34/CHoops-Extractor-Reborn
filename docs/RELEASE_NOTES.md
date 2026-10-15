@@ -1,3 +1,22 @@
+# v1.14.2 — Explorer overrides, references and cache fixes
+
+- Select overrides folder… moved to Explorer; stale fallback badges fixed.
+- Explorer follows the selected source and shows its replacement sizes/origins.
+  Reference columns are wider, with full-text detail and tooltips. Result-display
+  errors are reported safely instead of escaping Qt callbacks.
+- Added SELUH/A/X/Y/Z menu ownership plus confirmed cloth, player footwear,
+  stadium and paired-CDF references. Loaded roster IDs determine ownership.
+- Removed the Dry run GUI button. Build JB copy still validates automatically.
+- Retained both source indexes, separate reusable scratch files and a bounded
+  64 MiB RGBA cache. Input changes invalidate snapshots; checksum guards remain.
+- DDS is preferred within overrides; TXTR is fallback only if no matching DDS.
+  SCNE replacements remain supported.
+- CSVs whitelist game roster fields and exclude references/UI/research metadata.
+  Source hash, identities and original values remain for safe edit import.
+
+Includes v1.14.1 fixes. No input renaming, RPCS3, automatic/testing JB build,
+EBOOT edits or alternate assets. Broader reverse-engineering remains ongoing.
+
 # v1.14.2 — override list refresh
 
 Fixes stale JB fallback badges when selecting a new overrides folder while the
@@ -96,3 +115,21 @@ non-stadium texture normalization. Crash-free court allocation remains unknown.
 
 Prior details remain in Git/GitHub history. Legacy converters are private optional
 reference tools, excluded from current packages.
+
+Explorer/workspace update: Select overrides folder… now lives in Explorer,
+with source-aware asset sizes and Override/JB labels. Dry run is removed from the
+GUI; Build JB copy still performs automatic validation. Roster references cover
+home/away/alternate selection menus (SELUA/H/X/Y/Z), gameplay uniform banks,
+confirmed cloth geometry, player/team shoes, stadiums, paired CDF payloads and
+conference/school logo banks. These links use the loaded roster. The wider
+reference column, full-text panel and tooltips preserve long references.
+Unsupported display metadata is reported without escaping the Qt result callback.
+
+JB and override indexes remain available together. Source-specific scratch files
+are reused while file fingerprints are unchanged; RGBA previews share a bounded
+64 MiB content cache. Changed manifests invalidate override snapshots; changed
+payloads still undergo source/checksum validation. DDS artwork skips the matching
+raw TXTR replacement; TXTR remains the fallback only when no DDS is present.
+SCNE replacements remain supported. CSVs use explicit binary-backed field
+whitelists: asset references, preview labels, research fields and row offsets are
+excluded, while source/stale-edit safety columns are retained.

@@ -108,6 +108,7 @@ def test_preview_uses_visible_workspace_not_previous_cached_path(qtbot, monkeypa
     window.preview_mod=str(tmp_path/'old')
     current=tmp_path/'current';current.mkdir()
     (current/'overrides.json').write_text('[]',encoding='utf8')
+    (current/'source_preconditions.json').write_text('{}',encoding='utf8')
     window.mod_path.setText(str(current))
     window.preview_overrides.blockSignals(True)
     window.preview_overrides.setChecked(True)

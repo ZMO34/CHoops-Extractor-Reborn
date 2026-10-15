@@ -2,7 +2,7 @@
 import re
 from collections import defaultdict
 from .hash_names import hash_name
-from ..roster.uniforms import asset_name
+from ..roster.uniforms import asset_name, VARIANT_NAMES, JERSEY_SHAPES
 
 
 def category(entry):
@@ -38,11 +38,40 @@ def catalog(entries,model=None):
                         references[hash_name(file)].add(name+' — stadium')
             for role in ('home_shoe_texture','away_shoe_texture'):
                 if school.get(role):references[hash_name(school[role])].add(name+' — '+role.replace('_',' '))
-            references[hash_name('teamselectlogo.iff')].add(name+f" — menu logo ID {school['menu_logo_id']} (bank)")
+            if school.get('menu_logo_id') is not None:
+                references[hash_name('teamselectlogo.iff')].add(name+f" — menu logo ID {school['menu_logo_id']} (bank)")
             for uniform in model.rows.get('uniforms',[]):
                 if uniform['team_asset_id']!=school['uniform_owner_id']:continue
-                try:references[hash_name(asset_name(uniform))].add(name+' — uniform')
+                try:
+                    variant = VARIANT_NAMES.get(uniform['variant_code'], 'Uniform')
+                    references[hash_name(asset_name(uniform))].add(name+' — '+variant+' uniform')
+                    references[hash_name(asset_name(uniform, selection=True))].add(name+' — '+variant+' uniform selection menu')
+                    shape=JERSEY_SHAPES.get(uniform.get('jersey_shape_code'))
+                    if shape:
+                        for build in ('','_thin','_reg','_fat'):
+                            references[hash_name(f'cloth_{shape}{build}.iff')].add(name+' — '+variant+' jersey geometry')
+                    references[hash_name('cloth_shorts.iff')].add(name+' — shared shorts geometry')
                 except ValueError:continue
+        schools_by_player=defaultdict(set)
+        for school in model.rows.get('teams', []):
+            for player_index in school.get('roster_slots', []):
+                if type(player_index) is int:schools_by_player[player_index].add(school['school_name'])
+        for player in model.rows.get('players', []):
+            owner=player.get('display_name') or 'Player #'+str(player.get('index', '?'))
+            schools=schools_by_player.get(player.get('index'), set())
+            if schools:owner+=' ('+', '.join(sorted(schools))+')'
+            for role in ('home_shoe_texture', 'away_shoe_texture'):
+                if player.get(role):references[hash_name(player[role])].add(owner+' — '+role.replace('_',' '))
+        from ..roster.conference_assets import logo_record
+        for conference in model.rows.get('conferences', []):
+            if 0 <= conference['index'] < 39:
+                name=conference.get('conference_name') or 'Conference #'+str(conference['index'])
+                references[hash_name('teamselectlogo.iff')].add(name+' — '+logo_record(conference['index'])+' conference menu logo (bank)')
+        # The paired CDF contains payload for the same confirmed IFF ownership.
+        for entry in entries:
+            name=entry.get('name') or ''
+            if name.lower().endswith('.cdf'):
+                references[entry['hash']].update(references[hash_name(name[:-4]+'.iff')])
     rows=[]
     for entry in entries:
         row=dict(entry,category=category(entry),references='; '.join(sorted(references[entry['hash']])))
@@ -54,6 +83,7 @@ def catalog(entries,model=None):
 def record_references(archive_name, records, model):
     """Confirmed school menu logo IDs resolve to exact logoNNN bank records."""
     owners=defaultdict(set)
+    archive_name=archive_name or ''
     if model and archive_name.lower()=='teamselectlogo.iff':
         for school in model.rows.get('teams',[]):
             if school.get('menu_logo_id') is not None:
@@ -62,4 +92,7 @@ def record_references(archive_name, records, model):
         for conference in model.rows.get('conferences', []):
             if 0 <= conference['index'] < 39:
                 owners[logo_record(conference['index'])].add(conference['conference_name'] or f"Conference #{conference['index']}")
-    return [{**record,'references':'; '.join(sorted(owners[record.get('name','')]))} for record in records]
+    bank_references=''
+    if model and archive_name and archive_name.lower()!='teamselectlogo.iff':
+        bank_references=catalog([dict(name=archive_name,hash=hash_name(archive_name))],model)[0]['references']
+    return [{**record,'references':'; '.join(sorted(owners[record.get('name','')])) or bank_references} for record in records]

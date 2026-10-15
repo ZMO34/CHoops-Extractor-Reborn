@@ -59,7 +59,7 @@ Install Python 3.11+ and project desktop dependencies, or run the local onedir p
 3. Roster Editor: Load game roster or open supported original/raw/wrapped/decrypted roster. Search players/teams/arenas/coaches. Select a player/team row and Edit selected. Only confirmed fields are enabled; existing references are selected from records. Undo/Redo and Save copy preserve the original source. Names must have identical encoded length and unshared storage. Encrypted-save decryption and speculative fields are unsupported.
 4. Audio: open a JB in Explorer, choose Audio, then **Load / refresh catalog**. Licensed Music and Fight Songs are separate tabs. Select rows to export WAVs or export the whole tab. Choose a new output folder under `output/`. Replace one selected track from a WAV, or edit exported WAVs and prepare a batch replacement from that export folder's manifest. Select one track to export or replace its mapped cover art; fight songs share cover record 021, and some soundtrack tracks also share artwork. WAV export needs the LGPL FFmpeg helper; replacement also needs the ATRAC3 helper. Output is a staging workspace, not a complete JB.
 5. Models/Courts: select a SCNE nested record in Explorer to preview its supported geometry and textures. Court texture work uses Texture Editor. Mod Builder can replace complete SCNE records from an override folder; authoring individual vertices and faces is unavailable in this development version.
-6. Mod Builder: Open the source JB folder, choose a new mod path, then **Select overrides folder…**. The importer searches all subfolders and automatically recognizes Python texture/record export manifests and older record-folder layouts. There are no format-selection switches. Complete IFF/CDF replacements retain their canonical filenames; unresolved Python ripper assets can retain their `hash_XXXXXXXX.iff` identity. Older record folders use archive names such as `s256`, with `arena.scne`, `floor.scne`, and nested texture folders. Supplied SCNEs replace source SCNEs first; matching DDS files then override TXTR artwork, preserving the DDS dimensions, compression and mip count. Larger supported records and archives are relocated automatically in the copied JB. Unknown targets, ambiguous duplicates, unsupported layouts and invalid DDS files produce errors instead of silently falling back to another texture. Dry run reviews patches; **Build JB copy** creates a separate output/builds folder and verifies the result. The source JB and replacement folder remain unchanged.
+6. Explorer: Open the source JB folder, then **Select overrides folder…**. The importer searches all subfolders and automatically recognizes Python texture/record export manifests and older record-folder layouts. There are no format-selection switches. Complete IFF/CDF replacements retain their canonical filenames; unresolved Python ripper assets can retain their `hash_XXXXXXXX.iff` identity. Older record folders use archive names such as `s256`, with `arena.scne`, `floor.scne`, and nested texture folders. Supplied SCNEs replace source SCNEs first; matching DDS files then override TXTR artwork, preserving the DDS dimensions, compression and mip count. Larger supported records and archives are relocated automatically in the copied JB. Unknown targets, ambiguous duplicates, unsupported layouts and invalid DDS files produce errors instead of silently falling back to another texture. **Build JB copy** validates patches automatically and creates a separate output/builds folder and verifies the result. The source JB and replacement folder remain unchanged.
 7. Research shows a bounded raw hex view; Diagnostics checks built-in texture conversion and generated round trips. No converter installation is required. Logs retain recent operation outcomes. Extraction, override staging and JB copying/verification are cancelable.
 
 All generated paths currently belong under output/ beside the source project or executable. Existing files are refused. A staged mod has original-source hash preconditions; changed originals block a build. No workflow authorizes writing to the supplied game. Save/export paths containing spaces are supported.
@@ -121,7 +121,7 @@ All non-stadium banks import artwork into the selected base JB texture's dimensi
 
 Models / Courts now includes **Prepare single-texture court…** for the supplied full-court ZIP. It produces a separate floor SCNE and two DDS overrides, with extra floor surfaces disabled and arena assets untouched. See [single-surface court preparation and memory limits](SINGLE_SURFACE_COURT.md). This creates template files, not a JB build; gameplay compatibility still needs a manual check.
 
-Override selection displays an informational popup when DDS prioritization and preflight finish. A separate popup reports a completed JB build and its output path. Cancelled operations and dry runs do not show success popups. During processing, the status bar distinguishes DDS conversion, archive compression, source validation and prepared-archive compatibility checks.
+Override selection displays an informational popup when DDS prioritization and preflight finish. A separate popup reports a completed JB build and its output path. Cancelled operations do not show success popups. During processing, the status bar distinguishes DDS conversion, archive compression, source validation and prepared-archive compatibility checks.
 
 Jersey side-panel previews render front/back numbers: choose 0–99/00 or follow the selected player’s roster number. Preview choices do not change the roster. Reborn lettering uses the uniform’s surname font and curved placement. Source JB / selected overrides also applies to glyphs; missing font records produce a warning.
 
@@ -134,7 +134,7 @@ Text edits now grow beyond old allocations and keyboard entry capacities. The UI
 Select overrides folder… prepares a complete mod workspace and checks it before
 building. If the configured workspace already exists, the tool automatically
 chooses the next unused numbered sibling (for example my_mod_2). Existing folders
-are preserved. The Mod workspace field, previews, dry run and Build JB copy all
+are preserved. The Mod workspace field, previews and Build JB copy all
 use the newly prepared workspace. Failed or cancelled preparation leaves the
 previous workspace and GUI selection intact. This action does not build a JB.
 ## Roster and preview continuation
@@ -156,7 +156,7 @@ Reference guide width uses the central 10% of the authored strip UV: U across bo
 Load a JB folder, then open Models / Courts. Choose a uniform and click Preview
 selected jersey; choose shoe artwork and Preview selected shoes; or choose a
 stadium and the arena/floor mode, then Preview selected stadium / floor. No IFF
-must be opened in Explorer first. Select overrides folder… in Mod Builder to
+must be opened in Explorer first. Select overrides folder… in Explorer to
 prepare artwork, then use the global Source JB / overrides toggle to compare
 both geometry and textures. Missing required cloth/shoe meshes are reported;
 no substitute geometry is guessed. Uniform top/shorts and shape dropdowns are
@@ -177,3 +177,21 @@ the active preview after preparation. Preview loading uses the visible Mod
 workspace field, not an older cached path. The toolbar shows the loaded override
 count; an unavailable workspace is not mislabelled as JB fallback. Existing
 legacy DDS/SCNE folder names remain supported; no bulk rename is required.
+
+Explorer/workspace update: Select overrides folder… now lives in Explorer,
+with source-aware asset sizes and Override/JB labels. Dry run is removed from the
+GUI; Build JB copy still performs automatic validation. Roster references cover
+home/away/alternate selection menus (SELUA/H/X/Y/Z), gameplay uniform banks,
+confirmed cloth geometry, player/team shoes, stadiums, paired CDF payloads and
+conference/school logo banks. These links use the loaded roster. The wider
+reference column, full-text panel and tooltips preserve long references.
+Unsupported display metadata is reported without escaping the Qt result callback.
+
+JB and override indexes remain available together. Source-specific scratch files
+are reused while file fingerprints are unchanged; RGBA previews share a bounded
+64 MiB content cache. Changed manifests invalidate override snapshots; changed
+payloads still undergo source/checksum validation. DDS artwork skips the matching
+raw TXTR replacement; TXTR remains the fallback only when no DDS is present.
+SCNE replacements remain supported. CSVs use explicit binary-backed field
+whitelists: asset references, preview labels, research fields and row offsets are
+excluded, while source/stale-edit safety columns are retained.

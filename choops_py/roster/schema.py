@@ -185,3 +185,19 @@ for prop in EXTRA_PLAYER_FIELDS:
 
 from .appearance import JUMP_SHOT_NAMES
 ENUM_CHOICES["jump_shot_code"]=dict(enumerate(JUMP_SHOT_NAMES))
+
+
+# CSV data comes from confirmed binary-backed fields, never arbitrary UI row keys.
+CSV_GAME_FIELDS = {
+    'players': ('player_id', *STRING_FIELDS['players'], *PLAYER_SCALARS,
+                'jersey_number', 'height_inches', 'position_code', 'attribute_ratings',
+                'shot_tendencies', 'potential', *SHOE_FIELDS['players']),
+    'teams': (*STRING_FIELDS['teams'], *REFERENCES, 'asset_id', 'team_index_check',
+              'mascot_asset_id', 'uniform_owner_id', 'menu_logo_id', 'team_type_code',
+              'roster_slots', 'palette_colors', *SHOE_FIELDS['teams']),
+    'arenas': tuple(STRING_FIELDS['arenas']),
+    'coaches': tuple(STRING_FIELDS['coaches']),
+    'conferences': (*STRING_FIELDS['conferences'], *CONFERENCE_SCALARS, 'team_indices'),
+    'uniforms': ('team_asset_id', 'uniform_asset_id', 'variant_code', 'jersey_shape_code', 'unlock_id'),
+}
+CSV_GAME_FIELDS = {table: tuple(dict.fromkeys(fields)) for table, fields in CSV_GAME_FIELDS.items()}

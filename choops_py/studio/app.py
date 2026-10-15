@@ -93,6 +93,7 @@ class Rows(QAbstractTableModel):
             return value or self.rows[index.row()].get("name_hint") or f"hash_{self.rows[index.row()].get('hash',0):08x}"
         if role == Qt.ItemDataRole.UserRole:
             return value if isinstance(value, (int, float)) else str(value or "")
+        if role == Qt.ItemDataRole.ToolTipRole and key == 'references':return str(value or '').replace('; ', '\n')
         if role != Qt.ItemDataRole.DisplayRole:
             return None
         if key == "hash":
@@ -222,7 +223,9 @@ def set_rows(view, rows, columns, query=""):
 
     view.resizeColumnsToContents()
     for column in range(len(columns)):
-        view.setColumnWidth(column, min(240, max(80, view.columnWidth(column))))
+        maximum = 640 if columns[column][0] == 'references' else 240
+        minimum = 480 if columns[column][0] == 'references' else 80
+        view.setColumnWidth(column, min(maximum, max(minimum, view.columnWidth(column))))
     view.horizontalScrollBar().setValue(0)
 
     return proxy
@@ -294,6 +297,7 @@ class Window(QMainWindow):
         self.active = None
 
         self.archive = None
+        self._preview_archive_cache = {}
 
         self.asset_path = None
 
@@ -687,10 +691,13 @@ class Window(QMainWindow):
 
         worker.events.failed.connect(self.show_error)
 
-        worker.events.result.connect(
-            callback
-            or (lambda result: self.log(json.dumps(result, default=str)[:8000]))
-        )
+        def deliver(result):
+            try:
+                if callback:callback(result)
+                else:self.log(json.dumps(result, default=str)[:8000])
+            except Exception as error:
+                self.show_error(type(error).__name__ + ': ' + str(error))
+        worker.events.result.connect(deliver)
 
         worker.events.finished.connect(self.job_finished)
 
@@ -740,6 +747,7 @@ class Window(QMainWindow):
         def loaded(archive):
 
             self.archive = archive
+            self._preview_archive_cache.clear()
             self._jersey_preview_row=None;self.jersey_shape_controls.hide()
             self.audio_state.setText("Audio catalog has not been loaded for this JB.")
             for view in self.audio_tables.values():
@@ -771,6 +779,7 @@ class Window(QMainWindow):
                 [
                     ("name", "Asset"),
                     ("category", "Category"),
+                    ("preview_source", "Preview source"),
                     ("references", "Roster references"),
                     ("size", "Bytes"),
                     ("hash", "CRC32"),
@@ -780,6 +789,8 @@ class Window(QMainWindow):
                 ],
                 self.search.text(),
             )
+
+            self.explorer.selectionModel().selectionChanged.connect(self.show_explorer_references)
 
             self.identity.setText(
                 f"{len(archive.entries):,} entries • {len(archive.parts)} split parts • original source read-only"
@@ -795,6 +806,7 @@ class Window(QMainWindow):
         from ..archive.identity import recover,apply
         def display(result):
             apply(self.archive,result['identities'])
+            self._preview_archive_cache.clear()
             self.refresh_catalog()
             self.refresh_uniform_list();self.refresh_shoe_list();self.refresh_stadium_list()
             self.log(f"{result['matched_names']} canonical filenames verified by CRC32; {result['internal_labels']} internal-record labels. Labels preserve original hash identities.")
@@ -810,13 +822,23 @@ class Window(QMainWindow):
             self.identify_asset_names(candidates)
         except (ValueError,OSError) as error:QMessageBox.warning(self,'Filename list blocked',str(error))
 
-    def catalog_rows(self):
+    def catalog_rows(self, archive=None):
         from ..archive.catalog import catalog
-        return catalog(self.archive.entries,self.roster)
+        archive = archive or self.preview_archive() or self.archive
+        replacements=set(getattr(archive,'replacements',{}))
+        rows=catalog(archive.entries,self.roster)
+        for row in rows:
+            row['preview_source']='Override' if row['index'] in replacements else 'JB fallback' if self.preview_overrides.isChecked() else 'Source JB'
+        return rows
 
-    def refresh_catalog(self):
+    def refresh_catalog(self, archive=None):
         if not self.archive or not self.explorer.model():return
-        model=self.explorer.model().sourceModel();model.beginResetModel();model.rows=self.catalog_rows();model.endResetModel()
+        try:rows=self.catalog_rows(archive)
+        except (ValueError,OSError) as error:
+            self.log('Explorer source unavailable: '+str(error));return
+        model=self.explorer.model().sourceModel();model.beginResetModel()
+        try:model.rows=rows
+        finally:model.endResetModel()
         self.explorer.model().choose_category(self.archive_category.currentText())
 
     def create_explorer(self):
@@ -834,6 +856,7 @@ class Window(QMainWindow):
             layout,
             [
                 ("Open game…", self.choose_game),
+                ("Select overrides folder…", self.stage_replacements),
                 ("Extract selected…", self.extract_selected),
                 ("Extract all raw…", lambda: self.extract_selected(True)),
                 ("Identify unnamed assets", self.identify_asset_names),
@@ -863,8 +886,16 @@ class Window(QMainWindow):
         self.explorer.doubleClicked.connect(self.inspect_selected)
 
         layout.addWidget(self.explorer)
+        layout.addWidget(QLabel('Roster references — full text'))
+        self.explorer_references = QPlainTextEdit()
+        self.explorer_references.setReadOnly(True)
+        self.explorer_references.setPlaceholderText('Select an asset to read its full roster references here.')
+        self.explorer_references.setMinimumHeight(85)
+        self.explorer_references.setMaximumHeight(180)
+        layout.addWidget(self.explorer_references)
 
         self.nested = QTreeWidget()
+        self.nested.currentItemChanged.connect(self.show_nested_references)
 
         self.nested.setHeaderLabels(["Nested record", "Type", "Index"])
 
@@ -885,12 +916,24 @@ class Window(QMainWindow):
         preview_scroll.setWidget(self.explorer_image)
         layout.addWidget(preview_scroll)
 
+    def show_explorer_references(self, *_):
+        rows=selected(self.explorer)
+        text=rows[0].get('references','') if rows else ''
+        if rows and not text:
+            text='No confirmed roster references for this asset.' if self.roster else 'Load a roster in Roster Editor to see asset references.'
+        self.explorer_references.setPlainText(text.replace('; ', '\n'))
+
+    def show_nested_references(self, item, previous=None):
+        if item is not None:self.explorer_references.setPlainText(item.text(3).replace('; ', '\n'))
+
     def extract_selected(self, all_entries=False):
 
         if not self.archive:
             return self.log("Open a game first.")
 
-        entries = list(self.archive.entries) if all_entries else selected(self.explorer)
+        try:archive = self.preview_archive()
+        except (ValueError, OSError) as error:return self.show_error(str(error))
+        entries = list(archive.entries) if all_entries else selected(self.explorer)
 
         if not entries:
             return self.log("Select one or more rows to extract.")
@@ -902,7 +945,7 @@ class Window(QMainWindow):
         if path:
             self.run_job(
                 "Extract raw assets",
-                lambda job: extract(self.archive, entries, Path(path), job),
+                lambda job: extract(archive, entries, Path(path), job),
                 cancellable=True,
             )
 
@@ -946,8 +989,21 @@ class Window(QMainWindow):
         if not self.archive:return None
         if not self.preview_overrides.isChecked():return self.archive
         mod=self.mod_path.text()
-        if not (Path(mod)/'overrides.json').is_file():raise ValueError('Select an overrides folder before using override previews')
-        return PreviewArchive(self.archive,mod)
+        root=Path(mod).resolve()
+        if not (root/'overrides.json').is_file():raise ValueError('Select an overrides folder before using override previews')
+        try:
+            fingerprints=[]
+            for name in ('overrides.json','source_preconditions.json'):
+                info=(root/name).stat()
+                fingerprints.append((info.st_size,info.st_mtime_ns,info.st_ino))
+        except OSError as error:raise ValueError('Override workspace is incomplete; select the overrides folder again') from error
+        key=(id(self.archive),str(root),tuple(fingerprints))
+        if key not in self._preview_archive_cache:
+            try:snapshot=PreviewArchive(self.archive,str(root))
+            except (KeyError,TypeError,OSError) as error:raise ValueError('Invalid override workspace: '+str(error)) from error
+            if len(self._preview_archive_cache)>=2:self._preview_archive_cache.clear()
+            self._preview_archive_cache[key]=snapshot
+        return self._preview_archive_cache[key]
 
     def preview_file(self,source,archive=None):
         if archive is None:return source
@@ -996,13 +1052,16 @@ class Window(QMainWindow):
 
         from ..archive.catalog import record_references
         records=record_references(self.asset_path.name,result['records'],self.roster)
-        self.nested.setHeaderLabels(['Record','Type','Index','Referenced by schools'])
+        self.nested.setHeaderLabels(['Record','Type','Index','Roster references'])
+        self.nested.header().setStretchLastSection(True)
+        self.nested.setColumnWidth(3, 480)
 
         for rec in records:
-            QTreeWidgetItem(
+            item = QTreeWidgetItem(
                 self.nested,
-                [rec.get("name", ""), rec.get("type", ""), str(rec["index"]),rec['references']],
+                [str(rec.get('name') or ''), str(rec.get('type') or ''), str(rec['index']),rec['references']],
             )
+            item.setToolTip(3, rec['references'].replace('; ', '\n'))
 
         set_rows(
             self.textures,
@@ -1727,7 +1786,7 @@ class Window(QMainWindow):
     def refresh_preview_lists(self):
         self._preview_origin_error = False
         try:archive = self.preview_archive()
-        except ValueError:
+        except (ValueError,OSError):
             self._preview_origin_error = True
             archive = None
         self._preview_replacement_indices = set(getattr(archive, 'replacements', {}))
@@ -1739,6 +1798,7 @@ class Window(QMainWindow):
             self.preview_source_info.setText('Original JB assets')
             self.preview_source_info.setToolTip('')
         self.refresh_uniform_list();self.refresh_shoe_list();self.refresh_stadium_list()
+        if self.archive and archive is not None:self.refresh_catalog(archive)
 
     def refresh_stadium_list(self):
         import re
@@ -2022,7 +2082,7 @@ class Window(QMainWindow):
 
         layout = self.page(
             "Mod builder",
-            "Scan nested overrides, import SCNEs first and apply DDS textures with priority over TXTRs. Dry run checks the resulting archives; build writes a separate JB copy.",
+            "Select an overrides folder in Explorer. Build JB copy checks compatibility and writes a separate JB folder.",
         )
 
         form = QFormLayout()
@@ -2041,10 +2101,8 @@ class Window(QMainWindow):
         self.buttons(
             layout,
             [
-                ("Select overrides folder…", self.stage_replacements),
                 ("Export mod patch…", self.export_mod_patch),
                 ("Import mod patch…", self.import_mod_patch),
-                ("Dry run", lambda: self.build_game(True)),
                 ("Build JB copy", lambda: self.build_game(False)),
             ],
         )

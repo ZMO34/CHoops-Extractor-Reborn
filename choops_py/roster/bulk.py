@@ -6,7 +6,7 @@ import json
 from collections import defaultdict
 
 from ..archive.manifests import digest
-from .schema import EDITABLE, REFERENCES, RATING_COUNT, TENDENCY_NAMES
+from .schema import EDITABLE, REFERENCES, RATING_COUNT, TENDENCY_NAMES, CSV_GAME_FIELDS
 
 LIST_FIELDS = {"attribute_ratings", "shot_tendencies", "palette_colors"}
 CSV_COLUMNS = ("source_sha256", "table", "index", "school", "record", "field", "slot", "original", "value")
@@ -31,7 +31,7 @@ def cells(model):
             fields=EDITABLE.get(table, ())
             if table=='teams' and 'conference_index' not in fields:fields=(*fields,'conference_index')
             for field in fields:
-                if field not in row or field == "roster_slots":
+                if field not in CSV_GAME_FIELDS.get(table, ()) or field not in row or field == "roster_slots":
                     continue
                 value = row[field]
                 if field in LIST_FIELDS:
@@ -72,6 +72,8 @@ def csv_changes(model, text):
             raise ValueError(f"CSV line {line}: duplicate field")
         seen.add(key)
         if (field not in EDITABLE.get(table, ()) and not (table=='teams' and field=='conference_index')) or field == "roster_slots":
+            raise ValueError(f"CSV line {line}: unsupported field")
+        if field not in CSV_GAME_FIELDS.get(table, ()):
             raise ValueError(f"CSV line {line}: unsupported field")
         original, value = json.loads(row["original"]), json.loads(row["value"])
         current = model.rows[table][index][field]

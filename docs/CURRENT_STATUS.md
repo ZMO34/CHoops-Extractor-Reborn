@@ -1,13 +1,21 @@
-# v1.14.2 override-source refresh fix
+# v1.14.2 — Explorer overrides, references and cache fixes
 
 Release: https://github.com/ZMO34/CHoops-Extractor-Reborn/releases/tag/v1.14.2
 
-Fixes stale JB fallback labels after repeat override selection, uses the visible
-workspace for previews, and displays the loaded replacement count. A read-only
-legacy-folder audit resolved 1,824 archives. Its existing prepared workspace
-contained 1,825 replacements: the UI correctly showed 354 stadium and 727 uniform
-overrides. No shoe packages were supplied, so footwear retained JB fallbacks.
-No source/override files were renamed or modified; no JB was built.
+Select overrides folder… is in Explorer. The stale-fallback bug is fixed, source
+counts and source-aware asset rows are shown, and the visible workspace is used
+consistently. Dry run is removed from the GUI; JB builds still validate first.
+Confirmed roster ownership includes uniform selection menus, gameplay uniforms,
+cloth meshes, player/team footwear, stadiums and paired logo banks. Wider
+reference columns have full-text panels/tooltips. CSVs exclude UI/research
+fields and retain source/identity/stale-edit safety columns.
+
+Both JB and override indexes are retained. Separate validated scratch copies and
+a bounded 64 MiB decoded image cache support switching sources. DDS takes
+priority; raw TXTR is used only without a matching DDS. SCNE geometry remains
+supported. No user filenames or artwork were changed: the supplied names already
+resolved to 1,824 targets. Existing prepared data showed 354 stadium and 727
+uniform overrides; no shoe packages were supplied. No RPCS3 or testing JB build.
 
 # v1.14.1 preview source/list hotfix
 
@@ -272,3 +280,21 @@ the active preview after preparation. Preview loading uses the visible Mod
 workspace field, not an older cached path. The toolbar shows the loaded override
 count; an unavailable workspace is not mislabelled as JB fallback. Existing
 legacy DDS/SCNE folder names remain supported; no bulk rename is required.
+
+Explorer/workspace update: Select overrides folder… now lives in Explorer,
+with source-aware asset sizes and Override/JB labels. Dry run is removed from the
+GUI; Build JB copy still performs automatic validation. Roster references cover
+home/away/alternate selection menus (SELUA/H/X/Y/Z), gameplay uniform banks,
+confirmed cloth geometry, player/team shoes, stadiums, paired CDF payloads and
+conference/school logo banks. These links use the loaded roster. The wider
+reference column, full-text panel and tooltips preserve long references.
+Unsupported display metadata is reported without escaping the Qt result callback.
+
+JB and override indexes remain available together. Source-specific scratch files
+are reused while file fingerprints are unchanged; RGBA previews share a bounded
+64 MiB content cache. Changed manifests invalidate override snapshots; changed
+payloads still undergo source/checksum validation. DDS artwork skips the matching
+raw TXTR replacement; TXTR remains the fallback only when no DDS is present.
+SCNE replacements remain supported. CSVs use explicit binary-backed field
+whitelists: asset references, preview labels, research fields and row offsets are
+excluded, while source/stale-edit safety columns are retained.
