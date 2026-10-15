@@ -84,6 +84,29 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# Unreleased — faster override-folder preparation
+
+Override selection prepares independent archive groups in separate CPU worker
+processes (up to six, capped by cores and available RAM). A memory-weighted queue
+keeps heavy archives from overloading the system. Each archive has one writer;
+DDS priority, SCNE replacement, cube handling and validation remain unchanged.
+Progress shows completed archives and active workers. Cancellation or failure
+stops workers before removing partial output; the previous workspace is retained.
+
+Repeat selection reuses validated completed archives from the current prepared
+workspace when inputs, source checksums and importer code match. Changed inputs
+recompile only their archive; tampered cached output is rejected and regenerated.
+Conversion-cache identity is computed once per process and directory pruning is
+batched under a cross-process lock, with a final size-maintenance pass.
+
+Measured on 14 supplied scene groups / 612 DDS inputs with warm conversion cache:
+Final run: 24.838 s serial, 10.008 s with six workers (2.48x),
+6.676 s unchanged repeat. An earlier run measured 3.08x; timings vary with cache
+and machine load.
+All resulting archive hashes matched. These are preparation-only measurements;
+whole-folder timings also include discovery and compatibility checks and vary
+with CPU, RAM, storage and cache state. No RPCS3 or automatic/testing JB build.
+
 # v1.15.3 — frontend override import geometry fix
 
 Fixed folder selection aborting with `frontend_sync.iff: Geometry overlaps a
@@ -2140,3 +2163,26 @@ Final read-only supplied-input run: all 14 non-stadium SCNE groups compiled
 successfully together, zero failures. Legacy cube handling is isolated in its
 own module so unchanged ordinary conversions retain their cache identities.
 The final portable verification command passed all 524 tests again.
+
+## Parallel override preparation
+
+Windows spawn tests compare deterministic manifests and archive bytes between
+serial and two-worker preparation. Tests cover CPU/RAM limits, unchanged reuse,
+changed-input invalidation, tampered cached output, worker failure/cancellation
+and child cleanup, plus source/frozen module fingerprinting.
+
+Read-only benchmark: 14 actual scene groups / 612 DDS inputs, warm conversion
+cache, final run: serial 24.838 s, six workers 10.008 s, unchanged repeat
+6.676 s (2.48x parallel speedup). An earlier run measured 3.08x.
+All output archive checksums matched. Benchmark scratch was removed.
+No RPCS3 or real JB build.
+
+Frozen Windows EXE: three synthetic DDS overrides prepared with three spawned
+workers, then all three completed archives reused on repeat. Distinct texture
+outputs and source-bound manifests verified; owned smoke fixtures removed.
+Packaged Qt startup and synthetic audio round-trip also passed.
+
+Final `python tools/dev/verify.py`: 530 passed, 9 offscreen GL skips,
+2 deselected. Compile, CLI/Qt smoke, Ruff, mypy, handoff and diff checks passed.
+Final frozen EXE test repeated successfully with three workers and three reused
+archives; startup/audio smoke passed.
