@@ -374,3 +374,8 @@ strict rejection retained for direct imports without this legacy policy.
 Final complete suite: 524 passed, 9 offscreen GL skips, 2 deselected;
 51 targeted import/packing/live-preview checks passed. Actual studio import
 completed with +X updated and five source faces preserved.
+
+Final read-only supplied-input run: all 14 non-stadium SCNE groups compiled
+successfully together, zero failures. Legacy cube handling is isolated in its
+own module so unchanged ordinary conversions retain their cache identities.
+The final portable verification command passed all 524 tests again.

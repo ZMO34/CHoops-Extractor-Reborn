@@ -94,6 +94,9 @@ flag 0x10 from data-relative 0x20000010. Inline geometry/pointers remain unchang
 GPU buffers retain relocation and byte-preservation checks. Real overlaps and
 out-of-bounds or modified inline geometry still fail closed.
 
+Read-only validation passed all 14 supplied non-stadium SCNE import groups.
+The complete portable suite passed 524 tests.
+
 A failed folder import is atomic: it preserves the previous prepared workspace.
 That explains the old LSU preview after the failed reselection. Once import
 finishes successfully, the live source index and current S258 overrides activate.
@@ -2132,3 +2135,8 @@ strict rejection retained for direct imports without this legacy policy.
 Final complete suite: 524 passed, 9 offscreen GL skips, 2 deselected;
 51 targeted import/packing/live-preview checks passed. Actual studio import
 completed with +X updated and five source faces preserved.
+
+Final read-only supplied-input run: all 14 non-stadium SCNE groups compiled
+successfully together, zero failures. Legacy cube handling is isolated in its
+own module so unchanged ordinary conversions retain their cache identities.
+The final portable verification command passed all 524 tests again.

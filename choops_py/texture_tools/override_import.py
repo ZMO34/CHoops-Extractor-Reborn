@@ -34,7 +34,8 @@ def apply_dds(parts,kind,selector,source,job=None,converter=None,preserve_layout
         # converter incorrectly treats that header as a 3D texture.
         normalized=dds.normalized_2d(source_data);input_meta=meta;conformed=False;single_face=False
         if preserve_layout:
-            from .runtime_layout import conform,replace_cube_first_face
+            from .runtime_layout import conform
+            from .legacy_cube import replace_cube_first_face
             if allow_single_cube_face and reference.info()['cubemap'] and not meta['cubemap']:
                 normalized=replace_cube_first_face(normalized,reference,job);single_face=True
             normalized,conformed=conform(normalized,reference.info(),job)

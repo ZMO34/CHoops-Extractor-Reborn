@@ -8,6 +8,9 @@ flag 0x10 from data-relative 0x20000010. Inline geometry/pointers remain unchang
 GPU buffers retain relocation and byte-preservation checks. Real overlaps and
 out-of-bounds or modified inline geometry still fail closed.
 
+Read-only validation passed all 14 supplied non-stadium SCNE import groups.
+The complete portable suite passed 524 tests.
+
 A failed folder import is atomic: it preserves the previous prepared workspace.
 That explains the old LSU preview after the failed reselection. Once import
 finishes successfully, the live source index and current S258 overrides activate.
