@@ -8,7 +8,7 @@ from ..archive.hash_names import replacement_hash
 class PreviewArchive:
     def __init__(self,archive,mod):
         self.base=archive;self.path=archive.path;self.entries=[dict(e) for e in archive.entries]
-        self.replacements={};self.conditions={}
+        self.replacements={};self.conditions={};self.live=None
         root=Path(mod).resolve();manifest=root/'overrides.json'
         if not manifest.is_file():return
         conditions=root/'source_preconditions.json'
@@ -24,9 +24,17 @@ class PreviewArchive:
             self.replacements[entry['index']]=(target,row['sha256'])
             entry['size']=target.stat().st_size
 
+        if (root/'preview_inputs.json').is_file():
+            from .live_overrides import LiveOverrides
+            self.live=LiveOverrides(archive,root/'preview_inputs.json')
+            for index in self.live.groups:
+                self.replacements.setdefault(index,(root/'preview_inputs.json',digest((root/'preview_inputs.json').read_bytes())))
+
     def read(self,entry):
         index=entry['index']
         if index not in self.replacements:return self.base.read(self.base.entries[index])
+        if self.live and self.live.owner(index) is not None:
+            return self.live.read(index)
         expected=self.conditions.get(index)
         original=self.base.entries[index]
         if not expected or expected['hash']!=original['hash'] or expected['sha256']!=digest(self.base.read(original)):

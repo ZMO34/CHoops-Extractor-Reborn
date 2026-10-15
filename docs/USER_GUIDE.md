@@ -213,3 +213,20 @@ Models / Courts reserves more height for the full-width preview. Drag the wide
 divider above it up or down to enlarge or shrink it. Controls scroll independently
 when space is reduced; the main application window can also be resized normally.
 Fit camera frames the model after changing the available viewing area.
+
+# v1.15.2 — current override files in previews
+
+Folder-based previews now use current loose DDS, SCNE and archive inputs instead
+of treating an earlier prepared build snapshot as the selected folder. Only the
+requested archive is compiled for preview; unchanged inputs reuse a bounded
+64 MiB compiled cache. File changes invalidate materialized and decoded previews.
+Missing or incompatible live inputs raise an error rather than showing JB art.
+The same source applies to Explorer, texture, jersey, shoe and stadium previews.
+
+Select overrides folder once after upgrading to register live input locations.
+Older workspaces and imported patches remain usable prepared snapshots and are
+labelled accordingly. New or renamed files require selecting the folder again.
+After editing inputs, preview again (or switch sources) to reload. Select the
+folder again before building to prepare an updated build snapshot; previews do
+not change prepared builds or any original input. JB fallback applies only where
+no replacement exists. No emulator, testing JB or EBOOT changes.

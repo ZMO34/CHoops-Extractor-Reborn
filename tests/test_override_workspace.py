@@ -96,7 +96,7 @@ def test_new_override_folder_refreshes_lists_when_overrides_already_selected(qtb
     assert '[Override]' in window.scene_stadiums.itemText(1)
     assert '[Override]' in window.scene_uniforms.itemText(1)
     assert '[JB fallback]' in window.scene_shoes.itemText(1)
-    assert window.preview_source_info.text()=='2 archive overrides'
+    assert window.preview_source_info.text()=='2 prepared overrides — select folder again for live files'
     assert pending and pending[-1][0]==0
     window.active=None
 
