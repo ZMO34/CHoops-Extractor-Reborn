@@ -292,3 +292,39 @@ v1.14.1 preview source/list hotfix: 493 portable tests passed (9 offscreen GL sk
 Additional hotfix regression: global source switching preserves the active texture category rather than navigating to a prior 3D view. Final full suite: 494 passed, 9 offscreen GL skips, 2 deselected; nine direct-preview checks passed.
 
 Final v1.14.1 native preview/GL/roster-scale GUI suite: 22 passed. Packaged Windows startup and synthetic audio round-trip passed. Verified v1.13 audio helpers and matching source/licence archives reused.
+
+## v1.15 override-source refresh
+
+Final Windows Python checks: 497 passed, 9 offscreen GL skips, 2 deselected.
+Native override/direct-preview/GL checks: 24 passed. Compile, CLI/Qt smoke, Ruff,
+mypy, handoff and diff checks passed. Regression covers already-selected override
+mode during the worker result callback, queued preview reload, preservation of
+JB fallbacks, visible workspace versus stale cached path, and unavailable badges.
+Read-only supplied-folder discovery resolved 1,824 archives, including S258;
+existing workspace had 1,825 replacements. Native GUI list verification showed
+354 stadium and 727 uniform overrides. No shoe packages were supplied. Names and
+contents of user inputs were unchanged. No RPCS3 or automatic/testing JB build.
+
+## Final v1.15 Explorer/cache/CSV verification
+
+515 portable tests passed (9 offscreen GL skips, 2 deselected), with compile,
+CLI/Qt smoke, Ruff, mypy and handoff checks. Native targeted suite: 41 passed.
+Hidden Explorer loaded the supplied SELUH258 override, showed five records and
+full roster references, and rendered its texture without errors. Read-only
+S258/SELUH258/UH258 override inspection and DDS preview decoding also passed.
+Cache tests retain both source variants, invalidate modified inputs, reject
+altered replacement payloads and enforce the image-memory bound. DDS tests skip
+a broken raw TXTR when DDS exists and correctly use TXTR when DDS is absent.
+CSV tests exclude injected UI metadata and reject unsupported import fields
+without changing roster bytes. No RPCS3, game launch or automatic/testing JB.
+
+## v1.15 explicit roster I/O and release verification
+
+`python tools/dev/verify.py`: 519 passed, 9 offscreen OpenGL skips,
+2 deselected; compile, CLI/Qt smoke, Ruff, mypy and generated handoff passed.
+New regressions cover edited external IFF to USERDATA/IFF round trips, immutable
+source payloads, invalid-roster rejection, explicit JB/override source selection,
+missing override roster rejection and IFF export without a loaded JB.
+Native Windows targeted preview, cache, CSV and roster I/O suite: 45 passed.
+Windows packaging additionally runs frozen startup and synthetic audio round trip.
+No emulator/gameplay tests or automatic/testing JB builds are performed.

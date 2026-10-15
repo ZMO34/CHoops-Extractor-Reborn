@@ -45,7 +45,7 @@ def test_raw_record_then_dds_takes_priority(tmp_path,monkeypatch):
     (folder/'unif.txtr').write_bytes(wrap(1,[txtr_header(),b'rawimage']))
     child=folder/'_unif.txtr';child.mkdir();(child/'unif.dds').write_bytes(b'DDS artwork')
     def import_dds(parts,kind,selector,path,job=None,**options):
-        assert parts[1]==b'rawimage' and kind=='TXTR'
+        assert parts[1]==b'oldimage' and kind=='TXTR'
         return [parts[0],b'DDS wins'],{'width':4,'height':4,'format':'DXT1','mip_count':1}
     monkeypatch.setattr(override_import,'apply_dds',import_dds)
     arc=Archive(source);plan=discover(arc,folder)
@@ -181,7 +181,7 @@ def test_python_texture_manifest_detected_without_archive_folder_name(tmp_path,m
     metadata={'schema':2,'source':r'Z:\old\ua000.iff','textures':[{'texture_name':'unif','raw_output_path':r'Z:\old\0000_unif.txtr','dds_output_path':r'Z:\old\0000_unif.dds'}]}
     (folder/'manifest.json').write_text(json.dumps(metadata),encoding='utf8')
     def apply(parts,kind,selector,path,job=None,**options):
-        assert parts[1]==b'rawimage'
+        assert parts[1]==b'oldimage'
         return [parts[0],b'DDS wins'],{'width':4,'height':4,'format':'DXT1','mip_count':1}
     monkeypatch.setattr(override_import,'apply_dds',apply)
     arc=Archive(source);plan=discover(arc,folder)
@@ -351,3 +351,23 @@ def test_internal_record_index_cannot_collide_with_another_numeric_name():
     check=StandardIFF(result)
     assert record_blocks(check,check.records[0])[1][3].startswith(b'AAAAAAAA')
     assert record_blocks(check,check.records[1])[1][3].startswith(b'newimage')
+
+
+def test_broken_raw_txtr_is_ignored_when_dds_exists_but_used_as_fallback(tmp_path,monkeypatch):
+    payload=named_iff([txtr_header(),b'oldimage'],[(0x5c369069,[0,0])],[('unif','TXTR')])
+    source=game_fixture(tmp_path/'game',payload);folder=tmp_path/'ua000';folder.mkdir()
+    raw=folder/'unif.txtr';raw.write_bytes(b'broken raw TXTR must not be read')
+    dds_file=folder/'unif.dds';dds_file.write_bytes(b'DDS artwork')
+    def apply(parts,kind,selector,path,job=None,**options):
+        assert parts[1]==b'oldimage'
+        return [parts[0],b'DDS wins'],dict(width=4,height=4,format='DXT1',mip_count=1)
+    monkeypatch.setattr(override_import,'apply_dds',apply)
+    arc=Archive(source);group=discover(arc,folder)['groups'][0]
+    result,_=compile_group(arc,group)
+    check=StandardIFF(result)
+    assert record_blocks(check,check.records[0])[1][3].startswith(b'DDS wins')
+    dds_file.unlink()
+    raw.write_bytes(wrap(1,[txtr_header(),b'fallback']))
+    result,_=compile_group(arc,discover(arc,folder)['groups'][0])
+    check=StandardIFF(result)
+    assert record_blocks(check,check.records[0])[1][3].startswith(b'fallback')

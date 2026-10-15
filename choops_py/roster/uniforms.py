@@ -7,6 +7,7 @@ from ..formats.compression import encode_greedy, MAGIC
 from ..core.errors import ToolError
 
 BANKS='haxyz'
+JERSEY_SHAPES={0:'u',1:'v',2:'vtri',3:'tri',4:'wishbone'}
 VARIANT_NAMES={0:'Home',1:'Away',2:'Alternate 1',3:'Alternate 2',4:'Alternate 3'}
 
 def asset_name(row, selection=False):

@@ -115,16 +115,43 @@ def extract(
     return result
 
 
+def _file_signature(path):
+    info=Path(path).stat()
+    return info.st_size,info.st_mtime_ns,info.st_ino
+
+
 def materialize(archive: Archive, entry: dict, directory: Path | None = None) -> Path:
-    """Create a private scratch copy for parsers requiring a filesystem input."""
-    directory = directory or OUTPUT / "temp" / ("inspect_" + uuid.uuid4().hex)
+    """Reuse separate source/override scratch copies while inputs remain unchanged."""
     selected = [entry]
-    if entry["name"] and entry["name"].lower().endswith(".iff"):
-        companion = entry["name"][:-4] + ".cdf"
-        selected += [e for e in archive.entries if e["name"] == companion]
-    extract(archive, selected, directory)
-    name = safe_name(entry["name"] or f"hash_{entry['hash']:08x}.bin")
-    return directory / name
+    if entry['name'] and entry['name'].lower().endswith('.iff'):
+        companion=entry['name'][:-4]+'.cdf'
+        selected += [e for e in archive.entries if e['name']==companion]
+    base=getattr(archive,'base',archive)
+    key=None
+    cache=getattr(archive,'_preview_materialized',{})
+    if directory is None and hasattr(base,'parts'):
+        source=tuple((p['name'],_file_signature(base.path/p['name'])) for p in base.parts)
+        replacements=getattr(archive,'replacements',{})
+        overrides=tuple((e['index'],str(replacements[e['index']][0]),replacements[e['index']][1],
+                         _file_signature(replacements[e['index']][0]))
+                        for e in selected if e['index'] in replacements)
+        key=(source,overrides,tuple((e['index'],e['name'],e['size']) for e in selected))
+        if key in cache:
+            path,files=cache[key]
+            try:
+                if all(_file_signature(p)==signature for p,signature in files):return path
+            except OSError:pass
+            cache.pop(key,None)
+    directory=directory or OUTPUT/'temp'/('inspect_'+uuid.uuid4().hex)
+    extract(archive,selected,directory)
+    name=safe_name(entry['name'] or f"hash_{entry['hash']:08x}.bin")
+    result=directory/name
+    if key is not None:
+        files=tuple((p,_file_signature(p)) for p in directory.iterdir() if p.is_file())
+        if len(cache)>=64:cache.clear()
+        cache[key]=(result,files)
+        archive._preview_materialized=cache
+    return result
 
 
 def inspect_asset(path: Path) -> dict:
@@ -240,6 +267,15 @@ def decode_texture_preview(source: Path, selector: str):
 
 
 def decode_preview_asset(asset, max_size=2048):
+    from .preview_cache import images
+    signature=hashlib.sha256()
+    for block in asset.texture.blocks:
+        signature.update(len(block).to_bytes(8,'big'))
+        signature.update(block)
+    return images.get((signature.digest(),max_size),lambda:_decode_preview_asset(asset,max_size))
+
+
+def _decode_preview_asset(asset, max_size=2048):
     import shutil
     from PIL import Image
     from ..texture_tools.external_converters import convert
@@ -440,10 +476,10 @@ def inspect_uniform_preview(source, job=None):
 
 def inspect_jersey_preview(archive,uniform,neck,build,shorts,parts=0,job=None):
     """Combine existing top/shorts meshes in their original rest-pose coordinates."""
-    from ..roster.uniforms import asset_name
+    from ..roster.uniforms import asset_name, JERSEY_SHAPES
     from ..formats.standard_iff import StandardIFF
     job=job or JobContext()
-    shapes={0:'u',1:'v',2:'vtri',3:'tri',4:'wishbone'}
+    shapes=JERSEY_SHAPES
     if neck not in shapes or build not in ('thin','reg','fat') or shorts not in ('thin','reg','fat') or parts not in (0,1,2):raise ValueError('Choose a supported uniform preview shape')
     def entry(name):
         matches=[e for e in archive.entries if e.get('name')==name]

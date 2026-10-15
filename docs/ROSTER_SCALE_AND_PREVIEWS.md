@@ -173,3 +173,5 @@ Additional appearance/tattoo/post/free-throw fields and all 112 jump-shot captio
 Keyboard limits no longer block external edits. Dynamic text uses copy-on-write UTF-16 storage, NUL/control-character checks, signed-relative-pointer bounds and the adapter’s 60 MiB safety guard. That guard is a tool limit, not a claimed engine maximum; gameplay compatibility of arbitrary long names remains unverified.
 
 Secondary-position search is closed by owner confirmation; only the primary position is exposed. See CONFERENCE_ASSETS.md for current index/logo behavior and tournament-link protection.
+
+CSV boundary: both editable and per-table exports whitelist actual roster fields. Asset references, UI/source badges, research notes and row offsets do not enter CSV data. Editable CSV retains source SHA, table/index/slot identity and original values for safe import.
