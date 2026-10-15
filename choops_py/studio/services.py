@@ -207,14 +207,16 @@ def inspect_asset(path: Path) -> dict:
     }
 
 
-def stage_folder(source: Path, folder: Path, mod: Path, job=None) -> dict:
+def stage_folder(source: Path, folder: Path, mod: Path, job=None, *, workers=None) -> dict:
     """Compile recursive records first, then overlay DDS artwork atomically."""
     import shutil
-    from ..archive.folder_import import discover,compile_group
+    from ..archive.folder_import import discover
+    from ..archive.parallel_import import compiled_groups,prior_cache
     from ..archive.build_copy import preflight
     from ..archive.manifests import write_bytes
     archive=Archive(source);folder=Path(folder);mod=safe_output(mod,[source,folder])
     requested_mod = mod
+    reuse=prior_cache(mod)
     # Staging creates a complete snapshot. Never merge with or erase an old one.
     suffix = 2
     while mod.exists():
@@ -224,26 +226,22 @@ def stage_folder(source: Path, folder: Path, mod: Path, job=None) -> dict:
     work=mod.parent/('.mod_'+uuid.uuid4().hex);rows: list[dict]=[];conditions=[];growth=[];unchanged=0
     details=[];unapplied: list[dict]=[]
     try:
-        for i,group in enumerate(discovery['groups']):
-            job.check();job.progress(i,len(discovery['groups']),'Compile override '+group['name'])
-            original=archive.read(group['entry'])
-            group['_preview_source_sha']=hashlib.sha256(original).hexdigest()
-            try:data,imports=compile_group(archive,group,job)
-            except (ValueError,OSError) as error:raise ValueError(group['name']+': '+str(error)) from error
+        compiled={};outcomes={};worker_count=1
+        for i,group,result,worker_count in compiled_groups(archive,discovery['groups'],work,job,workers=workers,reuse=reuse):
+            group['_preview_source_sha']=result['source_sha256']
+            outcomes[i]=(group,result)
+            compiled[str(group['entry']['index'])]={key:value for key,value in result.items() if key not in ('root','cache_hit')}
+        reused=sum(result['cache_hit'] for _,result in outcomes.values())
+        for i in sorted(outcomes):
+            group,result=outcomes[i];imports=result['imports']
             unapplied.extend(dict(archive=group['name'],**item) for item in imports if item.get('status')=='unmatched')
-            if data==original and group['whole'] is None and not group.get('compiled_companion'):unchanged+=1;continue
-            target=f'assets/{len(rows):04d}.bin';write_bytes(work/target,data,[source,folder])
-            rows.append(dict(archive=group['name'],subfile=None,kind='archive',original_name=group['name'],path=target,sha256=hashlib.sha256(data).hexdigest(),size=len(data)))
-            conditions.append(dict(index=group['entry']['index'],hash=group['entry']['hash'],sha256=hashlib.sha256(original).hexdigest()))
-            details.append(dict(archive=group['name'],binary_records=len(group['records']),dds_imports=imports))
-            if len(data)>len(original):growth.append(dict(archive=group['name'],old_bytes=len(original),new_bytes=len(data)))
-            if group.get('compiled_companion'):
-                entry,name,payload=group['compiled_companion'];target=f'assets/{len(rows):04d}.bin'
-                write_bytes(work/target,payload,[source,folder])
-                rows.append(dict(archive=name,subfile=None,kind='archive',original_name=name,path=target,sha256=hashlib.sha256(payload).hexdigest(),size=len(payload)))
-                before=archive.read(entry)
-                conditions.append(dict(index=entry['index'],hash=entry['hash'],sha256=hashlib.sha256(before).hexdigest()))
-                if len(payload)>len(before):growth.append(dict(archive=name,old_bytes=len(before),new_bytes=len(payload)))
+            if result['unchanged']:unchanged+=1;continue
+            details.append(dict(archive=group['name'],binary_records=len(group['records']),dds_imports=imports,compiled_cache_hit=result['cache_hit']))
+            for output in result['outputs']:
+                rows.append({**{key:output[key] for key in ('archive','path','sha256','size')},'subfile':None,'kind':'archive','original_name':output['archive']})
+                conditions.append(dict(index=output['index'],hash=output['hash'],sha256=output['source_sha256']))
+                if output['size']>output['source_size']:growth.append(dict(archive=output['archive'],old_bytes=output['source_size'],new_bytes=output['size']))
+        save_json(work/'compiled_inputs.json',compiled,[source,folder])
         names=[row['archive'].casefold() for row in rows]
         if len(names)!=len(set(names)):raise ValueError('A paired CDF texture import conflicts with a complete CDF replacement')
         if not rows:raise ValueError('All discovered overrides match the selected game; no changed overrides to prepare')
@@ -252,7 +250,7 @@ def stage_folder(source: Path, folder: Path, mod: Path, job=None) -> dict:
         save_json(work/'import_options.json',dict(schema=1,allow_archive_growth=True,dds_priority=True,scne_priority=True),[source,folder])
         from .live_overrides import describe_groups
         save_json(work/'preview_inputs.json',describe_groups(discovery['groups'],folder,archive),[source,folder])
-        report=dict(staged=len(rows),mod=str(mod),requested_mod=str(requested_mod),workspace_changed=mod != requested_mod,detected_formats=discovery['detected_formats'],scanned_files=discovery['scanned_files'],dds_files=discovery['dds_files'],binary_records=discovery['binary_records'],ignored_files=discovery['ignored_files'],shadowed_dds=discovery['shadowed_dds'],resolved_targets=discovery['resolved_targets'],unapplied_overrides=unapplied,unchanged_archives=unchanged,growing_archives=growth,dds_priority=True,scne_priority=True,imports=details)
+        report=dict(parallel_workers=worker_count,reused_archives=reused,staged=len(rows),mod=str(mod),requested_mod=str(requested_mod),workspace_changed=mod != requested_mod,detected_formats=discovery['detected_formats'],scanned_files=discovery['scanned_files'],dds_files=discovery['dds_files'],binary_records=discovery['binary_records'],ignored_files=discovery['ignored_files'],shadowed_dds=discovery['shadowed_dds'],resolved_targets=discovery['resolved_targets'],unapplied_overrides=unapplied,unchanged_archives=unchanged,growing_archives=growth,dds_priority=True,scne_priority=True,imports=details)
         save_json(work/'folder_import_report.json',report,[source,folder])
         job.check();job.progress(0,1,'Checking override compatibility')
         _,patches=preflight(source,work,job)
@@ -261,6 +259,10 @@ def stage_folder(source: Path, folder: Path, mod: Path, job=None) -> dict:
     except BaseException:
         if work.exists() and work.resolve().is_relative_to(OUTPUT.resolve()):shutil.rmtree(work)
         raise
+    finally:
+        from ..texture_tools.conversion_cache import _maintain
+        _maintain(OUTPUT/'cache'/'texture_conversions',force=True)
+
 
 
 def decode_texture_preview(source: Path, selector: str):

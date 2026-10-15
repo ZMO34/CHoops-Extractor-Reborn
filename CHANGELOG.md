@@ -1,3 +1,8 @@
+# v1.15.4
+
+- Parallel CPU/RAM-bounded override preparation, completed-archive reuse, cheaper
+  conversion-cache maintenance, deterministic outputs and cancellable workers.
+
 # v1.15.3
 
 - Fix frontend menu override imports misclassifying header-relative geometry as

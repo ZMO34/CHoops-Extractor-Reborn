@@ -1,3 +1,26 @@
+# v1.15.4 — faster override-folder preparation
+
+Override selection prepares independent archive groups in separate CPU worker
+processes (up to six, capped by cores and available RAM). A memory-weighted queue
+keeps heavy archives from overloading the system. Each archive has one writer;
+DDS priority, SCNE replacement, cube handling and validation remain unchanged.
+Progress shows completed archives and active workers. Cancellation or failure
+stops workers before removing partial output; the previous workspace is retained.
+
+Repeat selection reuses validated completed archives from the current prepared
+workspace when inputs, source checksums and importer code match. Changed inputs
+recompile only their archive; tampered cached output is rejected and regenerated.
+Conversion-cache identity is computed once per process and directory pruning is
+batched under a cross-process lock, with a final size-maintenance pass.
+
+Measured on 14 supplied scene groups / 612 DDS inputs with warm conversion cache:
+Final run: 24.838 s serial, 10.008 s with six workers (2.48x),
+6.676 s unchanged repeat. An earlier run measured 3.08x; timings vary with cache
+and machine load.
+All resulting archive hashes matched. These are preparation-only measurements;
+whole-folder timings also include discovery and compatibility checks and vary
+with CPU, RAM, storage and cache state. No RPCS3 or automatic/testing JB build.
+
 # v1.15.3 — frontend override import geometry fix
 
 Fixed folder selection aborting with `frontend_sync.iff: Geometry overlaps a

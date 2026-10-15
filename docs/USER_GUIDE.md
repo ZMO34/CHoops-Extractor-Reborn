@@ -230,3 +230,18 @@ After editing inputs, preview again (or switch sources) to reload. Select the
 folder again before building to prepare an updated build snapshot; previews do
 not change prepared builds or any original input. JB fallback applies only where
 no replacement exists. No emulator, testing JB or EBOOT changes.
+
+## Faster overrides loading
+
+Select overrides folder uses CPU/RAM-limited parallel workers automatically.
+The progress line shows active workers and completed archives. Repeat selection
+reuses unchanged completed archives from the current Mod workspace; edited
+inputs recompile only affected archives. Old workspaces without reuse metadata
+prepare once before benefiting. No switches or extra converter tools are needed.
+Cancellation preserves the previous workspace.
+
+Reuse checks loose input paths, file identities, sizes and modification times;
+it validates the original JB archive and cached output with SHA-256 and also
+checks importer code. It does not hash all loose input contents on every scan,
+so deliberate same-size edits with preserved metadata can evade that quick
+input-change check. Ordinary saved/replaced files invalidate affected archives.
