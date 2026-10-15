@@ -1,3 +1,12 @@
+# v1.14.2 — override list refresh
+
+Fixes stale JB fallback badges when selecting a new overrides folder while the
+override source is already selected. Lists refresh immediately; the active
+preview reloads after preparation. The visible Mod workspace determines preview
+loading, and the toolbar shows the loaded archive override count. Invalid
+workspaces are labelled unavailable instead of misleading fallback badges.
+Legacy nested DDS/SCNE names remain supported without bulk renaming.
+
 # v1.14.1 — preview source and asset lists
 
 Fixes NoneType.lower during S258 floor preview by skipping unnamed archive

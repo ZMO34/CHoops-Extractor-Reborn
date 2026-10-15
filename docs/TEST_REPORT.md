@@ -292,3 +292,15 @@ v1.14.1 preview source/list hotfix: 493 portable tests passed (9 offscreen GL sk
 Additional hotfix regression: global source switching preserves the active texture category rather than navigating to a prior 3D view. Final full suite: 494 passed, 9 offscreen GL skips, 2 deselected; nine direct-preview checks passed.
 
 Final v1.14.1 native preview/GL/roster-scale GUI suite: 22 passed. Packaged Windows startup and synthetic audio round-trip passed. Verified v1.13 audio helpers and matching source/licence archives reused.
+
+## v1.14.2 override-source refresh
+
+Final Windows Python checks: 497 passed, 9 offscreen GL skips, 2 deselected.
+Native override/direct-preview/GL checks: 24 passed. Compile, CLI/Qt smoke, Ruff,
+mypy, handoff and diff checks passed. Regression covers already-selected override
+mode during the worker result callback, queued preview reload, preservation of
+JB fallbacks, visible workspace versus stale cached path, and unavailable badges.
+Read-only supplied-folder discovery resolved 1,824 archives, including S258;
+existing workspace had 1,825 replacements. Native GUI list verification showed
+354 stadium and 727 uniform overrides. No shoe packages were supplied. Names and
+contents of user inputs were unchanged. No RPCS3 or automatic/testing JB build.

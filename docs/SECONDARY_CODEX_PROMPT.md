@@ -84,6 +84,17 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# v1.14.2 override-source refresh fix
+
+Release: https://github.com/ZMO34/CHoops-Extractor-Reborn/releases/tag/v1.14.2
+
+Fixes stale JB fallback labels after repeat override selection, uses the visible
+workspace for previews, and displays the loaded replacement count. A read-only
+legacy-folder audit resolved 1,824 archives. Its existing prepared workspace
+contained 1,825 replacements: the UI correctly showed 354 stadium and 727 uniform
+overrides. No shoe packages were supplied, so footwear retained JB fallbacks.
+No source/override files were renamed or modified; no JB was built.
+
 # v1.14.1 preview source/list hotfix
 
 Release: https://github.com/ZMO34/CHoops-Extractor-Reborn/releases/tag/v1.14.1
@@ -340,6 +351,13 @@ filenames. Override mode labels replaced assets and JB fallbacks explicitly.
 Unnamed archive entries no longer break stock court-reference lookup.
 v1.14 is published from 2158df982f43ba3dbb1e2df1cfcd2030fb0a25ea;
 this follow-up targets the reported missing-name error and source-list UX.
+
+Override-source refresh fix: selecting another overrides folder while Selected
+overrides is already active now refreshes asset lists immediately and reloads
+the active preview after preparation. Preview loading uses the visible Mod
+workspace field, not an older cached path. The toolbar shows the loaded override
+count; an unavailable workspace is not mislabelled as JB fallback. Existing
+legacy DDS/SCNE folder names remain supported; no bulk rename is required.
 
 ---
 
@@ -1946,3 +1964,15 @@ v1.14.1 preview source/list hotfix: 493 portable tests passed (9 offscreen GL sk
 Additional hotfix regression: global source switching preserves the active texture category rather than navigating to a prior 3D view. Final full suite: 494 passed, 9 offscreen GL skips, 2 deselected; nine direct-preview checks passed.
 
 Final v1.14.1 native preview/GL/roster-scale GUI suite: 22 passed. Packaged Windows startup and synthetic audio round-trip passed. Verified v1.13 audio helpers and matching source/licence archives reused.
+
+## v1.14.2 override-source refresh
+
+Final Windows Python checks: 497 passed, 9 offscreen GL skips, 2 deselected.
+Native override/direct-preview/GL checks: 24 passed. Compile, CLI/Qt smoke, Ruff,
+mypy, handoff and diff checks passed. Regression covers already-selected override
+mode during the worker result callback, queued preview reload, preservation of
+JB fallbacks, visible workspace versus stale cached path, and unavailable badges.
+Read-only supplied-folder discovery resolved 1,824 archives, including S258;
+existing workspace had 1,825 replacements. Native GUI list verification showed
+354 stadium and 727 uniform overrides. No shoe packages were supplied. Names and
+contents of user inputs were unchanged. No RPCS3 or automatic/testing JB build.

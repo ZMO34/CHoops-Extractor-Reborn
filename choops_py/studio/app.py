@@ -369,6 +369,8 @@ class Window(QMainWindow):
         self.preview_source_selector.addItems(['Source JB', 'Selected overrides'])
         self.preview_source_selector.setToolTip('Applies to all texture and 3D preview categories.')
         preview_toolbar.addWidget(self.preview_source_selector)
+        self.preview_source_info = QLabel('Original JB assets')
+        preview_toolbar.addWidget(self.preview_source_info)
         self.preview_source_selector.activated.connect(lambda index:self.preview_overrides.setChecked(index == 1))
         self.preview_overrides.toggled.connect(lambda checked:self.preview_source_selector.setCurrentIndex(int(checked)))
 
@@ -943,7 +945,7 @@ class Window(QMainWindow):
         from .preview_source import PreviewArchive
         if not self.archive:return None
         if not self.preview_overrides.isChecked():return self.archive
-        mod=getattr(self,'preview_mod',None) or self.mod_path.text()
+        mod=self.mod_path.text()
         if not (Path(mod)/'overrides.json').is_file():raise ValueError('Select an overrides folder before using override previews')
         return PreviewArchive(self.archive,mod)
 
@@ -1719,12 +1721,23 @@ class Window(QMainWindow):
 
     def preview_origin_label(self, entry):
         if not self.preview_overrides.isChecked():return ''
+        if getattr(self, '_preview_origin_error', False):return ' [Overrides unavailable]'
         return ' [Override]' if entry['index'] in getattr(self, '_preview_replacement_indices', set()) else ' [JB fallback]'
 
     def refresh_preview_lists(self):
+        self._preview_origin_error = False
         try:archive = self.preview_archive()
-        except ValueError:return
+        except ValueError:
+            self._preview_origin_error = True
+            archive = None
         self._preview_replacement_indices = set(getattr(archive, 'replacements', {}))
+        if self.preview_overrides.isChecked():
+            self.preview_source_info.setText('Overrides unavailable' if self._preview_origin_error else
+                                            str(len(self._preview_replacement_indices)) + ' archive overrides')
+            self.preview_source_info.setToolTip(self.mod_path.text())
+        else:
+            self.preview_source_info.setText('Original JB assets')
+            self.preview_source_info.setToolTip('')
         self.refresh_uniform_list();self.refresh_shoe_list();self.refresh_stadium_list()
 
     def refresh_stadium_list(self):
@@ -2015,6 +2028,7 @@ class Window(QMainWindow):
         form = QFormLayout()
 
         self.mod_path = QLineEdit(str(OUTPUT / "builds" / "my_mod"))
+        self.mod_path.editingFinished.connect(lambda:self.reload_preview_source() if self.preview_overrides.isChecked() else None)
 
         self.build_path = QLineEdit(str(OUTPUT / "builds" / "my_build"))
 
@@ -2128,7 +2142,10 @@ class Window(QMainWindow):
         if operation == "staging":
             self.mod_path.setText(str(result['mod']))
             self.preview_mod=result.get('mod')
+            already_selected = self.preview_overrides.isChecked()
             self.preview_overrides.setChecked(True)
+            self.refresh_preview_lists()
+            if already_selected:QTimer.singleShot(0, self.reload_preview_source)
             title = "DDS prioritization complete"
             message = "Overrides are ready. DDS prioritization is complete.\n\n"
             message += f"Prepared archives: {result.get('staged', 0)}\nWorkspace: {result.get('mod', '')}"
