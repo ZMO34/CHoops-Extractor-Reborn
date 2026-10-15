@@ -284,7 +284,7 @@ class Window(QMainWindow):
 
         super().__init__()
 
-        self.setWindowTitle("CHoops Modding Studio • 1.0beta development")
+        self.setWindowTitle("CHoops Modding Studio • v1.15")
 
         self.resize(1420, 900)
 
@@ -984,10 +984,10 @@ class Window(QMainWindow):
                 self.display_asset,
             )
 
-    def preview_archive(self):
+    def preview_archive(self, use_overrides=None):
         from .preview_source import PreviewArchive
         if not self.archive:return None
-        if not self.preview_overrides.isChecked():return self.archive
+        if not (self.preview_overrides.isChecked() if use_overrides is None else use_overrides):return self.archive
         mod=self.mod_path.text()
         root=Path(mod).resolve()
         if not (root/'overrides.json').is_file():raise ValueError('Select an overrides folder before using override previews')
@@ -1345,8 +1345,9 @@ class Window(QMainWindow):
         self.buttons(
             layout,
             [
-                ("Open roster…", self.choose_roster),
-                ("Load game roster", self.load_game_roster),
+                ("Open USERDATA / roster IFF…", self.choose_roster),
+                ("Load from JB", self.load_game_roster),
+                ("Load from overrides", lambda: self.load_game_roster(True)),
                 ("Undo", self.undo_roster),
                 ("Redo", self.redo_roster),
                 ("Save copy…", self.save_roster),
@@ -1356,7 +1357,8 @@ class Window(QMainWindow):
         from PySide6.QtWidgets import QMenu
         extra=QHBoxLayout()
         export_button=QPushButton('Export…');export_menu=QMenu(export_button)
-        export_menu.addAction('Game roster IFF…',self.export_game_roster)
+        export_menu.addAction('Roster IFF…',self.export_game_roster)
+        export_menu.addAction('Save data (USERDATA)…',self.export_roster_userdata)
         from .roster_bulk import export_csv,import_csv,compare_roster
         export_menu.addAction('Roster CSV…',lambda:export_csv(self))
         export_button.setMenu(export_menu);extra.addWidget(export_button);extra.addStretch()
@@ -1428,7 +1430,7 @@ class Window(QMainWindow):
     def choose_roster(self):
 
         path, _ = QFileDialog.getOpenFileName(
-            self, "Open roster or decrypted USERDATA", "", "All supported files (*)"
+            self, "Open decrypted USERDATA / USRDATA or roster IFF", "", "Roster and save files (*.iff *.rost *.zip);;All files (*)"
         )
 
         if path:
@@ -1438,21 +1440,22 @@ class Window(QMainWindow):
                 "Load roster", lambda job: EditorModel.open(path), self.display_roster
             )
 
-    def load_game_roster(self):
-
+    def load_game_roster(self, from_overrides=False):
         if not self.archive:
-            return self.log("Open a game first.")
-
-        matches = [e for e in self.archive.entries if e["name"] == "roster_english.iff"]
-
-        if len(matches) != 1:
-            return self.log("Roster identity is missing or ambiguous.")
-
+            return self.log("Open a source JB folder first.")
+        try:
+            archive=self.preview_archive(use_overrides=bool(from_overrides))
+            matches=[e for e in archive.entries if e["name"]=="roster_english.iff"]
+            if len(matches)!=1:
+                raise ValueError("Roster identity is missing or ambiguous.")
+            if from_overrides and matches[0]['index'] not in archive.replacements:
+                raise ValueError("The selected overrides contain no roster_english.iff replacement.")
+        except (ValueError,OSError) as error:
+            return self.show_error(str(error))
         from ..roster.editor_model import EditorModel
-
         self.run_job(
-            "Load current JB folder roster",
-            lambda job: EditorModel.open(materialize(self.archive, matches[0])),
+            "Load overrides roster" if from_overrides else "Load source JB roster",
+            lambda job: EditorModel.open(materialize(archive,matches[0])),
             self.display_roster,
         )
 
@@ -1632,13 +1635,28 @@ class Window(QMainWindow):
 
     def export_game_roster(self):
         if not self.roster or self.active:return
-        if not self.archive:return self.log('Open the destination JB folder first.')
-        entries=[entry for entry in self.archive.entries if entry['name']=='roster_english.iff']
-        if len(entries)!=1:return self.log('The loaded JB has no unique roster_english.iff.')
-        output,_=QFileDialog.getSaveFileName(self,'Export edited roster for manual JB overrides',str(OUTPUT/'rosters'/'roster_english.iff'),'Game roster (*.iff)')
+        if self.roster.source.kind=='standard-iff':
+            template=self.roster.source.original
+        elif self.archive:
+            entries=[entry for entry in self.archive.entries if entry['name']=='roster_english.iff']
+            if len(entries)!=1:return self.show_error('The loaded JB has no unique roster_english.iff.')
+            template=self.archive.read(entries[0])
+        else:
+            path,_=QFileDialog.getOpenFileName(self,'Choose a roster IFF template','','Roster IFF (*.iff)')
+            if not path:return
+            try:template=Path(path).read_bytes()
+            except OSError as error:return self.show_error(str(error))
+        output,_=QFileDialog.getSaveFileName(self,'Export edited roster IFF',str(OUTPUT/'rosters'/'roster_english.iff'),'Roster IFF (*.iff)')
         if not output:return
         from ..roster.workflow import export_game_roster
-        self.run_job('Export game roster IFF',lambda job:export_game_roster(self.roster,self.archive.read(entries[0]),output))
+        self.run_job('Export roster IFF',lambda job:export_game_roster(self.roster,template,output))
+
+    def export_roster_userdata(self):
+        if not self.roster or self.active:return
+        output,_=QFileDialog.getSaveFileName(self,'Export decrypted save data',str(OUTPUT/'rosters'/'USERDATA'),'All files (*)')
+        if not output:return
+        from ..roster.workflow import export_userdata
+        self.run_job('Export decrypted USERDATA',lambda job:export_userdata(self.roster,output))
 
     def save_roster(self):
 

@@ -195,3 +195,14 @@ raw TXTR replacement; TXTR remains the fallback only when no DDS is present.
 SCNE replacements remain supported. CSVs use explicit binary-backed field
 whitelists: asset references, preview labels, research fields and row offsets are
 excluded, while source/stale-edit safety columns are retained.
+
+## Explicit roster sources and exports
+
+Roster controls explicitly open external roster IFF or decrypted USERDATA/USRDATA
+(and supported save ZIPs), load the source JB roster, or load a real override
+roster replacement independently of the preview dropdown. Export offers roster
+IFF and decrypted USERDATA. An external IFF supplies its own export template;
+other inputs use the loaded JB or a chosen IFF template. Save copy preserves the
+original wrapper, including other members of a loaded save ZIP. USERDATA export
+does not create encryption, PARAM files, or a complete console save package.
+All writers validate and reparse the result and protect the original input.

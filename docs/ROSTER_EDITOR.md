@@ -89,3 +89,14 @@ Jersey side tabs offer numbers 0–99/00 or the selected player’s roster numbe
 Additional appearance/tattoo/post/free-throw fields and all 112 jump-shot captions are now supported; see ROSTER_SEMANTICS.md. Arena vertex-colour/alpha, lightmap, glow and flare routing is implemented; see ARENA_SHADER_MASKS.md for evidence and remaining runtime effects.
 
 Text edits now grow beyond old allocations and keyboard entry capacities. The UI separates advisory game-keyboard sizes from unproved engine ceilings; structural pointer/UTF-16/adapter guards still apply.
+
+## Explicit roster sources and exports
+
+Roster controls explicitly open external roster IFF or decrypted USERDATA/USRDATA
+(and supported save ZIPs), load the source JB roster, or load a real override
+roster replacement independently of the preview dropdown. Export offers roster
+IFF and decrypted USERDATA. An external IFF supplies its own export template;
+other inputs use the loaded JB or a chosen IFF template. Save copy preserves the
+original wrapper, including other members of a loaded save ZIP. USERDATA export
+does not create encryption, PARAM files, or a complete console save package.
+All writers validate and reparse the result and protect the original input.

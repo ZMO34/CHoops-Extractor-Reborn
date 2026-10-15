@@ -55,3 +55,21 @@ def export_game_roster(model,base_iff,output):
 
 def save(path,patch,output):
     model=EditorModel.open(path);document=json.loads(Path(patch).read_text(encoding='utf-8'));model.apply_document(document);return save_model(model,output)
+
+
+def export_userdata(model,output):
+    """Export decrypted save payload; encryption and PARAM files are not invented."""
+    import struct
+    validation=model.validate()
+    if not validation['valid']:raise ToolError('roster_validation_failed',str(validation['issues'][:10]))
+    payload=bytes(model.data)
+    encoded=struct.pack('>I',len(payload))+payload
+    decoded=load_bytes(encoded)
+    if decoded.kind!='userdata' or decoded.payload!=payload:
+        raise ToolError('roster_wrapper_validation_failed','USERDATA round trip differs')
+    inputs=[model.source.source_path.split('!')[0]] if model.source.source_path else []
+    out=safe_output(output,inputs);write_bytes(out,encoded,inputs)
+    report=dict(status='success',output=str(out),source_type=model.source.kind,output_type='userdata',
+                output_sha256=digest(encoded),validation=validation,jb_built=False)
+    save_json(out.with_suffix(out.suffix+'.edit_report.json'),report)
+    return report
