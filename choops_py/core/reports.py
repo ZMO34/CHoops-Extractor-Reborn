@@ -4,9 +4,9 @@ import uuid
 from pathlib import Path
 from ..archive.manifests import safe_output, OUTPUT
 
-def save_json(path, data, sources=()):
+def save_json(path, data, sources=(), *, validator=safe_output):
     """Atomically replace a generated report/config, never a source input."""
-    path = safe_output(path, sources)
+    path = validator(path, sources)
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.parent / ('.r_'+uuid.uuid4().hex[:12]+'.tmp')
     try:
@@ -17,6 +17,10 @@ def save_json(path, data, sources=()):
     finally:
         if Path(temporary).exists(): Path(temporary).unlink()
     return path
+
+def save_build_json(path, data, sources=()):
+    from ..archive.manifests import build_destination
+    return save_json(path,data,sources,validator=build_destination)
 
 def import_report(data):
     save_json(OUTPUT/'reports'/'texture_import_report.json', data)

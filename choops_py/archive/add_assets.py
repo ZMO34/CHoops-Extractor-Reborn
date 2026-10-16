@@ -8,7 +8,7 @@ import hashlib
 from pathlib import Path
 from .usrdir_reader import Archive
 from .hash_names import hash_name,replacement_hash
-from .manifests import safe_output, OUTPUT
+from .manifests import build_destination as safe_output
 from .build_copy import jb_root, inventory
 from ..core.paths import reject_links
 from ..formats.standard_iff import StandardIFF
@@ -69,9 +69,13 @@ def plan(source, additions, replacements=None):
     first=min(e['offset'] for e in archive.entries)
     head_end=24+len(archive.parts)*16+len(archive.entries)*16
     with (archive.path/'0A').open('rb') as f:header=bytearray(f.read(first))
-    if any(header[head_end:first]):raise ValueError('Unclassified nonzero header padding')
+    if len(header)!=first:raise ValueError('Incomplete archive header')
     if len(additions)*16>first-head_end:
         raise CapacityError('Insufficient verified zero TOC padding')
+    # Replacements do not consume TOC space. Preserve the opaque gap verbatim;
+    # only newly occupied TOC slots must have been verified unused (zero).
+    if any(header[head_end:head_end+len(additions)*16]):
+        raise ValueError('New TOC slots overlap unclassified header bytes')
     records=[];toc_start=24+len(archive.parts)*16
     for i,e in enumerate(archive.entries):records.append(list(struct.unpack_from('>4I',header,toc_start+i*16)))
     cursor=sum(p['size'] for p in archive.parts);appended=[];patches=[]
@@ -128,7 +132,7 @@ def build(source, additions, output, replacements=None, job=None):
     if shutil.disk_usage(output.parent).free<required:raise ValueError('Insufficient disk space for copied JB')
     before=inventory(root)
     pending=output.parent/('.asset_build_'+uuid.uuid4().hex)
-    if not pending.resolve().is_relative_to(OUTPUT.resolve()):raise ValueError('Unsafe temporary output')
+    safe_output(pending,[root])
     try:
         copied=0
         def copy_file(src,dst):

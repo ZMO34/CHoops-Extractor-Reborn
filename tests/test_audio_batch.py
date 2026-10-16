@@ -67,3 +67,33 @@ def test_existing_batch_destination_is_untouched(batch):
     with pytest.raises(ValueError, match='new audio export folder'):
         workflow.export_tracks(archive, rows, output)
     assert file.read_bytes() == b'KEEP'
+
+
+def test_two_imports_share_one_bank_and_preserve_third_track(tmp_path,monkeypatch):
+    from support import iff_fixture
+    from test_audio import metadata
+    from choops_py.formats.cdf_backed_iff_writer import name_trailer
+    from choops_py.formats.standard_iff import StandardIFF
+    from choops_py.formats.standard_iff_writer import record_blocks
+    from choops_py.audio_tools.banks import StreamBank
+    streams=[bytes([i+1])*1520 for i in range(3)]
+    bank_data=b'PREFIX!!'+b''.join(streams)+b'BANKTAIL'
+    head=metadata([1520]*3)
+    global_data=iff_fixture([head],[(0x61df2234,[0])])+name_trailer([dict(name='cribmusic',type='AUSB')])
+    entries=[dict(hash=workflow.replacement_hash(name),name=name,size=len(data))
+             for name,data in [('global.iff',global_data),('cribmusic.bin',bank_data)]]
+    archive=SimpleNamespace(path=tmp_path/'source',entries=entries,
+                            read=lambda e:global_data if e['name']=='global.iff' else bank_data)
+    monkeypatch.setattr(workflow,'encode_wav',lambda path,*a,**kw:(bytes([int(path.stem)])*1520,3072))
+    changes=[(dict(bank='cribmusic',index=i,title=str(i)),tmp_path/f'{i+8}.wav') for i in (0,1)]
+    parent=OUTPUT/'temp';parent.mkdir(parents=True,exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix='queued_bank_test_',dir=parent) as directory:
+        out=Path(directory)/'songs';report=workflow.replace_tracks(archive,changes,out)
+        iff=StandardIFF((out/'global.iff').read_bytes());rebuilt=(out/'cribmusic.bin').read_bytes()
+        new_head=record_blocks(iff,iff.records[0])[0][3];bank=StreamBank(new_head,len(rebuilt))
+        assert len(report['replacements'])==2
+        assert rebuilt[bank.offsets[0]:bank.offsets[1]]==bytes([8])*1520
+        assert rebuilt[bank.offsets[1]:bank.offsets[2]]==bytes([9])*1520
+        assert rebuilt[bank.offsets[2]:bank.offsets[3]]==streams[2]
+        assert rebuilt[:8]==b'PREFIX!!' and rebuilt[-8:]==b'BANKTAIL'
+        assert new_head[-12:]==head[-12:]

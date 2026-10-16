@@ -17,6 +17,21 @@ def safe_output(path, sources=()):
             if p==source: raise ValueError("Output would overwrite input")
         elif p.is_relative_to(protected): raise ValueError("Output is inside input/source folder")
     return p
+
+def build_destination(path, sources=()):
+    """User-chosen JB destination, including other drives; never a source tree."""
+    raw=Path(path).absolute()
+    for parent in (raw,*raw.parents):
+        if parent.is_symlink() or (hasattr(parent,'is_junction') and parent.is_junction()):
+            raise ValueError('Build destination must not traverse links or junctions')
+    p=raw.resolve()
+    if p==Path(p.anchor) or p==ROOT.resolve() or ROOT.resolve().is_relative_to(p):
+        raise ValueError('Choose a separate named build folder')
+    for value in sources:
+        source=source_root(value).resolve()
+        if p.is_relative_to(source) or source.is_relative_to(p):
+            raise ValueError('Build destination overlaps an input/source folder')
+    return p
 def write_bytes(path,data,sources=()):
     p=safe_output(path,sources)
     if p.exists(): raise ValueError(f"Output exists: {p}")

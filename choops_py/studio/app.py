@@ -452,7 +452,8 @@ class Window(QMainWindow):
         layout.addLayout(row)
 
     def create_audio(self):
-
+        from ..audio_tools.pending import PendingSongs
+        self.pending_songs=PendingSongs()
         layout = self.page(
             "Audio workspace",
             "Browse Licensed Music and Fight Songs from the selected JB. WAV exports and replacement folders are prepared under output/ for you to select as overrides and build manually.",
@@ -468,7 +469,10 @@ class Window(QMainWindow):
                 ("Load / refresh catalog", self.audio_refresh),
                 ("Export selected WAVs…", self.audio_export_selected),
                 ("Export this section…", self.audio_export_section),
-                ("Replace selected from WAV…", self.audio_replace_selected),
+                ("Queue selected song from WAV…", self.audio_replace_selected),
+                ("Save queued songs…", self.audio_save_pending),
+                ("Remove queued song", self.audio_remove_pending),
+                ("Clear song queue", self.audio_clear_pending),
                 ("Replace from edited export…", self.audio_replace_folder),
                 ("Export shared cover art…", self.audio_export_cover),
                 ("Replace shared cover art…", self.audio_replace_cover),
@@ -482,6 +486,12 @@ class Window(QMainWindow):
         self.audio_tabs.addTab(self.audio_tables["Soundtrack"], "Licensed Music")
         self.audio_tabs.addTab(self.audio_tables["Fight song"], "Fight Songs")
         layout.addWidget(self.audio_tabs)
+
+        self.audio_queue=table()
+        self.audio_queue.setMaximumHeight(160)
+        layout.addWidget(QLabel('Pending replacements — choose songs above, then save the whole queue once.'))
+        layout.addWidget(self.audio_queue)
+        self.audio_show_pending()
 
         note = QLabel(
             "Song titles and artists are informational and read-only. Fight songs share jukebox cover record 021; some soundtrack records are shared too. Unknown AUDO loops and general CDF audio growth remain unsupported."
@@ -584,6 +594,28 @@ class Window(QMainWindow):
         )
         if not wav:
             return
+        try:self.pending_songs.add(archive,rows[0],Path(wav))
+        except (ValueError,OSError,EOFError) as error:return self.log(str(error))
+        self.audio_show_pending()
+
+    def audio_show_pending(self):
+        rows=[dict(bank=row['bank'],index=row['index'],title=row['title'],file=str(path))
+              for row,path in self.pending_songs.items.values()]
+        set_rows(self.audio_queue,rows,[('title','Song'),('bank','Bank'),('index','Index'),('file','Replacement WAV')])
+
+    def audio_remove_pending(self):
+        for row in selected(self.audio_queue):
+            self.pending_songs.items.pop((row['bank'],row['index']),None)
+        self.audio_show_pending()
+
+    def audio_clear_pending(self):
+        self.pending_songs.clear()
+        self.audio_show_pending()
+
+    def audio_save_pending(self):
+        archive=self.archive
+        try:replacements=self.pending_songs.replacements(archive)
+        except ValueError as error:return self.log(str(error))
         output = self.audio_output_path(
             "Choose a new replacement folder", Path("audio") / "song_edit"
         )
@@ -591,9 +623,14 @@ class Window(QMainWindow):
             return
         from ..audio_tools.workflow import replace_tracks
 
+        def saved(result):
+            self.pending_songs.saved(archive,replacements)
+            self.audio_show_pending()
+
         self.run_job(
-            "Prepare WAV replacement",
-            lambda job: replace_tracks(archive, [(rows[0], Path(wav))], output, job),
+            "Save queued song replacements",
+            lambda job: replace_tracks(archive, replacements, output, job),
+            saved,
             cancellable=True,
         )
 
@@ -2139,6 +2176,10 @@ class Window(QMainWindow):
 
         form.addRow("New JB output", self.build_path)
 
+        browse=QPushButton('Choose JB output folder…')
+        browse.clicked.connect(self.choose_build_output)
+        form.addRow('',browse)
+
         layout.addLayout(form)
 
         self.buttons(
@@ -2155,6 +2196,10 @@ class Window(QMainWindow):
         self.build_details.setReadOnly(True)
 
         layout.addWidget(self.build_details)
+
+    def choose_build_output(self):
+        path=QFileDialog.getExistingDirectory(self,'Choose an empty JB output folder (any drive)',self.build_path.text())
+        if path:self.build_path.setText(path)
 
     def stage_replacements(self):
 

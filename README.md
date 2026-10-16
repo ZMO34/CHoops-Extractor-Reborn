@@ -15,7 +15,7 @@ python tools/dev/setup.py
 .\.venv\Scripts\python.exe -m choops_py.cli --help
 ```
 
-Open the original JB/USRDIR in Explorer, double-click an asset, inspect/preview textures, save compatible edited copies, and stage them through Mod Builder. All generated output currently belongs under output/. No Node or HTTP server is required.
+Open the original JB/USRDIR in Explorer, double-click an asset, inspect/preview textures, save compatible edited copies, and stage them through Mod Builder. Prepared overrides and exports belong under output/. Mod Builder can write the completed JB to a manually selected empty folder on any drive, with source and overwrite protections. No Node or HTTP server is required.
 
 Local verification exercised read-only real inputs and separate generated outputs; environment-specific measurements are excluded from public documentation. Unknown formats stay read-only/unavailable, and runtime testing is NOT RUN.
 

@@ -1,3 +1,38 @@
+# Unreleased — queued audio, manual JB output and research continuation
+
+Audio now queues individual WAV replacements before one save. Selecting another
+WAV for the same bank/index replaces its queued choice; removing/clearing is
+explicit. Save writes one combined bank and matching global.iff AUSB metadata.
+Cancelled output selection or failed conversion retains the queue. Pending songs
+are tied to the source JB path and bank size/mtime/inode snapshot. Reopening the
+same unchanged source is supported; a different/changed JB is rejected.
+
+JB output can be selected in Mod Builder on any drive. Builds still reject source
+or overrides overlap, filesystem roots, links/junctions, existing files and
+unowned nonempty destinations. Atomic publication, manifest validation, rollback
+and owned temporary-folder cleanup work beside the selected destination. Other
+export workflows retain their documented output/ restrictions.
+
+Fixed the archive-growth error `Unclassified nonzero header padding`: replacements
+use existing TOC slots and preserve the opaque post-TOC gap. Added entries may
+consume only zero slots. Repacking preserves opaque bytes in place when the body
+start stays fixed; it refuses to relocate opaque bytes or overwrite them with a
+larger TOC. Unknown header bytes are never zeroed to bypass validation.
+
+Roster research corrects reported relative anchors (stored displacement includes
++1), accounts for the 33 confirmed bits in each uniform row, lists unresolved
+bit-mask runs and reports both legacy biased windows and engine logical record windows.
+Logical windows have no table overlap on the stock input. A newly audited
+arena +0x24 relative reference resolves to the team-name anchor for every nonnull
+stock row: 347 resolved and reciprocal team arena links, 32 nulls. Its wider runtime
+ownership/write behavior is not established; no new backlink writer is exposed.
+The full roster is still not semantically reversed. See ROSTER_SEMANTICS.md.
+
+Scorebug discovery identifies authored records/parts/textures in gamedata.iff and
+gamedataextra.iff. A read-only inventory command and SCOREBUG_RESEARCH.md record
+exact routes. Runtime score/clock/text bindings and geometry editing remain
+unresolved. No RPCS3, EBOOT writes or real/testing JB builds.
+
 # v1.15.4 — faster override-folder preparation
 
 Override selection prepares independent archive groups in separate CPU worker
