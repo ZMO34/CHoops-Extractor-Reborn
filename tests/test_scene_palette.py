@@ -61,3 +61,36 @@ def test_default_gray_and_unrecognized_material_do_not_guess_colors():
 def test_modded_shader_without_diffuse_uniform_declines_roster_binding():
     source = [{'batches':[{'material_hash':0x8a90aba9, 'supports_diffuse_color':False}]}]
     assert associate_palette(source, ['#FF0000FF']*31)[0]['batches'][0]['palette_tint'] is None
+
+
+def test_key_and_center_guides_use_authored_outlines_and_curve_uv_axis():
+    from choops_py.formats.scene_palette import supplement_floor_layers, floor_layers
+    vertices=[(12,0,30,0,0),(14,0,30,1,0),(14,0,32,1,1)]
+    routes={2:1723127071,10:3117775956,20:1460891455,19:2324736937}
+    original={'meshes':[dict(court_surface=True,vertices=vertices,batches=[
+        dict(first=0,count=3,material_hash=identity) for identity in routes.values()])],'warnings':[]}
+    selected={'meshes':[dict(name='floor',court_surface=True,vertices=vertices,batches=[dict(first=0,count=3,material_hash=123)])],'warnings':[],'images':{}}
+    result=supplement_floor_layers(selected,original);guide=result['meshes'][1]
+    assert {b['reference_slot'] for b in guide['batches']}=={2,10,20}
+    assert {b['reference_slot']:b['reference_axis'] for b in guide['batches']}=={2:2,10:2,20:1}
+    assert guide['vertices']==[(x,y+1,z,u,v) for x,y,z,u,v in vertices]
+    assert not floor_layers(result['meshes'],False,False,False)[1]['batches']
+    assert len(floor_layers(result['meshes'],False,False,True)[1]['batches'])==3
+    assert floor_layers(result['meshes'],False,False,True)[0]['batches']==selected['meshes'][0]['batches']
+    assert original['meshes'][0]['vertices']==vertices
+
+
+@pytest.mark.gui
+def test_key_center_toggle_is_independent_in_scene_panel(qtbot,monkeypatch,tmp_path):
+    from choops_py.studio.app import Window
+    window=Window();qtbot.addWidget(window);shown=[]
+    monkeypatch.setattr(window.scene_view,'set_meshes',lambda meshes,**kwargs:shown.append(meshes))
+    result=dict(meshes=[dict(name='guide',game_floor_layer=True,vertices=[(0,1,0,0,0)]*3,
+                            batches=[dict(first=0,count=3,reference_slot=s,reference_overlay=True) for s in (4,18,2,10,20)])],textures=[],images={},warnings=[])
+    window.show_scene_preview(result,tmp_path/'s256.iff')
+    assert window.scene_key_center.isEnabled() and not window.scene_key_center.isChecked()
+    window.scene_key_center.setChecked(True)
+    assert {b['reference_slot'] for b in shown[-1][0]['batches']}=={2,10,20}
+    assert not window.scene_three_point.isChecked() and not window.scene_border.isChecked()
+    window.scene_key_center.setChecked(False)
+    assert not shown[-1][0]['batches']

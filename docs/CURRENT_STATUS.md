@@ -1,3 +1,12 @@
+# Unreleased — key and center-circle alignment toggle
+
+Models/Courts adds an independent, default-off “Alignment guide: key and center
+circle” toggle. It copies stock S256 key-line, outer key-circle and center-circle
+batches (confirmed palette routes 20, 2, 10), raised one game unit. No filled key
+or center paint is added. Curves thin across V; straight key lines across U using
+the existing thin flat guide shader. Actual floor draws, palettes and textures
+remain unchanged. This is an independent update from the NBA support PR #25.
+
 # v1.17 — automatic shared PS3 2K archive layouts
 
 The existing editor now detects the supported College Hoops/NBA size32 and size64

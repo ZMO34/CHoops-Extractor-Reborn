@@ -1780,7 +1780,8 @@ class Window(QMainWindow):
         layout.addWidget(self.scene_cutaway)
         self.scene_three_point = QCheckBox('Alignment guide: 3-point lines')
         self.scene_border = QCheckBox('Alignment guide: out-of-bounds borders')
-        for box in (self.scene_three_point, self.scene_border):
+        self.scene_key_center = QCheckBox('Alignment guide: key and center circle')
+        for box in (self.scene_three_point, self.scene_border, self.scene_key_center):
             box.setChecked(False)
             box.toggled.connect(self.select_scene_part)
             layout.addWidget(box)
@@ -2096,8 +2097,8 @@ class Window(QMainWindow):
         from ..formats.scene_palette import COURT_PALETTE_ROUTES
         layers = {b.get('reference_slot')
                   for m in self.scene_meshes if m.get('game_floor_layer') for b in m.get('batches', [])}
-        for box, slot in ((self.scene_three_point, 18), (self.scene_border, 4)):
-            box.setEnabled(slot in layers)
+        for box, slots in ((self.scene_three_point, {18}), (self.scene_border, {4}), (self.scene_key_center, {2, 10, 20})):
+            box.setEnabled(bool(slots & layers))
             box.setToolTip('Fixed stock court alignment guide, raised 1 game unit. '
                            'Independent of roster palettes and floor artwork.')
         self.scene_parts.addItem('All supported parts', -1)
@@ -2135,7 +2136,7 @@ class Window(QMainWindow):
         if self.roster and school is not None:teams=[self.roster.rows['teams'][school]]
         colors = teams[0]['palette_colors'] if len(teams) == 1 else None
         meshes = associate_palette(meshes, colors)
-        meshes = floor_layers(meshes, self.scene_three_point.isChecked(), self.scene_border.isChecked())
+        meshes = floor_layers(meshes, self.scene_three_point.isChecked(), self.scene_border.isChecked(), self.scene_key_center.isChecked())
         if self.scene_uniform_images:
             meshes = [{**mesh,'batches':[{**batch,'texture':'__uniform_'+mesh['uniform_surface'], 'palette_tint':None}
                                         for batch in mesh['batches']]}

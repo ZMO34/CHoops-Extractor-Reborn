@@ -27,9 +27,11 @@ def associate_palette(meshes, colors):
         for mesh in meshes]
 
 
-def floor_layers(meshes, three_point=True, borders=True):
+KEY_CENTER_GUIDE_SLOTS = frozenset((2, 10, 20))  # Key circle outer, center circle, key line.
+
+def floor_layers(meshes, three_point=True, borders=True, key_center=False):
     """Toggle reference guides only; never suppress the court's actual draws."""
-    enabled = {18: three_point, 4: borders}
+    enabled = {18: three_point, 4: borders, **{slot: key_center for slot in KEY_CENTER_GUIDE_SLOTS}}
     return [{**mesh, 'batches': [b for b in mesh.get('batches', [])
              if enabled.get(b.get('reference_slot'), True)]} for mesh in meshes]
 
@@ -45,10 +47,10 @@ def supplement_floor_layers(result, original):
         batches = []
         for batch in mesh.get('batches', []):
             slot = COURT_PALETTE_ROUTES.get(batch.get('material_hash'))
-            if slot in (4, 18):
+            if slot in (4, 18) or slot in KEY_CENTER_GUIDE_SLOTS:
                 batches.append({'first': batch['first'], 'count': batch['count'],
                                 'reference_slot': slot, 'reference_overlay': True,
-                                'reference_axis': 1,
+                                'reference_axis': 2 if slot in (2, 10) else 1,
                                 'texture': None})
         if batches:
             vertices = [(v[0], v[1] + 1.0, *v[2:]) for v in mesh['vertices']]

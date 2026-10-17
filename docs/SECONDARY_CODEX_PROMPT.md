@@ -84,6 +84,15 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# Unreleased — key and center-circle alignment toggle
+
+Models/Courts adds an independent, default-off “Alignment guide: key and center
+circle” toggle. It copies stock S256 key-line, outer key-circle and center-circle
+batches (confirmed palette routes 20, 2, 10), raised one game unit. No filled key
+or center paint is added. Curves thin across V; straight key lines across U using
+the existing thin flat guide shader. Actual floor draws, palettes and textures
+remain unchanged. This is an independent update from the NBA support PR #25.
+
 # v1.17 — automatic shared PS3 2K archive layouts
 
 The existing editor now detects the supported College Hoops/NBA size32 and size64
@@ -1038,6 +1047,12 @@ apron geometry is invented; without the stock reference guides are unavailable.
 These controls change no SCNE, roster or build data and retain the camera.
 
 Reference guide width uses the central 10% of the authored strip UV: U across both 3-point and boundary strips. This thins guides without moving their centerlines or modifying floor geometry.
+
+The separate key/center-circle toggle adds authored S256 routes 20 (Key Line),
+2 (Key Circle Outer) and 10 (Center Circle). Filled paint route 19 is excluded.
+Curved strips use V as their cross-line UV axis; straight key strips use U. The
+central 10% clipping and +1-unit height match the existing guide treatment. This
+changes reference overlays only and does not simulate a new runtime floor shader.
 
 ---
 
@@ -2183,6 +2198,18 @@ Updated 2026-10-11. CURRENT_STATUS.md and TEST_REPORT.md are the living evidence
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+# Unreleased — key/center alignment guides
+
+Portable verification: 577 passed, 9 offscreen OpenGL skips, 2 deselected;
+compile, CLI/Qt smoke, Ruff, mypy, handoff and diff checks passed.
+
+Synthetic geometry test checks that routes 2/10/20 are copied from the authored
+reference, raised one unit and thinned on the appropriate UV axis, while filled
+key paint and actual floor draws remain unchanged. Qt regression checks default-off,
+independent enable/disable behavior alongside the existing guide toggles. Read-only
+stock S256 inspection confirms the named batches and radial UV direction. No game
+assets were committed, and no RPCS3 or real/testing JB was run/built.
 
 # v1.17 — automatic PS3 2K layouts
 
