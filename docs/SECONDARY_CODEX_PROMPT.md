@@ -84,6 +84,29 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# Unreleased — NBA 2K14 reading and separate NBA roster editors
+
+NBA 2K14's SDAT-wrapped seven-bank / 72-byte-descriptor archive is now readable
+through the shared Explorer, with authenticated random-access decoding and ZLIB
+IFF support. Extraction and texture inspection work; SDAT/extended-descriptor JB
+rebuilding is explicitly blocked. Supplied f000 floor decodes two meshes; s000
+arena decodes 61 meshes with one unsupported-UV warning. NBA 2K14 combined jersey
+artwork/cloth binding is unresolved. College Hoops and NBA 2K9 writers stay enabled.
+
+Roster payloads dispatch dynamically to College Hoops, NBA 2K9 or NBA 2K14 models.
+NBA names, height/weight, jersey number, face ID and primary positions are editable;
+NBA 2K14 also has a separate secondary-position field. NBA team/arena text,
+read-only membership/asset links, side panels, numeric dropdowns, undo/redo and
+wrapper-preserving export are implemented. Unknown ratings/body fields and NBA
+text heap growth remain blocked. No entire-roster-semantic or gameplay claim.
+
+Filename candidate families and corroborated shared record-type labels expanded.
+Animation portability is research only: 319 / 904 / 7,460 SingleMoCap records found
+in CH2K8 / NBA2K9 / NBA2K14. NBA2K9 is structurally closer; neither direct swap is
+certified. See NBA_ROSTERS_AND_2K14.md and ANIMATION_PORTABILITY.md. Both instances
+must keep those documents and this generated handoff current. No source game was
+modified; no RPCS3, EBOOT edits, animation port or real/testing JB build.
+
 # v1.17 — automatic shared PS3 2K archive layouts
 
 The existing editor now detects the supported College Hoops/NBA size32 and size64
@@ -565,6 +588,12 @@ excluded, while source/stale-edit safety columns are retained.
 
 Embedded source: docs/PS3_2K_ARCHIVES.md
 
+Current NBA extension: see [NBA roster/container support](NBA_ROSTERS_AND_2K14.md) and
+[animation portability research](ANIMATION_PORTABILITY.md). Those pages define the
+newer per-game boundaries; historical College Hoops-only statements below remain
+specific to that earlier scope. NBA 2K14 SDAT rebuilding and complete NBA ratings
+semantics are not implemented.
+
 # Shared PS3 2K archive support
 
 The editor automatically detects supported archive layouts when opening a JB or
@@ -677,6 +706,186 @@ supplied NBA TOC, preserving its size64 schema and source inventory. It created
 no output banks. Raw extraction is byte preserving; rebuilding tests use synthetic
 archives only.
 No supplied JB was rebuilt, no EBOOT was edited and RPCS3 was not opened.
+
+---
+
+Embedded source: docs/NBA_ROSTERS_AND_2K14.md
+
+# NBA PS3 support and roster evidence
+
+## Verified scope
+
+College Hoops 2K8 keeps its existing editor. Roster payload detection now selects
+separate NBA 2K9 or NBA 2K14 schemas automatically for raw ROST, standard IFF,
+length-prefixed decrypted USERDATA and supported save ZIP wrappers. Filename or
+selected game title does not authorize applying another game's field offsets.
+Unknown/malformed schemas fail; saved outputs are reparsed and preserve unknown
+bytes. No savedata encryption, account signing or gameplay certification is added.
+
+NBA 2K9: 1,064 player records (452 bytes), 69 team records (572 bytes), 72 arena
+records (60-byte anchor stride) on the supplied stock copy. NBA 2K14: 1,665 player
+records (460 bytes), 105 teams (760 bytes), 102 arena records (56-byte anchor
+stride). Counts come from validated relative table directories, not fixed stock
+counts. The following offsets are relative to the player record's physical start.
+
+| Field | NBA 2K9 | NBA 2K14 | Storage |
+|---|---|---|---|
+| Last / first name | +0x10 / +0x14 | +0x10 / +0x14 | signed relative UTF-16 BE pointers; field + displacement - 1 |
+| Height | +0x34 | +0x1C | BE float, centimeters; UI edits inches |
+| Weight | +0x30 | +0x20 | BE float, pounds |
+| Jersey number | word +0x38, bits 16–22 | word +0x30, bits 12–18 | masked writes, 0–99; 100 displays 00 |
+| Face artwork ID | low 16 bits at +0x38 | high 16 bits at +0x2C | pngNNNN.iff CRC candidates |
+| Primary position | +0x71 low 3 bits | +0x45 high 3 bits | PG=0, SG=1, SF=2, PF=3, C=4 |
+| Secondary position | unestablished | +0x45 bits 2–4 | same codes; 5=None |
+
+Names and floats are directly corroborated against named stock players. Number
+and face masks match the stock player/artwork sequences. Position runs match the
+observed lineups and valid-code distributions across both full player tables.
+NBA 2K14's position pair and height/weight/portrait relationship also agree with
+the original NBA 2K13 editor's field relationships. That reference is supporting
+evidence, not permission to transplant all PC/2K13 offsets. A candidate body field
+at that reference's offset is constant across all NBA 2K14 players and was rejected.
+College Hoops still has no independent secondary-position field.
+
+The NBA panel has Players / Teams / Arenas lists, team filtering, search and a
+side editor. Numeric editors/dropdowns cover supported measurements, number, face
+and positions. Undo/redo and Save copy use the same validated backend. Team and
+arena names are editable where their existing string storage is unique. Links to
+player membership and arena/floor/LED/dorna/menu assets are read-only. Explorer
+references show confirmed face IDs and literal arena/menu asset strings; team
+uniform ownership is not inferred from row ordering.
+
+Text allocation is intentionally bounded: no larger replacement than the existing
+UTF-16 string is written, and shared-string edits are rejected after scanning
+aligned relative references, including unparsed tables. NBA heap relocation and
+engine/display text limits remain unestablished. These bounds are editor safety
+rules, not claimed engine limits. Unknown ratings, tendencies, appearance, contract
+and history semantics remain read-only. Existing College Hoops ratings are not
+shown under NBA labels. NBA bulk CSV import/comparison and the College Hoops byte
+audit are blocked explicitly rather than reusing incompatible schemas. CLI decode
+can export NBA editable fields as CSV; source-bound JSON patches can edit them.
+
+## NBA 2K14 containers
+
+The supplied PS3 copy identifies itself as NBA 2K14 / BLUS31204. Its main archive
+has 8,594 entries and seven logical banks. Bank descriptors are 72 bytes rather
+than 16, with bounded UTF-16 names such as DVD:1A and SDAT:2A. Only these recognized
+prefixes are stripped; arbitrary paths remain rejected. TOC rows retain the
+size64/hash32/sector32 schema.
+
+0A, 0B, 2A and 3A are NPD v4 SDAT files. The Python random-access reader supports
+only observed flags 0x0100003C, verifies the header CMAC and each accessed block's
+HMAC before returning plaintext, and caches at most eight decoded blocks. No
+whole-bank plaintext copy or emulator is needed. Unsupported versions, flags,
+compressed/debug variants, bad hashes and truncated blocks fail explicitly.
+PyCryptodome supplies the cryptographic primitives. Original bank files remain
+unchanged. **SDAT/72-byte-descriptor JB rebuilding is blocked**, including on fully
+decrypted copies with the extended descriptors: authentication/header regeneration
+has not been validated. Export edited roster IFF/USERDATA copies for research;
+this update does not claim a tested in-game installation path for NBA 2K14.
+
+ZLIB block wrappers use a 16-byte BE header (magic, logical length, stored length,
+opaque flags) followed by a strict zlib stream. Writers preserve flags, update
+lengths, reject trailing/oversized/truncated streams and reparse changed output.
+The supplied NBA 2K14 roster decodes to 2,540,288 bytes; NBA 2K9 to 983,328 bytes.
+
+Some IFFs have an extended metadata area: the file pointer table is located through
+header +0x1C rather than assumed to immediately follow the block descriptors.
+Reading/texture inspection supports it. Rewriting these extended IFFs is blocked
+until the additional metadata's pointer semantics are established. The roster IFF
+uses the normal pointer-table layout and can be exported with edited payloads.
+
+NBA 2K14 scene variants observed and decoded: 128-byte instances, extended vertex
+buffer descriptors and 64-byte draw records with packed material indices. Each
+layout must uniquely pass bounded structural validation. Courts are separate
+fNNN.iff packages; selecting floor for sNNN.iff resolves the corresponding source's
+fNNN.iff when present. On the supplied samples: two floor meshes, 61 arena meshes;
+one arena lighting mesh has unsupported UVs. NBA 2K14 jersey artwork/cloth binding
+is still unresolved; its direct combined jersey preview remains unavailable.
+Runtime shader accuracy is not certified.
+
+## Filenames and repeatable research
+
+Expanded CRC candidate families include pngNNNN.iff faces, logoNNN/NNNN.iff, fNNN.iff,
+roster.iff, localized language banks, players.bin, teams.bin, motion.iff and music.iff.
+Candidate matches reduce generic names without asserting unknown file semantics;
+CRC32 alone is not proof of a unique authored spelling. The bounded candidate
+survey found 1,607 matches across previously unresolved entries of the two NBA
+copies (including three incidental patterns not promoted to the default dictionary).
+Shared record type labels are corroborated against authored College Hoops NAME
+trailers (SKEL, Clth, STRG, MRKS, SCOS, SPCI, AMCR and FxTweakables).
+
+Open a source JB in Explorer, then Roster editor > Load from JB or Load from
+overrides. External roster IFF/decrypted saves use Open USERDATA / roster IFF.
+Save copy retains the input wrapper; Export USERDATA emits a decrypted length-
+prefixed payload, not a signed PS3 savedata folder. CLI roster-detect/decode/save
+uses the same payload dispatch. The source game is never modified.
+
+## Primary references
+
+- [RPCS3 SDAT format implementation](https://github.com/RPCS3/rpcs3/blob/master/rpcs3/Crypto/unedat.cpp)
+  and [format constants](https://github.com/RPCS3/rpcs3/blob/master/rpcs3/Crypto/key_vault.h).
+  Source inspection only; RPCS3 was not launched. The new reader is independently
+  written and deliberately supports a narrower observed format.
+- [Original NBA 2K13 PlayerReader](https://github.com/leftos/nba-2k13-roster-editor/blob/master/NBA%202K13%20Roster%20Editor/Data/Players/PlayerReader.cs)
+  and its Position enum. No PC/2K13 schema is treated as NBA 2K14 PS3 proof without
+  matching supplied-byte evidence.
+
+---
+
+Embedded source: docs/ANIMATION_PORTABILITY.md
+
+# NBA animations to College Hoops: research only
+
+No animation port, bank replacement or gameplay patch is implemented.
+
+Read-only inventory of supplied PS3 archives finds:
+
+| Game | SingleMoCap records (0x60900D71) | Old SKEL records (0x7657AB8A) |
+|---|---:|---:|
+| College Hoops 2K8 | 319 | 1 |
+| NBA 2K9 | 904 | 1 |
+| NBA 2K14 | 7,460 | 0 |
+
+These are identifiable IFF records, not counts of all gameplay clips. Other raw
+banks remain undecoded. Zero old SKEL records does not mean NBA 2K14 has no skeleton.
+NBA 2K14 motion.iff also contains three records of unresolved type 0x9D34E89E,
+with sample decoded lengths 166,408 / 15,464 / 8,128 bytes and leading version word
+0x21. Their gameplay lookup/graph semantics are unestablished. players.bin and
+teams.bin are named by CRC candidates but their large opaque payloads have not
+been decoded as animation containers.
+
+College Hoops and NBA 2K9 share the observed older SingleMoCap envelope: examples
+include 64-byte reference-like records and longer packed records with track data
+following the header. Both global SKEL samples begin with 21 and contain matching
+matrix-like data, but names/identity metadata differ. Crowd track masks also differ
+(for example 0x003DF7DD versus 0x003B77DD). Shared type hashes or matrix bytes do not
+prove the same bone ordering, bind pose, event format or clip lookup contract.
+NBA 2K9 is the stronger candidate for a future controlled retargeting study.
+
+NBA 2K14 uses changed sample envelopes: 32-byte reference-like records and longer
+records with different header organization/packed data. Sharing SingleMoCap's type
+hash does not make those records directly compatible with the College Hoops reader.
+The evidence argues against copying NBA 2K14 banks directly into College Hoops.
+
+A future converter would need to establish bone identities/order and hierarchy,
+translation/rotation packing, time units/key interpolation, root motion, mirrored
+tracks, skeleton scale/bind transforms, animation/event IDs, gameplay lookup tables
+and contacts/ball/hand interactions. It would decode into an intermediate skeleton
+and clip representation, retarget deliberately, then encode the destination format
+while preserving unrelated records. None of those steps is assumed proven here.
+No direct swap is certified for either NBA title; no emulator or game was run.
+
+Repeatable read-only report:
+
+```powershell
+python -m choops_py.research.animation_compat CH_JB NBA09_JB NBA14_JB --output output/research/animation-comparison.json
+```
+
+The command scans bounded IFF headers, counts established type hashes and decodes
+up to five representative records per type. It checks that source bank metadata
+remains unchanged. The report is local research output, never bundled game data.
+See NBA_ROSTERS_AND_2K14.md for container and primary format references.
 
 ---
 
@@ -863,6 +1072,12 @@ CSV boundary: both editable and per-table exports whitelist actual roster fields
 ---
 
 Embedded source: docs/ROSTER_SEMANTICS.md
+
+Current NBA extension: see [NBA roster/container support](NBA_ROSTERS_AND_2K14.md) and
+[animation portability research](ANIMATION_PORTABILITY.md). Those pages define the
+newer per-game boundaries; historical College Hoops-only statements below remain
+specific to that earlier scope. NBA 2K14 SDAT rebuilding and complete NBA ratings
+semantics are not implemented.
 
 ## Byte audit continuation (2026-10-15)
 
@@ -1079,6 +1294,12 @@ EBOOT changes or automatic/testing JB folders are involved.
 ---
 
 Embedded source: docs/ANIMATION_RESEARCH.md
+
+Current NBA extension: see [NBA roster/container support](NBA_ROSTERS_AND_2K14.md) and
+[animation portability research](ANIMATION_PORTABILITY.md). Those pages define the
+newer per-game boundaries; historical College Hoops-only statements below remain
+specific to that earlier scope. NBA 2K14 SDAT rebuilding and complete NBA ratings
+semantics are not implemented.
 
 # Motion-capture extraction research
 
@@ -1452,6 +1673,25 @@ fingerprints include layout/label module code. Add malformed/ambiguous fixtures,
 synthetic writer round trips and explicit read-only input evidence for another
 variant. Never validate by launching an emulator or building a real/testing JB.
 See PS3_2K_ARCHIVES.md for current evidence and the standalone research command.
+
+## NBA roster and SDAT extension
+
+Runtime dependency PyCryptodome is declared in pyproject.toml and installed by
+tools/dev/setup.py. archive/sdat.py is a bounded read-only stream; Archive opens
+plain/encrypted banks through open_part, and BankReader uses the same abstraction.
+Bank descriptor sizes 16/72 are structurally selected, not inferred from a title.
+All JB writer plans reject encrypted/extended-descriptor archives before output.
+
+EditorModel.open dispatches NBA payloads to roster/nba.py; studio/nba_roster.py
+provides separate NBA side panels. Keep unknown NBA offsets out of the College
+Hoops schema and vice versa. The source-bound JSON patch backend and wrapper
+writers are shared. College-only bulk/research paths reject NBA explicitly.
+formats/compression.py handles bounded ZLIB alongside H7A; StandardIFF reads its
+record table through +0x1C. Extra IFF metadata remains read-only. New vertex, draw
+and instance layouts must uniquely validate; ambiguous geometry is not guessed.
+See NBA_ROSTERS_AND_2K14.md and ANIMATION_PORTABILITY.md for reproducible evidence,
+limitations and the read-only animation survey command. Neither animation ports
+nor SDAT rebuild/signature writers are enabled.
 
 ---
 
@@ -2100,6 +2340,12 @@ in the repository or Windows release.
 
 Embedded source: docs/KNOWN_LIMITATIONS.md
 
+Current NBA extension: see [NBA roster/container support](NBA_ROSTERS_AND_2K14.md) and
+[animation portability research](ANIMATION_PORTABILITY.md). Those pages define the
+newer per-game boundaries; historical College Hoops-only statements below remain
+specific to that earlier scope. NBA 2K14 SDAT rebuilding and complete NBA ratings
+semantics are not implemented.
+
 ## Shared 2K compatibility boundary
 
 The editor auto-detects two verified PS3 TOC schemas, not arbitrary game formats.
@@ -2183,6 +2429,26 @@ Updated 2026-10-11. CURRENT_STATUS.md and TEST_REPORT.md are the living evidence
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+# Unreleased — NBA extension validation
+
+Synthetic fixtures cover both NBA roster profiles, payload dispatch, masked edits,
+shared-string rejection, text growth/unknown-field rejection, undo/redo, patch
+rollback and Qt side-panel routing. SDAT tests cover header/block authentication,
+truncation, random reads, cache bounds, mixed encrypted/plain split-bank extraction
+and early writer rejection. ZLIB tests cover strict lengths and round trips;
+extended IFF tables and newer vertex/draw/instance layouts have synthetic fixtures.
+
+Read-only supplied evidence: both stock NBA roster payloads opened without string
+issues; player number/height changes encoded into IFF and reopened correctly.
+NBA2K9: 1,064 players / 69 teams / 72 arenas; NBA2K14: 1,665 / 105 / 102.
+NBA2K14 floor: two meshes/no warnings; arena: 61 meshes, one unsupported UV mesh.
+Combined NBA2K14 jersey preview remains unavailable and is not a passed check.
+Animation survey: 319 / 904 / 7,460 SingleMoCap records across CH2K8/NBA2K9/NBA2K14.
+Portable verification: 589 passed, 9 offscreen OpenGL skips, 2 deselected; compile,
+CLI/Qt smoke, Ruff, mypy, generated handoff and diff passed. Final exact-head
+verification is also recorded in the PR handoff.
+No RPCS3/gameplay, EBOOT edits, animation port or real/testing JB build.
 
 # v1.17 — automatic PS3 2K layouts
 

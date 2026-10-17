@@ -19,7 +19,7 @@ from ..core.paths import reject_links
 
 
 def plan(source, additions, replacements=None, job=None):
-    archive=Archive(source);replacements=replacements or {}
+    archive=Archive(source);archive.require_writable();replacements=replacements or {}
     if not additions and not replacements:raise ValueError('No asset changes supplied')
     by_hash={e['hash']:e for e in archive.entries}
     if len(by_hash)!=len(archive.entries) or any(e['toc_flags'] or e['content_size'] is None for e in archive.entries):

@@ -63,7 +63,7 @@ def asset_payload(name,data,changes):
 
 
 def plan(source, additions, replacements=None):
-    archive=Archive(source);replacements=replacements or {}
+    archive=Archive(source);archive.require_writable();replacements=replacements or {}
     if not additions and not replacements:raise ValueError('No asset changes supplied')
     if any(e['toc_flags'] for e in archive.entries):raise ValueError('Unclassified nonzero TOC flags block insertion')
     by_hash={e['hash']:e for e in archive.entries}

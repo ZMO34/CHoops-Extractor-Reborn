@@ -29,6 +29,21 @@ def tokens(raw):
                 output += 1
 
 def decode(raw, expected=None):
+    if raw[:4] == b'ZLIB':
+        import zlib
+        if len(raw) < 16:
+            raise ToolError('invalid_zlib', 'Truncated ZLIB wrapper')
+        logical, stored = struct.unpack_from('>II', raw, 4)
+        if stored != len(raw) or logical > MAX_LOGICAL or (expected is not None and expected != logical):
+            raise ToolError('invalid_zlib', 'ZLIB wrapper/table size mismatch')
+        inflater = zlib.decompressobj()
+        try:
+            result = inflater.decompress(raw[16:], logical+1)
+        except zlib.error as error:
+            raise ToolError('invalid_zlib', str(error)) from error
+        if len(result) != logical or not inflater.eof or inflater.unused_data or inflater.unconsumed_tail:
+            raise ToolError('invalid_zlib', 'ZLIB stream length or boundary mismatch')
+        return result
     if raw[:4] != struct.pack('>I', MAGIC):
         if expected is not None and len(raw) != expected: raise ToolError('block_size_mismatch','Uncompressed block length differs')
         return raw
@@ -65,6 +80,15 @@ def decode(raw, expected=None):
     return bytes(out)
 
 def encode_like(original, replacement):
+    if original[:4] == b'ZLIB':
+        import zlib
+        decode(original)
+        if len(replacement) > MAX_LOGICAL:
+            raise ToolError('invalid_zlib', 'Replacement exceeds logical size limit')
+        header = bytearray(original[:16])
+        body = zlib.compress(replacement, 9)
+        struct.pack_into('>II', header, 4, len(replacement), 16+len(body))
+        return bytes(header)+body
     """Prefer valid old tokens; recompress edited streams when literal expansion grows them.
 
     Token lengths and descriptor groups are fully recomputed. A bounded
@@ -96,6 +120,15 @@ def encode_like(original, replacement):
 
 
 def encode_greedy(original, replacement):
+    if original[:4] == b'ZLIB':
+        import zlib
+        decode(original)
+        if len(replacement) > MAX_LOGICAL:
+            raise ToolError('invalid_zlib', 'Replacement exceeds logical size limit')
+        header = bytearray(original[:16])
+        body = zlib.compress(replacement, 9)
+        struct.pack_into('>II', header, 4, len(replacement), 16+len(body))
+        return bytes(header)+body
     """Bounded-window H7A recompression; preserve wrapper metadata and bit order."""
     from collections import deque
     shift=Binary(original).u32(16)

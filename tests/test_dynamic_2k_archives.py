@@ -138,7 +138,7 @@ def test_gui_auto_indexes_nba_and_preserves_college_roster_boundary(qtbot, tmp_p
     errors = []
     monkeypatch.setattr(window, 'show_error', errors.append)
     window.load_game_roster()
-    assert len(errors) == 1 and 'roster schema' in errors[0]
+    assert len(errors) == 1 and 'Roster identity is missing' in errors[0]
     assert window.roster is None
     window.archive.game_info={}
     window.load_game_roster()

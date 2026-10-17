@@ -12,6 +12,11 @@ LIST_FIELDS = {"attribute_ratings", "shot_tendencies", "palette_colors"}
 CSV_COLUMNS = ("source_sha256", "table", "index", "school", "record", "field", "slot", "original", "value")
 
 
+def require_college(model):
+    if hasattr(model,'game'):
+        raise ValueError('NBA bulk CSV/comparison is not established; use the NBA side editor or source-bound roster JSON patches')
+
+
 def label(row):
     return next((row[k] for k in ("display_name", "school_name", "conference_name", "coach_name", "arena_name") if row.get(k)), f"Record {row['index']}")
 
@@ -42,6 +47,7 @@ def cells(model):
 
 
 def export_csv(model):
+    require_college(model)
     output = io.StringIO(newline="")
     writer = csv.DictWriter(output, CSV_COLUMNS)
     writer.writeheader()
@@ -54,6 +60,7 @@ def export_csv(model):
 
 
 def csv_changes(model, text):
+    require_college(model)
     reader = csv.DictReader(io.StringIO(text.lstrip("\ufeff")))
     if tuple(reader.fieldnames or ()) != CSV_COLUMNS:
         raise ValueError("Use a CSV exported by this roster editor; columns differ")
@@ -97,6 +104,7 @@ def csv_changes(model, text):
 
 
 def apply_changes(model, changes):
+    require_college(model)
     """Validate the entire selection, rollback on failure, and retain replayable edits."""
     before, history, redo, edits = bytes(model.data), list(model.history), list(model.redo_history), list(model.edits)
     from .shoes import FIELDS
@@ -149,6 +157,7 @@ def rating_document(row):
 
 
 def paste_ratings(model, indices, text):
+    require_college(model)
     document = json.loads(text)
     ratings, tendencies = document["ratings"], document["tendencies"]
     if document.get("schema") != "choops-ratings-1" or len(ratings) != RATING_COUNT or len(tendencies) != len(TENDENCY_NAMES):
@@ -185,6 +194,7 @@ def identities(model, table, *, player_ids=True):
 
 
 def compare(model, other):
+    require_college(model);require_college(other)
     changes, unmatched = [], []
     owners=school_labels(model)
     maps = {}

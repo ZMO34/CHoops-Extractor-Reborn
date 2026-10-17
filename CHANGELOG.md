@@ -1,3 +1,12 @@
+## Unreleased — NBA PS3 roster schemas and NBA 2K14 archive reading
+
+- Read authenticated NPD v4 SDAT blocks and extended split-bank descriptors; keep SDAT JB writing blocked.
+- Decode/re-encode strict ZLIB IFF blocks; read extended IFF pointer tables without unsafe rewriting.
+- Detect College Hoops/NBA 2K9/NBA 2K14 roster payloads and expose verified per-game fields in side panels.
+- Add NBA face, court, logo and language filename candidates and explicit roster asset references.
+- Decode observed newer scene buffer/draw/instance variants and resolve separate court packages.
+- Add read-only cross-game animation inventory and portability evidence; no animation port.
+
 ## v1.17
 
 - Auto-detect shared PS3 2K size32/size64 TOCs and preserve their layouts when rebuilding.

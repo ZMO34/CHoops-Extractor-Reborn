@@ -19,7 +19,7 @@ class BankReader:
             if base <= offset < end and size:
                 name = part['name']
                 if name not in self.streams:
-                    self.streams[name] = self.stack.enter_context((self.archive.path/name).open('rb'))
+                    self.streams[name] = self.stack.enter_context(self.archive.open_part(part) if hasattr(self.archive, 'open_part') else (self.archive.path/name).open('rb'))
                 stream = self.streams[name]
                 position = offset-base
                 if stream.tell() != position:

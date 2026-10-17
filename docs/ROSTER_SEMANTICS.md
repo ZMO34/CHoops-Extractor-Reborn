@@ -1,3 +1,9 @@
+Current NBA extension: see [NBA roster/container support](NBA_ROSTERS_AND_2K14.md) and
+[animation portability research](ANIMATION_PORTABILITY.md). Those pages define the
+newer per-game boundaries; historical College Hoops-only statements below remain
+specific to that earlier scope. NBA 2K14 SDAT rebuilding and complete NBA ratings
+semantics are not implemented.
+
 ## Byte audit continuation (2026-10-15)
 
 `python -m choops_py.roster.research ROSTER_FILE` prints a read-only audit; add

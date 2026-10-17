@@ -622,6 +622,12 @@ def inspect_stadium_preview(archive, entry, mode=0, job=None):
     source = materialize(archive, entry)
     iff = StandardIFF(source.read_bytes())
     name = 'arena' if mode == 2 else 'floor'
+    if name=='floor' and not any(r['type']=='SCNE' and r.get('name')=='floor' for r in iff.records):
+        import re
+        match=re.fullmatch(r's(\d+)\.iff',entry.get('name') or '',re.I)
+        floors=[e for e in archive.entries if match and (e.get('name') or '').casefold()=='f'+match[1]+'.iff']
+        if len(floors)==1:
+            source=materialize(archive,floors[0]);iff=StandardIFF(source.read_bytes())
     matches = [r for r in iff.records if r['type'] == 'SCNE' and (r.get('name') or '').lower() == name]
     if len(matches) != 1:
         raise ValueError('The selected stadium has no unique ' + name + ' SCNE')

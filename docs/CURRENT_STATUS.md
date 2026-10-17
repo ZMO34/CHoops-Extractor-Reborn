@@ -1,3 +1,26 @@
+# Unreleased — NBA 2K14 reading and separate NBA roster editors
+
+NBA 2K14's SDAT-wrapped seven-bank / 72-byte-descriptor archive is now readable
+through the shared Explorer, with authenticated random-access decoding and ZLIB
+IFF support. Extraction and texture inspection work; SDAT/extended-descriptor JB
+rebuilding is explicitly blocked. Supplied f000 floor decodes two meshes; s000
+arena decodes 61 meshes with one unsupported-UV warning. NBA 2K14 combined jersey
+artwork/cloth binding is unresolved. College Hoops and NBA 2K9 writers stay enabled.
+
+Roster payloads dispatch dynamically to College Hoops, NBA 2K9 or NBA 2K14 models.
+NBA names, height/weight, jersey number, face ID and primary positions are editable;
+NBA 2K14 also has a separate secondary-position field. NBA team/arena text,
+read-only membership/asset links, side panels, numeric dropdowns, undo/redo and
+wrapper-preserving export are implemented. Unknown ratings/body fields and NBA
+text heap growth remain blocked. No entire-roster-semantic or gameplay claim.
+
+Filename candidate families and corroborated shared record-type labels expanded.
+Animation portability is research only: 319 / 904 / 7,460 SingleMoCap records found
+in CH2K8 / NBA2K9 / NBA2K14. NBA2K9 is structurally closer; neither direct swap is
+certified. See NBA_ROSTERS_AND_2K14.md and ANIMATION_PORTABILITY.md. Both instances
+must keep those documents and this generated handoff current. No source game was
+modified; no RPCS3, EBOOT edits, animation port or real/testing JB build.
+
 # v1.17 — automatic shared PS3 2K archive layouts
 
 The existing editor now detects the supported College Hoops/NBA size32 and size64

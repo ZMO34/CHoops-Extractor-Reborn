@@ -20,7 +20,7 @@ from ..texture_tools.pipeline import Container,imported_image
 def jb_root(source):
     source=Path(source).resolve()
     for p in [source,*source.parents]:
-        if (p/'PS3_GAME'/'USRDIR'/'0A').is_file():return p
+        if any((p/'PS3_GAME'/'USRDIR'/n).is_file() for n in ('0A','0A.SDAT')):return p
     raise ToolError('jb_folder_required','Select a vanilla JB folder containing PS3_GAME/USRDIR/0A')
 
 def inventory(source):
@@ -36,7 +36,7 @@ def import_summary(mod):
             'unapplied_count':len(unapplied),'unapplied_overrides':unapplied,'report':str(path.resolve())}
 
 def preflight(source,mod,job=None):
-    archive=Archive(source);rows=validate(mod);grouped={};patches=[]
+    archive=Archive(source);archive.require_writable();rows=validate(mod);grouped={};patches=[]
     options=Path(mod)/'import_options.json'
     allow_growth=False
     if options.exists():
