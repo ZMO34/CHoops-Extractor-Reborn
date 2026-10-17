@@ -6,8 +6,8 @@ import uuid
 from pathlib import Path
 from .importer import validate
 from .usrdir_reader import Archive,usrdir
-from .manifests import OUTPUT,safe_output,digest
-from ..core.reports import save_json
+from .manifests import OUTPUT,build_destination as safe_output,digest
+from ..core.reports import save_build_json
 from ..core.paths import reject_links
 from ..core.errors import ToolError
 from ..formats.standard_iff import StandardIFF
@@ -145,8 +145,8 @@ def verify_preserved_ranges(source, copied, archive, patches, job=None):
 def build(source,mod,output,overwrite=False,dry_run=False,job=None):
     if job:job.check()
     src=jb_root(source);out=safe_output(output,[src,mod])
-    if not out.is_relative_to((OUTPUT/'builds').resolve()) or out==(OUTPUT/'builds').resolve():raise ToolError('unsafe_build_output','Build destinations must be output/builds/<build_name>/')
     reject_links(src)
+    if out.exists() and not out.is_dir():raise ToolError('unsafe_build_output','Choose a folder, not an existing file')
     if out.exists() and any(out.iterdir()):
         marker=out/'build_manifest.json'
         if not overwrite:raise ToolError('output_exists','Use --overwrite for an existing generated JB build')
@@ -162,7 +162,7 @@ def build(source,mod,output,overwrite=False,dry_run=False,job=None):
         try:
             result=relocated_build(src,{},staging,{e['name']:data for e,data in patches},job)
             manifest={'project_kind':'choops-jb-copy','source':str(src),'mod':str(Path(mod).resolve()),'output':str(out),'import_summary':summary,'patches':plan,'archive_relocation_required':True,'validation':result}
-            save_json(staging/'build_manifest.json',manifest,[src,mod])
+            save_build_json(staging/'build_manifest.json',manifest,[src,mod])
             if out.exists():
                 backup=safe_output(out.parent/('.jb_previous_'+uuid.uuid4().hex));out.rename(backup)
             staging.rename(out)
@@ -203,7 +203,7 @@ def build(source,mod,output,overwrite=False,dry_run=False,job=None):
         verify_preserved_ranges(src,staging,archive,patches,job)
         if inventory(src)!=before:raise ToolError('vanilla_changed_during_build','Vanilla source inventory changed during copying; discard build and retry')
         manifest={'project_kind':'choops-jb-copy','source':str(src),'mod':str(Path(mod).resolve()),'output':str(out),'import_summary':summary,'patches':plan,'file_count':len(before),'vanilla_inventory_unchanged':True,'validation':{'inventory_and_sizes':True,'patched_extents_byte_exact':True,'all_unpatched_bytes_exact':True,'console_gameplay':'not tested'}}
-        save_json(staging/'build_manifest.json',manifest,[src,mod])
+        save_build_json(staging/'build_manifest.json',manifest,[src,mod])
         if out.exists():
             backup=safe_output(out.parent/('.jb_previous_'+uuid.uuid4().hex));out.rename(backup)
         staging.rename(out)

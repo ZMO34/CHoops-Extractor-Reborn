@@ -9,7 +9,7 @@ import uuid
 from pathlib import Path
 from .usrdir_reader import Archive
 from .hash_names import hash_name,replacement_hash
-from .manifests import safe_output,OUTPUT
+from .manifests import build_destination as safe_output
 from .build_copy import jb_root,inventory
 from .add_assets import meaningful_iff,validate_payload,checksum,asset_payload
 from ..core.paths import reject_links
@@ -25,7 +25,7 @@ def plan(source, additions, replacements=None, job=None):
     end=24+len(archive.parts)*16+len(archive.entries)*16
     with (archive.path/'0A').open('rb') as f:old_header=f.read(first)
     if any(struct.unpack_from('>I',old_header,24+i*16+4)[0] for i in range(len(archive.parts))):raise ValueError('Unclassified bank descriptor flags block repacking')
-    if len(old_header)!=first or any(old_header[end:first]):raise ValueError('Unclassified header padding')
+    if len(old_header)!=first:raise ValueError('Incomplete archive header')
     contents={};trimmed={}
     supplied={**additions,**replacements}
     for position,(name,data) in enumerate(supplied.items()):
@@ -51,6 +51,11 @@ def plan(source, additions, replacements=None, job=None):
         bank_count=count
     else:raise ValueError('Bank layout did not converge')
     if not 1<=bank_count<=256:raise ValueError('Too many archive banks')
+    new_toc_end=24+bank_count*16+(len(archive.entries)+len(additions))*16
+    if start!=first and any(old_header[end:first]):
+        raise ValueError('Cannot relocate unclassified header bytes; header growth requires verified zero padding')
+    if any(old_header[end:min(first,max(end,new_toc_end))]):
+        raise ValueError('Expanded TOC overlaps unclassified header bytes')
     bank_names=[p['name'] for p in archive.parts]
     if any(name!=f"{i//26}{chr(65+i%26)}" for i,name in enumerate(bank_names)):
         raise ValueError('Unknown source bank naming sequence')
@@ -64,6 +69,7 @@ def plan(source, additions, replacements=None, job=None):
         else:records.append([h,cursor//alignment,0,len(data)])
         appended.append((cursor,data,name));cursor=(cursor+len(data)+alignment-1)//alignment*alignment
     records.sort(key=lambda r:r[0]);header=bytearray(start);header[:24]=old_header[:24]
+    if start==first:header[end:first]=old_header[end:first]
     struct.pack_into('>I',header,8,bank_count);struct.pack_into('>I',header,16,len(records))
     for i,(name,size) in enumerate(zip(bank_names,sizes)):
         if size%2048 or len(name)>4:raise ValueError('Unsupported bank dimensions')
@@ -83,7 +89,7 @@ def build(source, additions, output, replacements=None, job=None):
     needed=sum(p['size'] for p in before.values())+total-sum(p['size'] for p in arc.parts)
     if shutil.disk_usage(output.parent).free<needed:raise ValueError('Insufficient disk space')
     pending=output.parent/('.archive_repack_'+uuid.uuid4().hex)
-    if not pending.resolve().is_relative_to(OUTPUT.resolve()):raise ValueError('Unsafe temporary output')
+    safe_output(pending,[root])
     try:
         bank_set=set(p['name'] for p in arc.parts)
         def ignore(path,files):return bank_set if Path(path).resolve()==arc.path else set()

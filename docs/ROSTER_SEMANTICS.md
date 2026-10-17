@@ -1,3 +1,43 @@
+## Byte audit continuation (2026-10-15)
+
+`python -m choops_py.roster.research ROSTER_FILE` prints a read-only audit; add
+`--full` for every byte observation. Header targets now correctly subtract the
+stored +1 displacement bias. The anchors are logical anchors inside records, not
+raw row starts; HEADER_TABLES bias includes that +1. Uniform rows classify 33/64
+bits: owner 22..31, asset 12..21, variant 8..10 and unlock 0..6 of word 0; shape
+27..29 of word 1. All other bits stay unresolved/read-only in the audit.
+
+Each table reports half-open unresolved byte runs with exact unknown-bit masks,
+including partially known bytes. Fields crossing a legacy declared stride are
+listed explicitly instead of silently omitted or counted as solved bytes. This
+matters for arena text/backlinks and team shoe/type fields with biased anchors.
+The old 24-byte arena/team overlap is an artifact of those biased editor windows,
+not an overlap of the logical engine tables on the stock input. Logical origins
+are player +0x10, arena +0x18, team +0x30, coach +0x14, conference/uniform +0.
+The audit now retains legacy offsets and separately reports logical bit coverage
+and unassigned regions; no writer offsets or record strides are changed.
+
+New structural evidence: arena raw +0x24 is a signed relative reference using
+`field + delta - 1` to a team raw +0x30 name anchor. On the stock roster, 347
+nonnull references resolve exactly and every referenced team links back through
+its arena_index; 32 rows are null. This establishes the stored association on that
+input, not a universal ownership policy for shared/neutral venues. EBOOT
+0x1BC070..0x1BC098 indexes arenas using (index<<5)-(index<<2), reads count/table
+from roster +0x20/+0x24, and returns the logical anchor. Arena deserialize
+0x1CA620 resolves four pointers at logical +0/+4/+8/+0xC via 0x11650; serialize
+0x1CA68C applies the reverse routine 0x15200. The fourth is raw +0x24. This
+corroborates the backlink structure independently of the stock values. No reciprocal
+arena writer is added. Arena raw +0x2C resembles seating capacity in the stock
+values, but its executable consumer/width and edit semantics need corroboration
+before an editor control is justified.
+
+Read-only EBOOT continuation checked the localized player accessors around
+0x69E85C–0x69E924: the four byte tendencies and potential/confidence remain
+consistent with their current biased offsets. This does not establish the meaning
+of the intervening raw +0x7C..0x7E bytes. Those, other roster tables, history fields
+and unresolved packed bits remain research work; full byte-for-byte semantic
+completion is not claimed.
+
 # Roster semantic evidence and supported edits
 
 ## Appearance and signature controls
@@ -73,3 +113,8 @@ unknown bits remain protected. Structural pointer classification is not proof of
 all history/legacy meaning. Roster text dialogs show a live orange border beyond
 confirmed game keyboard limits, measured in UTF-16 units. The warning does not
 truncate text or impose an invented engine limit.
+
+Stock logical-row classified bit counts (structural pointer identity included):
+players 775/2464, arenas 128/224, teams 2165/5632, coaches 64/352, conferences
+3480/23712 and uniforms 33/64. These are audit counts, not percentages of all game
+semantics solved. Unknown regions outside these tables also remain.

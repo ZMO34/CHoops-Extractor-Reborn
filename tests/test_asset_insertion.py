@@ -89,7 +89,7 @@ def test_insertion_refuses_bad_compressed_payload_and_nonzero_toc_padding(tmp_pa
     struct.pack_into('>I',broken,84+4,999)
     with pytest.raises(ValueError):plan(source,{'uy777.iff':bytes(broken)})
     path=source/'PS3_GAME'/'USRDIR'/'0A'
-    data=bytearray(path.read_bytes());data[100]=1;path.write_bytes(data)
+    data=bytearray(path.read_bytes());data[56]=1;path.write_bytes(data)
     with pytest.raises(ValueError):plan(source,{'uy777.iff':original})
 
 

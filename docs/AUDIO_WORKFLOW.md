@@ -1,3 +1,26 @@
+## Queue several songs before saving
+
+In Audio, select one track and click **Queue selected song from WAV…**. Repeat for
+other songs in either Licensed Music or Fight Songs. The pending table lists the
+bank/index and selected file. Re-queueing the same song changes its file; **Remove
+queued song** removes selected pending rows and **Clear song queue** removes all.
+Click **Save queued songs…** once and choose a new replacement folder under
+`output/`. The result includes one combined `cribmusic.bin` (when applicable),
+`global.iff` and a replacement report. Select that folder as overrides for a manual
+JB build. Queue entries clear only after a successful save; cancellation/failure
+keeps them. They are session-only and must be saved before closing the app.
+
+Queued WAVs must have a nonempty RIFF/RF64 WAV header; full decoding and validation
+happen on save, retaining support for the encoder's existing WAV sample formats.
+Bank sample rate/channels/duration
+are conformed by the existing encoder. The queue belongs to its loaded source JB;
+changing source requires returning to it or clearing/reselecting the songs. This
+prevents accidentally applying catalog indices from one JB to another. Reopening
+the same JB path is supported when bank size/mtime/inode metadata still matches.
+As with the override input quick check, this is not a content hash: a same-size
+external edit that preserves all metadata may evade the source-change check.
+Songs newly queued or changed during an active save remain pending afterward.
+
 # Experimental audio workflow
 
 Batch WAV export publishes its output folder only after all selected tracks and

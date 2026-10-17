@@ -1,3 +1,14 @@
+# Unreleased
+
+- Queue multiple song WAV imports, review/remove pending edits, then save combined
+  music banks and global.iff once; retain pending edits on cancellation/failure.
+- Choose the JB destination on any drive, with source/overwrite/link guards and
+  transactional cleanup preserved.
+- Preserve opaque archive header gaps during replacement growth; reject only
+  newly consumed/relocated unknown bytes rather than all nonzero gap bytes.
+- Correct roster research anchors/uniform bit coverage; audit arena-team backlinks.
+- Add read-only scorebug record/part/texture discovery and evidence documentation.
+
 # v1.15.4
 
 - Parallel CPU/RAM-bounded override preparation, completed-archive reuse, cheaper

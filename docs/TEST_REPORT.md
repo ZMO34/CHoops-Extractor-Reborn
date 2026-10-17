@@ -1,3 +1,24 @@
+## Queued audio / build destinations / roster and scorebug audit — 2026-10-15
+
+`python tools/dev/verify.py` passed: **541 portable tests**, nine offscreen
+OpenGL skips, two deselected real/manual/native-reference checks. Compileall,
+CLI help, hidden Qt startup, Ruff, mypy, handoff consistency and diff checks passed.
+The PR records the exact tested head. No RPCS3 or real/testing JB folder was built.
+
+New synthetic checks cover two changes in one cribmusic bank plus global.iff,
+untouched third stream/prefix/tail/metadata, queue replacement/source binding and
+reopen, preservation of newer choices during a save, GUI queue/save callbacks,
+external output paths including existing empty folders, source/ancestor rejection,
+opaque header-gap preservation in append/repack, occupied TOC rejection, correct
+roster +1 anchors/uniform masks/logical windows, and bounded scorebug discovery.
+
+Read-only stock checks: scorebug discovery parsed all twelve identified records
+in gamedata/gamedataextra and their SCNE textures/parts. Roster audit found 347
+resolved and reciprocal arena-team references, 32 nulls, no unresolved nonnull
+arena links and no logical-table overlaps. EBOOT arena indexing and four-pointer
+serialization/deserialization corroborate the structure. Remaining unknown bytes
+are still reported explicitly; this is not a full semantic or gameplay certification.
+
 # Roster / game-line / animation continuation verification
 
 Portable final runner: **473 passed, 7 skipped, 2 deselected**. Native Windows

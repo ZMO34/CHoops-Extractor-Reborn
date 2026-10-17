@@ -17,6 +17,7 @@ DOCUMENTS = (
     "DEVELOPER_GUIDE.md",
     "AUDIO_RESEARCH.md",
     "AUDIO_WORKFLOW.md",
+    "SCOREBUG_RESEARCH.md",
     "PROJECT_SOURCE_OF_TRUTH.md",
     "projects/01-uniform-preview.md",
     "projects/02-team-uniform-routing.md",

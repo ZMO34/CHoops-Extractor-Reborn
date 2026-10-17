@@ -34,7 +34,11 @@ tests are permitted. Record absent private fixture checks as skipped.
 GUI/CLI share Archive, studio.services, formats, texture_tools, roster model and
 audio_tools. Qt workers return signals/data, never manipulate widgets. Writers
 reparse output, preserve unknown bytes/bits and reject ambiguous shared ranges.
-Generated outputs live under output/ and originals remain immutable.
+Prepared overrides/exports live under output/ and originals remain immutable.
+Completed JB builds also support user-selected destinations through
+archive.manifests.build_destination; keep safe_output for other workflows.
+Destination validation must protect source/mod trees in both directions. Build
+reports and temporary/backup folders use the same validated destination drive.
 
 `tools/rebuild/package_windows.ps1` packages the Windows GUI and audio helpers.
 The FFmpeg helper is configured without GPL/nonfree components and uses only the

@@ -84,6 +84,41 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# Unreleased — queued audio, manual JB output and research continuation
+
+Audio now queues individual WAV replacements before one save. Selecting another
+WAV for the same bank/index replaces its queued choice; removing/clearing is
+explicit. Save writes one combined bank and matching global.iff AUSB metadata.
+Cancelled output selection or failed conversion retains the queue. Pending songs
+are tied to the source JB path and bank size/mtime/inode snapshot. Reopening the
+same unchanged source is supported; a different/changed JB is rejected.
+
+JB output can be selected in Mod Builder on any drive. Builds still reject source
+or overrides overlap, filesystem roots, links/junctions, existing files and
+unowned nonempty destinations. Atomic publication, manifest validation, rollback
+and owned temporary-folder cleanup work beside the selected destination. Other
+export workflows retain their documented output/ restrictions.
+
+Fixed the archive-growth error `Unclassified nonzero header padding`: replacements
+use existing TOC slots and preserve the opaque post-TOC gap. Added entries may
+consume only zero slots. Repacking preserves opaque bytes in place when the body
+start stays fixed; it refuses to relocate opaque bytes or overwrite them with a
+larger TOC. Unknown header bytes are never zeroed to bypass validation.
+
+Roster research corrects reported relative anchors (stored displacement includes
++1), accounts for the 33 confirmed bits in each uniform row, lists unresolved
+bit-mask runs and reports both legacy biased windows and engine logical record windows.
+Logical windows have no table overlap on the stock input. A newly audited
+arena +0x24 relative reference resolves to the team-name anchor for every nonnull
+stock row: 347 resolved and reciprocal team arena links, 32 nulls. Its wider runtime
+ownership/write behavior is not established; no new backlink writer is exposed.
+The full roster is still not semantically reversed. See ROSTER_SEMANTICS.md.
+
+Scorebug discovery identifies authored records/parts/textures in gamedata.iff and
+gamedataextra.iff. A read-only inventory command and SCOREBUG_RESEARCH.md record
+exact routes. Runtime score/clock/text bindings and geometry editing remain
+unresolved. No RPCS3, EBOOT writes or real/testing JB builds.
+
 # v1.15.4 — faster override-folder preparation
 
 Override selection prepares independent archive groups in separate CPU worker
@@ -655,6 +690,46 @@ CSV boundary: both editable and per-table exports whitelist actual roster fields
 
 Embedded source: docs/ROSTER_SEMANTICS.md
 
+## Byte audit continuation (2026-10-15)
+
+`python -m choops_py.roster.research ROSTER_FILE` prints a read-only audit; add
+`--full` for every byte observation. Header targets now correctly subtract the
+stored +1 displacement bias. The anchors are logical anchors inside records, not
+raw row starts; HEADER_TABLES bias includes that +1. Uniform rows classify 33/64
+bits: owner 22..31, asset 12..21, variant 8..10 and unlock 0..6 of word 0; shape
+27..29 of word 1. All other bits stay unresolved/read-only in the audit.
+
+Each table reports half-open unresolved byte runs with exact unknown-bit masks,
+including partially known bytes. Fields crossing a legacy declared stride are
+listed explicitly instead of silently omitted or counted as solved bytes. This
+matters for arena text/backlinks and team shoe/type fields with biased anchors.
+The old 24-byte arena/team overlap is an artifact of those biased editor windows,
+not an overlap of the logical engine tables on the stock input. Logical origins
+are player +0x10, arena +0x18, team +0x30, coach +0x14, conference/uniform +0.
+The audit now retains legacy offsets and separately reports logical bit coverage
+and unassigned regions; no writer offsets or record strides are changed.
+
+New structural evidence: arena raw +0x24 is a signed relative reference using
+`field + delta - 1` to a team raw +0x30 name anchor. On the stock roster, 347
+nonnull references resolve exactly and every referenced team links back through
+its arena_index; 32 rows are null. This establishes the stored association on that
+input, not a universal ownership policy for shared/neutral venues. EBOOT
+0x1BC070..0x1BC098 indexes arenas using (index<<5)-(index<<2), reads count/table
+from roster +0x20/+0x24, and returns the logical anchor. Arena deserialize
+0x1CA620 resolves four pointers at logical +0/+4/+8/+0xC via 0x11650; serialize
+0x1CA68C applies the reverse routine 0x15200. The fourth is raw +0x24. This
+corroborates the backlink structure independently of the stock values. No reciprocal
+arena writer is added. Arena raw +0x2C resembles seating capacity in the stock
+values, but its executable consumer/width and edit semantics need corroboration
+before an editor control is justified.
+
+Read-only EBOOT continuation checked the localized player accessors around
+0x69E85C–0x69E924: the four byte tendencies and potential/confidence remain
+consistent with their current biased offsets. This does not establish the meaning
+of the intervening raw +0x7C..0x7E bytes. Those, other roster tables, history fields
+and unresolved packed bits remain research work; full byte-for-byte semantic
+completion is not claimed.
+
 # Roster semantic evidence and supported edits
 
 ## Appearance and signature controls
@@ -730,6 +805,11 @@ unknown bits remain protected. Structural pointer classification is not proof of
 all history/legacy meaning. Roster text dialogs show a live orange border beyond
 confirmed game keyboard limits, measured in UTF-16 units. The warning does not
 truncate text or impose an invented engine limit.
+
+Stock logical-row classified bit counts (structural pointer identity included):
+players 775/2464, arenas 128/224, teams 2165/5632, coaches 64/352, conferences
+3480/23712 and uniforms 33/64. These are audit counts, not percentages of all game
+semantics solved. Unknown regions outside these tables also remain.
 
 ---
 
@@ -1153,7 +1233,11 @@ tests are permitted. Record absent private fixture checks as skipped.
 GUI/CLI share Archive, studio.services, formats, texture_tools, roster model and
 audio_tools. Qt workers return signals/data, never manipulate widgets. Writers
 reparse output, preserve unknown bytes/bits and reject ambiguous shared ranges.
-Generated outputs live under output/ and originals remain immutable.
+Prepared overrides/exports live under output/ and originals remain immutable.
+Completed JB builds also support user-selected destinations through
+archive.manifests.build_destination; keep safe_output for other workflows.
+Destination validation must protect source/mod trees in both directions. Build
+reports and temporary/backup folders use the same validated destination drive.
 
 `tools/rebuild/package_windows.ps1` packages the Windows GUI and audio helpers.
 The FFmpeg helper is configured without GPL/nonfree components and uses only the
@@ -1292,6 +1376,29 @@ See CURRENT_STATUS.md and each PR's exact verification for the latest evidence.
 
 Embedded source: docs/AUDIO_WORKFLOW.md
 
+## Queue several songs before saving
+
+In Audio, select one track and click **Queue selected song from WAV…**. Repeat for
+other songs in either Licensed Music or Fight Songs. The pending table lists the
+bank/index and selected file. Re-queueing the same song changes its file; **Remove
+queued song** removes selected pending rows and **Clear song queue** removes all.
+Click **Save queued songs…** once and choose a new replacement folder under
+`output/`. The result includes one combined `cribmusic.bin` (when applicable),
+`global.iff` and a replacement report. Select that folder as overrides for a manual
+JB build. Queue entries clear only after a successful save; cancellation/failure
+keeps them. They are session-only and must be saved before closing the app.
+
+Queued WAVs must have a nonempty RIFF/RF64 WAV header; full decoding and validation
+happen on save, retaining support for the encoder's existing WAV sample formats.
+Bank sample rate/channels/duration
+are conformed by the existing encoder. The queue belongs to its loaded source JB;
+changing source requires returning to it or clearing/reselecting the songs. This
+prevents accidentally applying catalog indices from one JB to another. Reopening
+the same JB path is supported when bank size/mtime/inode metadata still matches.
+As with the override input quick check, this is not a content hash: a same-size
+external edit that preserves all metadata may evade the source-change check.
+Songs newly queued or changed during an active save remain pending afterward.
+
 # Experimental audio workflow
 
 Batch WAV export publishes its output folder only after all selected tracks and
@@ -1370,6 +1477,68 @@ are distributed in `THIRD-PARTY-SOURCES`. The default PyAV wheel is not bundled.
 When building locally, both helpers must be present before running
 `tools/rebuild/package_windows.ps1`. See AUDIO_RESEARCH.md for evidence and
 format limits.
+
+---
+
+Embedded source: docs/SCOREBUG_RESEARCH.md
+
+# Scorebug research — authored assets, runtime routing pending
+
+Read-only stock archive inspection on 2026-10-15 identifies the following records.
+Names identify authored resources; they do not alone prove which runtime path is
+active. No executable edits or scorebug geometry writer are implemented.
+
+| Archive | Record | Type | Evidence |
+|---|---|---|---|
+| gamedata.iff | scorebug_bottombar (55) | SCNE | 23 parts; six embedded textures |
+| gamedata.iff | scorebug_topbar (250) | SCNE | text_nodeMask and g_top_bar; one texture |
+| gamedata.iff | scorebug_blackbar (135) | SCNE | group_blackbar_text |
+| gamedata.iff | scorebug_logo_bloom (260) | SCNE | klogo_Score_bug |
+| gamedata.iff | scorebug_bloom (25) | TXTR | Separate artwork |
+| gamedata.iff | scorebug_info_blk (39) | TXTR | Separate artwork |
+| gamedata.iff | scorebug_logos (60) | TXTR | Separate artwork |
+| gamedata.iff | scorebug_scanlines (143) | TXTR | Separate artwork |
+| gamedata.iff | shotclock (174) | TXTR | Clock-related artwork; numeric binding pending |
+| gamedataextra.iff | scorebug_ps3 (1) | SCNE | Five parts; two textures |
+| gamedataextra.iff | scorebug_xenon (2 / 3) | MRKS / SCNE | Separate marker and scene records |
+
+The bottom-bar parts include Score_bug, drop_shadow, top_greybar, bot_greybar,
+color_1, color_2, logo1, logo2, frame1..7, frame8_glare, frame9_glare, ncaa2k8,
+g_2K_circle_logo and text_nodeMask. Its embedded texture slots are:
+
+| Slot | Dimensions | Encoding |
+|---|---|---|
+| 0 / 1 | 64 × 64 | DXT1 |
+| 2 | 128 × 128 | DXT5 |
+| 3 | 256 × 256 | DXT5 |
+| 4 | 128 × 128 | DXT5 |
+| 5 | 512 × 256 | DXT1 |
+
+The PS3/Xenon scenes both have polySurface50, Score_bug, group2, mesh_slider2 and
+titlebar_plane1, with 256 × 128 and 128 × 64 DXT5 textures. Their relation to the
+free-throw meter (the neighboring LAYT record) is a hypothesis, not proof that
+these scenes control the main score overlay. overlaycache.iff contains 21 scenes,
+including halftime_box_score, but no explicitly named scorebug record.
+
+Reproduce the inventory without extracting artwork or building a JB:
+
+```powershell
+python -m choops_py.formats.scorebug "YOUR_JB_ROOT"
+```
+
+This prints JSON record identities, part names, logical block sizes and texture
+layouts. Current Explorer/texture tools can inspect and replace confirmed TXTR or
+SCNE texture slots using their exact names, original dimensions, alpha and mip
+layout. Preserve scene parts, materials and record names. This is an artwork-only
+starting point; it does not promise a complete layout redesign or validated game
+behavior. A record index is supporting evidence for this input, not a portable
+replacement key; use exact record names.
+
+Next research: map score/period/game-clock/shot-clock/team-name fields to authored
+nodes, trace team-color/logo bindings and animation/visibility states in read-only
+EBOOT consumers, distinguish broadcast modes and console variants, then prove
+which layout/material parameters can change without executable edits. Moving or
+removing scorebug nodes is deferred until these dynamic bindings are understood.
 
 ---
 
@@ -1531,6 +1700,23 @@ Next trace: runtime uniform color/material setters and number/name atlas consume
 ---
 
 Embedded source: docs/projects/04-archive-size-and-assets.md
+
+## Header-gap preservation and user destinations (current update)
+
+The post-TOC/pre-asset gap can contain opaque nonzero bytes in rebuilt inputs.
+Existing replacement slots consume none of it; append planning preserves the gap
+verbatim and validates only slots occupied by additions. Repack planning can keep
+opaque bytes at their original offsets when the body start is unchanged and the
+new TOC consumes only verified zeros. Moving the body with opaque header data or
+expanding TOC over that data remains blocked. This deliberately does not infer
+unknown header pointers or erase nonzero bytes.
+
+Mod Builder's **Choose JB output folder…** accepts an empty destination on another
+drive. CLI build-copy accepts the same destinations. The original JB and mod
+workspace cannot overlap the output in either direction; roots and linked paths
+are refused. Existing nonempty folders require the existing explicit overwrite
+option and a valid tool-owned build manifest. Publication/rollback uses siblings
+on the destination drive. Other export/staging paths still use output/.
 
 # Archive size and new assets
 
@@ -1781,6 +1967,27 @@ Updated 2026-10-11. CURRENT_STATUS.md and TEST_REPORT.md are the living evidence
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+## Queued audio / build destinations / roster and scorebug audit — 2026-10-15
+
+`python tools/dev/verify.py` passed: **541 portable tests**, nine offscreen
+OpenGL skips, two deselected real/manual/native-reference checks. Compileall,
+CLI help, hidden Qt startup, Ruff, mypy, handoff consistency and diff checks passed.
+The PR records the exact tested head. No RPCS3 or real/testing JB folder was built.
+
+New synthetic checks cover two changes in one cribmusic bank plus global.iff,
+untouched third stream/prefix/tail/metadata, queue replacement/source binding and
+reopen, preservation of newer choices during a save, GUI queue/save callbacks,
+external output paths including existing empty folders, source/ancestor rejection,
+opaque header-gap preservation in append/repack, occupied TOC rejection, correct
+roster +1 anchors/uniform masks/logical windows, and bounded scorebug discovery.
+
+Read-only stock checks: scorebug discovery parsed all twelve identified records
+in gamedata/gamedataextra and their SCNE textures/parts. Roster audit found 347
+resolved and reciprocal arena-team references, 32 nulls, no unresolved nonnull
+arena links and no logical-table overlaps. EBOOT arena indexing and four-pointer
+serialization/deserialization corroborate the structure. Remaining unknown bytes
+are still reported explicitly; this is not a full semantic or gameplay certification.
 
 # Roster / game-line / animation continuation verification
 
