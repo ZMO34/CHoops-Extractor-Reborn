@@ -20,6 +20,10 @@ historical claims that all related games behave identically.
 | Reusable court texture template | [Single-surface court](SINGLE_SURFACE_COURT.md) |
 | CLI commands | [Commands](COMMANDS.md), executable `--cli --help` |
 
+[Modern-feature backport feasibility](MODERN_FEATURE_BACKPORTS.md) separates
+existing asset/data routes, animation conversion research, companion workflows
+and changes requiring new runtime systems.
+
 ## Development and evidence
 
 [Developer guide](DEVELOPER_GUIDE.md) explains the modules and prerequisites.

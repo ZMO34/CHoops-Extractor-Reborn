@@ -37,3 +37,9 @@ Only synthetic fixtures, Qt/CLI/frozen smoke and read-only research are used.
 RPCS3/gameplay NOT RUN; real/testing JB NOT BUILT; EBOOT NOT EDITED.
 Both Codex instances must maintain current docs and the generated handoff on each
 update. Document evidence and unknowns; never replace uncertainty with a label.
+
+## Research follow-up — modern features
+
+[Backport feasibility](MODERN_FEATURE_BACKPORTS.md) ranks practical artwork/roster
+updates, 2K9 animation conversion, broadcast bindings and indirect companion ideas.
+No backport is implemented; modern runtime features remain distinct from assets.
