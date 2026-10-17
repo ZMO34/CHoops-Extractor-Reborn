@@ -4,7 +4,7 @@ import json
 import sys
 from pathlib import Path
 from .commands import COMMANDS,SPECS
-from .archive.manifests import safe_output,write_bytes
+from .archive.manifests import safe_output,build_destination,write_bytes
 from .core.errors import ToolError
 from .core.reports import save_json
 
@@ -42,7 +42,9 @@ def execute(a):
         from .studio import main as launch
         return launch([])
     sources=[getattr(a,key) for key in ('source','input','cdf','dds_file','wav_file','image','mod','modded','edited','patch') if getattr(a,key,None)]
-    if hasattr(a,'output'):a.output=safe_output(a.output,sources)
+    if hasattr(a,'output'):
+        validator=build_destination if c=='build-copy' else safe_output
+        a.output=validator(a.output,sources)
     if c in ('inspect-animations', 'export-animations'):
         from .formats.animations import inspect_animations
         raw = Path(a.input).read_bytes()

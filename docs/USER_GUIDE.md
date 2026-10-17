@@ -245,3 +245,19 @@ it validates the original JB archive and cached output with SHA-256 and also
 checks importer code. It does not hash all loose input contents on every scan,
 so deliberate same-size edits with preserved metadata can evade that quick
 input-change check. Ordinary saved/replaced files invalidate affected archives.
+
+
+## Rebuild speed and validation (v1.16)
+
+Select overrides once and reuse the prepared workspace. Unchanged DDS conversion
+results and prepared archives remain cached; edited inputs invalidate their
+matching cache entries. Build JB copies files to your chosen destination, then
+checks replacement payloads and all preserved bytes. Growing archives use
+sequential verification, including unused bank padding and copied non-bank files.
+Progress identifies copying, relocating, checking entries and checking preserved
+archive bytes. Those checks still read the new output on every build.
+
+Cancel safely through the job dialog. A failure or cancellation removes the
+owned incomplete output and leaves an existing completed build intact. DDS
+preflight scratch files are cleaned up automatically. Insufficient free space is
+reported before copying. Keep the source and overrides unchanged during a build.

@@ -1,3 +1,37 @@
+# v1.16 — sequential rebuild verification and queued soundtrack edits
+
+Rebuilding growing archives now verifies preserved bytes sequentially in 4 MiB
+chunks and keeps bank handles open, replacing thousands of per-entry opens and
+random reads. Relocation writes also reuse bank handles. Existing DDS conversion
+and prepared-override caches remain enabled; selecting unchanged overrides still
+reuses validated archives. Fresh build outputs are always checked rather than
+trusting a prior build's verification result.
+
+Source preconditions share the replacement's original-asset read; unrelated
+preconditions are streamed. CDF pairs avoid eagerly rereading partners already
+supplied as replacements. DDS preflight temporary folders are removed after
+success or failure. The CLI build command now uses the same manual-output policy
+as the GUI/backend; other export commands retain their output restrictions.
+Fixed-size builds check free space before copying. Source
+inventory is captured before planning/preflight, so changes during that phase
+also prevent publication.
+
+Growing-build verification now checks preserved bank padding and all copied
+non-bank files, in addition to TOC identities, exact generated headers and
+replacement payloads. Cancellation/failure retains atomic cleanup. No hard links
+or writes to source files are used.
+
+Synthetic benchmark: 8,192 shuffled entries / 32 MiB, Windows Python 3.12:
+1.5131 s previous per-entry verification versus 0.0477 s sequential (31.69x for
+this verification phase); bank opens reduced from 16,384 to 2. This is not a
+whole-build speed estimate; disk copying, texture conversion and asset checks
+still take time. Reproduce with `python tools/dev/benchmark_rebuild.py`.
+
+This release also includes PR #22: queued multi-song WAV imports before one bank
+save, manual JB output folders, preserved opaque header gaps, and read-only
+roster/scorebug research. Complete roster semantics and dynamic scorebug behavior
+remain unresolved. No alternate assets, RPCS3, EBOOT edits or real/testing JB build.
+
 # Unreleased — queued audio, manual JB output and research continuation
 
 Audio now queues individual WAV replacements before one save. Selecting another
