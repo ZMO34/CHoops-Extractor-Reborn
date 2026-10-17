@@ -1,6 +1,7 @@
 from pathlib import Path
 from .hash_names import lookup
 from ..formats.binary import Binary
+from .layouts import decode_toc
 def usrdir(path):
     p=Path(path).resolve()
     if p.is_file() and p.name=='0A':p=p.parent
@@ -12,7 +13,7 @@ class Archive:
         self.path=usrdir(path)
         with (self.path/'0A').open('rb') as f:
             b=Binary(f.read(24));self.magic=b.u32(0);self.alignment=b.u32(4);na=b.u32(8);nf=b.u32(16)
-            if self.magic!=0xAA00B3BF or not self.alignment or self.alignment & (self.alignment-1) or not 1<=na<=256 or not 1<=nf<=1000000:raise ValueError("Invalid CH2K8 archive header")
+            if self.magic!=0xAA00B3BF or not self.alignment or self.alignment & (self.alignment-1) or not 1<=na<=256 or not 1<=nf<=1000000:raise ValueError("Invalid PS3 2K archive header")
             desc=Binary(f.read(na*16));self.parts=[]
             for i in range(na):
                 name=desc.slice(i*16+8,8).decode('utf-16-be').rstrip('\0')
@@ -21,24 +22,11 @@ class Archive:
                 if p.stat().st_size!=size:raise ValueError("Archive part size mismatch")
                 if any(part['name'].casefold()==name.casefold() for part in self.parts):raise ValueError('Duplicate archive part name')
                 self.parts.append(dict(name=name,size=size))
-            toc=Binary(f.read(nf*16));self.entries=[]
-            for i in range(nf):
-                h=toc.u32(i*16);off=toc.u32(i*16+4)*self.alignment;size=toc.u32(i*16+12)
-                self.entries.append(dict(index=i,hash=h,name=lookup().get(h),offset=off,stored_size=size,size=size,toc_flags=toc.u32(i*16+8)))
-        ordered=sorted(self.entries,key=lambda e:e['offset']);total=sum(p['size'] for p in self.parts)
-        if ordered[0]['offset']<24+na*16+nf*16:raise ValueError('Archive entry overlaps header/TOC')
-        for i,e in enumerate(ordered):
-            boundary=ordered[i+1]['offset'] if i+1<len(ordered) else total
-            if not 0<=e['offset']<boundary<=total:raise ValueError("Invalid TOC ordering/range")
-            capacity=boundary-e['offset']
-            e['allocation_size']=capacity
-            if not 0<e['stored_size']<=capacity:
-                e['size_derived']=True
-                e['content_size']=None
-                e['size']=capacity
-            else:
-                e['content_size']=e['stored_size']
-                e['size']=min(capacity,(e['stored_size']+self.alignment-1)//self.alignment*self.alignment)
+            raw=f.read(nf*16)
+            self.toc_layout,self.entries=decode_toc(raw,self.alignment,24+na*16+nf*16,sum(p['size'] for p in self.parts))
+            for entry in self.entries:entry['name']=lookup().get(entry['hash'])
+        from .game_info import read_identity
+        self.game_info=read_identity(self.path)
         from .identity import load_cached
         load_cached(self)
     def read(self,entry):

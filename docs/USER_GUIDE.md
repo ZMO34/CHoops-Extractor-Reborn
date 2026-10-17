@@ -261,3 +261,14 @@ Cancel safely through the job dialog. A failure or cancellation removes the
 owned incomplete output and leaves an existing completed build intact. DDS
 preflight scratch files are cleaned up automatically. Insufficient free space is
 reported before copying. Keep the source and overrides unchanged during a build.
+
+
+## Shared PS3 2K sources (v1.17)
+
+Open a supported PS3 2K JB through the same source-folder action. The editor detects
+the archive layout and displays the game title automatically. Explorer extraction,
+textures, authored 3D previews, overrides and building use that source's layout;
+there is no game-mode selector. College Hoops 2K8 roster editing remains specific
+to its confirmed roster format. Unknown layouts/resources produce a clear error
+instead of a guessed conversion. See PS3_2K_ARCHIVES.md for verified games and
+research-only extraction commands. Included in Windows v1.17.

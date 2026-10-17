@@ -1,3 +1,26 @@
+# v1.17 — automatic shared PS3 2K archive layouts
+
+The existing editor now detects the supported College Hoops/NBA size32 and size64
+TOC layouts automatically. Extraction, cached source/override previews, DDS import
+and fixed/growing/repacked builds use the detected source schema. Game title/ID
+are shown from PARAM.SFO; College Hoops 2K8 roster controls remain specific to their
+confirmed schema. Unknown/ambiguous layouts fail explicitly; universal support for
+all 2K years/platforms is not claimed.
+
+Read-only NBA 2K9 validation: 5,624 entries / 6 banks; selected IFF/CDF samples
+extracted exactly; five standard IFFs' blocks decompressed; textures and 71 menu
+logo records parsed. Shared preview services show 2 jersey/shorts meshes, 2 floor
+meshes and all 78 arena meshes / 58 images. Half4 UV/color declarations and
+case-sensitive internal CRC labels bridge the shared format variants. Source
+banks are unchanged. A standalone research inventory/extractor is also available.
+See PS3_2K_ARCHIVES.md for evidence, commands and explicit remaining limitations.
+Rebuilding is validated with synthetic fixtures only; no real/testing JB or RPCS3.
+
+Official v1.17 integrates PRs #22–24 and includes the Windows application.
+Portable verification: 575 passed; frozen startup/audio and both synthetic writer
+layouts passed. Both instances must maintain these docs and the generated handoff
+on every subsequent update.
+
 # v1.16 — sequential rebuild verification and queued soundtrack edits
 
 Rebuilding growing archives now verifies preserved bytes sequentially in 4 MiB

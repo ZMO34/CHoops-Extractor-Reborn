@@ -61,3 +61,21 @@ Do not cache verification of a fresh output or use hard links to source files.
 
 Use `python tools/dev/benchmark_rebuild.py` for a bounded synthetic-only benchmark.
 Its entry count can be changed with `--entries`; it never accepts a game path.
+
+
+## Automatic shared 2K layouts
+
+`archive.layouts.decode_toc` validates all candidate schemas, requires a unique
+answer and exposes canonical row fields to the existing reader/writers.
+`pack_row` serializes canonical fields back to the source schema. Do not make
+writers infer a game from names, extensions or UI settings. Source size semantics
+remain profile-specific: legacy rounded/derived extents versus exact size64 extents.
+Keep unknown formats raw and preserve their bytes through builds.
+
+Record CRC labels are case-sensitive and only fill missing labels; authored
+trailers take precedence. A matching label does not establish unknown type or
+roster semantics. Cache fingerprints include the schema and frozen prepared-cache
+fingerprints include layout/label module code. Add malformed/ambiguous fixtures,
+synthetic writer round trips and explicit read-only input evidence for another
+variant. Never validate by launching an emulator or building a real/testing JB.
+See PS3_2K_ARCHIVES.md for current evidence and the standalone research command.

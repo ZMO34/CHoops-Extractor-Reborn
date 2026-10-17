@@ -1,3 +1,28 @@
+# v1.17 — automatic PS3 2K layouts
+
+Focused automatic-layout/research suite: 22 passed. Covers both TOC schemas,
+64-bit stored sizes, ambiguous-layout rejection, split-bank extraction, fixed/
+growing/repacked NBA synthetic builds, source preservation, CRC record labels,
+CDF pairing/TXTR variants, half4 UV/color fields, automatic Qt source loading and
+College Hoops roster boundaries. An end-to-end synthetic test selects a DDS
+folder, previews its live replacement and rebuilds with the same detected layout.
+
+Read-only supplied NBA 2K9 evidence: 5,624 TOC entries / 6 banks, no overlaps;
+selected raw IFF/CDF outputs rehashed; five standard sample IFFs' logical blocks
+decoded; five sample DDS exports plus a menu-logo DDS opened successfully.
+Shared preview services: jersey/shorts 2 meshes / 2 images; floor 2 meshes / 2
+images / no warnings; arena 78 meshes / 58 images / no warnings. These checks
+materialize extracted scratch assets only, never a rebuilt game JB. Broader game
+compatibility and runtime shader/roster behavior remain unverified.
+
+Full portable verification: 575 passed, 9 offscreen OpenGL skips, 2 deselected;
+compile, CLI/Qt smoke, Ruff, mypy, handoff and diff passed. RPCS3/gameplay NOT RUN; real/testing JB NOT BUILT; EBOOT NOT EDITED.
+
+Windows packaging validation: startup and synthetic audio round trip passed.
+Frozen CLI passed read-only NBA IFF extraction, fixed/growing/138-bank repack
+fixtures for both layouts and a three-worker NBA override import. Both source
+layouts retain unchanged synthetic source bytes. No supplied game was rebuilt.
+
 # v1.16 rebuild performance verification
 
 Targeted synthetic rebuild tests: 26 passed, 1 GUI case deselected. Twelve new

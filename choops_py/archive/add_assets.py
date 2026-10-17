@@ -11,6 +11,7 @@ from .hash_names import hash_name,replacement_hash
 from .manifests import build_destination as safe_output
 from .build_copy import jb_root, inventory
 from .build_io import verify_body, verify_files
+from .layouts import pack_row
 from ..core.paths import reject_links
 from ..formats.standard_iff import StandardIFF
 from ..formats.binary import Binary
@@ -78,7 +79,7 @@ def plan(source, additions, replacements=None):
     if any(header[head_end:head_end+len(additions)*16]):
         raise ValueError('New TOC slots overlap unclassified header bytes')
     records=[];toc_start=24+len(archive.parts)*16
-    for i,e in enumerate(archive.entries):records.append(list(struct.unpack_from('>4I',header,toc_start+i*16)))
+    for e in archive.entries:records.append([e['hash'],e['offset']//archive.alignment,e['toc_flags'],e['stored_size']])
     cursor=sum(p['size'] for p in archive.parts);appended=[];patches=[]
     for name,data in additions.items():
         if not re.fullmatch(r'[A-Za-z0-9_-]+\.(?:iff|cdf)',name,re.IGNORECASE):raise ValueError('Unsafe or unsupported new asset name')
@@ -109,7 +110,7 @@ def plan(source, additions, replacements=None):
     records.sort(key=lambda row:row[0])
     struct.pack_into('>I',header,16,len(records))
     struct.pack_into('>I',header,24+(len(archive.parts)-1)*16,(archive.parts[-1]['size']+growth)//2048)
-    for i,row in enumerate(records):struct.pack_into('>4I',header,toc_start+i*16,*row)
+    for i,row in enumerate(records):pack_row(header,toc_start+i*16,row,archive.toc_layout)
     return archive,bytes(header),appended,patches,final_total
 
 

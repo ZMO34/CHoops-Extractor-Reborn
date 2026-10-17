@@ -284,7 +284,7 @@ class Window(QMainWindow):
 
         super().__init__()
 
-        self.setWindowTitle("CHoops Modding Studio • v1.16")
+        self.setWindowTitle("CHoops Modding Studio • v1.17")
 
         self.resize(1420, 900)
 
@@ -830,7 +830,7 @@ class Window(QMainWindow):
             self.explorer.selectionModel().selectionChanged.connect(self.show_explorer_references)
 
             self.identity.setText(
-                f"{len(archive.entries):,} entries • {len(archive.parts)} split parts • original source read-only"
+                f"{getattr(archive,'game_info',{}).get('TITLE','PS3 2K archive')} • {len(archive.entries):,} entries • {len(archive.parts)} split parts • original source read-only"
             )
 
             self.log("Archive index loaded; payloads remain lazy.")
@@ -1481,6 +1481,9 @@ class Window(QMainWindow):
     def load_game_roster(self, from_overrides=False):
         if not self.archive:
             return self.log("Open a source JB folder first.")
+        title=getattr(self.archive,'game_info',{}).get('TITLE','')
+        if (title and 'college hoops 2k8' not in title.casefold()) or getattr(self.archive,'toc_layout',None)=='size64-hash-offset':
+            return self.show_error('The College Hoops 2K8 roster schema is not confirmed for '+(title or 'this source')+'. Asset extraction, previews and rebuilding remain available.')
         try:
             archive=self.preview_archive(use_overrides=bool(from_overrides))
             matches=[e for e in archive.entries if e["name"]=="roster_english.iff"]

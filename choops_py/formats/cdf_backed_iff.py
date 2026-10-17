@@ -1,5 +1,6 @@
 from .binary import Binary
-from .standard_iff import names
+from .standard_iff import names,TYPES
+from .record_labels import label
 from ..archive.manifests import write_bytes,report,safe_name
 class CDFPair:
     def __init__(self,iff,cdf):
@@ -16,7 +17,7 @@ class CDFPair:
             if rec+20>end or desc+16>end:raise ValueError("Record outside metadata")
             b.slice(rec,20);vals=[b.u32(desc+j*4) for j in range(4)]
             h,hl,p,pl=vals;c.slice(h,hl);c.slice(p,pl)
-            name,typ=ns[i] if i<len(ns) else (str(i),{0x1AEDDA1F:'AUDO',0x5C36FB69:'TXTR'}.get(b.u32(rec+4),'UNKNOWN'))
+            name,typ=ns[i] if i<len(ns) else (label(b.u32(rec),str(i)),{0x5C36FB69:'TXTR',**TYPES}.get(b.u32(rec+4),'UNKNOWN'))
             self.records.append(dict(index=i,name=name,type=typ,header_offset=h,header_length=hl,payload_offset=p,payload_length=pl,primary_words=[b.u32(rec+j*4) for j in range(5)]))
     def manifest(self): return dict(family='cdf-backed-iff',cdf_name=self.cdf_name,records=self.records)
     def dump(self,out):

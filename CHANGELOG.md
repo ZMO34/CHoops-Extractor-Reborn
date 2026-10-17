@@ -1,3 +1,10 @@
+## v1.17
+
+- Auto-detect shared PS3 2K size32/size64 TOCs and preserve their layouts when rebuilding.
+- Read optional game identity, retain College Hoops roster boundaries and shared source/override caching.
+- Recover common internal CRC labels; support standard CDF TXTR hashes and half4 scene attributes.
+- Add read-only NBA 2K9 inventory/extraction tooling and supplied-copy extraction/preview evidence.
+
 ## v1.16
 
 - Faster sequential rebuild verification and persistent relocation bank handles.

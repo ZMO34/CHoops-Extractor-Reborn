@@ -84,6 +84,29 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# v1.17 — automatic shared PS3 2K archive layouts
+
+The existing editor now detects the supported College Hoops/NBA size32 and size64
+TOC layouts automatically. Extraction, cached source/override previews, DDS import
+and fixed/growing/repacked builds use the detected source schema. Game title/ID
+are shown from PARAM.SFO; College Hoops 2K8 roster controls remain specific to their
+confirmed schema. Unknown/ambiguous layouts fail explicitly; universal support for
+all 2K years/platforms is not claimed.
+
+Read-only NBA 2K9 validation: 5,624 entries / 6 banks; selected IFF/CDF samples
+extracted exactly; five standard IFFs' blocks decompressed; textures and 71 menu
+logo records parsed. Shared preview services show 2 jersey/shorts meshes, 2 floor
+meshes and all 78 arena meshes / 58 images. Half4 UV/color declarations and
+case-sensitive internal CRC labels bridge the shared format variants. Source
+banks are unchanged. A standalone research inventory/extractor is also available.
+See PS3_2K_ARCHIVES.md for evidence, commands and explicit remaining limitations.
+Rebuilding is validated with synthetic fixtures only; no real/testing JB or RPCS3.
+
+Official v1.17 integrates PRs #22–24 and includes the Windows application.
+Portable verification: 575 passed; frozen startup/audio and both synthetic writer
+layouts passed. Both instances must maintain these docs and the generated handoff
+on every subsequent update.
+
 # v1.16 — sequential rebuild verification and queued soundtrack edits
 
 Rebuilding growing archives now verifies preserved bytes sequentially in 4 MiB
@@ -537,6 +560,123 @@ raw TXTR replacement; TXTR remains the fallback only when no DDS is present.
 SCNE replacements remain supported. CSVs use explicit binary-backed field
 whitelists: asset references, preview labels, research fields and row offsets are
 excluded, while source/stale-edit safety columns are retained.
+
+---
+
+Embedded source: docs/PS3_2K_ARCHIVES.md
+
+# Shared PS3 2K archive support
+
+The editor automatically detects supported archive layouts when opening a JB or
+USRDIR folder. There is no game-mode selector. Game title/ID are read from optional
+PARAM.SFO for display; they never determine the binary TOC layout. College Hoops
+2K8 roster editing and its confirmed rendering features remain available. A known
+other title is not automatically decoded with the College Hoops roster schema.
+
+## Confirmed outer layouts
+
+Both supplied games use magic AA00B3BF, a 24-byte big-endian header, 16-byte bank
+descriptors, 2,048-byte alignment and 16-byte asset entries. Banks are concatenated
+logically; an entry may cross bank boundaries. The entry order differs:
+
+| Byte | College Hoops 2K8 layout | NBA 2K9 layout |
+|---|---|---|
+| 0..3 | filename CRC32 | stored byte length, high 32 bits |
+| 4..7 | sector offset | stored byte length, low 32 bits |
+| 8..11 | preserved flags | filename CRC32 |
+| 12..15 | stored byte length | sector offset |
+
+The detector validates both candidates against the full TOC, unique hashes,
+header/neighbor/bank boundaries and stored lengths. Exactly one candidate must be
+valid; ambiguous/unknown layouts are rejected. College Hoops' existing derived
+extent fallback and rounded extraction behavior are retained. The size64 layout
+uses exact stored lengths. Writers serialize TOC rows using the detected source
+layout for in-place builds, growth/append and bank repacking. Header/flags/opaque
+padding, unknown resources and untouched files keep their preservation checks.
+The raw 64-bit size is not truncated to a 32-bit field.
+
+Other PS3 2K games may work automatically if they use a supported layout and inner
+formats. This is not a claim that every game/year/platform is compatible. New or
+ambiguous layouts require evidence and fixtures; do not add filename/title guesses
+or silently reinterpret an unknown format.
+
+## NBA 2K9 supplied-copy observations
+
+Read-only inventory: 6 banks, 6,158,907,392 bytes, 5,624 entries, no overlaps.
+945 outer filenames match the existing hash dictionary; those remain candidates,
+not new globally verified name assignments. Source game ID is BLUS30197.
+
+| Stored resource signature | Count | Handling |
+|---|---:|---|
+| FF3BEF94 | 3,171 | Standard IFF, existing readers |
+| F0985030 | 46 | CDF-backed IFF metadata; preserve linked CDF |
+| 01 + 0E4837C3 | 2,322 | Flagged H7A resource; exact raw extraction |
+| 0E4837C3 | 15 | Compressed header/prefix and possible following data; raw preservation |
+| Other | 70 | Exact raw extraction; unsupported inner decoding stays explicit |
+
+A sampled flagged H7A resource decoded to non-IFF data. Do not strip the flag and
+assume all 2,322 entries are complete compressed IFFs. Their wider purpose and
+possible references are not fully established. No archive resource is automatically
+unwrapped/rebuilt based on this signature alone.
+
+Selected exact extractions: ua000.iff, uh000.iff, s000.iff, gamedata.iff, global.iff,
+teamselectlogo.iff and its linked teamselectlogo.cdf. All blocks in the five standard
+IFF samples decoded to their declared lengths. Uniform TXTRs, stadium TXTRs and
+shared gamedata/global artwork converted to valid DDS images with existing code.
+The menu-logo pair parsed 71 texture records and exported a 512x512 DXT5 DDS.
+
+The shared preview services decoded:
+
+- Jersey + shorts: 2 meshes and 2 authored images, using existing cloth packages.
+- Floor: 2 meshes and 2 images, no parser warnings.
+- Arena: 78 meshes and 58 images, no parser warnings.
+
+These are static authored previews, not runtime/gameplay certification. NBA number
+placement, roster semantics, animation/skinning, dynamic shaders and all unknown
+resources have not been generalized. College Hoops' fixed S256 alignment guides
+are not injected into another game's floor preview.
+
+## Shared inner readers
+
+IFFs without a tool-generated name trailer can recover a small set of shared
+internal names from case-sensitive CRC32 IDs: arena, floor, uniform artwork,
+jersey/shorts cloth shapes and numbered logos. Unknown IDs remain numeric and
+unknown types remain unknown. Authored name tables still take precedence.
+CDF metadata recognizes the standard TXTR hash as well as the older CDF variant.
+SCNE previews accept declared half4/float4 UV fields (first two UV components) and
+half4 vertex colors; complete declared attribute extents stay bounds checked.
+The NBA arena's half4 declarations are the read-only evidence for this extension.
+
+Asset caches include the detected TOC schema. Frozen importer fingerprints include
+the shared layout and record-label modules, so changed readers invalidate prepared
+results. Source and override toggles keep the same detected schema and game identity.
+
+## Editor and research usage
+
+Open the NBA JB folder through the existing source-folder action. Use Explorer,
+Texture Editor, Models / Courts, Select overrides folder and Mod Builder normally.
+There is no new game mode. Unresolved extracted IFFs keep a hash-based .iff filename;
+non-IFF resources remain .bin. Load source rosters only for a confirmed schema.
+
+For a separate read-only inventory/extraction command, from the repository root:
+
+```powershell
+python -m choops_py.research.nba2k9 "NBA_JB_ROOT" output/research/nba-inventory
+python -m choops_py.research.nba2k9 "NBA_JB_ROOT" output/research/nba-samples --extract ua000.iff uh000.iff s000.iff gamedata.iff global.iff teamselectlogo.iff
+```
+
+Selectors also accept `index:1045` or `hash:0x30f9aaf9`. Indices are input-specific;
+use names/hashes for repeatable selection. This command auto-includes a CDF
+metadata file's linked payload, checks its filename/CRC and publishes a new output
+folder only after source metadata and written SHA256 checks. Existing output is
+never overwritten. `--all-iff` explicitly exports all direct IFFs and linked CDFs;
+this can use several GiB. It does not pretend unknown GPU/resource streams are IFFs.
+
+Read-only planning also accepted a larger uniform-IFF replacement against the
+supplied NBA TOC, preserving its size64 schema and source inventory. It created
+no output banks. Raw extraction is byte preserving; rebuilding tests use synthetic
+archives only.
+No supplied JB was rebuilt, no EBOOT was edited and RPCS3 was not opened.
 
 ---
 
@@ -1295,6 +1435,24 @@ Do not cache verification of a fresh output or use hard links to source files.
 Use `python tools/dev/benchmark_rebuild.py` for a bounded synthetic-only benchmark.
 Its entry count can be changed with `--entries`; it never accepts a game path.
 
+
+## Automatic shared 2K layouts
+
+`archive.layouts.decode_toc` validates all candidate schemas, requires a unique
+answer and exposes canonical row fields to the existing reader/writers.
+`pack_row` serializes canonical fields back to the source schema. Do not make
+writers infer a game from names, extensions or UI settings. Source size semantics
+remain profile-specific: legacy rounded/derived extents versus exact size64 extents.
+Keep unknown formats raw and preserve their bytes through builds.
+
+Record CRC labels are case-sensitive and only fill missing labels; authored
+trailers take precedence. A matching label does not establish unknown type or
+roster semantics. Cache fingerprints include the schema and frozen prepared-cache
+fingerprints include layout/label module code. Add malformed/ambiguous fixtures,
+synthetic writer round trips and explicit read-only input evidence for another
+variant. Never validate by launching an emulator or building a real/testing JB.
+See PS3_2K_ARCHIVES.md for current evidence and the standalone research command.
+
 ---
 
 Embedded source: docs/AUDIO_RESEARCH.md
@@ -1942,6 +2100,15 @@ in the repository or Windows release.
 
 Embedded source: docs/KNOWN_LIMITATIONS.md
 
+## Shared 2K compatibility boundary
+
+The editor auto-detects two verified PS3 TOC schemas, not arbitrary game formats.
+College Hoops 2K8 and the supplied NBA 2K9 copy have read-only extraction/preview
+evidence; both writers have synthetic round-trip evidence. Other years/platforms,
+unknown resources and gameplay need further verification. NBA roster semantics,
+number placement and dynamic shader behavior are not established. See
+PS3_2K_ARCHIVES.md. College Hoops-specific roster features remain available.
+
 ## Current continuation evidence
 
 Floor alignment guides are independent flat-colour stock S256 reference geometry,
@@ -2016,6 +2183,31 @@ Updated 2026-10-11. CURRENT_STATUS.md and TEST_REPORT.md are the living evidence
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+# v1.17 — automatic PS3 2K layouts
+
+Focused automatic-layout/research suite: 22 passed. Covers both TOC schemas,
+64-bit stored sizes, ambiguous-layout rejection, split-bank extraction, fixed/
+growing/repacked NBA synthetic builds, source preservation, CRC record labels,
+CDF pairing/TXTR variants, half4 UV/color fields, automatic Qt source loading and
+College Hoops roster boundaries. An end-to-end synthetic test selects a DDS
+folder, previews its live replacement and rebuilds with the same detected layout.
+
+Read-only supplied NBA 2K9 evidence: 5,624 TOC entries / 6 banks, no overlaps;
+selected raw IFF/CDF outputs rehashed; five standard sample IFFs' logical blocks
+decoded; five sample DDS exports plus a menu-logo DDS opened successfully.
+Shared preview services: jersey/shorts 2 meshes / 2 images; floor 2 meshes / 2
+images / no warnings; arena 78 meshes / 58 images / no warnings. These checks
+materialize extracted scratch assets only, never a rebuilt game JB. Broader game
+compatibility and runtime shader/roster behavior remain unverified.
+
+Full portable verification: 575 passed, 9 offscreen OpenGL skips, 2 deselected;
+compile, CLI/Qt smoke, Ruff, mypy, handoff and diff passed. RPCS3/gameplay NOT RUN; real/testing JB NOT BUILT; EBOOT NOT EDITED.
+
+Windows packaging validation: startup and synthetic audio round trip passed.
+Frozen CLI passed read-only NBA IFF extraction, fixed/growing/138-bank repack
+fixtures for both layouts and a three-worker NBA override import. Both source
+layouts retain unchanged synthetic source bytes. No supplied game was rebuilt.
 
 # v1.16 rebuild performance verification
 

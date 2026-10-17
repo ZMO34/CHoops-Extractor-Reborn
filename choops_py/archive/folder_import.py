@@ -147,6 +147,7 @@ def resolve_legacy_targets(archive,discovery,folder,job=None):
     Python manifest selectors remain authoritative and are never guessed.
     """
     from ..formats.standard_iff import names,TYPES,StandardIFF
+    from ..formats.record_labels import label
     from ..formats.binary import Binary
     groups={g['entry']['hash']:g for g in discovery['groups']};labels={};catalog=None
     discovery['resolved_targets']=[]
@@ -174,7 +175,7 @@ def resolve_legacy_targets(archive,discovery,folder,job=None):
                 result=names(archive.read({**entry,'offset':entry['offset']+end,'size':entry['size']-end}),0,count)
                 if len(result)<count:
                     header=Binary(archive.read({**entry,'size':b.u32(4)}));start=32+b.u32(16)*32
-                    result += [(str(i),TYPES.get(header.u32(header.relative(start+i*4)+4),'UNKNOWN')) for i in range(len(result),count)]
+                    result += [(label(header.u32(header.relative(start+i*4)),str(i)),TYPES.get(header.u32(header.relative(start+i*4)+4),'UNKNOWN')) for i in range(len(result),count)]
             elif head[:4]==bytes.fromhex('f0985030'):
                 result=cdf_records(entry,archive.read(entry))
         labels[key]=result;return result

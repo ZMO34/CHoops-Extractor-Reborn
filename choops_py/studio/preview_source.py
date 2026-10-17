@@ -8,6 +8,7 @@ from ..archive.hash_names import replacement_hash
 class PreviewArchive:
     def __init__(self,archive,mod):
         self.base=archive;self.path=archive.path;self.entries=[dict(e) for e in archive.entries]
+        self.toc_layout=getattr(archive,'toc_layout',None);self.game_info=getattr(archive,'game_info',{})
         self.replacements={};self.conditions={};self.live=None
         root=Path(mod).resolve();manifest=root/'overrides.json'
         if not manifest.is_file():return
