@@ -84,6 +84,38 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# v1.16 — sequential rebuild verification and queued soundtrack edits
+
+Rebuilding growing archives now verifies preserved bytes sequentially in 4 MiB
+chunks and keeps bank handles open, replacing thousands of per-entry opens and
+random reads. Relocation writes also reuse bank handles. Existing DDS conversion
+and prepared-override caches remain enabled; selecting unchanged overrides still
+reuses validated archives. Fresh build outputs are always checked rather than
+trusting a prior build's verification result.
+
+Source preconditions share the replacement's original-asset read; unrelated
+preconditions are streamed. CDF pairs avoid eagerly rereading partners already
+supplied as replacements. DDS preflight temporary folders are removed after
+success or failure. Fixed-size builds check free space before copying. Source
+inventory is captured before planning/preflight, so changes during that phase
+also prevent publication.
+
+Growing-build verification now checks preserved bank padding and all copied
+non-bank files, in addition to TOC identities, exact generated headers and
+replacement payloads. Cancellation/failure retains atomic cleanup. No hard links
+or writes to source files are used.
+
+Synthetic benchmark: 8,192 shuffled entries / 32 MiB, Windows Python 3.12:
+1.5131 s previous per-entry verification versus 0.0477 s sequential (31.69x for
+this verification phase); bank opens reduced from 16,384 to 2. This is not a
+whole-build speed estimate; disk copying, texture conversion and asset checks
+still take time. Reproduce with `python tools/dev/benchmark_rebuild.py`.
+
+This release also includes PR #22: queued multi-song WAV imports before one bank
+save, manual JB output folders, preserved opaque header gaps, and read-only
+roster/scorebug research. Complete roster semantics and dynamic scorebug behavior
+remain unresolved. No alternate assets, RPCS3, EBOOT edits or real/testing JB build.
+
 # Unreleased — queued audio, manual JB output and research continuation
 
 Audio now queues individual WAV replacements before one save. Selecting another
@@ -1246,6 +1278,21 @@ AtracDEnc source archives and applicable notices accompany the package. Confirm
 the exact configuration and packaged smoke on Windows; no proprietary converters
 or game assets are included. See AUDIO_WORKFLOW.md and the encoder README.
 
+
+## Rebuild I/O (v1.16)
+
+`archive.build_io` verifies preserved source-coordinate spans against their output
+coordinates, with a relocation delta when needed. In-place replacement ranges
+alone are excluded; old bytes left by relocated replacements and all padding are
+still compared. Each bank is opened once per comparison, and ExitStack closes all
+handles on cancellation/error. Repack BankWriter closes/flushed handles before
+reopening output for validation. Replacement/header verification stays separate.
+Copied non-bank files also receive byte comparisons before atomic publication.
+Do not cache verification of a fresh output or use hard links to source files.
+
+Use `python tools/dev/benchmark_rebuild.py` for a bounded synthetic-only benchmark.
+Its entry count can be changed with `--entries`; it never accepts a game path.
+
 ---
 
 Embedded source: docs/AUDIO_RESEARCH.md
@@ -1967,6 +2014,24 @@ Updated 2026-10-11. CURRENT_STATUS.md and TEST_REPORT.md are the living evidence
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+# v1.16 rebuild performance verification
+
+Targeted synthetic rebuild tests: 25 passed, 1 GUI case deselected. Eleven new
+regressions cover persistent split-bank reads/writes, bank crossings, overlapping
+preservation exclusions, corruption in preserved padding/non-bank files, cleanup,
+single-read source fingerprints and cancellation handle release. Existing append,
+relocation, CDF insertion, opaque-header-gap and manual-output regressions pass.
+
+Synthetic verification benchmark (Windows Python 3.12, 8,192 shuffled entries /
+32 MiB): 1.5131 s per-entry checks; 0.0477 s sequential checks, 31.69x for this
+phase only. 16,384 opens become two. No real game files were used by the benchmark.
+Command: `python tools/dev/benchmark_rebuild.py`.
+
+Full portable verification: 552 passed, 9 offscreen OpenGL skips, 2 deselected;
+compile, CLI/Qt smoke, Ruff, mypy, handoff and diff checks passed.
+Frozen Windows checks run in the release packaging workflow.
+RPCS3/gameplay NOT RUN; testing JB NOT BUILT; EBOOT NOT EDITED.
 
 ## Queued audio / build destinations / roster and scorebug audit — 2026-10-15
 

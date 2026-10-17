@@ -6,12 +6,14 @@ import re
 import shutil
 import struct
 import uuid
+from contextlib import ExitStack
 from pathlib import Path
 from .usrdir_reader import Archive
 from .hash_names import hash_name,replacement_hash
 from .manifests import build_destination as safe_output
 from .build_copy import jb_root,inventory
-from .add_assets import meaningful_iff,validate_payload,checksum,asset_payload
+from .build_io import BankWriter,CHUNK,verify_body,verify_files
+from .add_assets import meaningful_iff,validate_payload,asset_payload
 from ..core.paths import reject_links
 
 
@@ -81,11 +83,11 @@ def plan(source, additions, replacements=None, job=None):
 
 def build(source, additions, output, replacements=None, job=None):
     root=jb_root(source);reject_links(root)
+    before=inventory(root)
     arc,header,names,sizes,delta,appended,total=plan(root,additions,replacements,job)
     output=safe_output(output,[root])
     if output.exists():raise ValueError('Output already exists')
     output.parent.mkdir(parents=True,exist_ok=True)
-    before=inventory(root)
     needed=sum(p['size'] for p in before.values())+total-sum(p['size'] for p in arc.parts)
     if shutil.disk_usage(output.parent).free<needed:raise ValueError('Insufficient disk space')
     pending=output.parent/('.archive_repack_'+uuid.uuid4().hex)
@@ -105,36 +107,31 @@ def build(source, additions, output, replacements=None, job=None):
         usr=pending/arc.path.relative_to(root)
         for name,size in zip(names,sizes):
             with (usr/name).open('xb') as f:f.truncate(size)
-        def write(offset,data):
-            position=0;base=0
-            for name,size in zip(names,sizes):
-                end=base+size
-                if base<=offset<end and position<len(data):
-                    n=min(len(data)-position,end-offset)
-                    with (usr/name).open('r+b') as f:f.seek(offset-base);f.write(data[position:position+n])
-                    position+=n;offset+=n
-                base=end
-            if position!=len(data):raise ValueError('Incomplete split-bank write')
-        write(0,header)
-        first=min(e['offset'] for e in arc.entries);entry={'offset':first,'size':sum(p['size'] for p in arc.parts)-first}
-        cursor=first+delta;done=0
-        for data in arc.chunks(entry,2*1024*1024):
-            if job:job.check();job.progress(done,entry['size'],'Repacking preserved archive body')
-            write(cursor,data);cursor+=len(data);done+=len(data)
-        for offset,data,name in appended:
-            if job:job.check()
-            write(offset,data)
+        with ExitStack() as handles:
+            writer=BankWriter(usr,names,sizes,handles)
+            writer.write(0,header)
+            first=min(e['offset'] for e in arc.entries);entry={'offset':first,'size':sum(p['size'] for p in arc.parts)-first}
+            cursor=first+delta;done=0
+            for data in arc.chunks(entry,CHUNK):
+                if job:job.check();job.progress(done,entry['size'],'Repacking preserved archive body')
+                writer.write(cursor,data);cursor+=len(data);done+=len(data)
+            for offset,data,name in appended:
+                if job:job.check()
+                writer.write(offset,data)
         result=Archive(usr);new_hash={e['hash']:e for e in result.entries}
+        if result.read({'offset':0,'size':len(header)})!=header:raise ValueError('Rebuilt archive header differs')
         replaced_hashes={replacement_hash(name) for name in (replacements or {})}
         for i,e in enumerate(arc.entries):
             if job:job.check();job.progress(i,len(arc.entries),'Verifying repacked archive entries')
             new=new_hash[e['hash']]
             if e['hash'] not in replaced_hashes:
-                if new['offset']!=e['offset']+delta or new['size']!=e['size'] or checksum(arc.chunks(e))!=checksum(result.chunks(new)):
+                if new['offset']!=e['offset']+delta or new['size']!=e['size']:
                     raise ValueError('Repacked entry preservation failed')
         for offset,data,name in appended:
             new=new_hash[replacement_hash(name) if name in (replacements or {}) else hash_name(name)]
             if new['content_size']!=len(data) or result.read(new)[:len(data)]!=data:raise ValueError('Added/replaced entry verification failed')
+        verify_body(arc,result,delta=delta,job=job)
+        verify_files(root,pending,arc,before,job)
         if inventory(root)!=before:raise ValueError('Source changed during repack')
         report={'schema':1,'method':'repack','added_assets':list(additions),'replaced_assets':list(replacements or {}),
                 'verified_existing_entry_count':len(arc.entries),'unchanged_entry_count':len(arc.entries)-len(replacements or {}),

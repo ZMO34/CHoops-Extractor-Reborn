@@ -1,3 +1,21 @@
+# v1.16 rebuild performance verification
+
+Targeted synthetic rebuild tests: 25 passed, 1 GUI case deselected. Eleven new
+regressions cover persistent split-bank reads/writes, bank crossings, overlapping
+preservation exclusions, corruption in preserved padding/non-bank files, cleanup,
+single-read source fingerprints and cancellation handle release. Existing append,
+relocation, CDF insertion, opaque-header-gap and manual-output regressions pass.
+
+Synthetic verification benchmark (Windows Python 3.12, 8,192 shuffled entries /
+32 MiB): 1.5131 s per-entry checks; 0.0477 s sequential checks, 31.69x for this
+phase only. 16,384 opens become two. No real game files were used by the benchmark.
+Command: `python tools/dev/benchmark_rebuild.py`.
+
+Full portable verification: 552 passed, 9 offscreen OpenGL skips, 2 deselected;
+compile, CLI/Qt smoke, Ruff, mypy, handoff and diff checks passed.
+Frozen Windows checks run in the release packaging workflow.
+RPCS3/gameplay NOT RUN; testing JB NOT BUILT; EBOOT NOT EDITED.
+
 ## Queued audio / build destinations / roster and scorebug audit — 2026-10-15
 
 `python tools/dev/verify.py` passed: **541 portable tests**, nine offscreen

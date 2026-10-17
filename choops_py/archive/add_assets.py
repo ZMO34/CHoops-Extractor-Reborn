@@ -10,6 +10,7 @@ from .usrdir_reader import Archive
 from .hash_names import hash_name,replacement_hash
 from .manifests import build_destination as safe_output
 from .build_copy import jb_root, inventory
+from .build_io import verify_body, verify_files
 from ..core.paths import reject_links
 from ..formats.standard_iff import StandardIFF
 from ..formats.binary import Binary
@@ -120,6 +121,7 @@ def checksum(chunks):
 
 def build(source, additions, output, replacements=None, job=None):
     root=jb_root(source);reject_links(root)
+    before=inventory(root)
     try:
         archive,header,appended,patches,total=plan(root,additions,replacements)
     except CapacityError:
@@ -130,7 +132,6 @@ def build(source, additions, output, replacements=None, job=None):
     output.parent.mkdir(parents=True,exist_ok=True)
     required=sum(p.stat().st_size for p in root.rglob('*') if p.is_file())+total-sum(p['size'] for p in archive.parts)
     if shutil.disk_usage(output.parent).free<required:raise ValueError('Insufficient disk space for copied JB')
-    before=inventory(root)
     pending=output.parent/('.asset_build_'+uuid.uuid4().hex)
     safe_output(pending,[root])
     try:
@@ -167,15 +168,17 @@ def build(source, additions, output, replacements=None, job=None):
                 part_base=end
             if remaining:raise ValueError('Incomplete replacement write')
         result=Archive(destination);new_by_hash={e['hash']:e for e in result.entries}
+        if result.read({'offset':0,'size':len(header)})!=header:raise ValueError('Rebuilt archive header differs')
+        replacements_by_hash={replacement_hash(n):(n,v) for n,v in (replacements or {}).items()}
         for i,e in enumerate(archive.entries):
             if job:job.check();job.progress(i,len(archive.entries),'Verifying preserved archive entries')
             new=new_by_hash[e['hash']]
-            replacement=next((v for n,v in (replacements or {}).items() if replacement_hash(n)==e['hash']),None)
+            replacement=replacements_by_hash.get(e['hash'],(None,None))[1]
             if replacement is None:
-                if new['offset']!=e['offset'] or new['size']!=e['size'] or checksum(result.chunks(new))!=checksum(archive.chunks(e)):
+                if new['offset']!=e['offset'] or new['size']!=e['size']:
                     raise ValueError('Existing entry verification failed')
             else:
-                replacement_name=next(n for n in replacements if replacement_hash(n)==e['hash'])
+                replacement_name=replacements_by_hash[e['hash']][0]
                 content=replacement if replacement_name.lower().endswith('.cdf') else meaningful_iff(replacement)
                 span=e['size'] if new['offset']==e['offset'] else new['size']
                 expected=hashlib.sha256(content+b'\0'*(span-len(content))).hexdigest()
@@ -184,6 +187,8 @@ def build(source, additions, output, replacements=None, job=None):
         for offset,data,name in appended:
             e=new_by_hash[replacement_hash(name) if name in (replacements or {}) else hash_name(name)]
             if e['content_size']!=len(data) or result.read(e)[:len(data)]!=data:raise ValueError('New asset verification failed')
+        verify_body(archive,result,[(offset,len(data)) for offset,data in patches],job=job)
+        verify_files(root,pending,archive,before,job)
         if inventory(root)!=before:raise ValueError('Source changed during build')
         report={'schema':1,'added_assets':list(additions),'replaced_assets':list(replacements or {}),
                 'verified_existing_entry_count':len(archive.entries),

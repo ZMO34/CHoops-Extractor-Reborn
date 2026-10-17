@@ -1,3 +1,11 @@
+## v1.16
+
+- Faster sequential rebuild verification and persistent relocation bank handles.
+- Single-read source preconditions; avoid redundant CDF partner reads.
+- Verify copied non-bank files, preserved bank padding and generated headers.
+- Remove DDS preflight temporary folders on success/failure; check free disk space.
+- Include queued song imports, manual output folders and opaque archive-gap fixes from PR #22.
+
 # Unreleased
 
 - Queue multiple song WAV imports, review/remove pending edits, then save combined

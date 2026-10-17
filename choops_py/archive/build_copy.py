@@ -3,6 +3,7 @@ import json
 import os
 import shutil
 import uuid
+import hashlib
 from pathlib import Path
 from .importer import validate
 from .usrdir_reader import Archive,usrdir
@@ -42,6 +43,7 @@ def preflight(source,mod,job=None):
         policy=json.loads(options.read_text(encoding='utf8'))
         if policy.get('schema')!=1:raise ToolError('invalid_import_options','Unsupported import options')
         allow_growth=policy.get('allow_archive_growth') is True
+    expected_sources={}
     conditions=Path(mod)/'source_preconditions.json'
     if conditions.exists():
         document=json.loads(conditions.read_text(encoding='utf-8'))
@@ -51,8 +53,11 @@ def preflight(source,mod,job=None):
             index=expected['index']
             if not isinstance(index,int) or not 0<=index<len(archive.entries):raise ToolError('source_version_mismatch','TOC index differs')
             entry=archive.entries[index]
-            if entry['hash']!=expected['hash'] or digest(archive.read(entry))!=expected['sha256']:
+            if entry['hash']!=expected['hash']:
                 raise ToolError('source_version_mismatch','Original archive asset changed since staging')
+            if index in expected_sources and expected_sources[index]!=expected['sha256']:
+                raise ToolError('source_version_mismatch','Conflicting source fingerprints')
+            expected_sources[index]=expected['sha256']
     for row in rows:grouped.setdefault(row['archive'].lower(),[]).append(row)
     for i,(name,group) in enumerate(grouped.items()):
         if job:job.check();job.progress(i,len(grouped),'Preflight staged archive '+name)
@@ -63,15 +68,21 @@ def preflight(source,mod,job=None):
             if len(matches)==1:matches[0]={**matches[0],'name':name}
         if len(matches)!=1:raise ToolError('unresolved_archive_identity',name)
         entry=matches[0];original=archive.read(entry);data=original
+        expected=expected_sources.pop(entry['index'],None)
+        if expected is not None and digest(original)!=expected:
+            raise ToolError('source_version_mismatch','Original archive asset changed since staging')
         for row in group:
             path=Path(mod)/row['path'];replacement=path.read_bytes()
             if row.get('kind')=='dds':
                 # Reuse the same import pipeline, using an output/temp copy as the
                 # evolving source. Nothing is written into vanilla.
                 work=safe_output(OUTPUT/'temp'/('build_preflight_'+uuid.uuid4().hex));work.mkdir()
-                input_file=work/entry['name'];input_file.write_bytes(data)
-                c=Container(input_file)
-                asset=c.select(row['subfile']);image,_=imported_image(asset,path);data=c.replacement(asset,image)
+                try:
+                    input_file=work/entry['name'];input_file.write_bytes(data)
+                    c=Container(input_file)
+                    asset=c.select(row['subfile']);image,_=imported_image(asset,path);data=c.replacement(asset,image)
+                finally:
+                    shutil.rmtree(work)
             elif row['subfile'] is not None:
                 iff=StandardIFF(data);rec=record(iff,row['subfile'])
                 parts=unwrap(replacement)[1] if replacement[:4]==b'2kTl' else [replacement]
@@ -87,16 +98,26 @@ def preflight(source,mod,job=None):
             data+=b'\0'*(len(original)-len(data))
         if data[:4]==bytes.fromhex('ff3bef94'):StandardIFF(data)
         patches.append((entry,data))
+    # Preconditions for assets not being replaced are still checked, but streamed.
+    for index,expected in expected_sources.items():
+        checksum=hashlib.sha256()
+        for chunk in archive.chunks(archive.entries[index]):
+            if job:job.check()
+            checksum.update(chunk)
+        if checksum.hexdigest()!=expected:
+            raise ToolError('source_version_mismatch','Original archive asset changed since staging')
     final={e['name'].lower():data for e,data in patches if e['name']}
     for entry,data in patches:
         if data[:4]==bytes.fromhex('f0985030'):
             partner=entry['name'][:-4]+'.cdf';matches=[e for e in archive.entries if e['name'] and e['name'].lower()==partner.lower()]
             if len(matches)!=1:raise ToolError('cdf_pair_required',partner)
-            CDFPair(data,final.get(partner.lower(),archive.read(matches[0])))
+            payload=final[partner.lower()] if partner.lower() in final else archive.read(matches[0])
+            CDFPair(data,payload)
         elif entry['name'].lower().endswith('.cdf'):
             partner=entry['name'][:-4]+'.iff';matches=[e for e in archive.entries if e['name'] and e['name'].lower()==partner.lower()]
             if len(matches)!=1:raise ToolError('cdf_pair_required',partner)
-            CDFPair(final.get(partner.lower(),archive.read(matches[0])),data)
+            header=final[partner.lower()] if partner.lower() in final else archive.read(matches[0])
+            CDFPair(header,data)
     return archive,patches
 
 def patch_parts(archive,directory,entry,data):
@@ -152,6 +173,7 @@ def build(source,mod,output,overwrite=False,dry_run=False,job=None):
         if not overwrite:raise ToolError('output_exists','Use --overwrite for an existing generated JB build')
         if not marker.is_file() or json.loads(marker.read_text(encoding='utf-8')).get('project_kind')!='choops-jb-copy':raise ToolError('unowned_build_output',"Refusing to overwrite a folder without this tool's build manifest")
         reject_links(out)
+    before=inventory(src)
     archive,patches=preflight(src,mod,job);plan=[{'archive':e['name'],'index':e['index'],'size':len(data),'sha256':digest(data)} for e,data in patches]
     growing=any(len(data)>e['size'] for e,data in patches)
     summary=import_summary(mod)
@@ -161,6 +183,7 @@ def build(source,mod,output,overwrite=False,dry_run=False,job=None):
         staging=safe_output(out.parent/('.jb_build_'+uuid.uuid4().hex),[src,mod]);backup=None
         try:
             result=relocated_build(src,{},staging,{e['name']:data for e,data in patches},job)
+            if inventory(src)!=before:raise ToolError('vanilla_changed_during_build','Source changed during rebuild; retry')
             manifest={'project_kind':'choops-jb-copy','source':str(src),'mod':str(Path(mod).resolve()),'output':str(out),'import_summary':summary,'patches':plan,'archive_relocation_required':True,'validation':result}
             save_build_json(staging/'build_manifest.json',manifest,[src,mod])
             if out.exists():
@@ -172,7 +195,9 @@ def build(source,mod,output,overwrite=False,dry_run=False,job=None):
             if staging.exists():shutil.rmtree(safe_output(staging))
             if backup and backup.exists() and not out.exists():backup.rename(out)
             raise
-    before=inventory(src);out.parent.mkdir(parents=True,exist_ok=True)
+    out.parent.mkdir(parents=True,exist_ok=True)
+    if shutil.disk_usage(out.parent).free<sum(item['size'] for item in before.values()):
+        raise ToolError('insufficient_disk_space','Insufficient disk space for copied JB')
     staging=safe_output(out.parent/('.jb_build_'+uuid.uuid4().hex),[src,mod]);backup=None
     print('Copying vanilla JB into a separate output build...',flush=True)
     try:

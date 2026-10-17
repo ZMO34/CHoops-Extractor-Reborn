@@ -46,3 +46,18 @@ PCM formats and ATRAC3 decoder needed for WAV/audio operations. Its FFmpeg and
 AtracDEnc source archives and applicable notices accompany the package. Confirm
 the exact configuration and packaged smoke on Windows; no proprietary converters
 or game assets are included. See AUDIO_WORKFLOW.md and the encoder README.
+
+
+## Rebuild I/O (v1.16)
+
+`archive.build_io` verifies preserved source-coordinate spans against their output
+coordinates, with a relocation delta when needed. In-place replacement ranges
+alone are excluded; old bytes left by relocated replacements and all padding are
+still compared. Each bank is opened once per comparison, and ExitStack closes all
+handles on cancellation/error. Repack BankWriter closes/flushed handles before
+reopening output for validation. Replacement/header verification stays separate.
+Copied non-bank files also receive byte comparisons before atomic publication.
+Do not cache verification of a fresh output or use hard links to source files.
+
+Use `python tools/dev/benchmark_rebuild.py` for a bounded synthetic-only benchmark.
+Its entry count can be changed with `--entries`; it never accepts a game path.

@@ -284,7 +284,7 @@ class Window(QMainWindow):
 
         super().__init__()
 
-        self.setWindowTitle("CHoops Modding Studio • v1.15.4")
+        self.setWindowTitle("CHoops Modding Studio • v1.16")
 
         self.resize(1420, 900)
 
