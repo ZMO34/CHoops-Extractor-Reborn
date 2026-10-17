@@ -58,7 +58,12 @@ def extract(
     targets = []
     seen = set()
     for entry in entries:
-        name = safe_name(entry["name"] or f"hash_{entry['hash']:08x}.bin")
+        if entry['name']:
+            name = safe_name(entry['name'])
+        else:
+            prefix = next(archive.chunks({**entry, 'size': min(4, entry['size'])}), b'')[:4]
+            suffix = '.iff' if prefix in (bytes.fromhex('ff3bef94'), bytes.fromhex('f0985030')) else '.bin'
+            name = f"hash_{entry['hash']:08x}{suffix}"
         key = name.casefold()
         if key in seen or (out / name).exists():
             raise ValueError(f"Duplicate or existing extraction target: {name}")
@@ -331,6 +336,9 @@ def inspect_scene_with_game_layers(source, record_index, archive, include_all=Fa
         return result
     from ..formats.scene_palette import supplement_floor_layers
     base = getattr(archive, 'base', archive)
+    title = getattr(base, 'game_info', {}).get('TITLE', '')
+    if (title and 'college hoops 2k8' not in title.casefold()) or getattr(base,'toc_layout',None)=='size64-hash-offset':
+        return result
     # Fixed reference court, independent of selected school and override layout.
     matches = [e for e in base.entries if (e.get('name') or '').lower() == 's256.iff']
     if len(matches) != 1:

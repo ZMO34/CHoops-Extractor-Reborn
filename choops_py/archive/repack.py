@@ -13,6 +13,7 @@ from .hash_names import hash_name,replacement_hash
 from .manifests import build_destination as safe_output
 from .build_copy import jb_root,inventory
 from .build_io import BankWriter,CHUNK,verify_body,verify_files
+from .layouts import pack_row
 from .add_assets import meaningful_iff,validate_payload,asset_payload
 from ..core.paths import reject_links
 
@@ -77,7 +78,7 @@ def plan(source, additions, replacements=None, job=None):
         if size%2048 or len(name)>4:raise ValueError('Unsupported bank dimensions')
         reserved=struct.unpack_from('>I',old_header,24+i*16+4)[0] if i<len(archive.parts) else 0
         struct.pack_into('>II8s',header,24+i*16,size//2048,reserved,name.ljust(4,'\0').encode('utf-16-be'))
-    for i,row in enumerate(records):struct.pack_into('>4I',header,24+bank_count*16+i*16,*row)
+    for i,row in enumerate(records):pack_row(header,24+bank_count*16+i*16,row,archive.toc_layout)
     return archive,bytes(header),bank_names,sizes,delta,appended,total
 
 

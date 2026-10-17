@@ -1,4 +1,5 @@
 from .binary import Binary
+from .record_labels import label
 from ..archive.manifests import safe_name, write_bytes, report
 MAGIC=0xFF3BEF94
 TYPES={0x5C369069:"TXTR",0xE26C9B5D:"SCNE",0x86A1AC9E:"LAYT",0xC61649B2:"ROST",0x1AEDDA1F:"AUDO",0x68B693B2:"NAME",0xA7701F00:"CDAN"}
@@ -35,7 +36,7 @@ class StandardIFF:
             offsets=[b.u32(off+12+j*4) for j in range(n)]
             for j,v in enumerate(offsets):
                 if v!=0xffffffff and v>self.blocks[j]['logical_size']: raise ValueError("Subfile offset out of bounds")
-            name,typ=ns[i] if i<len(ns) else (str(i),TYPES.get(b.u32(off+4),'UNKNOWN'))
+            name,typ=ns[i] if i<len(ns) else (label(b.u32(off),str(i)),TYPES.get(b.u32(off+4),'UNKNOWN'))
             self.records.append(dict(index=i,name=name,type=typ,id=b.u32(off),type_hash=b.u32(off+4),offsets=offsets))
     def manifest(self): return dict(family='standard-iff',header_size=self.header_size,file_length=self.file_length,blocks=self.blocks,records=self.records)
     def spans(self,record):

@@ -1,3 +1,12 @@
+## Shared 2K compatibility boundary
+
+The editor auto-detects two verified PS3 TOC schemas, not arbitrary game formats.
+College Hoops 2K8 and the supplied NBA 2K9 copy have read-only extraction/preview
+evidence; both writers have synthetic round-trip evidence. Other years/platforms,
+unknown resources and gameplay need further verification. NBA roster semantics,
+number placement and dynamic shader behavior are not established. See
+PS3_2K_ARCHIVES.md. College Hoops-specific roster features remain available.
+
 ## Current continuation evidence
 
 Floor alignment guides are independent flat-colour stock S256 reference geometry,

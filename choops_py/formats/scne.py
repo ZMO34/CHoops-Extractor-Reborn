@@ -157,7 +157,7 @@ def preview_meshes(blocks):
             declaration = head.relative(off + 0x9c)
             head.slice(declaration, declaration_count * 64)
             position, uv, uv_format = None, None, None
-            color_decl=None;secondary_uv=None
+            color_decl=None;secondary_uv=None;color_format='>4f'
             position_format = ">3f"
             position_transform = uv_transform = None
             position_stream = uv_stream = 0
@@ -184,6 +184,12 @@ def preview_meshes(blocks):
                     position, position_stream = code[1], code[2]
                 elif code[4:]==bytes.fromhex('02040300'):
                     color_decl=(code[1],code[2])
+                elif code[4:]==bytes.fromhex('03040300'):
+                    color_decl=(code[1],code[2]);color_format='>4e'
+                elif code[4:] == bytes.fromhex('03040800'):
+                    uv_stream=code[2];uv,uv_format=code[1],'>4e'
+                elif code[4:] == bytes.fromhex('02040800'):
+                    uv_stream=code[2];uv,uv_format=code[1],'>4f'
                 elif code[4:] == bytes.fromhex('03020800'):
                     uv_stream = code[2]
                     uv, uv_format = code[1], '>2e'
@@ -206,7 +212,7 @@ def preview_meshes(blocks):
                 if position_transform:
                     bias,scale=position_transform
                     xyz=tuple(max(-1.,x/32767.)*scale[k]+bias[k] for k,x in enumerate(xyz))
-                tex = struct.unpack_from(uv_format, uv_data, v * uv_stride + uv)
+                tex = struct.unpack_from(uv_format, uv_data, v * uv_stride + uv)[:2]
                 if uv_format == '>2h':
                     tex = tuple(max(-1., x/32767.) for x in tex)
                     if uv_transform:
@@ -219,8 +225,8 @@ def preview_meshes(blocks):
                     color=(1.,1.,1.,1.);tex1=tex
                     if color_decl:
                         color_offset,color_stream=color_decl;stride,data=streams[color_stream]
-                        if color_offset+16>stride:raise ValueError('Color declaration exceeds vertex stride')
-                        color=struct.unpack_from('>4f',data,v*stride+color_offset)
+                        if color_offset+struct.calcsize(color_format)>stride:raise ValueError('Color declaration exceeds vertex stride')
+                        color=struct.unpack_from(color_format,data,v*stride+color_offset)
                     if secondary_uv:
                         uv_offset,uv_index,fmt=secondary_uv;stride,data=streams[uv_index]
                         if uv_offset+4>stride:raise ValueError('Lightmap UV exceeds vertex stride')
