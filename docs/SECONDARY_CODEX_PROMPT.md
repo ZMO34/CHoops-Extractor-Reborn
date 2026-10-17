@@ -84,6 +84,25 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# Unreleased — split-header rebuilding and actionable override failures
+
+Rebuild planners now read the complete logical pre-body header region across split
+banks, not just 0A. Append writing also uses bounded split-bank writes so updating
+such a header never extends 0A across a bank boundary. The archive reader follows
+TOCs across banks too. Synthetic append/repack regressions preserve opaque header
+bytes and unchanged inputs. The supplied original CH/NBA sources do not reproduce
+the reported error; a split-header fixture reproduces the old failing condition.
+
+Truncated/missing banks report filenames and expected/actual byte counts. GUI build
+and override failures keep their full details in Mod Builder, with specific next
+steps for source damage, CDF pairs, duplicate/ambiguous selectors, DDS layouts,
+geometry overlap and stale prepared inputs. No unsafe automatic renaming or byte
+removal is used as a repair. Read-only NBA2K14 overrides can pass preview validation;
+authenticated JB rebuilding stays blocked and the completion dialog says preview
+only for that source. Combined portable verification: 596 passed, 9 GL skips,
+2 deselected; compile/CLI/Qt/Ruff/mypy/handoff/diff passed. See USER_GUIDE and
+TEST_REPORT.
+
 # Unreleased — NBA 2K14 reading and separate NBA roster editors
 
 NBA 2K14's SDAT-wrapped seven-bank / 72-byte-descriptor archive is now readable
@@ -783,6 +802,8 @@ unchanged. **SDAT/72-byte-descriptor JB rebuilding is blocked**, including on fu
 decrypted copies with the extended descriptors: authentication/header regeneration
 has not been validated. Export edited roster IFF/USERDATA copies for research;
 this update does not claim a tested in-game installation path for NBA 2K14.
+Supported override preparation can run in preview-only validation mode; this
+does not bypass the independent JB writer guard.
 
 ZLIB block wrappers use a 16-byte BE header (magic, logical length, stored length,
 opaque flags) followed by a strict zlib stream. Writers preserve flags, update
@@ -2429,6 +2450,19 @@ Updated 2026-10-11. CURRENT_STATUS.md and TEST_REPORT.md are the living evidence
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+# Unreleased — split-header and override diagnostics regressions
+
+Synthetic tests reproduce a valid header prefix crossing 0A into 0B, then check
+append and repack replacement outputs, opaque-byte preservation and unchanged
+source banks. A 130-entry TOC crossing the first 2 KiB bank is parsed correctly.
+Damaged-bank cases test missing header bytes, named bank/size diagnostics and
+specific suggested actions. SDAT tests check preview validation can run while the
+JB writer remains explicitly blocked. A Qt test verifies archive/selector details
+and suggested fixes persist in Mod Builder without losing the original error.
+Portable verification of the combined update: 596 passed, 9 offscreen GL skips,
+2 deselected; compile, CLI/Qt smoke, Ruff, mypy, handoff and diff passed.
+No real/testing game folder was rebuilt.
 
 # Unreleased — NBA extension validation
 

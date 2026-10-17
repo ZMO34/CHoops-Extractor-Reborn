@@ -35,8 +35,10 @@ def import_summary(mod):
     return {'staged_archives':report.get('staged'),'applied_dds':sum('width' in item and not item.get('policy') for group in report.get('imports',[]) for item in group['dds_imports']),
             'unapplied_count':len(unapplied),'unapplied_overrides':unapplied,'report':str(path.resolve())}
 
-def preflight(source,mod,job=None):
-    archive=Archive(source);archive.require_writable();rows=validate(mod);grouped={};patches=[]
+def preflight(source,mod,job=None,*,for_build=True):
+    archive=Archive(source)
+    if for_build:archive.require_writable()
+    rows=validate(mod);grouped={};patches=[]
     options=Path(mod)/'import_options.json'
     allow_growth=False
     if options.exists():

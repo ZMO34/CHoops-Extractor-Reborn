@@ -70,6 +70,8 @@ unchanged. **SDAT/72-byte-descriptor JB rebuilding is blocked**, including on fu
 decrypted copies with the extended descriptors: authentication/header regeneration
 has not been validated. Export edited roster IFF/USERDATA copies for research;
 this update does not claim a tested in-game installation path for NBA 2K14.
+Supported override preparation can run in preview-only validation mode; this
+does not bypass the independent JB writer guard.
 
 ZLIB block wrappers use a 16-byte BE header (magic, logical length, stored length,
 opaque flags) followed by a strict zlib stream. Writers preserve flags, update

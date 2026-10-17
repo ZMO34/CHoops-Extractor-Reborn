@@ -26,9 +26,9 @@ def plan(source, additions, replacements=None, job=None):
         raise ValueError('Unclassified/duplicate source TOC fields block repacking')
     first=min(e['offset'] for e in archive.entries);old_total=sum(p['size'] for p in archive.parts)
     end=24+len(archive.parts)*16+len(archive.entries)*16
-    with (archive.path/'0A').open('rb') as f:old_header=f.read(first)
+    from .build_io import archive_header
+    old_header=archive_header(archive)
     if any(struct.unpack_from('>I',old_header,24+i*16+4)[0] for i in range(len(archive.parts))):raise ValueError('Unclassified bank descriptor flags block repacking')
-    if len(old_header)!=first:raise ValueError('Incomplete archive header')
     contents={};trimmed={}
     supplied={**additions,**replacements}
     for position,(name,data) in enumerate(supplied.items()):

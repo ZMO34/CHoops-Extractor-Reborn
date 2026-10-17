@@ -712,6 +712,7 @@ class Window(QMainWindow):
 
             return
 
+        self._job_label=label
         worker = Worker(function, JobContext())
 
         self.active = worker
@@ -750,6 +751,7 @@ class Window(QMainWindow):
 
     def job_finished(self):
 
+        self._job_label=""
         self.active = None
 
         self.cancel.setEnabled(False)
@@ -768,7 +770,13 @@ class Window(QMainWindow):
 
         self.log(text)
 
-        QMessageBox.warning(self, "Operation could not complete", text)
+        from .build_diagnostics import failure_summary
+        label=getattr(self,'_job_label','Operation') or 'Operation'
+        if any(word in label.casefold() for word in ('override','jb','preflight')) or 'archive header' in str(text).casefold():
+            message=failure_summary(label,text)
+            self.build_details.setPlainText(message)
+            QMessageBox.warning(self,"Operation could not complete",message)
+        else:QMessageBox.warning(self, "Operation could not complete", text)
 
     def choose_game(self):
 
@@ -2320,7 +2328,7 @@ class Window(QMainWindow):
             if unapplied:
                 message += f"\n\n{unapplied} overrides could not be applied. Review the details before building."
             else:
-                message += "\n\nYou can now build the JB folder."
+                message += "\n\nYou can now build the JB folder." if result.get('build_supported',True) else "\n\nPreviews are ready. JB rebuilding is not supported for this SDAT source yet."
         else:
             title = "JB build complete"
             message = f"The JB folder was built successfully.\n\nOutput: {result.get('output', '')}"

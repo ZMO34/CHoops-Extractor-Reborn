@@ -10,7 +10,7 @@ from .usrdir_reader import Archive
 from .hash_names import hash_name,replacement_hash
 from .manifests import build_destination as safe_output
 from .build_copy import jb_root, inventory
-from .build_io import verify_body, verify_files
+from .build_io import BankWriter, verify_body, verify_files
 from .layouts import pack_row
 from ..core.paths import reject_links
 from ..formats.standard_iff import StandardIFF
@@ -70,8 +70,8 @@ def plan(source, additions, replacements=None):
     if len(by_hash)!=len(archive.entries):raise ValueError('Source has duplicate hashes')
     first=min(e['offset'] for e in archive.entries)
     head_end=24+len(archive.parts)*16+len(archive.entries)*16
-    with (archive.path/'0A').open('rb') as f:header=bytearray(f.read(first))
-    if len(header)!=first:raise ValueError('Incomplete archive header')
+    from .build_io import archive_header
+    header=bytearray(archive_header(archive))
     if len(additions)*16>first-head_end:
         raise CapacityError('Insufficient verified zero TOC padding')
     # Replacements do not consume TOC space. Preserve the opaque gap verbatim;
@@ -150,7 +150,9 @@ def build(source, additions, output, replacements=None, job=None):
             return dst
         shutil.copytree(root,pending,copy_function=copy_file)
         destination=pending/archive.path.relative_to(root)
-        with (destination/'0A').open('r+b') as f:f.write(header)
+        from contextlib import ExitStack
+        with ExitStack() as handles:
+            BankWriter(destination,[p['name'] for p in archive.parts],[p['size'] for p in archive.parts],handles).write(0,header)
         last=destination/archive.parts[-1]['name'];base=sum(p['size'] for p in archive.parts[:-1])
         with last.open('r+b') as f:
             for offset,data,name in appended:

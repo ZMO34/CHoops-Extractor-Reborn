@@ -1,3 +1,16 @@
+# Unreleased — split-header and override diagnostics regressions
+
+Synthetic tests reproduce a valid header prefix crossing 0A into 0B, then check
+append and repack replacement outputs, opaque-byte preservation and unchanged
+source banks. A 130-entry TOC crossing the first 2 KiB bank is parsed correctly.
+Damaged-bank cases test missing header bytes, named bank/size diagnostics and
+specific suggested actions. SDAT tests check preview validation can run while the
+JB writer remains explicitly blocked. A Qt test verifies archive/selector details
+and suggested fixes persist in Mod Builder without losing the original error.
+Portable verification of the combined update: 596 passed, 9 offscreen GL skips,
+2 deselected; compile, CLI/Qt smoke, Ruff, mypy, handoff and diff passed.
+No real/testing game folder was rebuilt.
+
 # Unreleased — NBA extension validation
 
 Synthetic fixtures cover both NBA roster profiles, payload dispatch, masked edits,

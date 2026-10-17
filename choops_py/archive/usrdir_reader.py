@@ -18,7 +18,7 @@ class Archive:
         with opener(self.path/first) as f:
             b=Binary(f.read(24));self.magic=b.u32(0);self.alignment=b.u32(4);na=b.u32(8);nf=b.u32(16)
             if self.magic!=0xAA00B3BF or not self.alignment or self.alignment & (self.alignment-1) or not 1<=na<=256 or not 1<=nf<=1000000:raise ValueError("Invalid PS3 2K archive header")
-            candidates=[]
+            candidates=[];errors=[]
             for stride in (16,72):
                 try:
                     f.seek(24);desc=Binary(f.read(na*stride));parts=[]
@@ -34,14 +34,18 @@ class Archive:
                         if physical.endswith('.SDAT'):
                             with SDATReader(file) as part:actual=part.size
                         else:actual=file.stat().st_size
-                        if actual!=size:raise ValueError("Archive part size mismatch")
+                        if actual!=size:raise ValueError(f'Archive part size mismatch: {physical}; expected {size:,} bytes, found {actual:,}. Restore that source bank from the same rip and reselect the source JB.')
                         if any(part['name'].casefold()==physical.casefold() for part in parts):raise ValueError('Duplicate archive part name')
                         parts.append(dict(name=physical,size=size,encrypted=physical.endswith('.SDAT')))
-                    raw=f.read(nf*16)
+                    self.parts=parts
+                    from contextlib import ExitStack
+                    from .build_io import BankReader
+                    with ExitStack() as handles:raw=BankReader(self,handles).read(24+na*stride,nf*16)
                     layout,entries=decode_toc(raw,self.alignment,24+na*stride+nf*16,sum(p['size'] for p in parts))
                     candidates.append((stride,parts,layout,entries))
-                except (ValueError,OSError,UnicodeError):continue
-            if len(candidates)!=1:raise ValueError('Unsupported or ambiguous 2K bank descriptors/TOC: overlaps or invalid ranges')
+                except (ValueError,OSError,UnicodeError) as error:
+                    errors.append(str(stride)+'-byte descriptors: '+str(error));continue
+            if len(candidates)!=1:raise ValueError('Unsupported or ambiguous 2K bank descriptors/TOC: overlaps or invalid ranges. '+'; '.join(errors))
             self.descriptor_stride,self.parts,self.toc_layout,self.entries=candidates[0]
             self.read_only=any(p['encrypted'] for p in self.parts) or self.descriptor_stride!=16
             for entry in self.entries:entry['name']=lookup().get(entry['hash'])

@@ -278,3 +278,21 @@ there is no game-mode selector. College Hoops 2K8 roster editing remains specifi
 to its confirmed roster format. Unknown layouts/resources produce a clear error
 instead of a guessed conversion. See PS3_2K_ARCHIVES.md for verified games and
 research-only extraction commands. Included in Windows v1.17.
+
+## Rebuild and override errors
+
+The former “Incomplete archive header” path assumed the pre-body header region
+fit inside 0A. The updated planners read that region across banks and append writes
+respect each bank boundary. This automatically fixes valid split-header sources;
+it does not fabricate missing data in a damaged rip.
+
+For failures, Mod Builder retains Problem / Suggested fix / Details. Details name
+the offending archive/selector or source bank; short source banks include expected
+and actual byte counts. Restore a named damaged bank from the same original rip
+and reselect the source; do not rename DDSes to fix source metadata. For ambiguous
+selectors, resolve duplicate equal-priority DDSes; DDS still wins over TXTR. Match
+CDF companions from the same rip, re-export invalid DDS encodings correctly, and
+reselect original overrides after a source change. Unknown geometry/metadata must
+not be deleted to force an import. Unsupported errors retain their exact raw text.
+NBA2K14 can prepare supported overrides for preview, but its success message warns
+that authenticated JB rebuilding is not supported yet.

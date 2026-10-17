@@ -67,3 +67,6 @@ def test_extended_archive_mixed_banks_stream_exactly_and_block_writes(tmp_path):
     with pytest.raises(ValueError,match='extraction and previews only'):archive.require_writable()
     from choops_py.archive.build_copy import preflight
     with pytest.raises(ValueError,match='extraction and previews only'):preflight(tmp_path,tmp_path/'missing_mod')
+    mod=tmp_path/'preview_mod';mod.mkdir();(mod/'overrides.json').write_text('[]',encoding='utf8')
+    checked,patches=preflight(tmp_path,mod,for_build=False)
+    assert checked.read_only and not patches

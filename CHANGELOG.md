@@ -1,3 +1,10 @@
+## Unreleased — split archive headers and override error fixes
+
+- Read and write header regions across source banks; support a TOC crossing 0A.
+- Name damaged banks and expected/actual sizes instead of a generic incomplete-header error.
+- Keep actionable override/build failure details and targeted repair advice in the GUI.
+- Allow NBA2K14 override preview validation without enabling its unvalidated JB writer.
+
 ## Unreleased — NBA PS3 roster schemas and NBA 2K14 archive reading
 
 - Read authenticated NPD v4 SDAT blocks and extended split-bank descriptors; keep SDAT JB writing blocked.

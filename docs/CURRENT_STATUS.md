@@ -1,3 +1,22 @@
+# Unreleased — split-header rebuilding and actionable override failures
+
+Rebuild planners now read the complete logical pre-body header region across split
+banks, not just 0A. Append writing also uses bounded split-bank writes so updating
+such a header never extends 0A across a bank boundary. The archive reader follows
+TOCs across banks too. Synthetic append/repack regressions preserve opaque header
+bytes and unchanged inputs. The supplied original CH/NBA sources do not reproduce
+the reported error; a split-header fixture reproduces the old failing condition.
+
+Truncated/missing banks report filenames and expected/actual byte counts. GUI build
+and override failures keep their full details in Mod Builder, with specific next
+steps for source damage, CDF pairs, duplicate/ambiguous selectors, DDS layouts,
+geometry overlap and stale prepared inputs. No unsafe automatic renaming or byte
+removal is used as a repair. Read-only NBA2K14 overrides can pass preview validation;
+authenticated JB rebuilding stays blocked and the completion dialog says preview
+only for that source. Combined portable verification: 596 passed, 9 GL skips,
+2 deselected; compile/CLI/Qt/Ruff/mypy/handoff/diff passed. See USER_GUIDE and
+TEST_REPORT.
+
 # Unreleased — NBA 2K14 reading and separate NBA roster editors
 
 NBA 2K14's SDAT-wrapped seven-bank / 72-byte-descriptor archive is now readable
