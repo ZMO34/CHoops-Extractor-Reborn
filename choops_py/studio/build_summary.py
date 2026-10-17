@@ -18,7 +18,11 @@ def summary(result):
     cube_faces=[(group['archive'],item) for group in groups for item in group.get('dds_imports',[]) if item.get('cubemap_face_updated')]
     for archive,item in cube_faces[:10]:
         lines.append(f"Cubemap: {archive} / {item.get('selector','')}: legacy DDS updates +X; other five faces preserved")
-    for item in problems[:30]:lines.append(f"Issue: {item.get('archive','')} / {item.get('selector','')}: {item.get('reason','unapplied')}")
+    from .build_diagnostics import diagnose
+    for item in problems[:30]:
+        lines.append(f"Issue: {item.get('archive','')} / {item.get('selector','')}: {item.get('reason','unapplied')}")
+        lines.append('Fix: '+diagnose(item.get('reason','unapplied'))['suggested_fix'])
+    if result.get('build_supported') is False:lines.append('Preview only: authenticated SDAT JB rebuilding is unavailable.')
     if len(problems)>30:lines.append(f"… {len(problems)-30} more unapplied overrides")
     if result.get('mod'):lines.append('Workspace: '+str(result['mod']))
     if result.get('workspace_changed'):lines.append('Existing workspace preserved; a new workspace was selected.')

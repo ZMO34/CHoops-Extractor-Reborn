@@ -24,6 +24,8 @@ def record_blocks(iff, rec):
     return blocks
 
 def replace_records(iff, changes):
+    if iff.record_table != 32+len(iff.blocks)*32:
+        raise ToolError('extended_iff_read_only','Extended IFF header metadata is not yet safe to rewrite')
     """changes maps record index to complete block slices (same logical size).
 
     Physical block positions/lengths, fileLength and H7A lengths are recomputed.
@@ -81,6 +83,8 @@ def replace_records(iff, changes):
 
 
 def replace_records_expanding(iff,changes):
+    if iff.record_table != 32+len(iff.blocks)*32:
+        raise ToolError('extended_iff_read_only','Extended IFF header metadata is not yet safe to rewrite')
     """Keep original logical addresses; append only enlarged or aliased slices.
 
     Complete TXTR/SCNE slices carry their own local relative pointers. Unchanged
@@ -133,7 +137,7 @@ def replace_records_expanding(iff,changes):
         mutable[bi]=packed
     header=bytearray(iff.raw[:iff.header_size]);b=Binary(header)
     for (index,block),target in offset_updates.items():
-        field=32+len(iff.blocks)*32+index*4;descriptor=b.relative(field)
+        field=iff.record_table+index*4;descriptor=b.relative(field)
         struct.pack_into('>I',header,descriptor+12+block*4,target)
     payload=bytearray();cursor=iff.header_size
     for block in sorted(iff.blocks,key=lambda b:b['start']):

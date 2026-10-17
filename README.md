@@ -44,3 +44,11 @@ for extraction, authored previews and source-format rebuilding. College Hoops 2K
 roster features remain specific to that game. Other titles require verification;
 unknown layouts fail explicitly. See [shared format evidence and commands](docs/PS3_2K_ARCHIVES.md).
 Included in the official v1.17 Windows release.
+
+### NBA roster and NBA 2K14 extension (unreleased)
+
+See [verified NBA editing and container support](docs/NBA_ROSTERS_AND_2K14.md) and
+[animation portability research](docs/ANIMATION_PORTABILITY.md). NBA 2K14 reads
+SDAT sources directly; authenticated JB rebuilding and combined jersey previews
+remain unsupported. Roster editing dispatches by payload schema; unconfirmed NBA
+fields remain read-only. These changes are newer than Windows v1.17.

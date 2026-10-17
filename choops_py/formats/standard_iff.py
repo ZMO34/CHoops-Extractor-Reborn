@@ -7,6 +7,10 @@ TYPES[0x61df2234]='AUSB'
 # Embedded NAME metadata in stock gumbel/crowd/gamedata banks identifies this
 # family. Raw extraction is lossless; skeletal track interpretation is pending.
 TYPES[0x60900D71]='SingleMoCap'
+# Authored College Hoops NAME trailers establish these shared type hash labels.
+TYPES.update({0xb69815a5:'FxTweakables',0x4014b412:'SPCI',0xe1124f13:'Clth',
+              0xc6ed33a2:'MRKS',0xfa31f4d:'SCOS',0x249fd2c9:'AMCR',
+              0x7657ab8a:'SKEL',0xf37c12d9:'STRG'})
 def names(data,offset,count):
     b=Binary(data)
     if offset+8>len(data) or b.u32(offset)!=0xAA171516: return []
@@ -23,16 +27,19 @@ class StandardIFF:
         if b.u32(0)!=MAGIC: raise ValueError("Not a standard PS3 IFF")
         self.header_size=b.u32(4);self.file_length=b.u32(8);bc=b.u32(16);fc=b.u32(24)
         if not 32<=self.header_size<=self.file_length<=len(data): raise ValueError("Invalid IFF boundaries")
-        b.slice(32,bc*32+fc*4);self.blocks=[];self.records=[]
+        b.slice(32,bc*32)
+        self.record_table=b.relative(28)
+        if self.record_table<32+bc*32 or self.record_table+fc*4>self.header_size:raise ValueError('Invalid record pointer table')
+        b.slice(self.record_table,fc*4);self.blocks=[];self.records=[]
         for i in range(bc):
             off=32+i*32;values=[b.u32(off+j*4) for j in range(8)]
             start,size=values[5:7]
             if start<self.header_size or start+size>self.file_length: raise ValueError("Invalid block range")
-            self.blocks.append(dict(index=i,fields=values,start=start,size=size,logical_size=values[3],compressed=data[start:start+4]==bytes.fromhex('0e4837c3')))
+            self.blocks.append(dict(index=i,fields=values,start=start,size=size,logical_size=values[3],compressed=data[start:start+4] in (bytes.fromhex('0e4837c3'),b'ZLIB')))
         ns=names(data,self.file_length,fc)
         for i in range(fc):
-            field=32+bc*32+i*4;off=b.relative(field);n=b.u32(off+8)
-            if off<32+bc*32+fc*4 or off+12+n*4>self.header_size or n>bc: raise ValueError("Invalid file record")
+            field=self.record_table+i*4;off=b.relative(field);n=b.u32(off+8)
+            if off<self.record_table+fc*4 or off+12+n*4>self.header_size or n>bc: raise ValueError("Invalid file record")
             offsets=[b.u32(off+12+j*4) for j in range(n)]
             for j,v in enumerate(offsets):
                 if v!=0xffffffff and v>self.blocks[j]['logical_size']: raise ValueError("Subfile offset out of bounds")

@@ -25,7 +25,10 @@ class EditorModel:
                 ranges.append((target,end))
             self.source_string_issues.append((dict(issue),ranges))
     @classmethod
-    def open(cls,path):return cls(load(path))
+    def open(cls,path):
+        source=load(path)
+        from .nba import family,NBARosterModel
+        return NBARosterModel(source) if family(source.payload) else cls(source)
     def row_offset(self,table,index):
         if table not in self.tables:raise ToolError('unknown_roster_table',table)
         start,count,size=self.tables[table]

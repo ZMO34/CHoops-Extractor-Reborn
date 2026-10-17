@@ -1,3 +1,9 @@
+Current NBA extension: see [NBA roster/container support](NBA_ROSTERS_AND_2K14.md) and
+[animation portability research](ANIMATION_PORTABILITY.md). Those pages define the
+newer per-game boundaries; historical College Hoops-only statements below remain
+specific to that earlier scope. NBA 2K14 SDAT rebuilding and complete NBA ratings
+semantics are not implemented.
+
 ## Shared 2K compatibility boundary
 
 The editor auto-detects two verified PS3 TOC schemas, not arbitrary game formats.

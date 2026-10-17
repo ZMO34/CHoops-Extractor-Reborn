@@ -19,7 +19,7 @@ class BankReader:
             if base <= offset < end and size:
                 name = part['name']
                 if name not in self.streams:
-                    self.streams[name] = self.stack.enter_context((self.archive.path/name).open('rb'))
+                    self.streams[name] = self.stack.enter_context(self.archive.open_part(part) if hasattr(self.archive, 'open_part') else (self.archive.path/name).open('rb'))
                 stream = self.streams[name]
                 position = offset-base
                 if stream.tell() != position:
@@ -35,6 +35,22 @@ class BankReader:
         if size:
             raise ValueError('Verification range outside split banks')
         return bytes(result)
+
+
+def archive_header(archive):
+    """Read the pre-body region from logical split-bank coordinates."""
+    from ..core.errors import ToolError
+    first=min(e['offset'] for e in archive.entries)
+    minimum=24+len(archive.parts)*getattr(archive,'descriptor_stride',16)+len(archive.entries)*16
+    if first<minimum or first>sum(p['size'] for p in archive.parts):
+        raise ToolError('invalid_archive_header_extent',f'First asset starts at {first:,}; metadata needs {minimum:,} bytes. Select a complete matching source JB; overrides cannot repair its TOC.')
+    if first>128*1024*1024:
+        raise ToolError('archive_header_extent_unconfirmed',f'The pre-body region is {first:,} bytes, above the bounded 128 MiB writer limit. Select the original JB or inspect the source TOC before rebuilding; no overrides were changed.')
+    try:
+        with ExitStack() as stack:return BankReader(archive,stack).read(0,first)
+    except (ValueError,OSError) as error:
+        sizes=', '.join(p['name']+': '+str((archive.path/p['name']).stat().st_size if (archive.path/p['name']).is_file() else 'missing') for p in archive.parts)
+        raise ToolError('incomplete_archive_header',f'Expected {first:,} header bytes across the source banks ({sizes}). {error}. Restore missing/truncated source banks from the same rip and select the source JB again; do not rename or remove overrides to fix source data.') from error
 
 
 class BankWriter:

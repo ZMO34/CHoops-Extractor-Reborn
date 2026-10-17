@@ -79,3 +79,22 @@ fingerprints include layout/label module code. Add malformed/ambiguous fixtures,
 synthetic writer round trips and explicit read-only input evidence for another
 variant. Never validate by launching an emulator or building a real/testing JB.
 See PS3_2K_ARCHIVES.md for current evidence and the standalone research command.
+
+## NBA roster and SDAT extension
+
+Runtime dependency PyCryptodome is declared in pyproject.toml and installed by
+tools/dev/setup.py. archive/sdat.py is a bounded read-only stream; Archive opens
+plain/encrypted banks through open_part, and BankReader uses the same abstraction.
+Bank descriptor sizes 16/72 are structurally selected, not inferred from a title.
+All JB writer plans reject encrypted/extended-descriptor archives before output.
+
+EditorModel.open dispatches NBA payloads to roster/nba.py; studio/nba_roster.py
+provides separate NBA side panels. Keep unknown NBA offsets out of the College
+Hoops schema and vice versa. The source-bound JSON patch backend and wrapper
+writers are shared. College-only bulk/research paths reject NBA explicitly.
+formats/compression.py handles bounded ZLIB alongside H7A; StandardIFF reads its
+record table through +0x1C. Extra IFF metadata remains read-only. New vertex, draw
+and instance layouts must uniquely validate; ambiguous geometry is not guessed.
+See NBA_ROSTERS_AND_2K14.md and ANIMATION_PORTABILITY.md for reproducible evidence,
+limitations and the read-only animation survey command. Neither animation ports
+nor SDAT rebuild/signature writers are enabled.

@@ -255,10 +255,11 @@ def stage_folder(source: Path, folder: Path, mod: Path, job=None, *, workers=Non
         save_json(work/'import_options.json',dict(schema=1,allow_archive_growth=True,dds_priority=True,scne_priority=True),[source,folder])
         from .live_overrides import describe_groups
         save_json(work/'preview_inputs.json',describe_groups(discovery['groups'],folder,archive),[source,folder])
-        report=dict(parallel_workers=worker_count,reused_archives=reused,staged=len(rows),mod=str(mod),requested_mod=str(requested_mod),workspace_changed=mod != requested_mod,detected_formats=discovery['detected_formats'],scanned_files=discovery['scanned_files'],dds_files=discovery['dds_files'],binary_records=discovery['binary_records'],ignored_files=discovery['ignored_files'],shadowed_dds=discovery['shadowed_dds'],resolved_targets=discovery['resolved_targets'],unapplied_overrides=unapplied,unchanged_archives=unchanged,growing_archives=growth,dds_priority=True,scne_priority=True,imports=details)
+        report=dict(build_supported=not archive.read_only,parallel_workers=worker_count,reused_archives=reused,staged=len(rows),mod=str(mod),requested_mod=str(requested_mod),workspace_changed=mod != requested_mod,detected_formats=discovery['detected_formats'],scanned_files=discovery['scanned_files'],dds_files=discovery['dds_files'],binary_records=discovery['binary_records'],ignored_files=discovery['ignored_files'],shadowed_dds=discovery['shadowed_dds'],resolved_targets=discovery['resolved_targets'],unapplied_overrides=unapplied,unchanged_archives=unchanged,growing_archives=growth,dds_priority=True,scne_priority=True,imports=details)
         save_json(work/'folder_import_report.json',report,[source,folder])
         job.check();job.progress(0,1,'Checking override compatibility')
-        _,patches=preflight(source,work,job)
+        if archive.read_only:_,patches=preflight(source,work,job,for_build=False)
+        else:_,patches=preflight(source,work,job)
         work.rename(mod)
         return report
     except BaseException:
@@ -622,6 +623,12 @@ def inspect_stadium_preview(archive, entry, mode=0, job=None):
     source = materialize(archive, entry)
     iff = StandardIFF(source.read_bytes())
     name = 'arena' if mode == 2 else 'floor'
+    if name=='floor' and not any(r['type']=='SCNE' and r.get('name')=='floor' for r in iff.records):
+        import re
+        match=re.fullmatch(r's(\d+)\.iff',entry.get('name') or '',re.I)
+        floors=[e for e in archive.entries if match and (e.get('name') or '').casefold()=='f'+match[1]+'.iff']
+        if len(floors)==1:
+            source=materialize(archive,floors[0]);iff=StandardIFF(source.read_bytes())
     matches = [r for r in iff.records if r['type'] == 'SCNE' and (r.get('name') or '').lower() == name]
     if len(matches) != 1:
         raise ValueError('The selected stadium has no unique ' + name + ' SCNE')

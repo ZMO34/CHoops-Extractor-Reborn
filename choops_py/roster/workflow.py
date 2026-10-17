@@ -10,7 +10,7 @@ from .editor_model import EditorModel
 from .adapters import load,load_bytes
 
 def detect(path):
-    source=load(path);model=EditorModel(source)
+    model=EditorModel.open(path);source=model.source
     return {'source_type':source.kind,'source_size':len(source.original),'payload_size':len(source.payload),'validation':model.validate()}
 
 def export_model(model,output):
@@ -18,7 +18,7 @@ def export_model(model,output):
     save_json(out/'roster.json',model.document())
     from .schema import CSV_GAME_FIELDS
     for name,rows in model.rows.items():
-        fields=['index', *(field for field in CSV_GAME_FIELDS.get(name, ()) if any(field in row for row in rows))]
+        fields=['index', *(field for field in (model.editable(name) if hasattr(model,'game') else CSV_GAME_FIELDS.get(name, ())) if any(field in row for row in rows))]
         stream=io.StringIO(newline='');writer=csv.DictWriter(stream,fieldnames=fields)
         writer.writeheader()
         for row in rows:writer.writerow({key:json.dumps(row.get(key),ensure_ascii=False) if isinstance(row.get(key),(list,dict)) else row.get(key,'') for key in fields})
@@ -44,6 +44,8 @@ def export_game_roster(model,base_iff,output):
     validation=model.validate()
     if not validation['valid']:raise ToolError('roster_validation_failed',str(validation['issues'][:10]))
     source=load_bytes(base_iff)
+    from .nba import family
+    if family(source.payload)!=family(bytes(model.data)):raise ToolError('roster_game_mismatch','Roster payload belongs to another game')
     if source.kind!='standard-iff':raise ToolError('game_roster_iff_required','Choose the loaded JB roster_english.iff')
     encoded=source.encode(bytes(model.data))
     if load_bytes(encoded).payload!=bytes(model.data):raise ToolError('roster_wrapper_validation_failed','Game roster payload differs after export')

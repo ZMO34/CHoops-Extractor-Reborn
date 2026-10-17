@@ -14,6 +14,7 @@ def palette_rows(model, team_index):
 
 
 def analyze(model):
+    if hasattr(model,'game'):raise ValueError('This byte audit describes College Hoops only; see NBA_ROSTERS_AND_2K14.md for NBA schemas')
     data = bytes(model.data)
     header = []
     for field in range(8, 0xb0, 8):

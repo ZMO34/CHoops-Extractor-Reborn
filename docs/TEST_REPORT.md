@@ -1,3 +1,36 @@
+# Unreleased — split-header and override diagnostics regressions
+
+Synthetic tests reproduce a valid header prefix crossing 0A into 0B, then check
+append and repack replacement outputs, opaque-byte preservation and unchanged
+source banks. A 130-entry TOC crossing the first 2 KiB bank is parsed correctly.
+Damaged-bank cases test missing header bytes, named bank/size diagnostics and
+specific suggested actions. SDAT tests check preview validation can run while the
+JB writer remains explicitly blocked. A Qt test verifies archive/selector details
+and suggested fixes persist in Mod Builder without losing the original error.
+Portable verification of the combined update: 596 passed, 9 offscreen GL skips,
+2 deselected; compile, CLI/Qt smoke, Ruff, mypy, handoff and diff passed.
+No real/testing game folder was rebuilt.
+
+# Unreleased — NBA extension validation
+
+Synthetic fixtures cover both NBA roster profiles, payload dispatch, masked edits,
+shared-string rejection, text growth/unknown-field rejection, undo/redo, patch
+rollback and Qt side-panel routing. SDAT tests cover header/block authentication,
+truncation, random reads, cache bounds, mixed encrypted/plain split-bank extraction
+and early writer rejection. ZLIB tests cover strict lengths and round trips;
+extended IFF tables and newer vertex/draw/instance layouts have synthetic fixtures.
+
+Read-only supplied evidence: both stock NBA roster payloads opened without string
+issues; player number/height changes encoded into IFF and reopened correctly.
+NBA2K9: 1,064 players / 69 teams / 72 arenas; NBA2K14: 1,665 / 105 / 102.
+NBA2K14 floor: two meshes/no warnings; arena: 61 meshes, one unsupported UV mesh.
+Combined NBA2K14 jersey preview remains unavailable and is not a passed check.
+Animation survey: 319 / 904 / 7,460 SingleMoCap records across CH2K8/NBA2K9/NBA2K14.
+Portable verification: 589 passed, 9 offscreen OpenGL skips, 2 deselected; compile,
+CLI/Qt smoke, Ruff, mypy, generated handoff and diff passed. Final exact-head
+verification is also recorded in the PR handoff.
+No RPCS3/gameplay, EBOOT edits, animation port or real/testing JB build.
+
 # v1.17 — automatic PS3 2K layouts
 
 Focused automatic-layout/research suite: 22 passed. Covers both TOC schemas,

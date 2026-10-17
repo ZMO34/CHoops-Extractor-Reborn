@@ -1,3 +1,9 @@
+Current NBA extension: see [NBA roster/container support](NBA_ROSTERS_AND_2K14.md) and
+[animation portability research](ANIMATION_PORTABILITY.md). Those pages define the
+newer per-game boundaries; historical College Hoops-only statements below remain
+specific to that earlier scope. NBA 2K14 SDAT rebuilding and complete NBA ratings
+semantics are not implemented.
+
 # Motion-capture extraction research
 
 Stock embedded NAME metadata identifies record hash 0x60900D71 as `SingleMoCap`.
