@@ -1,3 +1,11 @@
+# v1.18
+
+- Integrate NBA 2K14 reading, detected NBA roster editors and split-header repair (PR #25).
+- Add independent key/center-circle court reference guides (PR #26).
+- Replace stale landing pages/matrix with current per-game documentation; add workflow, troubleshooting, testing and release guides. Preserve dated research in clearly labelled history.
+- Remove obsolete pinned Windows dependency snapshot/unpublished beta draft; consolidate wrapper assertions into binary tests without reducing coverage.
+- Include the complete documentation tree in Windows packages and maintain the generated cross-PC handoff.
+
 ## Unreleased — split archive headers and override error fixes
 
 - Read and write header regions across source banks; support a TOC crossing 0A.

@@ -1,10 +1,9 @@
-Current NBA extension: see [NBA roster/container support](NBA_ROSTERS_AND_2K14.md) and
-[animation portability research](ANIMATION_PORTABILITY.md). Those pages define the
-newer per-game boundaries; historical College Hoops-only statements below remain
-specific to that earlier scope. NBA 2K14 SDAT rebuilding and complete NBA ratings
-semantics are not implemented.
+# Native studio user guide
 
-# Native studio user guide (development build)
+Start with [current workflows](WORKFLOWS.md), the [support matrix](FEATURE_MATRIX.md)
+and [troubleshooting](TROUBLESHOOTING.md). The versioned sections below preserve
+detailed behavior introduced over time; removed actions are not available. NBA
+scope is defined in [NBA support](NBA_ROSTERS_AND_2K14.md).
 
 Active development: Export > Roster CSV exports editable cells. Import / compare
 opens a review with field checkboxes before applying changes. Ratings edit inline;
@@ -21,7 +20,7 @@ under research. In Explorer, teamselectlogo's nested logoNNN records show their
 school references. Source switching resolves unique SCNE names after reordering.
 
 The Preview source toolbar switches SCNE and textures between Source JB and
-Selected overrides. Stage the chosen overrides first; no JB build is needed.
+Selected overrides. Select the overrides folder in Explorer first; no JB build is needed.
 The same choice applies to shoes and uniforms. Named/hashed counterparts reload;
 unrelated standalone files retain their own source. Archive categories and roster
 reference columns support sorting/filtering. See ROSTER_SCALE_AND_PREVIEWS.md.

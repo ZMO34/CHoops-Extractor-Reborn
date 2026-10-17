@@ -1,3 +1,7 @@
+> **Historical evidence.** This document preserves an earlier implementation or research snapshot.
+> Current support: [documentation index](README.md), CURRENT_STATUS and FEATURE_MATRIX.
+> Do not use old UI, packaging or support claims as current instructions.
+
 # Old tool architecture audit
 
 The old sources are read-only references; no JavaScript tree is copied. Equivalent reader/writer versions are consolidated instead of retaining ripperV1/V2/V3 duplicates.

@@ -84,533 +84,347 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
-# Unreleased — split-header rebuilding and actionable override failures
-
-Rebuild planners now read the complete logical pre-body header region across split
-banks, not just 0A. Append writing also uses bounded split-bank writes so updating
-such a header never extends 0A across a bank boundary. The archive reader follows
-TOCs across banks too. Synthetic append/repack regressions preserve opaque header
-bytes and unchanged inputs. The supplied original CH/NBA sources do not reproduce
-the reported error; a split-header fixture reproduces the old failing condition.
-
-Truncated/missing banks report filenames and expected/actual byte counts. GUI build
-and override failures keep their full details in Mod Builder, with specific next
-steps for source damage, CDF pairs, duplicate/ambiguous selectors, DDS layouts,
-geometry overlap and stale prepared inputs. No unsafe automatic renaming or byte
-removal is used as a repair. Read-only NBA2K14 overrides can pass preview validation;
-authenticated JB rebuilding stays blocked and the completion dialog says preview
-only for that source. Combined portable verification: 596 passed, 9 GL skips,
-2 deselected; compile/CLI/Qt/Ruff/mypy/handoff/diff passed. See USER_GUIDE and
-TEST_REPORT.
-
-# Unreleased — NBA 2K14 reading and separate NBA roster editors
-
-NBA 2K14's SDAT-wrapped seven-bank / 72-byte-descriptor archive is now readable
-through the shared Explorer, with authenticated random-access decoding and ZLIB
-IFF support. Extraction and texture inspection work; SDAT/extended-descriptor JB
-rebuilding is explicitly blocked. Supplied f000 floor decodes two meshes; s000
-arena decodes 61 meshes with one unsupported-UV warning. NBA 2K14 combined jersey
-artwork/cloth binding is unresolved. College Hoops and NBA 2K9 writers stay enabled.
-
-Roster payloads dispatch dynamically to College Hoops, NBA 2K9 or NBA 2K14 models.
-NBA names, height/weight, jersey number, face ID and primary positions are editable;
-NBA 2K14 also has a separate secondary-position field. NBA team/arena text,
-read-only membership/asset links, side panels, numeric dropdowns, undo/redo and
-wrapper-preserving export are implemented. Unknown ratings/body fields and NBA
-text heap growth remain blocked. No entire-roster-semantic or gameplay claim.
-
-Filename candidate families and corroborated shared record-type labels expanded.
-Animation portability is research only: 319 / 904 / 7,460 SingleMoCap records found
-in CH2K8 / NBA2K9 / NBA2K14. NBA2K9 is structurally closer; neither direct swap is
-certified. See NBA_ROSTERS_AND_2K14.md and ANIMATION_PORTABILITY.md. Both instances
-must keep those documents and this generated handoff current. No source game was
-modified; no RPCS3, EBOOT edits, animation port or real/testing JB build.
-
-# Unreleased — key and center-circle alignment toggle
-
-Models/Courts adds an independent, default-off “Alignment guide: key and center
-circle” toggle. It copies stock S256 key-line, outer key-circle and center-circle
-batches (confirmed palette routes 20, 2, 10), raised one game unit. No filled key
-or center paint is added. Curves thin across V; straight key lines across U using
-the existing thin flat guide shader. Actual floor draws, palettes and textures
-remain unchanged. This is an independent update from the NBA support PR #25.
-
-# v1.17 — automatic shared PS3 2K archive layouts
-
-The existing editor now detects the supported College Hoops/NBA size32 and size64
-TOC layouts automatically. Extraction, cached source/override previews, DDS import
-and fixed/growing/repacked builds use the detected source schema. Game title/ID
-are shown from PARAM.SFO; College Hoops 2K8 roster controls remain specific to their
-confirmed schema. Unknown/ambiguous layouts fail explicitly; universal support for
-all 2K years/platforms is not claimed.
-
-Read-only NBA 2K9 validation: 5,624 entries / 6 banks; selected IFF/CDF samples
-extracted exactly; five standard IFFs' blocks decompressed; textures and 71 menu
-logo records parsed. Shared preview services show 2 jersey/shorts meshes, 2 floor
-meshes and all 78 arena meshes / 58 images. Half4 UV/color declarations and
-case-sensitive internal CRC labels bridge the shared format variants. Source
-banks are unchanged. A standalone research inventory/extractor is also available.
-See PS3_2K_ARCHIVES.md for evidence, commands and explicit remaining limitations.
-Rebuilding is validated with synthetic fixtures only; no real/testing JB or RPCS3.
-
-Official v1.17 integrates PRs #22–24 and includes the Windows application.
-Portable verification: 575 passed; frozen startup/audio and both synthetic writer
-layouts passed. Both instances must maintain these docs and the generated handoff
-on every subsequent update.
-
-# v1.16 — sequential rebuild verification and queued soundtrack edits
-
-Rebuilding growing archives now verifies preserved bytes sequentially in 4 MiB
-chunks and keeps bank handles open, replacing thousands of per-entry opens and
-random reads. Relocation writes also reuse bank handles. Existing DDS conversion
-and prepared-override caches remain enabled; selecting unchanged overrides still
-reuses validated archives. Fresh build outputs are always checked rather than
-trusting a prior build's verification result.
-
-Source preconditions share the replacement's original-asset read; unrelated
-preconditions are streamed. CDF pairs avoid eagerly rereading partners already
-supplied as replacements. DDS preflight temporary folders are removed after
-success or failure. The CLI build command now uses the same manual-output policy
-as the GUI/backend; other export commands retain their output restrictions.
-Fixed-size builds check free space before copying. Source
-inventory is captured before planning/preflight, so changes during that phase
-also prevent publication.
-
-Growing-build verification now checks preserved bank padding and all copied
-non-bank files, in addition to TOC identities, exact generated headers and
-replacement payloads. Cancellation/failure retains atomic cleanup. No hard links
-or writes to source files are used.
-
-Synthetic benchmark: 8,192 shuffled entries / 32 MiB, Windows Python 3.12:
-1.5131 s previous per-entry verification versus 0.0477 s sequential (31.69x for
-this verification phase); bank opens reduced from 16,384 to 2. This is not a
-whole-build speed estimate; disk copying, texture conversion and asset checks
-still take time. Reproduce with `python tools/dev/benchmark_rebuild.py`.
-
-This release also includes PR #22: queued multi-song WAV imports before one bank
-save, manual JB output folders, preserved opaque header gaps, and read-only
-roster/scorebug research. Complete roster semantics and dynamic scorebug behavior
-remain unresolved. No alternate assets, RPCS3, EBOOT edits or real/testing JB build.
-
-# Unreleased — queued audio, manual JB output and research continuation
-
-Audio now queues individual WAV replacements before one save. Selecting another
-WAV for the same bank/index replaces its queued choice; removing/clearing is
-explicit. Save writes one combined bank and matching global.iff AUSB metadata.
-Cancelled output selection or failed conversion retains the queue. Pending songs
-are tied to the source JB path and bank size/mtime/inode snapshot. Reopening the
-same unchanged source is supported; a different/changed JB is rejected.
-
-JB output can be selected in Mod Builder on any drive. Builds still reject source
-or overrides overlap, filesystem roots, links/junctions, existing files and
-unowned nonempty destinations. Atomic publication, manifest validation, rollback
-and owned temporary-folder cleanup work beside the selected destination. Other
-export workflows retain their documented output/ restrictions.
-
-Fixed the archive-growth error `Unclassified nonzero header padding`: replacements
-use existing TOC slots and preserve the opaque post-TOC gap. Added entries may
-consume only zero slots. Repacking preserves opaque bytes in place when the body
-start stays fixed; it refuses to relocate opaque bytes or overwrite them with a
-larger TOC. Unknown header bytes are never zeroed to bypass validation.
-
-Roster research corrects reported relative anchors (stored displacement includes
-+1), accounts for the 33 confirmed bits in each uniform row, lists unresolved
-bit-mask runs and reports both legacy biased windows and engine logical record windows.
-Logical windows have no table overlap on the stock input. A newly audited
-arena +0x24 relative reference resolves to the team-name anchor for every nonnull
-stock row: 347 resolved and reciprocal team arena links, 32 nulls. Its wider runtime
-ownership/write behavior is not established; no new backlink writer is exposed.
-The full roster is still not semantically reversed. See ROSTER_SEMANTICS.md.
-
-Scorebug discovery identifies authored records/parts/textures in gamedata.iff and
-gamedataextra.iff. A read-only inventory command and SCOREBUG_RESEARCH.md record
-exact routes. Runtime score/clock/text bindings and geometry editing remain
-unresolved. No RPCS3, EBOOT writes or real/testing JB builds.
-
-# v1.15.4 — faster override-folder preparation
-
-Override selection prepares independent archive groups in separate CPU worker
-processes (up to six, capped by cores and available RAM). A memory-weighted queue
-keeps heavy archives from overloading the system. Each archive has one writer;
-DDS priority, SCNE replacement, cube handling and validation remain unchanged.
-Progress shows completed archives and active workers. Cancellation or failure
-stops workers before removing partial output; the previous workspace is retained.
-
-Repeat selection reuses validated completed archives from the current prepared
-workspace when inputs, source checksums and importer code match. Changed inputs
-recompile only their archive; tampered cached output is rejected and regenerated.
-Conversion-cache identity is computed once per process and directory pruning is
-batched under a cross-process lock, with a final size-maintenance pass.
-
-Measured on 14 supplied scene groups / 612 DDS inputs with warm conversion cache:
-Final run: 24.838 s serial, 10.008 s with six workers (2.48x),
-6.676 s unchanged repeat. An earlier run measured 3.08x; timings vary with cache
-and machine load.
-All resulting archive hashes matched. These are preparation-only measurements;
-whole-folder timings also include discovery and compatibility checks and vary
-with CPU, RAM, storage and cache state. No RPCS3 or automatic/testing JB build.
-
-# v1.15.3 — frontend override import geometry fix
-
-Fixed folder selection aborting with `frontend_sync.iff: Geometry overlaps a
-texture image`. Menu SCNEs can store inline geometry in their header block and
-textures in a separate block. Image packing now distinguishes inline vertex
-stream flag 0x40000002 from GPU stream flag 0x40000003, and header-relative index
-flag 0x10 from data-relative 0x20000010. Inline geometry/pointers remain unchanged;
-GPU buffers retain relocation and byte-preservation checks. Real overlaps and
-out-of-bounds or modified inline geometry still fail closed.
-
-Read-only validation passed all 14 supplied non-stadium SCNE import groups.
-The complete portable suite passed 524 tests.
-
-A failed folder import is atomic: it preserves the previous prepared workspace.
-That explains the old LSU preview after the failed reselection. Once import
-finishes successfully, the live source index and current S258 overrides activate.
-No source files, prepared snapshots, EBOOT or JB builds are modified by this fix.
-
-
-Legacy flat DDS artwork targeting a base cubemap is handled only in recognized
-legacy folder imports: it updates the first (+X) face, resampled to the original
-format, dimensions and mip chain; the other five faces are retained from source.
-The result remains a full cubemap and its descriptor is preserved. The GUI
-compatibility summary identifies this operation. Modern manifest-based imports
-and direct DDS imports still require matching complete cubemap inputs.
-
-# v1.15.2 — current override files in previews
-
-Folder-based previews now use current loose DDS, SCNE and archive inputs instead
-of treating an earlier prepared build snapshot as the selected folder. Only the
-requested archive is compiled for preview; unchanged inputs reuse a bounded
-64 MiB compiled cache. File changes invalidate materialized and decoded previews.
-Missing or incompatible live inputs raise an error rather than showing JB art.
-The same source applies to Explorer, texture, jersey, shoe and stadium previews.
-
-Select overrides folder once after upgrading to register live input locations.
-Older workspaces and imported patches remain usable prepared snapshots and are
-labelled accordingly. New or renamed files require selecting the folder again.
-After editing inputs, preview again (or switch sources) to reload. Select the
-folder again before building to prepare an updated build snapshot; previews do
-not change prepared builds or any original input. JB fallback applies only where
-no replacement exists. No emulator, testing JB or EBOOT changes.
-
-# v1.15.1 — resizable full-width 3D preview
-
-
-## Resizable 3D preview
-
-Models / Courts reserves more height for the full-width preview. Drag the wide
-divider above it up or down to enlarge or shrink it. Controls scroll independently
-when space is reduced; the main application window can also be resized normally.
-Fit camera frames the model after changing the available viewing area.
-# v1.15 — Explorer overrides, references and cache fixes
-
-Roster controls explicitly open external roster IFF or decrypted USERDATA/USRDATA
-(and supported save ZIPs), load the source JB roster, or load a real override
-roster replacement independently of the preview dropdown. Export offers roster
-IFF and decrypted USERDATA. An external IFF supplies its own export template;
-other inputs use the loaded JB or a chosen IFF template. Save copy preserves the
-original wrapper, including other members of a loaded save ZIP. USERDATA export
-does not create encryption, PARAM files, or a complete console save package.
-All writers validate and reparse the result and protect the original input.
-
-Release: https://github.com/ZMO34/CHoops-Extractor-Reborn/releases/tag/v1.15
-
-Select overrides folder… is in Explorer. The stale-fallback bug is fixed, source
-counts and source-aware asset rows are shown, and the visible workspace is used
-consistently. Dry run is removed from the GUI; JB builds still validate first.
-Confirmed roster ownership includes uniform selection menus, gameplay uniforms,
-cloth meshes, player/team footwear, stadiums and paired logo banks. Wider
-reference columns have full-text panels/tooltips. CSVs exclude UI/research
-fields and retain source/identity/stale-edit safety columns.
-
-Both JB and override indexes are retained. Separate validated scratch copies and
-a bounded 64 MiB decoded image cache support switching sources. DDS takes
-priority; raw TXTR is used only without a matching DDS. SCNE geometry remains
-supported. No user filenames or artwork were changed: the supplied names already
-resolved to 1,824 targets. Existing prepared data showed 354 stadium and 727
-uniform overrides; no shoe packages were supplied. No RPCS3 or testing JB build.
-
-# v1.14.1 preview source/list hotfix
-
-Release: https://github.com/ZMO34/CHoops-Extractor-Reborn/releases/tag/v1.14.1
-
-Top-toolbar Source JB / Selected overrides dropdown controls all previews.
-Models / Courts offers Jerseys, Shoes and Stadiums / Floors subtabs with pick-only
-lists, explicit Override / JB fallback labels and retained selections. Missing
-archive/scene names are handled safely. Switching sources keeps the active page.
-Read-only S258 preview succeeded with unchanged input. 494 portable tests and 22
-native GUI/GL checks passed; Windows frozen startup/audio checks passed.
-Broader roster/shader research remains incomplete as described below.
-
-# v1.14 release preparation
-
-Direct Models / Courts selectors now preview jerseys, shoes and stadium/floor
-packages without first opening an IFF. Captured source/override selection applies
-to SCNE and texture data. Jersey shape controls remain available; stadium modes
-choose arena+floor, floor only or arena only. Integrates tested PR #14 updates
-and the override-folder fix in PR #15; broad reverse-engineering remains ongoing.
-
-# Override-folder selection fix
-
-The GUI action is now Select overrides folder… . Existing mod directories no
-longer cause Choose a new mod directory: selection prepares a fresh numbered
-workspace, preserving old folders, and updates both build and preview paths
-only after successful compatibility checks. Verification: 464 portable tests passed; 26 targeted override checks passed.
-Separate PR from the ongoing roster
-and shader research (#14); no emulator or automatic JB build.
-
-# Current project status
-
-## Active roster, floor-layer and animation continuation
-
-v1.13 is published from master 9e18f32aed8d0e3f81c2cfb05e0346d8854320b9:
-https://github.com/ZMO34/CHoops-Extractor-Reborn/releases/tag/v1.13.
-Its Windows package passed Windows/Linux CI and local frozen startup/audio checks.
-
-The next feature branch adds orange advisory keyboard-limit warnings, independent raised
-alignment guides from fixed stock S256 court coordinates, safer conference index validation, exact conference-logo editor routing and
-read-only motion-record discovery/export. Byte coverage now reports unresolved
-bits within packed words. Conference +0x1A is a tournament index, not a logo ID;
-its unsafe generic writer is protected. See CONFERENCE_ASSETS.md and
-ANIMATION_RESEARCH.md. No secondary-position search: the owner closed that task.
-
-Complete remaining byte semantics, universal engine text ceilings, reflection,
-fake-bump/AO and all dynamic palette modes remain unestablished. This continuation
-does not claim completion of those research goals or gameplay certification.
-No RPCS3, EBOOT edits, added alternates or testing JB folders.
-
-Continuation verification: 482 portable tests passed (9 offscreen GL skips,
-2 deselected), 28 native Qt/OpenGL checks passed, plus hidden read-only S256 line
-rendering. Compile, CLI/Qt startup, Ruff, mypy and handoff checks passed.
-
-
-PR #13 combined roster/arena continuation: twelve additional appearance/tattoo/
-signature fields with verified inclusive option bounds, all 112 jump-shot labels,
-and authored arena vertex-colour/alpha, second-UV lightmaps, glow/flare masks.
-461 portable tests passed (9 offscreen GL skips, 2 deselected); 144 native
-checks passed. See ROSTER_SEMANTICS.md and ARENA_SHADER_MASKS.md. Complete
-remaining roster bytes, per-field engine ceilings
-and every runtime shader/palette mode remain unproved; no guessed edits are added.
-
-
-Authored jersey lettering continuation (PR #13): front/back numbers 0–99/00,
-roster-linked or preview-only number choices, and curved Reborn surname rendering
-use actual indexed fonts/metrics and placement. Declared material DiffuseColor
-and integer shader switches are fixed. Palette 16/17 runtime-copy roles are
-confirmed. Full roster semantics and remaining arena mask routes
-remain under research. No guessed writers, EBOOT edits, RPCS3 or testing JB.
-Verification: 448 passed, 4 offscreen-OpenGL skips, 2 deselected; native hidden
-OpenGL checks separately passed. Source startup, CLI, lint/type checks passed.
-The PR #13 continuation was published in v1.13; the active next branch above is unreleased.
-
-
-## Roster / preview continuation
-
-v1.12 is published from merged PR #12. Continuation source fixes worker source
-snapshots and named SCNE identity, comparison reference matching, school-filter
-reset and menu-logo subrecord references. Confirmed Edit Schools text capacities
-are mapped to roster fields, and the jump-shot animation ID is editable with
-confirmed bounds. See ROSTER_SCALE_AND_PREVIEWS.md for evidence and unfinished
-semantics. This continuation is not a published release.
-Combined with merged PR #11: 341 tests passed, 2 deselected; source/Qt startup,
-lint/type and documentation checks passed. No RPCS3, EBOOT edits or testing JB.
-## Latest release and single-slice integration
-
-v1.12 publishes merged PR #12 at master 4f0eec7f95f9d624ff0fe09b4aac489ba4cf058e.
-Windows ZIP and SHA256SUMS: https://github.com/ZMO34/CHoops-Extractor-Reborn/releases/tag/v1.12.
-Exact-head Windows/Linux CI and local packaged startup/audio checks passed.
-PR #11 is integrated with that source and independently tested: 329 passed,
-1 isolated native-audio skip, 2 deselected. Depth-one, non-cubemap 3D TXTRs
-support 2D DDS replacement while retaining their original descriptor; deeper
-volumes remain unsupported. See TEST_REPORT.md for exact review evidence.
-
-## Active roster scale / preview project
-
-The feature branch adds source-bound CSV editing, selective comparison, atomic
-ratings paste, inline rating boxes, school filtering, Class/Redshirt controls,
-growing UTF-16 text, shared source/override SCNE and texture previews, archive
-categories/references and bounded conversion/normalization caching. This remains
-a continuing research project; its implemented checkpoint is published in v1.12,
-while full reverse engineering remains unfinished.
-See ROSTER_SCALE_AND_PREVIEWS.md for exact behavior, evidence and remaining work.
-Development verification on 2026-10-13: 326 tests passed, 2 deselected; source/Qt
-startup, lint/type and generated handoff checks passed. No testing JB or gameplay.
-Merged checkpoint: https://github.com/ZMO34/CHoops-Extractor-Reborn/pull/12.
-Jersey colour constants now trace to slots 0/1 and a separate mode using 14/15;
-fragment routing and mode selection remain unfinished.
-Recent functional PRs were merged before work; baseline is v1.11/master
-7796fcbd72c127730f484c67a5b0de26440ed066.
-
-## v1.11 side-panel update
-
-Every roster category has a right-side editor. School palettes, shoes and jersey
-previews are in appropriate side tabs; Edit selected/Team palette/shoe toolbar
-actions are removed. Player School supports guarded move/unassign; all 18 slots
-and counts are handled, with active player row zero correctly represented.
-School brand application updates that school’s players only in one undo step.
-Jersey preview combines top/shorts and offers neck/build/cut dropdowns. No alternate
-assets created. See ROSTER_SIDE_PANELS.md; it supersedes historical 16-slot claims.
-
-## v1.10 roster usability update
-
-Current public GUI combines Teams/Edit Schools as Schools, displays player height
-in feet/inches and positions as PG–C, and keeps Player/Ratings/Scholarship details
-beside the player table. Scholarship/Walk-on is writable through a verified flag,
-preserving weight and unknown bits. Separate properties/attributes dialogs and
-D1/alternate/independent-asset actions are removed from the release surface;
-conference realignment remains. No alternate work is authorized in this update.
-See PLAYER_QOL_RESEARCH.md; older feature descriptions below record historical
-backend capabilities rather than removed public actions.
-
-Updated 2026-10-13. Upstream: ZMO34/CHoops-Extractor-Reborn; base: master.
-Baseline before this handoff: `e556e360d0091df0bb645da9eb1d279e9d8f9e3a`.
-Last published Windows feature release at that baseline: **v1.07**, commit
-`bf43d81b10ea2f16bab7df3e798edb64435ab6f4`.
-Check GitHub and git history for newer commits/releases; these are provenance,
-not a permanently current HEAD assertion.
-
-## Implemented foundation
-
-- Native Python/PySide6 desktop GUI; CLI and GUI share parsers and services.
-- Split JB archive browsing, extraction and identity recovery; bounded IFF/CDF,
-  H7A compression, tool wrappers, TXTR and SCNE handling.
-- Built-in DDS/GTF conversion, recursive override discovery, DDS priority over
-  raw TXTRs, replacement SCNE priority, dynamic supported stadium asset sizes.
-- Base-layout normalization outside sNNN stadiums; preserve source dimensions,
-  format, mip count, remapping and layout. Use vanilla source for vanilla sizes.
-- DDS replacement accepts depth-one 3D TXTR descriptors as single-slice images,
-  preserving their descriptor; deeper volumes remain read-only.
-- Texture and geometry previews including arena, cloth and shoe selection;
-  material texture routing, packed geometry, camera movement and RSX remapping.
-  Basic previews do not reproduce every game shader. Artificial floor lift is
-  not the solution and must not be reintroduced.
-- Roster adapters, editable confirmed fields and conference history records,
-  ratings, undo/redo, RGB color dialog,
-  packed Yes/No and L/R choices, player/team shoe editing and roster IFF export.
-- Community ZIP/save wrappers are preserved. Existing unchanged malformed name
-  characters are warnings; new corruption or invalid pointers still block writes.
-- Explicit alternate-linking/asset-building operations, availability checkboxes,
-  optional D1 conversion. No automatic conversion or profile unlock bypass.
-- Manual JB staging/building, source hash preconditions and transactional writes.
-  Having this feature does not authorize agents to create testing game builds.
-- Reusable single-surface court preparation; actual bump semantic and DXT5nm
-  routing; only extra **floor** draws disabled. Arena remains normally textured.
-
-## Current audio project
-
-`audio_tools/{codec,banks,workflow}.py`, `formats/audio.py`, and the thin native
-ATRAC3 helper source provide an **experimental** backend. Mapping recovered 23
-licensed tracks and 64 fight songs in cribmusic. Title/artist/artwork mappings are
-data in soundtrack_names.json. WAV decode/re-encode passed a synthetic round trip.
-Bank replacement updates AUSB offsets/durations and checks untouched streams.
-Workflow and game archive replacement still need broader regression validation.
-
-Experimental catalog/WAV/song/batch/AUDO/jukebox-art CLI commands are exposed;
-unchanged manifest WAVs are skipped and sample bounds/export overwrite are checked.
-The Audio workspace now uses the shared backend in the Qt studio, with distinct
-Licensed Music and Fight Songs tabs, selected/section WAV export, WAV replacement
-preparation and shared cover-art actions. Independent review fixes scene/shoe
-navigation to Models/Courts by name, removes a clean-clone test dependency on
-proprietary converters, and makes batch WAV export transactional. See PR #5 for
-integration/review status. The `codex/audio-codec-packaging` branch adds a
-restricted LGPL FFmpeg CLI and the ATRAC3 encoder to the standalone Windows GUI,
-with matching source archives and notices. Exact-head Windows CI built both
-helpers, packaged the GUI, and passed the frozen synthetic WAV round trip on
-`e149790005fdaeb14d0a1b79689d0a3de3b8f2da` (run 54). This is CI-verified branch
-work, not yet a published release. Follow-up fixes the ATRAC helper's PCM input
-ceiling to ±4.0, aligned with its internal 1/4 scaling, for over-range float WAVs.
-Licensed Music and Fight Songs replacements are also trimmed or silence-padded
-to the selected track's catalog sample length before archive rebuilding.
-
-Song-title/artist editing stays read-only because archive-only routing is not
-established, and EBOOT writing is prohibited. Unknown AUDO loops and general CDF
-audio growth remain unsupported. Users stage outputs and build JB copies manually.
-See AUDIO_RESEARCH.md and AUDIO_WORKFLOW.md.
-
-## Priorities for the next instance
-
-1. Review and publish the CI-verified LGPL-only Windows audio-helper package,
-   including corresponding sources, notices and packaged WAV round trips.
-2. Continue independent validation of audio metadata identity, conversion
-   limits, cancellation and no-overwrite handling. Keep uncertain name fields
-   read-only. Reject non-WAV replacement sources before codec conversion.
-3. Validate standalone/paired/inline AUDO handling and explicitly block unknown
-   loop formats or unsupported CDF writes. Do not claim all formats writable.
-4. Continue remaining roster semantics, palettes, shaders and asset-linking
-   investigation as separate documented PRs; do not distract from audio validation.
-
-## Remaining uncertainty
-
-- Six team palette words (16, 17, 27–30) have no verified role. 22 exact Edit Schools
-  captions plus three additional runtime roles are known; older nine-caption
-  requests must not be mistaken for the latest remaining count.
-- Complete arena shader-mask routing and authored number/name atlas behavior.
-- Alternate/profile unlock behavior and newly inserted asset consumption in game.
-- Independent asset IDs/menu-logo handling for decloned classic/all-time teams.
-- Commercial shoe style names and exact special-family UI caption.
-- Crash-free court texture budget. 4096 is a dimension ceiling, not a tested safe
-  allocation. Defaults: court 2048x1024 DXT5; normal 512x512 DXT5, full mips.
-- Soundtrack title localization override route, AUDO loop semantics, CDF growth.
-
-## Verification boundary
-
-No emulator tests and no automatic testing JB builds are permitted. v1.07 had
-135 targeted Python/Qt checks plus private roster save/reopen and archive checks.
-The initial audio commit had syntax checks and 10 existing archive regressions.
-The handoff/audio CLI update passed 240 portable tests, source smoke, scoped lint
-and mypy. Native WAV re-encode/resample, AUSB preservation and AUDO/header checks
-are covered. Read-only stock catalog returned 23 licensed/64 fight/159 total music
-bank streams. No game replacement consumption validation. See TEST_REPORT.md for
-exact commands; new commits require their own results rather than reused counts.
-The LGPL-helper packaging branch passed the Windows build and packaged audio
-round trip on `e149790005fdaeb14d0a1b79689d0a3de3b8f2da`; see TEST_REPORT.md.
-
-All game inputs, rosters, templates, private reverse-engineering helpers and raw
-audio are local and absent from Git. A fresh PC must supply its own authorized
-fixtures. Do not assume a generated court template or any old local build exists.
-
-Additional appearance/tattoo/post/free-throw fields and all 112 jump-shot captions are now supported; see ROSTER_SEMANTICS.md. Arena vertex-colour/alpha, lightmap, glow and flare routing is implemented; see ARENA_SHADER_MASKS.md for evidence and remaining runtime effects.
-
-Text edits now grow beyond old allocations and keyboard entry capacities. The UI separates advisory game-keyboard sizes from unproved engine ceilings; structural pointer/UTF-16/adapter guards still apply.
-
-ROST string fixup 77FB1C computes field + signed delta - 1; 7C5818
-consumes big-endian wide characters. The previous shifted LE view only happened
-to work for ASCII. Copy-on-write now preserves non-Latin text and aligned targets.
-The shared formatter count is limited to 65,535 UTF-16 units; smaller display
-ceilings remain unresolved. Qt's unrelated 32,767-character cap is removed.
-
-Preview source/list hotfix: the top toolbar dropdown selects Source JB or Selected
-overrides for every preview category. Models / Courts has Jerseys, Shoes and
-Stadiums / Floors subtabs with pick-only asset lists, preventing typed unmatched
-filenames. Override mode labels replaced assets and JB fallbacks explicitly.
-Unnamed archive entries no longer break stock court-reference lookup.
-v1.14 is published from 2158df982f43ba3dbb1e2df1cfcd2030fb0a25ea;
-this follow-up targets the reported missing-name error and source-list UX.
-
-Override-source refresh fix: selecting another overrides folder while Selected
-overrides is already active now refreshes asset lists immediately and reloads
-the active preview after preparation. Preview loading uses the visible Mod
-workspace field, not an older cached path. The toolbar shows the loaded override
-count; an unavailable workspace is not mislabelled as JB fallback. Existing
-legacy DDS/SCNE folder names remain supported; no bulk rename is required.
-
-Explorer/workspace update: Select overrides folder… now lives in Explorer,
-with source-aware asset sizes and Override/JB labels. Dry run is removed from the
-GUI; Build JB copy still performs automatic validation. Roster references cover
-home/away/alternate selection menus (SELUA/H/X/Y/Z), gameplay uniform banks,
-confirmed cloth geometry, player/team shoes, stadiums, paired CDF payloads and
-conference/school logo banks. These links use the loaded roster. The wider
-reference column, full-text panel and tooltips preserve long references.
-Unsupported display metadata is reported without escaping the Qt result callback.
-
-JB and override indexes remain available together. Source-specific scratch files
-are reused while file fingerprints are unchanged; RGBA previews share a bounded
-64 MiB content cache. Changed manifests invalidate override snapshots; changed
-payloads still undergo source/checksum validation. DDS artwork skips the matching
-raw TXTR replacement; TXTR remains the fallback only when no DDS is present.
-SCNE replacements remain supported. CSVs use explicit binary-backed field
-whitelists: asset references, preview labels, research fields and row offsets are
-excluded, while source/stale-edit safety columns are retained.
+# Current status — v1.18
+
+This release integrates the NBA support/split-header repair from PR #25 and the
+key/center-circle court guide from PR #26, then refreshes the public documentation.
+The [support matrix](FEATURE_MATRIX.md) is the concise contract. Earlier status
+entries are preserved in [history](history/STATUS_THROUGH_V117.md).
+
+## Delivered
+
+- Automatic observed College Hoops/NBA archive layouts; read-only NBA 2K14 SDAT
+  banks, authenticated reads, extended descriptors and supported ZLIB IFF blocks.
+- Separate detected NBA 2K9/2K14 roster side editors with confirmed fields,
+  preserved wrappers/unknown bits, undo/redo and guarded text writes. College Hoops
+  remains a distinct model with broader ratings/CSV/comparison tools.
+- Split-bank archive header/TOC reading and append/repack preservation. Missing or
+  truncated banks retain exact expected/actual details. GUI override/build errors
+  include persistent Problem / Suggested fix / Details guidance.
+- Independent thin court reference toggles: border, 3-point and key/center circle.
+  Authored stock geometry is raised one game unit; actual floor rendering is untouched.
+- Documentation index, practical workflows, troubleshooting, per-game matrix,
+  testing map and release procedure. Historical status/results separated; stale
+  dependency snapshot/unpublished beta draft removed; wrapper test consolidated.
+
+## Still unresolved
+
+NBA 2K14 authenticated JB writing/signature generation, complete NBA ratings and
+text growth, all College Hoops unknown bytes, universal engine text ceilings,
+complete runtime shader/palette modes, newer cloth/jersey artwork binding and
+validated cross-game animation porting. College Hoops has no independent secondary
+position field established; do not confuse NBA evidence with that schema.
+No new alternate assets or removed D1 actions are added.
+
+## Verification and maintenance
+
+See [TEST_REPORT.md](TEST_REPORT.md) and the release PR for exact-head results.
+Only synthetic fixtures, Qt/CLI/frozen smoke and read-only research are used.
+RPCS3/gameplay NOT RUN; real/testing JB NOT BUILT; EBOOT NOT EDITED.
+Both Codex instances must maintain current docs and the generated handoff on each
+update. Document evidence and unknowns; never replace uncertainty with a label.
+
+---
+
+Embedded source: docs/FEATURE_MATRIX.md
+
+# Current support matrix — v1.18
+
+Supported means structurally verified by parsers and automated fixtures. No row
+certifies game/runtime compatibility. Unknown variants fail explicitly.
+
+| Operation | College Hoops 2K8 PS3 | NBA 2K9 PS3 | NBA 2K14 PS3 |
+| --- | --- | --- | --- |
+| Archive detection, listing, extraction | Supported observed layout | Supported observed layout | Supported observed SDAT/72-byte descriptor variant |
+| IFF/CDF, texture inspection | Supported known layouts | Supported known layouts | Supported known layouts, including observed ZLIB blocks |
+| DDS overrides / static preview | Supported known layouts | Supported known layouts | Preview/preflight supported; some newer mesh/UV bindings unavailable |
+| Manual fixed/growing/repacked JB output | Supported layout, synthetic verification | Supported layout, synthetic verification | Blocked: authenticated SDAT/extended writer not established |
+| Roster identity | College Hoops schema | Separate NBA 2K9 schema | Separate NBA 2K14 schema |
+| Roster editing | Confirmed names, ratings, appearance, history, palettes, footwear, assignment | Confirmed numeric/text fields only | Confirmed numeric/text fields only, including observed secondary position |
+| CSV / selective comparison import | Supported confirmed College Hoops fields | Not a general NBA bulk editor | Not a general NBA bulk editor |
+| Full unknown-byte semantics / engine ceilings | Incomplete; unknown bits retained | Incomplete | Incomplete |
+| Animation banks | Inventory/research | Inventory/portability research | Inventory/portability research |
+
+## Shared features
+
+- Explorer reads nested records and researched asset references; labels never make
+  an unknown hash an established semantic identity.
+- Source and overrides are cached concurrently. Global preview selection resolves
+  geometry and artwork; DDS takes priority only within overrides, with TXTR fallback.
+- Static preview camera supports orbit, look-around, pan, WASD movement and fit.
+  Combined jersey/shorts and cut/neck controls use supported authored meshes.
+- Court guides are separate raised thin references. Border, 3-point, key/center
+  toggles do not modify floor textures or depend on roster palettes.
+- Supported College Hoops jersey previews draw authored numbers 0–99 and the
+  supported Reborn surname preview. Runtime cloth/skinning is not simulated.
+- Audio WAV replacement can queue multiple songs before saving cribmusic.bin.
+  Song names/artists are read-only. Licensed music/fight songs are separated.
+- GUI repair diagnostics identify the target and compatible next action. Larger
+  payloads still require known relocation/pointer semantics; arbitrary growth is
+  not automatically safe.
+
+## Excluded or unresolved
+
+No alternate-asset creation, automatic D1 conversion, EBOOT editing, animation
+port, encrypted-save decryption, universal NBA roster fields or full arena shader
+emulation. Unknown reflection/fake-bump/AO/runtime palettes and universal text
+ceilings remain unestablished. See [limitations](KNOWN_LIMITATIONS.md),
+[NBA details](NBA_ROSTERS_AND_2K14.md) and [shader evidence](ARENA_SHADER_MASKS.md).
+
+---
+
+Embedded source: docs/WORKFLOWS.md
+
+# Practical workflows
+
+## Select a game and overrides
+
+Open the source JB, PS3_GAME or USRDIR in Explorer. Detection is based on verified
+container structure, not a user-selected game mode. Keep every required split
+bank available together. For SDAT input, extraction is authenticated and bounded;
+a successful read does not imply the editor can sign/rebuild that container.
+
+Choose **Select overrides folder** in Explorer. Discovery is recursive and handles
+supported current and legacy rip structures. Geometry SCNE replacements override
+vanilla SCNE records; corresponding DDS artwork wins over TXTR artwork. A TXTR
+is used when its DDS does not exist. This preparation resolves identities,
+validates layouts and caches conversions; it does not create the game output.
+Do not rename unrelated files merely to bypass an ambiguous selector error.
+
+Selecting unchanged sources reuses cached work. Source metadata changes invalidate
+matching entries, and content/conversion keys protect supported prepared operations.
+Timestamps are not a general proof against deliberately timestamp-preserved changes;
+reselect edited input and investigate unexpected fallback before building.
+
+## Preview the intended artwork
+
+The top **Preview source** dropdown applies across model categories. Choose Source
+JB to inspect the original, or Selected overrides to resolve replacement geometry
+and textures. The asset lists in Jerseys, Shoes and Stadiums/Floors avoid manual
+IFF-name entry. A fallback label means a matching replacement was not resolved;
+it does not mean the override artwork has been loaded.
+
+Select an asset and press its preview button. Use the neck/build/shorts/render
+controls for supported combined uniforms, and Floor only for court inspection.
+Roster palettes require a unique confirmed association or an explicitly selected
+matching roster. Unassociated meshes use embedded material artwork.
+
+Drag the pane splitter to resize controls versus the preview. Left-drag orbits,
+right-drag looks around, middle-drag or Shift-drag pans; WASD moves, Q/E moves
+vertically, Shift/Ctrl changes speed, wheel zooms and F fits the camera.
+For full-court texture alignment, independently enable border, 3-point and
+key/center-circle guides. They are fixed stock court references raised one game
+unit, not boundaries inferred from the apron edges and not exported artwork.
+
+## Edit and compare rosters
+
+Load from JB, load from selected overrides, or open an external supported IFF,
+raw ROST/decrypted USERDATA or supported save wrapper. Encrypted saves need an
+external authorized decryption step. Format detection chooses the schema; do not
+apply College Hoops offsets to an NBA roster.
+
+Select a row for its side editor. Double-click writable values. Confirmed choices
+use readable labels; unknown values are preserved rather than guessed. College
+Hoops ratings support copying to selected players, CSV export/import review and
+selective comparison. Retain CSV identity/safety columns and import only compatible
+edits. UI/research references are excluded from game-data CSVs.
+
+School transfers use guarded slot/count updates. A school shoe-brand change
+propagates only to that school's players. Export a copy in the requested supported
+IFF/save format, reopen it and inspect the result. Names exceeding established
+keyboard capacities get orange warnings where mapped; an unknown limit is not
+inferred from the old string's length. NBA text growth/shared storage has separate
+restrictions documented in NBA_ROSTERS_AND_2K14.md.
+
+## Replace soundtrack audio
+
+Use Audio's Licensed Music or Fight Songs subsection. Export WAV to inspect the
+supported stream. Queue/import multiple songs before saving the rebuilt
+cribmusic.bin; review each queue item and save to a separate output. The licensed
+Windows helpers handle the supported WAV/ATRAC3 path. Keep their corresponding
+source archives and notices with redistributed binaries. Names/artists remain
+read-only; cover-art actions operate only on established mappings.
+
+## Build manually and inspect the report
+
+For a supported writable source, prepare overrides, choose a **new empty output
+folder** in Mod Builder and start the build. Destinations can be on another drive
+but must not overlap source/mod data or overwrite an existing build. The tool
+validates records, source preconditions, sizes and relocation support, copies to
+transactional output, verifies generated/preserved bytes and publishes on success.
+Read the GUI summary for replacements, resizing and compatibility problems.
+
+Non-stadium artwork is normalized to the selected base layout where required;
+stadium assets can grow only through supported writers. No universally safe maximum
+GPU texture size has been certified. The editor rejects unknown layouts instead
+of treating a successful DDS decode as proof of game compatibility.
+No agent creates a real testing JB or launches RPCS3. The user chooses when and
+how to test the manually built output.
+
+---
+
+Embedded source: docs/TROUBLESHOOTING.md
+
+# Troubleshooting
+
+Start with the persistent GUI **Problem / Suggested fix / Details** report. Keep
+the exact named archive, record selector and expected/actual sizes in a bug report.
+Do not replace a structural error with guessed identities or silently skipped bytes.
+
+| Symptom | Meaning / next step |
+| --- | --- |
+| Incomplete archive header | Check all split banks and their names/sizes. The current reader follows header/TOC boundaries across banks. Restore a truncated or missing bank from the original; send the named details if it persists. |
+| Geometry overlaps a texture image | The replacement image/geometry ranges cannot safely coexist. Use the reported record to check its SCNE and image layout; preserve the originals. Supported relocation is format-specific, not a blanket permission to overlap. |
+| Unknown/ambiguous record or no unique archive record | The selector matches none/multiple destination records. Verify the correct source JB and rip identity, nested name/hash and CDF partner. Do not rename every record to a generic logo. |
+| Unsupported texture layout | Confirm 2D or a supported complete cube. A stored depth-one volume has specific support; true deeper volumes, DX10/arrays and unknown encodings remain restricted. |
+| Overrides show JB fallback | Check the chosen root, recognized archive/SCNE structure and matching selector. Reselect after edits and inspect diagnostics. DDS must belong to the resolved override record. |
+| Old artwork despite replacement | Check both selected SCNE and DDS paths, the global source dropdown and fallback labels. Compare source vs override, not just the IFF display name. Report the specific asset/record and folder structure. |
+| Preparing DDS appears slow | First import validates/converts many images. Bounded workers and caches accelerate subsequent unchanged selections. Check progress/target details; do not assume loading archives performs the same work. |
+| Output directory rejected | Use a new empty folder outside source, overrides and prepared workspace. Both parent/child overlap and overwrite are guarded; choose another drive if free space is insufficient. |
+| NBA 2K14 build blocked | SDAT read support does not provide authenticated write/signing support. Extraction/preview is available; do not remove this guard to produce an invalid game. |
+| Roster edit blocked | Confirm schema, pointer validity, wrapper and shared-string constraints. Previously observed bad characters are distinguished from newly introduced damage. Unknown bits remain opaque. |
+| Orange name outline | Text exceeds a confirmed game keyboard capacity for that field. Review it; capacity is measured in the documented encoding/units, not arbitrary old allocation size. |
+| Audio helper missing | Extract the full release. Source developers must build the pinned LGPL helpers; no proprietary DDS executable is required. |
+| Windows app fails after copying just EXE | Restore the entire ZIP, including `_internal`. CLI smoke and audio smoke can separate Qt/runtime and codec failures. |
+
+## Useful evidence for a bug report
+
+Include version/source commit, operating system, game/title ID and detected layout,
+workflow steps, exact error text and relevant small metadata. State whether the
+preview is source/overrides/fallback and whether input was recently changed.
+Do not upload game banks, copyrighted audio/art, credentials or private save data
+to a public issue. Prefer a minimal synthetic reproduction. Logs/screenshots may
+contain private paths; redact them before posting.
+
+## Recovery
+
+Original game/override inputs should remain unchanged. Keep your manually exported
+roster/texture copies and any user-created builds. A failed/cancelled transactional
+build should not be treated as a completed output. Report unexpected leftover
+folders before deleting them; never bulk-delete a research directory to clear a
+cache. The project does not launch RPCS3 for diagnosis or patch EBOOT.
+
+---
+
+Embedded source: docs/TESTING.md
+
+# Testing and regression maintenance
+
+## Reproducible portable checks
+
+```powershell
+python tools/dev/setup.py
+.\.venv\Scripts\python.exe tools/dev/verify.py
+```
+
+The runner checks generated handoff freshness, compiles Python, runs synthetic/Qt
+pytest cases, CLI help, offscreen GUI startup, fatal-error lint, scoped typing and
+diff whitespace. CI runs on Windows and Linux. Capture the exact commit, command,
+pass/skip/deselection counts and unavailable dependencies in TEST_REPORT/PR.
+
+Before reviewing another PR, inspect its diff/dependencies/scripts, then test the
+exact head in an isolated checkout. Use `--python` with an existing environment
+when appropriate; ensure imports resolve to that checkout. New commits invalidate
+old exact-head evidence. Public jobs must not receive private games or tokens.
+
+## Regression map
+
+| Risk | Main test modules |
+| --- | --- |
+| Split banks, TOC layouts and opaque header bytes | test_dynamic_2k_archives, test_split_archive_header, test_archive_identity |
+| SDAT authentication/read boundaries | test_sdat_2k14 |
+| Newer IFF/ZLIB/scene descriptors | test_nba14_formats, test_standard_iff, test_compression_rebuild |
+| Transactional output, relocation, preserved bytes | test_modding, test_build_streaming, test_asset_insertion |
+| DDS layouts, CDF/SCNE packing, overrides | test_builtin_conversion, test_runtime_texture_layout, test_scene_image_packing, test_cdf_folder_import |
+| Concurrent preparation and cache/source routing | test_parallel_overrides, test_cache, test_live_override_previews, test_preview_source_caching |
+| Roster bits, wrappers, identity and batch review | test_roster_editor, test_roster_semantics, test_roster_bulk, test_roster_csv_fields, test_nba_rosters |
+| Side editors, school assignment and footwear | test_roster_side_panels, test_school_assignment, test_shoes |
+| Reference guides and authored uniform artwork | test_scene_palette, test_jersey_preview, test_uniform_preview, test_scene_number_gl |
+| Audio queue/writers and output destination | test_audio, test_audio_batch, test_audio_queue_build_outputs |
+
+Read the code for fixture-specific scope; a suite name does not imply all semantics
+are understood. Keep rejection, untouched-byte, aliasing, rollback and cancellation
+coverage when consolidating modules. In v1.18 the small wrapper regression moved
+into test_binary.py; no assertions were discarded.
+
+## Optional and forbidden checks
+
+`real_game` and `runtime_manual` markers and the optional legacy native comparison
+are excluded by the portable runner. Offscreen OpenGL, absent native codecs and
+private fixtures may explicitly skip. A skip is not a pass. Read-only supplied-input
+checks may inspect archives/metadata and in-memory round trips without modifying
+originals. Never run verify_game.py --build, create a full automatic/testing JB,
+launch RPCS3 or edit EBOOT. Tiny synthetic archive fixtures are allowed.
+
+## Windows package verification
+
+Use the exact release commit. Run packaged `--smoke`, `--audio-codec-smoke` and
+`--cli --help`. Test extraction/format paths using read-only supplied or synthetic
+inputs. Check source-schema handling and preservation with synthetic builders,
+not a copied game. Validate the ZIP after creation, include its SHA-256, and pair
+LGPL helpers with exact matching sources/notices. Record what was skipped.
+
+## Cleanup policy
+
+Remove superseded generated logs, bytecode/pytest caches and owned temporary review
+checkouts only after checks finish and required evidence is recorded. Resolve and
+check absolute paths before recursive removal. Preserve regression tests for
+supported legacy formats, real user overrides/builds, private evidence and original
+game files. Do not delete a test just to make a failure disappear.
+
+---
+
+Embedded source: docs/RELEASING.md
+
+# Windows and GitHub release procedure
+
+## Prepare a reviewable source update
+
+1. Fetch canonical master and inspect open PRs, discussions and dependency changes.
+   Work on a release branch; integrate only owner-authorized, reviewed changes.
+2. Update `choops_py/__init__.py` and `pyproject.toml` to the same version. Maintain
+   CURRENT_STATUS, FEATURE_MATRIX, affected user/format docs, CHANGELOG and test
+   evidence. Keep unresolved semantics explicit.
+3. Run `python tools/dev/handoff.py`, then portable verification. Commit the final
+   source and test its exact head in an isolated checkout. Publish a PR with SHA,
+   commands/results, skips, risks and next action. Attach it to the active chat.
+4. Check Windows/Linux CI and review threads. Merge only with owner authorization;
+   release authorization in a user request can cover that specific release.
+
+## Build Windows x64
+
+Use the repository's Python 3.12 x64 development environment with PySide6,
+PyInstaller and declared dependencies, including PyCryptodome for SDAT reads.
+`tools/rebuild/package_windows.ps1` builds an onedir bundle, applies the Qt ICU
+compatibility check, includes required data and native helpers, and runs startup
+and audio round-trip smoke. Build pinned audio helpers using the documented codec
+scripts first. A trusted previously released helper may be reused only with its
+exact matching corresponding sources/notices and recorded provenance.
+
+Keep `_internal` with the executable. Include current documentation at its original
+relative paths so links work, README-START-HERE, BUILD-INFO with source commit,
+THIRD-PARTY-SOURCES and applicable notices. Do not bundle private inputs, game
+assets, settings, logs, development virtualenvs or proprietary DDS converters.
+Source DDS conversion is built in. Exclude unneeded Qt/browser modules and PyAV.
+
+## Validate and publish
+
+- Run the frozen GUI/CLI/audio checks and bounded synthetic format/writer tests.
+  No RPCS3 or real/testing JB. Confirm the version and SDAT/other optional imports
+  are collected; startup alone does not test a lazy-loaded module.
+- ZIP the complete app directory, test ZIP integrity, inspect entries for private
+  data, and calculate SHA256SUMS.txt. Record source head, size and digest privately
+  and in durable release evidence where appropriate.
+- Tag the exact tested source commit (or an identical merged tree with explicit
+  provenance). Create a draft release with honest features, limitations, commands
+  and counts. Upload the Windows ZIP/checksum; verify uploaded size/digest.
+- Publish only after source, CI, package and license gates pass. Link merged PRs
+  and release in handoff comments. Both instances maintain this procedure.
+
+Do not regenerate a package from an uncommitted tree or label a parser-only result
+as gameplay certification. Preserve published releases unless a specific owner
+request calls for removal. Cleanup local intermediates after successful publication;
+keep the delivered package/checksum and avoid deleting user builds/research.
 
 ---
 
@@ -1648,8 +1462,8 @@ LGPL sources. Audio conversion uses the restricted LGPL FFmpeg helper built from
 `tools/audio_codec/build_ffmpeg.sh` and the optional ATRAC3 encoder. No PyAV
 wheel is required or packaged. No other PC's credentials, environment or paths
 are copied. Versions go into ignored dev-setup.txt.
-requirements-windows-dev.txt is an old environment snapshot; pyproject/setup
-are the portable dependency contract.
+pyproject.toml and tools/dev/setup.py are the portable dependency contract.
+The obsolete pinned Windows environment snapshot has been removed.
 
 verify.py excludes real_game/runtime_manual and the optional legacy native
 comparison. It runs remaining synthetic/Qt tests, source smoke, fatal-error Ruff
@@ -2027,11 +1841,11 @@ removing scorebug nodes is deferred until these dynamic bindings are understood.
 
 Embedded source: docs/PROJECT_SOURCE_OF_TRUTH.md
 
-> Updated 2026-10-11: choops_py.studio is PySide6. CURRENT_STATUS.md and the project
-> notes govern current editing support. The format contracts below retain some
-> inherited observations; table offsets are stock evidence, not universal hardcodes.
-> Supported growth and optional roster operations supersede older fixed-capacity
-> restrictions. Texture conversion is built in; audio is experimental Python CLI.
+> Inherited technical evidence, not the current per-game support contract.
+> See FEATURE_MATRIX.md, PS3_2K_ARCHIVES.md and NBA_ROSTERS_AND_2K14.md for
+> newer archive/roster variants. Current caching/audio/UI behavior is described
+> in WORKFLOWS.md; fixed-capacity and experimental-only statements below may
+> reflect earlier versions. Unknown bits remain preserved.
 
 # Project source of truth
 
@@ -2466,517 +2280,31 @@ Updated 2026-10-11. CURRENT_STATUS.md and TEST_REPORT.md are the living evidence
 
 Embedded source: docs/TEST_REPORT.md
 
-# Unreleased — split-header and override diagnostics regressions
-
-Synthetic tests reproduce a valid header prefix crossing 0A into 0B, then check
-append and repack replacement outputs, opaque-byte preservation and unchanged
-source banks. A 130-entry TOC crossing the first 2 KiB bank is parsed correctly.
-Damaged-bank cases test missing header bytes, named bank/size diagnostics and
-specific suggested actions. SDAT tests check preview validation can run while the
-JB writer remains explicitly blocked. A Qt test verifies archive/selector details
-and suggested fixes persist in Mod Builder without losing the original error.
-Portable verification of the combined update: 596 passed, 9 offscreen GL skips,
-2 deselected; compile, CLI/Qt smoke, Ruff, mypy, handoff and diff passed.
-No real/testing game folder was rebuilt.
-
-# Unreleased — NBA extension validation
-
-Synthetic fixtures cover both NBA roster profiles, payload dispatch, masked edits,
-shared-string rejection, text growth/unknown-field rejection, undo/redo, patch
-rollback and Qt side-panel routing. SDAT tests cover header/block authentication,
-truncation, random reads, cache bounds, mixed encrypted/plain split-bank extraction
-and early writer rejection. ZLIB tests cover strict lengths and round trips;
-extended IFF tables and newer vertex/draw/instance layouts have synthetic fixtures.
-
-Read-only supplied evidence: both stock NBA roster payloads opened without string
-issues; player number/height changes encoded into IFF and reopened correctly.
-NBA2K9: 1,064 players / 69 teams / 72 arenas; NBA2K14: 1,665 / 105 / 102.
-NBA2K14 floor: two meshes/no warnings; arena: 61 meshes, one unsupported UV mesh.
-Combined NBA2K14 jersey preview remains unavailable and is not a passed check.
-Animation survey: 319 / 904 / 7,460 SingleMoCap records across CH2K8/NBA2K9/NBA2K14.
-Portable verification: 589 passed, 9 offscreen OpenGL skips, 2 deselected; compile,
-CLI/Qt smoke, Ruff, mypy, generated handoff and diff passed. Final exact-head
-verification is also recorded in the PR handoff.
-No RPCS3/gameplay, EBOOT edits, animation port or real/testing JB build.
-
-# Unreleased — key/center alignment guides
-
-Portable verification: 577 passed, 9 offscreen OpenGL skips, 2 deselected;
-compile, CLI/Qt smoke, Ruff, mypy, handoff and diff checks passed.
-
-Synthetic geometry test checks that routes 2/10/20 are copied from the authored
-reference, raised one unit and thinned on the appropriate UV axis, while filled
-key paint and actual floor draws remain unchanged. Qt regression checks default-off,
-independent enable/disable behavior alongside the existing guide toggles. Read-only
-stock S256 inspection confirms the named batches and radial UV direction. No game
-assets were committed, and no RPCS3 or real/testing JB was run/built.
-
-# v1.17 — automatic PS3 2K layouts
-
-Focused automatic-layout/research suite: 22 passed. Covers both TOC schemas,
-64-bit stored sizes, ambiguous-layout rejection, split-bank extraction, fixed/
-growing/repacked NBA synthetic builds, source preservation, CRC record labels,
-CDF pairing/TXTR variants, half4 UV/color fields, automatic Qt source loading and
-College Hoops roster boundaries. An end-to-end synthetic test selects a DDS
-folder, previews its live replacement and rebuilds with the same detected layout.
-
-Read-only supplied NBA 2K9 evidence: 5,624 TOC entries / 6 banks, no overlaps;
-selected raw IFF/CDF outputs rehashed; five standard sample IFFs' logical blocks
-decoded; five sample DDS exports plus a menu-logo DDS opened successfully.
-Shared preview services: jersey/shorts 2 meshes / 2 images; floor 2 meshes / 2
-images / no warnings; arena 78 meshes / 58 images / no warnings. These checks
-materialize extracted scratch assets only, never a rebuilt game JB. Broader game
-compatibility and runtime shader/roster behavior remain unverified.
-
-Full portable verification: 575 passed, 9 offscreen OpenGL skips, 2 deselected;
-compile, CLI/Qt smoke, Ruff, mypy, handoff and diff passed. RPCS3/gameplay NOT RUN; real/testing JB NOT BUILT; EBOOT NOT EDITED.
-
-Windows packaging validation: startup and synthetic audio round trip passed.
-Frozen CLI passed read-only NBA IFF extraction, fixed/growing/138-bank repack
-fixtures for both layouts and a three-worker NBA override import. Both source
-layouts retain unchanged synthetic source bytes. No supplied game was rebuilt.
-
-# v1.16 rebuild performance verification
-
-Targeted synthetic rebuild tests: 26 passed, 1 GUI case deselected. Twelve new
-regressions cover persistent split-bank reads/writes, bank crossings, overlapping
-preservation exclusions, corruption in preserved padding/non-bank files, cleanup,
-single-read source fingerprints, cancellation handle release and CLI manual-output
-parity without relaxing unrelated exports. Existing append,
-relocation, CDF insertion, opaque-header-gap and manual-output regressions pass.
-
-Synthetic verification benchmark (Windows Python 3.12, 8,192 shuffled entries /
-32 MiB): 1.5131 s per-entry checks; 0.0477 s sequential checks, 31.69x for this
-phase only. 16,384 opens become two. No real game files were used by the benchmark.
-Command: `python tools/dev/benchmark_rebuild.py`.
-
-Full portable verification: 553 passed, 9 offscreen OpenGL skips, 2 deselected;
-compile, CLI/Qt smoke, Ruff, mypy, handoff and diff checks passed.
-Frozen Windows checks run in the release packaging workflow.
-RPCS3/gameplay NOT RUN; testing JB NOT BUILT; EBOOT NOT EDITED.
-
-## Queued audio / build destinations / roster and scorebug audit — 2026-10-15
-
-`python tools/dev/verify.py` passed: **541 portable tests**, nine offscreen
-OpenGL skips, two deselected real/manual/native-reference checks. Compileall,
-CLI help, hidden Qt startup, Ruff, mypy, handoff consistency and diff checks passed.
-The PR records the exact tested head. No RPCS3 or real/testing JB folder was built.
-
-New synthetic checks cover two changes in one cribmusic bank plus global.iff,
-untouched third stream/prefix/tail/metadata, queue replacement/source binding and
-reopen, preservation of newer choices during a save, GUI queue/save callbacks,
-external output paths including existing empty folders, source/ancestor rejection,
-opaque header-gap preservation in append/repack, occupied TOC rejection, correct
-roster +1 anchors/uniform masks/logical windows, and bounded scorebug discovery.
-
-Read-only stock checks: scorebug discovery parsed all twelve identified records
-in gamedata/gamedataextra and their SCNE textures/parts. Roster audit found 347
-resolved and reciprocal arena-team references, 32 nulls, no unresolved nonnull
-arena links and no logical-table overlaps. EBOOT arena indexing and four-pointer
-serialization/deserialization corroborate the structure. Remaining unknown bytes
-are still reported explicitly; this is not a full semantic or gameplay certification.
-
-# Roster / game-line / animation continuation verification
-
-Portable final runner: **473 passed, 7 skipped, 2 deselected**. Native Windows
-targeted checks: **17 passed**, including seven rendered shader paths, keyboard
-warnings, exact conference-logo selection and authored line supplementation.
-Read-only hidden S256 floor rendering restored two verified line draws with the
-original coordinates/UVs and no OpenGL error; source SHA was unchanged. Appearance
-and unknown-bit coverage checks passed. No RPCS3, EBOOT changes or testing JB.
-
-Regressions cover UTF-16 supplementary characters, advisory warning reset,
-invalid conference index rollback, protected tournament links, exact logo900+
-index identity, compressed raw motion span extraction, unchanged arena/apron
-geometry and no duplicate supplemental draws. Source/Qt/CLI startup, compile,
-Ruff/mypy and generated documentation checks are part of the final runner.
-
-# Combined roster/arena continuation verification
-
-Portable runner: **461 passed, 7 skipped, 2 deselected**. Seven rendered-pixel
-checks are skipped only by Qt offscreen; native Windows targeted verification:
-**144 passed**, including all seven rendered shader paths. Source/Qt/CLI startup,
-compilation, Ruff, mypy and handoff checks passed. Synthetic appearance tests
-check shared packed-word neighbours, bounds, readback and undo for all 12 fields.
-Read-only S256 hidden rendering: 119 parts, 180 lightmapped batches, no shader
-errors. No RPCS3, testing JB or EBOOT edits. Proprietary fixtures stay private.
-
-# Uniform lettering continuation verification
-
-`python tools/dev/verify.py`: **448 passed, 4 skipped, 2 deselected**. Skips
-are rendered-pixel GL checks on Qt offscreen. Compilation, CLI/Qt startup,
-Ruff, mypy (11 files), handoff and diff checks passed.
-Native Windows targeted check: indexed_font, scene_number_gl, scene_preview and
-roster_side_panels: **128 passed**. GL tests read actual front/back/name/palette
-pixels. All 101 number codes are exercised. Private read-only source inspection
-and hidden rendering confirmed authored Reborn above the back number, and front
-and back 23. No assets/screenshots enter Git. Inputs remained immutable.
-No RPCS3/gameplay, EBOOT editing or full testing JB was performed.
-
-# Development verification
-
-## Roster / preview continuation checks
-
-Final integrated `python tools/dev/verify.py`: 341 passed, 2 intentional
-deselections; compile, CLI/Qt startup, lint/type and handoff checks passed.
-Final targeted preview/bulk/GUI run: 27 passed. Regressions include reordered
-conference references, entire long-string warning preservation, exact menu logo
-ownership, game entry capacities and isolated jump-shot writes/undo. No
-RPCS3, EBOOT writes or testing JB. Evidence is in ROSTER_SCALE_AND_PREVIEWS.md.
-## PR #11 independent integration review — 2026-10-14
-
-Inspected exact original head 81cd1665c26ce8798c025f5bfbd2d20f98cf213f in
-an isolated checkout: 15 texture-layout tests passed. Merged v1.12 master into
-the branch, resolved the changelog conflict and regenerated the shared handoff.
-Added an actual DDS replacement/export check preserving the depth-one descriptor,
-header and payload extent, and rejection checks for depth zero, depth two and
-volume-plus-cubemap combinations. Integrated portable suite: 329 passed,
-1 native-audio skip (helpers absent in this isolated checkout), 2 intentional
-deselections. Compile, CLI/Qt startup, lint/type and handoff checks passed.
-No RPCS3, gameplay, EBOOT edits or testing JB. Sampler runtime behavior remains
-unverified; this change does not generalize to deeper volumes or DDS arrays.
-
-## Roster scale / preview development checkpoint — 2026-10-13
-
-`python tools/dev/verify.py`: 326 passed, 2 intentional deselections. Compile,
-CLI help, offscreen Qt startup, scoped Ruff, mypy (11 files), generated handoff
-and diff checks passed. The earlier targeted bulk/preview/cache/GUI run passed
-13 tests; three subsequent CSV scalar-type regressions passed in the full suite.
-Comparison selection survives filtering/sorting; bulk edits preserve one-step
-undo, source preconditions and coupled-field rollback. The comparison uses a
-table model rather than allocating a widget item for every changed cell.
-CSV rejects JSON objects, arrays and booleans in scalar text/numeric fields.
-No RPCS3, gameplay, EBOOT writes or testing JB build. Unfinished text-limit and
-shader research remains explicitly documented in ROSTER_SCALE_AND_PREVIEWS.md.
-
-## v1.11 side-panel and membership verification
-
-The local source checkpoint passed 310 tests with 2 intentional deselections;
-native audio coverage runs using the unchanged verified LGPL helpers. GUI/source
-startup, scoped lint/type and generated handoff checks passed. New regressions
-cover every category side editor, palette/coach/uniform edits, transfer/count/
-row-zero handling, shared/inconsistent refusal, scoped shoe brand propagation,
-18-member/full-destination behavior, undo and top/shorts texture-role/coordinate
-preservation. No untested alternate-asset actions are restored.
-
-Read-only stock checks validate all 443 school arrays/counts (maximum 18), identify
-row-zero ownership, transfer/undo without player-data changes and school-only brand
-propagation/undo. Actual combined jersey/shorts decode returns both roles with
-separate mapped artwork. Inputs remain unchanged; no emulator, EBOOT write or
-testing JB. Exact release SHA and packaged Windows checks are recorded in the PR.
-
-## v1.10 roster usability checks
-
-Portable suite: 296 passed, 1 native-codec skip, 2 deselected at the local
-checkpoint. Source startup, scoped lint/type and handoff checks passed. Added
-height/position display and numeric-sort checks, scholarship exact-mask/undo
-checks, visible Player/Ratings/Scholarship tabs, equipment labels, removed-action
-checks and combined Schools view. Updated existing position edit/save/reopen and
-realignment interactions. Synthetic Qt visual QA checked the main roster layout;
-a toolbar text-encoding issue found during rendering was corrected before release.
-Duplicate equipment captions receive distinct variant labels so accepting the
-current choice cannot accidentally write a different code; a regression checks this.
-
-Read-only stock/EBOOT tracing confirms single byte positions and scholarship
-polarity; the full stock roster contains 5,166 scholarship flags and 519 walk-ons.
-No game input modified. Exact source SHA and Windows packaging/codec smoke results
-are recorded in the PR/release metadata. No emulator or testing JB.
-
-## Independent conference review — 2026-10-12
-
-Original PR #8 head f38448cadd71eae38e0374517193312fd3367bbd failed the generated
-handoff synchronization gate. Regenerated the snapshot and added parameterized
-coverage for all 14 conference scalars: exact byte preservation, reopen, validation,
-undo and negative/overflow rejection without mutation. The source offset/width
-table matches the primary public `conferences.py` definition; labels remain source
-labels, not independently verified gameplay semantics. No private inputs required,
-emulator/gameplay checks or test JB copies. Final head/results are recorded in PR #8.
-Portable checks passed 292 tests, 1 native codec skip, 2 deselected; source startup,
-scoped lint/type checks and handoff synchronization passed. The native FFmpeg
-helper is unavailable locally, so that skip is explicit rather than a pass.
-
-## Conference historical fields — current branch
-
-The supplied read-only USERDATA file was used to confirm 39 conference rows.
-An in-memory model edit changed only the selected `final_fours` field byte;
-model validation passed and undo restored the exact original payload. The file
-was not modified or added to Git. Windows packaging completed with
-`tools/rebuild/package_windows.ps1`; the packaged Qt startup and bundled LGPL
-audio round-trip smoke checks passed. Conference gameplay effects are not
-independently verified.
-
-## LGPL audio packaging branch — verified PR head
-
-Follow-up native reproduction: stereo IEEE-float WAV audio with peaks at ±1.5
-encodes after raising the ATRAC frontend's finite-sample ceiling to ±4.0, aligned
-with AtracDEnc's internal 1/4 scaling. Direct helper checks accepted ±4.0 and
-rejected ±4.01 and NaN. `pytest tests/test_audio.py tests/test_cli.py -q`: 18 passed;
-native round trips verify replacement trim to 24,000 samples and silence padding
-to 60,000 at 48 kHz. `python -m compileall -q choops_py/audio_tools tests/test_audio.py`,
-handoff generation, and `git diff --check` passed. The rebuilt frozen app passed
-the Qt startup smoke and over-range float WAV encode/decode round trip.
-
-Exact-head CI run 54 passed on `e149790005fdaeb14d0a1b79689d0a3de3b8f2da` on
-both Ubuntu and Windows. The Windows job built the pinned LGPL FFmpeg helper and
-ATRAC3 encoder, built/smoke-tested the standalone package, and printed
-`Bundled LGPL audio helpers passed a synthetic WAV round trip` from the frozen
-executable. Thus the packaged helper lookup, WAV resampling/encoding and ATRAC3
-decode validation ran in the actual frozen app.
-
-Local `python tools/dev/verify.py` on the previous PR head: 250 passed, 1 skipped,
-2 deselected. The one skip was the native helper round trip; the two deselections
-were private game/runtime checks and the optional legacy native comparison. CLI
-help, Qt startup smoke, scoped Ruff, studio/service mypy, handoff snapshot,
-compileall and `git diff --check` passed. The suite includes a regression that
-rejects a non-RIFF/RF64 replacement before codec lookup.
-
-Earlier Windows runs exposed and fixed an annotated-tag SHA mismatch, FFmpeg
-component names/make target, a missing MSYS2 `cmp`, and the absence of conversion
-filters. The final verified helper pins the peeled `n9.0.2` source commit, enables
-only LGPL `aresample`/`aformat` conversion filters, and checks required codecs,
-formats and filters. No emulator or testing JB was run/built. PR #6 was merged;
-this follow-up is tracked in its own PR and does not create a release.
-
-## Independent PR #5 review and continuation — 2026-10-12
-
-Reviewed submitted head 6603d24f4d32f70abfd25e3f6770939b86f4594b in an isolated
-checkout: 239 passed, 1 skipped (encoder absent), 1 failed (legacy converter
-presence), 2 deselected. Reproduction tests separately showed both scene and shoe
-previews opened Audio instead of Models/Courts. Navigation now uses page names;
-discovery tests use synthetic files instead of excluded proprietary executables.
-
-Continuation makes batch WAV export transactional. Regressions cover successful
-publication, decode failure, cancellation, destination preservation, final sidecar
-paths, shared fight-song artwork and cancelled GUI output selection. The unchanged
-pinned-source encoder was enabled for an actual native WAV round trip. No emulator,
-EBOOT writes or full testing JB. Final exact-head results are recorded in the PR.
-
-The final portable continuation run passed 250 tests, 2 deselected; actual native
-WAV encoding ran rather than skipping. Source GUI/CLI smoke, scoped Ruff and mypy
-passed. The handoff snapshot check passed. No private game fixture was required.
-
-## Audio workspace update — 2026-10-11
-
-Python 3.12 x64 setup check and pinned LGPL ATRAC3 helper build completed.
-Audio/CLI tests: `pytest tests/test_audio.py tests/test_cli.py -q` — 17 passed.
-Qt navigation and audio-category tests: 2 passed. Full portable suite excluding
-the two documented private/optional checks and the legacy converter-presence
-assertion: 240 passed, 3 deselected. CLI help, Qt startup smoke, scoped Ruff and
-studio/service mypy checks passed. A read-only scan of the available Vanilla JB
-catalog returned 23 licensed tracks and 64 fight songs; no audio or artwork was
-exported and no source was modified.
-
-The exact `tools/dev/verify.py` run on this audio GUI head reported 240 passed,
-1 failed and 2 deselected before stopping at the pre-existing
-`test_bundled_paths_have_precedence` assertion. It expects the historical
-`tools/gtf2dds.exe`, which is absent from the public clone and excluded from
-releases. That single check is outside the audio GUI change; no proprietary
-converter was fetched or substituted. The full suite with that assertion
-excluded passed. No emulator, gameplay test or JB build was performed.
-
-## Audio/handoff update — 2026-10-11
-
-`python tools/dev/verify.py`: 240 passed, 2 deselected (private game test and
-optional historical executable comparison). Source CLI help and Qt smoke passed;
-scoped fatal-error Ruff, new setup script lint and GUI/service mypy passed.
-`python tools/dev/setup.py --check`: installed desktop/dev dependencies imported.
-`python tools/dev/setup.py --audio-encoder`: dependency install and pinned-source
-native helper rebuild completed. Windows packaging and startup smoke completed;
-packaged CLI help includes audio registrations. Decode/encode uses Python workspace.
-`pytest tests/test_audio.py tests/test_cli.py -q`: 17 passed at this checkpoint.
-Audio tests cover AUSB neighbor/prefix/tail/unknown preservation, invalid offsets/
-encoded sample bounds, flat/split/inline/wrapped AUDO, blocked loop fields, catalog
-artwork/category counts and native 24k mono WAV -> 48k stereo ATRAC3 round trip.
-Private read-only stock catalog: 23 licensed, 64 fight, 159 total music streams.
-No native decoder DLL redistribution, full bank game validation, EBOOT writes,
-RPCS3 or testing JB. Exact commit SHAs are recorded in the PR/release metadata.
-
-The full portable run exposed pre-existing invalid four-byte fixtures tagged as
-TXTR and an output-safety test expecting a later error. Fixtures now use generic
-CDAN where appropriate; normalization rejects truncated texture headers cleanly.
-Type annotations were corrected without changing preview/staging behavior.
-
-Historical results below remain separate observations, not current test totals.
-
-The community roster and shoe-editing update passed 135 targeted Python/Qt
-checks. Both supplied community ZIPs were loaded, edited for ratings and
-player/school shoes, saved and reopened with exact payload round trips. ZIP
-members other than USERDATA remained byte-exact, and original input hashes
-were unchanged. Both payloads also exported to game roster IFFs and reopened
-successfully. Three malformed source name strings in one input remain
-unchanged warnings; changing their malformed bytes or introducing a new
-invalid pointer remains fatal, including pre-existing out-of-bounds pointers.
-All 90 DDS overrides for the frontend bank
-compiled in memory. Zero/non-one stored depth in declared 2D textures is
-covered separately from rejected volume dimensions. No JB build or emulator
-test was performed.
-
-For 2D/cubemap texture storage, the dimension selects the resource type and
-effective depth is one; an unused stored depth is not a volume declaration.
-The primary reference is [RPCS3's texture layout implementation](https://github.com/RPCS3/rpcs3/blob/master/rpcs3/Emu/RSX/Common/TextureUtils.cpp),
-whose image-section layout uses depth only for the 3D case. The importer now
-follows that distinction and includes dimension/cube/depth values in remaining
-unsupported-layout errors.
-
-The court-template and non-stadium texture policy update passed 125 targeted
-Python checks, including raw and whole-IFF normalization, paired CDF imports,
-HDR preservation, multistream geometry relocation, previews, compression and
-CLI registration. Real gameplay/uniform replacements were compiled in memory
-and retained exact base headers after resizing. The supplied court template
-retained its floor triangles and primary UVs, resolved albedo to slot 0 and
-bump to slot 2, disabled the other floor draws, and ignored inactive artwork.
-The source GUI passed its startup smoke check. No emulator was opened and no
-JB build was produced for this update. The optional historical executable
-comparison was excluded after Windows rejected its DLL relocation; built-in
-conversion checks passed independently. The game's crash-free court texture
-budget remains unverified.
-
-Built-in DDS/GTF conversion is tested in both directions against generated
-native-reference fixtures for L8, ARGB8, DXT1/3/5 and RGBA16F. Coverage includes
-rectangular Morton order, non-power-of-two linear storage, mip chains and all six
-cubemap faces. Default import/export and preview tests run without external tools.
-The independent accelerated H7A codec and portable decoder agree on random,
-overlapping and malformed streams. Override regression tests cover misplaced
-scene folders, numeric record aliases, Windows copy suffixes and explicit reports
-for DDS files requiring a missing replacement scene.
-
-Local checks exercised the synthetic parser/writer, Qt navigation/edit/save, actual Windows converter, interruption cleanup, source preconditions, malicious ZIP rejection and cross-part copy/patch workflows. Private read-only game integration and separate generated-output verification also ran; environment-specific results are excluded from public documentation.
-
-Commands: pytest, compileall, CLI --help, studio --smoke, studio --verify-game --game PRIVATE_PATH, Ruff and mypy on the new studio/patch-package modules. Test groups distinguish unit, integration, gui, windows and real_game. Public CI must skip the private fixture when absent. Converter tests use generated inputs.
-
-Initial Ubuntu CI exposed missing libEGL.so.1; the workflow installs the required Qt runtime libraries and allows both platforms to complete independently. The corrected prior CI commit passed Windows/Linux and standalone packaging. Subsequent code requires its own observed checks.
-
-Original files were read only; output patch and untouched ranges were verified separately. Runtime PS3/RPCS3 verification: NOT RUN. Unsupported layouts, geometry import/export and unknown roster semantics remain documented limitations. This is not completion or publication of v1.0beta.
-The DDS importer now treats dimension-3 TXTRs with stored depth one as
-single-slice storage and continues to reject deeper volumes. The existing
-volume fixture now covers acceptance at depth one and rejection at depth two.
-Automated checks were not run for this change; no RPCS3 or gameplay validation
-was performed.
-
-## Override-folder selection regression
-
-Python 3.12.14 on Windows: tools/dev/verify.py passed with 464 tests, 7
-offscreen GL skips and 2 deselected checks. Compile, CLI/Qt smoke, Ruff, mypy,
-handoff and diff checks passed. Targeted override tests: 26 passed. Repeated
-selection preserves previous snapshots, skips occupied numbered workspaces,
-compiles current artwork, cleans only its failed temporary workspace and updates
-GUI build/preview destinations together. No RPCS3 or automatic/testing JB build.
-Current continuation: 482 portable tests passed, 9 offscreen GL skips, 2 deselected; 28 native targeted checks passed after them. Guide tests verify flat colour with transparent textures, zero palette tint, glow mode and both automatic/manual texture selection. Runtime BE text tests independently check field+delta-1 and save/reopen/undo. No RPCS3 or JB build.
-
-Combined v1.14 preview release checks: 491 portable tests passed, 9 offscreen OpenGL skips, 2 deselected; 37 native Qt/OpenGL targeted checks passed. Direct jersey launch, captured source/override stadium selection, scene-mode identity and reload behavior are covered. No RPCS3 or JB build.
-
-v1.14.1 preview source/list hotfix: 493 portable tests passed (9 offscreen GL skips, 2 deselected); 17 native direct-preview/GL checks passed. Read-only stock S258 floor preview returned five parts and twelve textures; source hash unchanged. Shared source dropdown and pick-only category lists have regression coverage. No RPCS3 or JB build.
-
-Additional hotfix regression: global source switching preserves the active texture category rather than navigating to a prior 3D view. Final full suite: 494 passed, 9 offscreen GL skips, 2 deselected; nine direct-preview checks passed.
-
-Final v1.14.1 native preview/GL/roster-scale GUI suite: 22 passed. Packaged Windows startup and synthetic audio round-trip passed. Verified v1.13 audio helpers and matching source/licence archives reused.
-
-## v1.15 override-source refresh
-
-Final Windows Python checks: 497 passed, 9 offscreen GL skips, 2 deselected.
-Native override/direct-preview/GL checks: 24 passed. Compile, CLI/Qt smoke, Ruff,
-mypy, handoff and diff checks passed. Regression covers already-selected override
-mode during the worker result callback, queued preview reload, preservation of
-JB fallbacks, visible workspace versus stale cached path, and unavailable badges.
-Read-only supplied-folder discovery resolved 1,824 archives, including S258;
-existing workspace had 1,825 replacements. Native GUI list verification showed
-354 stadium and 727 uniform overrides. No shoe packages were supplied. Names and
-contents of user inputs were unchanged. No RPCS3 or automatic/testing JB build.
-
-## Final v1.15 Explorer/cache/CSV verification
-
-515 portable tests passed (9 offscreen GL skips, 2 deselected), with compile,
-CLI/Qt smoke, Ruff, mypy and handoff checks. Native targeted suite: 41 passed.
-Hidden Explorer loaded the supplied SELUH258 override, showed five records and
-full roster references, and rendered its texture without errors. Read-only
-S258/SELUH258/UH258 override inspection and DDS preview decoding also passed.
-Cache tests retain both source variants, invalidate modified inputs, reject
-altered replacement payloads and enforce the image-memory bound. DDS tests skip
-a broken raw TXTR when DDS exists and correctly use TXTR when DDS is absent.
-CSV tests exclude injected UI metadata and reject unsupported import fields
-without changing roster bytes. No RPCS3, game launch or automatic/testing JB.
-
-## v1.15 explicit roster I/O and release verification
-
-`python tools/dev/verify.py`: 519 passed, 9 offscreen OpenGL skips,
-2 deselected; compile, CLI/Qt smoke, Ruff, mypy and generated handoff passed.
-New regressions cover edited external IFF to USERDATA/IFF round trips, immutable
-source payloads, invalid-roster rejection, explicit JB/override source selection,
-missing override roster rejection and IFF export without a loaded JB.
-Native Windows targeted preview, cache, CSV and roster I/O suite: 45 passed.
-Windows packaging additionally runs frozen startup and synthetic audio round trip.
-No emulator/gameplay tests or automatic/testing JB builds are performed.
-
-## v1.15.1 preview resizing
-
-18 native direct-preview/OpenGL regressions passed. Hidden Windows Qt resize
-check confirmed a 1,364-pixel-wide viewport and dragging the divider changed its
-height from 255 to 120 pixels without hiding controls. Qt startup, Ruff and
-diff checks passed. No RPCS3 or testing JB.
-
-Full `python tools/dev/verify.py`: 519 passed, 9 offscreen GL skips,
-2 deselected; compile, CLI/Qt startup, Ruff, mypy, handoff and diff checks passed.
-
-## v1.15.2 live preview reproduction
-
-Read-only S258 reproduction found a prepared snapshot's old floor image while
-current loose inputs compiled the Dayton court. The actual live PreviewArchive
-and stadium path now decoded that current 1024 x 512 preview with two floor mesh
-parts; unchanged materialization reused its cache. Source inputs were untouched.
-Synthetic regression verifies stale snapshot replacement, loose file edits,
-cache invalidation, source immutability and missing-file rejection. No JB build.
-
-Final portable suite: 520 passed, 9 offscreen GL skips, 2 deselected.
-Native source/preview/OpenGL suite: 36 passed. Compile, CLI/Qt smoke, Ruff,
-mypy, generated handoff and diff checks passed. Windows package startup/audio
-smoke runs before publication.
-
-## v1.15.3 frontend import reproduction
-
-Read-only frontend_sync import reproduced the false texture/geometry overlap.
-Header-relative streams had flag 0x40000002, pointer 5, valid header vertex floats
-and header-relative 16-bit indices (flag 0x10). GPU menu streams use 0x40000003
-and index flag 0x20000010. The fix imported frontend_sync successfully in memory.
-Synthetic tests preserve both inline vertex streams and indices through image
-packing, preserve GPU menu relocation, and reject real overlaps, invalid ranges
-and changed inline geometry. No RPCS3 or automatic/testing JB build.
-
-`python tools/dev/verify.py`: 523 passed, 9 offscreen GL skips, 2 deselected.
-Compile, CLI/Qt smoke, Ruff, mypy, handoff and diff checks passed.
-
-The broader check passed 13 of 14 non-stadium scene groups and exposed a second
-studio cubemap mismatch. Added a guarded legacy first-face import: regression
-checks retain the original descriptor and five other DDS faces exactly, with
-strict rejection retained for direct imports without this legacy policy.
-
-Final complete suite: 524 passed, 9 offscreen GL skips, 2 deselected;
-51 targeted import/packing/live-preview checks passed. Actual studio import
-completed with +X updated and five source faces preserved.
-
-Final read-only supplied-input run: all 14 non-stadium SCNE groups compiled
-successfully together, zero failures. Legacy cube handling is isolated in its
-own module so unchanged ordinary conversions retain their cache identities.
-The final portable verification command passed all 524 tests again.
-
-## Parallel override preparation
-
-Windows spawn tests compare deterministic manifests and archive bytes between
-serial and two-worker preparation. Tests cover CPU/RAM limits, unchanged reuse,
-changed-input invalidation, tampered cached output, worker failure/cancellation
-and child cleanup, plus source/frozen module fingerprinting.
-
-Read-only benchmark: 14 actual scene groups / 612 DDS inputs, warm conversion
-cache, final run: serial 24.838 s, six workers 10.008 s, unchanged repeat
-6.676 s (2.48x parallel speedup). An earlier run measured 3.08x.
-All output archive checksums matched. Benchmark scratch was removed.
-No RPCS3 or real JB build.
-
-Frozen Windows EXE: three synthetic DDS overrides prepared with three spawned
-workers, then all three completed archives reused on repeat. Distinct texture
-outputs and source-bound manifests verified; owned smoke fixtures removed.
-Packaged Qt startup and synthetic audio round-trip also passed.
-
-Final `python tools/dev/verify.py`: 530 passed, 9 offscreen GL skips,
-2 deselected. Compile, CLI/Qt smoke, Ruff, mypy, handoff and diff checks passed.
-Final frozen EXE test repeated successfully with three workers and three reused
-archives; startup/audio smoke passed.
+# Verification — v1.18
+
+Full portable verification on Windows / Python 3.12.14: **598 passed,
+9 offscreen OpenGL skips, 2 deselected**; compile, CLI/Qt smoke, Ruff, mypy,
+generated handoff and diff passed. New navigation links resolve locally.
+
+Current source combines the reviewed NBA support, split-header regression fixes,
+key/center-circle guide and documentation cleanup. Exact final-head commands and
+results are recorded in the release PR and release notes after verification.
+The portable runner is `python tools/dev/verify.py`; the isolated run uses the
+same runner with `--python` pointing to the prepared development interpreter.
+
+Regression additions from PR #25 cover NBA schema detection/wrapper preservation,
+SDAT authentication/tamper/truncation, ZLIB boundaries, extended scene layouts,
+cross-bank headers, both append/repack writers and named corrective diagnostics.
+PR #26 covers authored key/center routes, radial UV direction, elevation,
+source preservation and independent Qt toggle behavior. Wrapper unit assertions
+are consolidated into test_binary.py without removing coverage.
+
+Previous exact-head evidence: PR #25 had 596 portable passes (9 GL skips,
+2 deselected); PR #26 had 577 (9 skips, 2 deselected). These are separate branch
+counts, not the combined release result. Isolated runs additionally skip an
+optional native DLL when it is absent. Historical per-release detail is in
+[verification history](history/VERIFICATION_THROUGH_V117.md).
+
+The Windows package requires startup, CLI, audio round trip, lazy SDAT dependency
+checks, ZIP integrity and checksum verification. No RPCS3/gameplay, real/testing
+JB, EBOOT writes or copyrighted assets in Git. See [testing policy](TESTING.md).

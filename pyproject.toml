@@ -3,7 +3,7 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 [project]
 name = "choops-extractor-reborn"
-version = "1.17"
+version = "1.18"
 requires-python = ">=3.11"
 dependencies = ["pycryptodome>=3.20,<4"]
 description = "Preservation-first PS3 College Hoops 2K8 archive tools"

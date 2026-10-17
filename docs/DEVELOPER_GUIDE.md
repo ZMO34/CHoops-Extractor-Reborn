@@ -18,8 +18,8 @@ LGPL sources. Audio conversion uses the restricted LGPL FFmpeg helper built from
 `tools/audio_codec/build_ffmpeg.sh` and the optional ATRAC3 encoder. No PyAV
 wheel is required or packaged. No other PC's credentials, environment or paths
 are copied. Versions go into ignored dev-setup.txt.
-requirements-windows-dev.txt is an old environment snapshot; pyproject/setup
-are the portable dependency contract.
+pyproject.toml and tools/dev/setup.py are the portable dependency contract.
+The obsolete pinned Windows environment snapshot has been removed.
 
 verify.py excludes real_game/runtime_manual and the optional legacy native
 comparison. It runs remaining synthetic/Qt tests, source smoke, fatal-error Ruff

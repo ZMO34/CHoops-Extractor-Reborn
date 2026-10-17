@@ -1,8 +1,8 @@
-> Updated 2026-10-11: choops_py.studio is PySide6. CURRENT_STATUS.md and the project
-> notes govern current editing support. The format contracts below retain some
-> inherited observations; table offsets are stock evidence, not universal hardcodes.
-> Supported growth and optional roster operations supersede older fixed-capacity
-> restrictions. Texture conversion is built in; audio is experimental Python CLI.
+> Inherited technical evidence, not the current per-game support contract.
+> See FEATURE_MATRIX.md, PS3_2K_ARCHIVES.md and NBA_ROSTERS_AND_2K14.md for
+> newer archive/roster variants. Current caching/audio/UI behavior is described
+> in WORKFLOWS.md; fixed-capacity and experimental-only statements below may
+> reflect earlier versions. Unknown bits remain preserved.
 
 # Project source of truth
 

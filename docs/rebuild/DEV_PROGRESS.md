@@ -1,3 +1,7 @@
+> **Historical evidence.** This document preserves an earlier implementation or research snapshot.
+> Current support: [documentation index](../README.md), CURRENT_STATUS and FEATURE_MATRIX.
+> Do not use old UI, packaging or support claims as current instructions.
+
 # Development progress
 
 Work implemented: native Qt explorer/nested inspection, actual image preview, confirmed roster fields with undo/redo and friendly selections, bounded extraction, source-bound XOR mod packages, replacement-folder staging, transactional chunked JB builds, exact untouched-range verification, cancellation and truthful interrupted-export reports. Tests include split-boundary reads/writes, native edit/save/reopen, malformed metadata and ZIP/path safety. Original inputs stay read-only.
