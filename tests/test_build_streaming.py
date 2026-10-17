@@ -143,3 +143,15 @@ def test_dds_preflight_removes_owned_temporary_folder(tmp_path, monkeypatch, fai
     else:
         build_copy.preflight(source, mod)
     assert not list((output/'temp').iterdir())
+
+
+def test_cli_manual_build_output_uses_builder_policy_without_relaxing_exports(tmp_path, monkeypatch):
+    from choops_py.cli import main
+    source = game_fixture(tmp_path/'source', iff_fixture())
+    mod = tmp_path/'mod';mod.mkdir()
+    (mod/'overrides.json').write_text('[]', encoding='utf8')
+    output = tmp_path/'chosen-drive'/'build'
+    assert main(['build-copy', str(source), str(mod), str(output)]) == 0
+    assert (output/'build_manifest.json').is_file()
+    # General-purpose exports still retain their project output restriction.
+    assert main(['inspect-iff', str(source/'PS3_GAME/USRDIR/0A'), str(tmp_path/'export')]) == 1

@@ -2,6 +2,7 @@
 
 - Faster sequential rebuild verification and persistent relocation bank handles.
 - Single-read source preconditions; avoid redundant CDF partner reads.
+- Fix CLI rejection of manually chosen JB output folders.
 - Verify copied non-bank files, preserved bank padding and generated headers.
 - Remove DDS preflight temporary folders on success/failure; check free disk space.
 - Include queued song imports, manual output folders and opaque archive-gap fixes from PR #22.

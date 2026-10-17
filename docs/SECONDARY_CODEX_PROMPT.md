@@ -96,7 +96,9 @@ trusting a prior build's verification result.
 Source preconditions share the replacement's original-asset read; unrelated
 preconditions are streamed. CDF pairs avoid eagerly rereading partners already
 supplied as replacements. DDS preflight temporary folders are removed after
-success or failure. Fixed-size builds check free space before copying. Source
+success or failure. The CLI build command now uses the same manual-output policy
+as the GUI/backend; other export commands retain their output restrictions.
+Fixed-size builds check free space before copying. Source
 inventory is captured before planning/preflight, so changes during that phase
 also prevent publication.
 
@@ -2017,10 +2019,11 @@ Embedded source: docs/TEST_REPORT.md
 
 # v1.16 rebuild performance verification
 
-Targeted synthetic rebuild tests: 25 passed, 1 GUI case deselected. Eleven new
+Targeted synthetic rebuild tests: 26 passed, 1 GUI case deselected. Twelve new
 regressions cover persistent split-bank reads/writes, bank crossings, overlapping
 preservation exclusions, corruption in preserved padding/non-bank files, cleanup,
-single-read source fingerprints and cancellation handle release. Existing append,
+single-read source fingerprints, cancellation handle release and CLI manual-output
+parity without relaxing unrelated exports. Existing append,
 relocation, CDF insertion, opaque-header-gap and manual-output regressions pass.
 
 Synthetic verification benchmark (Windows Python 3.12, 8,192 shuffled entries /
@@ -2028,7 +2031,7 @@ Synthetic verification benchmark (Windows Python 3.12, 8,192 shuffled entries /
 phase only. 16,384 opens become two. No real game files were used by the benchmark.
 Command: `python tools/dev/benchmark_rebuild.py`.
 
-Full portable verification: 552 passed, 9 offscreen OpenGL skips, 2 deselected;
+Full portable verification: 553 passed, 9 offscreen OpenGL skips, 2 deselected;
 compile, CLI/Qt smoke, Ruff, mypy, handoff and diff checks passed.
 Frozen Windows checks run in the release packaging workflow.
 RPCS3/gameplay NOT RUN; testing JB NOT BUILT; EBOOT NOT EDITED.

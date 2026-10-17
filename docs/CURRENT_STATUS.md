@@ -10,7 +10,9 @@ trusting a prior build's verification result.
 Source preconditions share the replacement's original-asset read; unrelated
 preconditions are streamed. CDF pairs avoid eagerly rereading partners already
 supplied as replacements. DDS preflight temporary folders are removed after
-success or failure. Fixed-size builds check free space before copying. Source
+success or failure. The CLI build command now uses the same manual-output policy
+as the GUI/backend; other export commands retain their output restrictions.
+Fixed-size builds check free space before copying. Source
 inventory is captured before planning/preflight, so changes during that phase
 also prevent publication.
 
