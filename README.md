@@ -37,10 +37,10 @@ Both Codex instances maintain documentation and submit each update through a PR;
 [AGENTS.md](AGENTS.md) defines the shared rules.
 
 
-### Shared PS3 2K sources (development)
+### Shared PS3 2K sources (v1.17)
 
 The editor now auto-detects the verified College Hoops and NBA 2K9 archive layouts
 for extraction, authored previews and source-format rebuilding. College Hoops 2K8
 roster features remain specific to that game. Other titles require verification;
 unknown layouts fail explicitly. See [shared format evidence and commands](docs/PS3_2K_ARCHIVES.md).
-These development changes are not included in the published v1.16 Windows ZIP.
+Included in the official v1.17 Windows release.

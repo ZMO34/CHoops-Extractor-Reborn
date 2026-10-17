@@ -1,4 +1,4 @@
-## Unreleased
+## v1.17
 
 - Auto-detect shared PS3 2K size32/size64 TOCs and preserve their layouts when rebuilding.
 - Read optional game identity, retain College Hoops roster boundaries and shared source/override caching.

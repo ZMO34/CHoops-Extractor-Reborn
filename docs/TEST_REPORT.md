@@ -1,4 +1,4 @@
-# Unreleased — automatic PS3 2K layouts
+# v1.17 — automatic PS3 2K layouts
 
 Focused automatic-layout/research suite: 22 passed. Covers both TOC schemas,
 64-bit stored sizes, ambiguous-layout rejection, split-bank extraction, fixed/
@@ -17,6 +17,11 @@ compatibility and runtime shader/roster behavior remain unverified.
 
 Full portable verification: 575 passed, 9 offscreen OpenGL skips, 2 deselected;
 compile, CLI/Qt smoke, Ruff, mypy, handoff and diff passed. RPCS3/gameplay NOT RUN; real/testing JB NOT BUILT; EBOOT NOT EDITED.
+
+Windows packaging validation: startup and synthetic audio round trip passed.
+Frozen CLI passed read-only NBA IFF extraction, fixed/growing/138-bank repack
+fixtures for both layouts and a three-worker NBA override import. Both source
+layouts retain unchanged synthetic source bytes. No supplied game was rebuilt.
 
 # v1.16 rebuild performance verification
 

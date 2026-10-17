@@ -84,7 +84,7 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
-# Unreleased — automatic shared PS3 2K archive layouts
+# v1.17 — automatic shared PS3 2K archive layouts
 
 The existing editor now detects the supported College Hoops/NBA size32 and size64
 TOC layouts automatically. Extraction, cached source/override previews, DDS import
@@ -101,6 +101,11 @@ case-sensitive internal CRC labels bridge the shared format variants. Source
 banks are unchanged. A standalone research inventory/extractor is also available.
 See PS3_2K_ARCHIVES.md for evidence, commands and explicit remaining limitations.
 Rebuilding is validated with synthetic fixtures only; no real/testing JB or RPCS3.
+
+Official v1.17 integrates PRs #22–24 and includes the Windows application.
+Portable verification: 575 passed; frozen startup/audio and both synthetic writer
+layouts passed. Both instances must maintain these docs and the generated handoff
+on every subsequent update.
 
 # v1.16 — sequential rebuild verification and queued soundtrack edits
 
@@ -2179,7 +2184,7 @@ Updated 2026-10-11. CURRENT_STATUS.md and TEST_REPORT.md are the living evidence
 
 Embedded source: docs/TEST_REPORT.md
 
-# Unreleased — automatic PS3 2K layouts
+# v1.17 — automatic PS3 2K layouts
 
 Focused automatic-layout/research suite: 22 passed. Covers both TOC schemas,
 64-bit stored sizes, ambiguous-layout rejection, split-bank extraction, fixed/
@@ -2198,6 +2203,11 @@ compatibility and runtime shader/roster behavior remain unverified.
 
 Full portable verification: 575 passed, 9 offscreen OpenGL skips, 2 deselected;
 compile, CLI/Qt smoke, Ruff, mypy, handoff and diff passed. RPCS3/gameplay NOT RUN; real/testing JB NOT BUILT; EBOOT NOT EDITED.
+
+Windows packaging validation: startup and synthetic audio round trip passed.
+Frozen CLI passed read-only NBA IFF extraction, fixed/growing/138-bank repack
+fixtures for both layouts and a three-worker NBA override import. Both source
+layouts retain unchanged synthetic source bytes. No supplied game was rebuilt.
 
 # v1.16 rebuild performance verification
 
