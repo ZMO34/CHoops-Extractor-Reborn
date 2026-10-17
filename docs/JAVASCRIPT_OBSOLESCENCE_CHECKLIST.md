@@ -1,3 +1,7 @@
+> **Historical evidence.** This document preserves an earlier implementation or research snapshot.
+> Current support: [documentation index](README.md), CURRENT_STATUS and FEATURE_MATRIX.
+> Do not use old UI, packaging or support claims as current instructions.
+
 # Legacy removal checklist
 
 The intended master tree includes Python package/tests, project metadata, documentation, and the two authorized original texture converter executables in tools/. No package.json/package-lock.json, JavaScript entry points, src/ or 2k-tools/ JavaScript trees, node_modules, native desktop editors, dist products, old packaged applications or generated output.

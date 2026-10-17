@@ -12,21 +12,32 @@ def category(entry):
     if re.match(r'shoe_',name):return 'Shoes'
     if re.match(r'(?:sel)?u[haxyz]\d+',name):return 'Uniforms'
     if name.startswith('cloth'):return 'Cloth geometry'
-    if re.fullmatch(r's\d+n?\.(iff|cdf|bin)',name):return 'Stadiums'
+    if re.fullmatch(r'[sf]\d+n?\.(iff|cdf|bin)',name):return 'Stadiums'
     if 'logo' in name or 'logo' in hint:return 'Logos'
-    if name.startswith(('p','h')) and re.fullmatch(r'[ph]\d+\.(iff|cdf|bin)',name):return 'Players'
+    if name.startswith(('p','h')) and re.fullmatch(r'(?:png|p|h)\d+\.(iff|cdf|bin)',name):return 'Players'
     if any(word in name for word in ('music','jukebox','chant','sfx')):return 'Audio'
     if any(word in name for word in ('frontend','teamselect','loading','legalpage')):return 'Menus'
     if 'roster' in name:return 'Rosters'
     if name in ('crowd.iff', 'gumbel.iff', 'kellogg.iff', 'gameintro_cameras.iff', 'playercreate.iff'):
         return 'Animation banks'
-    if 'singlemocap' in hint:return 'Animation banks'
+    if 'singlemocap' in hint or name=='motion.iff':return 'Animation banks'
     return 'Other / unresolved'
 
 
 def catalog(entries,model=None):
     references=defaultdict(set)
-    if model:
+    if model and hasattr(model,'game'):
+        for player in model.rows['players']:
+            references[hash_name(f"png{player['face_id']:04d}.iff")].add(player['display_name']+' — face artwork')
+        for arena in model.rows['arenas']:
+            for role in ('stadium_asset','floor_asset','dorna_asset','led_asset'):
+                if arena.get(role):references[hash_name(arena[role]+'.iff')].add(arena['arena_name']+' — '+role.replace('_',' '))
+        for team in model.rows['teams']:
+            if team.get('menu_logo'):
+                owner=team['city']+' '+team['team_name']
+                references[hash_name(team['menu_logo']+'.iff')].add(owner+' — menu logo')
+                references[hash_name('teamselectlogo.iff')].add(owner+' — '+team['menu_logo'])
+    if model and not hasattr(model,'game'):
         for school in model.rows.get('teams',[]):
             name=school['school_name']
             arena_index=school.get('arena_index')
@@ -84,7 +95,10 @@ def record_references(archive_name, records, model):
     """Confirmed school menu logo IDs resolve to exact logoNNN bank records."""
     owners=defaultdict(set)
     archive_name=archive_name or ''
-    if model and archive_name.lower()=='teamselectlogo.iff':
+    if model and hasattr(model,'game') and archive_name.lower()=='teamselectlogo.iff':
+        for team in model.rows['teams']:
+            if team.get('menu_logo'):owners[team['menu_logo']].add(team['city']+' '+team['team_name'])
+    if model and not hasattr(model,'game') and archive_name.lower()=='teamselectlogo.iff':
         for school in model.rows.get('teams',[]):
             if school.get('menu_logo_id') is not None:
                 owners[f"logo{school['menu_logo_id']:03d}"].add(school['school_name'])

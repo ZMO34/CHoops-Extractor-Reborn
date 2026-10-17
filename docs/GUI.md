@@ -17,7 +17,7 @@ widgets update on the Qt main thread through signals.
 Explorer opens read-only JB/PS3_GAME/USRDIR, searches hashes/names and nested IFF
 records. Texture Editor previews/exports supported TXTR/SCNE artwork with built-in
 conversion. Roster Editor exposes confirmed fields, RGB color picker, ratings,
-player/team shoes, save-copy/export, undo/redo and alternate controls. Audio has
+player/team shoes, save-copy/export and undo/redo. New alternate-asset controls are removed. Audio has
 separate Licensed Music and Fight Songs tabs, catalog browsing, selected/section
 WAV export, WAV replacement preparation and shared jukebox cover-art actions.
 Song titles and artists are read-only. Models/Courts

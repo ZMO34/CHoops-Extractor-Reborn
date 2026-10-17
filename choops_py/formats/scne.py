@@ -38,13 +38,21 @@ def preview_meshes(blocks):
         if instance_count > 10000:
             raise ValueError('SCNE instance count exceeds preview limit')
         instances = head.relative(0x40)
-        head.slice(instances, instance_count * 144)
-        for j in range(instance_count):
-            instance = instances + j*144
-            matrix = struct.unpack('>16f', head.slice(instance, 64))
-            if not all(math.isfinite(x) and abs(x) < 1e8 for x in matrix) or any(abs(matrix[k]) > 1e-5 for k in (3,7,11)) or abs(matrix[15]-1.) > 1e-5:
-                raise ValueError('Unsupported SCNE instance transform')
-            transforms.setdefault(head.u32(instance+68), []).append(matrix)
+        candidates=[]
+        for stride in (144,128):
+            try:
+                head.slice(instances,instance_count*stride)
+                candidate={}
+                for j in range(instance_count):
+                    instance=instances+j*stride
+                    matrix=struct.unpack('>16f',head.slice(instance,64))
+                    if not all(math.isfinite(x) and abs(x)<1e8 for x in matrix) or any(abs(matrix[k])>1e-5 for k in (3,7,11)) or abs(matrix[15]-1.)>1e-5:
+                        raise ValueError('Unsupported SCNE instance transform')
+                    candidate.setdefault(head.u32(instance+68),[]).append(matrix)
+                if candidate not in candidates:candidates.append(candidate)
+            except ValueError:continue
+        if len(candidates)!=1:raise ValueError('Unsupported or ambiguous SCNE instance transform layout')
+        transforms=candidates[0]
     # Materials refer to shader-sized parameter blocks containing texture hashes.
     # Match only aligned references to unique texture IDs in this package.
     try:
@@ -142,15 +150,21 @@ def preview_meshes(blocks):
             stream_count = head.u32(descriptor+20) or 1
             if not 1 <= stream_count <= 16 or not 1 <= vertices <= 250000:
                 raise ValueError('invalid vertex stream dimensions')
-            streams = []
-            for stream in range(stream_count):
-                entry = descriptor+28+stream*16
-                head.slice(entry,16)
-                stride, length = head.u32(entry+4), head.u32(entry+8)
-                if not 1 <= stride <= 256 or length != vertices*stride:
-                    raise ValueError('invalid vertex buffer dimensions')
-                start = head.relative(entry+12) if embedded else head.u32(entry+12)-1
-                streams.append((stride, payload.slice(start,length)))
+            stream_layouts=[];stream_bases=[]
+            for stream_base,stream_stride in ((28,16),(36,24)):
+                try:
+                    candidate=[]
+                    for stream in range(stream_count):
+                        entry=descriptor+stream_base+stream*stream_stride
+                        head.slice(entry,16)
+                        stride,length=head.u32(entry+4),head.u32(entry+8)
+                        if not 1<=stride<=256 or length!=vertices*stride:raise ValueError('invalid vertex buffer dimensions')
+                        start=head.relative(entry+12) if embedded else head.u32(entry+12)-1
+                        candidate.append((stride,payload.slice(start,length)))
+                    if candidate not in stream_layouts:stream_layouts.append(candidate);stream_bases.append(stream_base)
+                except ValueError:continue
+            if len(stream_layouts)!=1:raise ValueError('invalid or ambiguous vertex buffer dimensions')
+            streams=stream_layouts[0]
             declaration_count = head.u32(off + 0x94)
             if not 1 <= declaration_count <= 16:
                 raise ValueError("unsupported vertex declaration count")
@@ -247,12 +261,21 @@ def preview_meshes(blocks):
             if not 1 <= runs <= 10000:
                 raise ValueError("unsupported draw count")
             draw = head.relative(off + 0x80)
-            head.slice(draw, runs * 48)
+            draw_layouts=[]
+            for draw_stride in (48,64):
+                try:
+                    head.slice(draw,runs*draw_stride)
+                    if all(head.u32(draw+j*draw_stride)==6 and head.u32(draw+j*draw_stride+4)+head.u32(draw+j*draw_stride+8)<=index_count for j in range(runs)):
+                        draw_layouts.append(draw_stride)
+                except ValueError:continue
+            if not draw_layouts:raise ValueError('unsupported draw topology or index range')
+            if len(draw_layouts)>1 and runs>1:raise ValueError('ambiguous draw record layout')
+            draw_stride=64 if runs==1 and stream_bases[0]==36 and 64 in draw_layouts else draw_layouts[0]
             triangles = []
             batches = []
             for j in range(runs):
                 batch_start = len(triangles)
-                run = draw + j * 48
+                run = draw + j * draw_stride
                 primitive, first, size = (head.u32(run + k) for k in (0, 4, 8))
                 if primitive != 6 or first + size > index_count:
                     raise ValueError("unsupported draw topology or index range")
@@ -271,15 +294,16 @@ def preview_meshes(blocks):
                         if len({a, b, c}) == 3:
                             triangles.extend((points[a], points[b], points[c]))
                 if len(triangles) > batch_start:
+                    material_index=head.u16(run+32) if draw_stride==64 else head.u32(run+32)
                     batches.append({'first': batch_start, 'count': len(triangles)-batch_start,
-                                    'texture_index': material_textures.get(head.u32(run+32)),
-                                    'material_index': head.u32(run+32),
-                                    'lightmap_index':lightmap_textures.get(head.u32(run+32)) if secondary_uv else None,
-                                    'shader_mode':material_shader_modes.get(head.u32(run+32)) if color_decl else None,
-                                    'material_name': material_names.get(head.u32(run+32)),
-                                    'material_hash': material_hashes.get(head.u32(run+32)),
-                                    'supports_diffuse_color': head.u32(run+32) in diffuse_materials,
-                                    'diffuse_color':material_colors.get(head.u32(run+32))})
+                                    'texture_index': material_textures.get(material_index),
+                                    'material_index': material_index,
+                                    'lightmap_index':lightmap_textures.get(material_index) if secondary_uv else None,
+                                    'shader_mode':material_shader_modes.get(material_index) if color_decl else None,
+                                    'material_name': material_names.get(material_index),
+                                    'material_hash': material_hashes.get(material_index),
+                                    'supports_diffuse_color': material_index in diffuse_materials,
+                                    'diffuse_color':material_colors.get(material_index)})
                 if total_vertices + len(triangles) > 1500000:
                     raise ValueError("scene exceeds preview triangle budget")
             if triangles:

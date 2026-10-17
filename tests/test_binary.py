@@ -9,3 +9,10 @@ class BinaryTests(unittest.TestCase):
         for off,size in [(-1,1),(0,20)]:
             with self.assertRaises(ValueError):b.slice(off,size)
         with self.assertRaises(ValueError):Binary(b'\0'*4).relative(0)
+
+
+from choops_py.formats.tool_wrapper import wrap,unwrap
+class WrapperTests(unittest.TestCase):
+    def test_roundtrip(self):
+        data=wrap(1,[b'abc',b'def']);self.assertEqual(unwrap(data),(1,[b'abc',b'def']));self.assertEqual(unwrap(wrap(0,[])),(0,[]))
+        with self.assertRaises(ValueError):unwrap(data[:-1])

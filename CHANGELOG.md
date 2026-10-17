@@ -1,3 +1,32 @@
+# v1.18
+
+- Integrate NBA 2K14 reading, detected NBA roster editors and split-header repair (PR #25).
+- Add independent key/center-circle court reference guides (PR #26).
+- Replace stale landing pages/matrix with current per-game documentation; add workflow, troubleshooting, testing and release guides. Preserve dated research in clearly labelled history.
+- Remove obsolete pinned Windows dependency snapshot/unpublished beta draft; consolidate wrapper assertions into binary tests without reducing coverage.
+- Include the complete documentation tree in Windows packages and maintain the generated cross-PC handoff.
+
+## Unreleased — split archive headers and override error fixes
+
+- Read and write header regions across source banks; support a TOC crossing 0A.
+- Name damaged banks and expected/actual sizes instead of a generic incomplete-header error.
+- Keep actionable override/build failure details and targeted repair advice in the GUI.
+- Allow NBA2K14 override preview validation without enabling its unvalidated JB writer.
+
+## Unreleased — NBA PS3 roster schemas and NBA 2K14 archive reading
+
+- Read authenticated NPD v4 SDAT blocks and extended split-bank descriptors; keep SDAT JB writing blocked.
+- Decode/re-encode strict ZLIB IFF blocks; read extended IFF pointer tables without unsafe rewriting.
+- Detect College Hoops/NBA 2K9/NBA 2K14 roster payloads and expose verified per-game fields in side panels.
+- Add NBA face, court, logo and language filename candidates and explicit roster asset references.
+- Decode observed newer scene buffer/draw/instance variants and resolve separate court packages.
+- Add read-only cross-game animation inventory and portability evidence; no animation port.
+
+## Unreleased — additional court alignment guides
+
+- Add a separate key/free-throw-circle and center-circle guide toggle using stock authored geometry, independent of 3-point/border guides.
+- Keep guides raised, thin, flat-colored and separate from actual floor rendering.
+
 ## v1.17
 
 - Auto-detect shared PS3 2K size32/size64 TOCs and preserve their layouts when rebuilding.

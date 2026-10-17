@@ -174,7 +174,7 @@ def resolve_legacy_targets(archive,discovery,folder,job=None):
                 if end>entry['size']:raise ValueError('Invalid archive metadata: '+str(entry['name']))
                 result=names(archive.read({**entry,'offset':entry['offset']+end,'size':entry['size']-end}),0,count)
                 if len(result)<count:
-                    header=Binary(archive.read({**entry,'size':b.u32(4)}));start=32+b.u32(16)*32
+                    header=Binary(archive.read({**entry,'size':b.u32(4)}));start=header.relative(28)
                     result += [(label(header.u32(header.relative(start+i*4)),str(i)),TYPES.get(header.u32(header.relative(start+i*4)+4),'UNKNOWN')) for i in range(len(result),count)]
             elif head[:4]==bytes.fromhex('f0985030'):
                 result=cdf_records(entry,archive.read(entry))

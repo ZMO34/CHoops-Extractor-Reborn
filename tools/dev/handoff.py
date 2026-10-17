@@ -6,7 +6,14 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 DOCUMENTS = (
     "CURRENT_STATUS.md",
+    "FEATURE_MATRIX.md",
+    "WORKFLOWS.md",
+    "TROUBLESHOOTING.md",
+    "TESTING.md",
+    "RELEASING.md",
     "PS3_2K_ARCHIVES.md",
+    "NBA_ROSTERS_AND_2K14.md",
+    "ANIMATION_PORTABILITY.md",
     "ROSTER_SCALE_AND_PREVIEWS.md",
     "ROSTER_SEMANTICS.md",
     "ARENA_SHADER_MASKS.md",

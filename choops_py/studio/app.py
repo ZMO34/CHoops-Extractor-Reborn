@@ -712,6 +712,7 @@ class Window(QMainWindow):
 
             return
 
+        self._job_label=label
         worker = Worker(function, JobContext())
 
         self.active = worker
@@ -750,6 +751,7 @@ class Window(QMainWindow):
 
     def job_finished(self):
 
+        self._job_label=""
         self.active = None
 
         self.cancel.setEnabled(False)
@@ -768,7 +770,13 @@ class Window(QMainWindow):
 
         self.log(text)
 
-        QMessageBox.warning(self, "Operation could not complete", text)
+        from .build_diagnostics import failure_summary
+        label=getattr(self,'_job_label','Operation') or 'Operation'
+        if any(word in label.casefold() for word in ('override','jb','preflight')) or 'archive header' in str(text).casefold():
+            message=failure_summary(label,text)
+            self.build_details.setPlainText(message)
+            QMessageBox.warning(self,"Operation could not complete",message)
+        else:QMessageBox.warning(self, "Operation could not complete", text)
 
     def choose_game(self):
 
@@ -792,6 +800,7 @@ class Window(QMainWindow):
             self.scene_uniform_images = {}
             # A newly selected JB folder must not inherit another source's roster.
             self.roster = None
+            self.nba_roster=None;self.nba_panel.hide();self.ch_roster_panel.show()
             self.refresh_uniform_list()
             self.refresh_shoe_list()
             self.refresh_stadium_list()
@@ -863,7 +872,7 @@ class Window(QMainWindow):
         from ..archive.catalog import catalog
         archive = archive or self.preview_archive() or self.archive
         replacements=set(getattr(archive,'replacements',{}))
-        rows=catalog(archive.entries,self.roster)
+        rows=catalog(archive.entries,getattr(self,'nba_roster',None) or self.roster)
         for row in rows:
             row['preview_source']='Override' if row['index'] in replacements else 'JB fallback' if self.preview_overrides.isChecked() else 'Source JB'
         return rows
@@ -1012,7 +1021,7 @@ class Window(QMainWindow):
             "Assets (*.iff *.txtr *.dds *.scne);;All files (*)",
         )
 
-        if path and Path(path).name == "0A":
+        if path and Path(path).name in ("0A","0A.SDAT"):
             self.open_game(Path(path))
         elif path:
             self.run_job(
@@ -1089,7 +1098,7 @@ class Window(QMainWindow):
         self.nested.clear()
 
         from ..archive.catalog import record_references
-        records=record_references(self.asset_path.name,result['records'],self.roster)
+        records=record_references(self.asset_path.name,result['records'],getattr(self,'nba_roster',None) or self.roster)
         self.nested.setHeaderLabels(['Record','Type','Index','Roster references'])
         self.nested.header().setStretchLastSection(True)
         self.nested.setColumnWidth(3, 480)
@@ -1392,6 +1401,11 @@ class Window(QMainWindow):
             ],
         )
 
+        from .nba_roster import NBARosterPanel
+        self.nba_roster=None
+        self.nba_panel=NBARosterPanel(self);layout.addWidget(self.nba_panel,1);self.nba_panel.hide()
+        self.ch_roster_panel=QWidget();layout.addWidget(self.ch_roster_panel,1)
+        layout=QVBoxLayout(self.ch_roster_panel)
         from PySide6.QtWidgets import QMenu
         extra=QHBoxLayout()
         export_button=QPushButton('Export…');export_menu=QMenu(export_button)
@@ -1481,12 +1495,11 @@ class Window(QMainWindow):
     def load_game_roster(self, from_overrides=False):
         if not self.archive:
             return self.log("Open a source JB folder first.")
-        title=getattr(self.archive,'game_info',{}).get('TITLE','')
-        if (title and 'college hoops 2k8' not in title.casefold()) or getattr(self.archive,'toc_layout',None)=='size64-hash-offset':
-            return self.show_error('The College Hoops 2K8 roster schema is not confirmed for '+(title or 'this source')+'. Asset extraction, previews and rebuilding remain available.')
         try:
             archive=self.preview_archive(use_overrides=bool(from_overrides))
-            matches=[e for e in archive.entries if e["name"]=="roster_english.iff"]
+            title=getattr(archive,'game_info',{}).get('TITLE','').casefold()
+            roster_name='roster.iff' if title.startswith('nba 2k') or getattr(archive,'toc_layout',None)=='size64-hash-offset' else 'roster_english.iff'
+            matches=[e for e in archive.entries if e['name'] and e['name'].casefold()==roster_name]
             if len(matches)!=1:
                 raise ValueError("Roster identity is missing or ambiguous.")
             if from_overrides and matches[0]['index'] not in archive.replacements:
@@ -1501,6 +1514,12 @@ class Window(QMainWindow):
         )
 
     def display_roster(self, model):
+        from ..roster.nba import NBARosterModel
+        if isinstance(model,NBARosterModel):
+            self.nba_roster=model;self.roster=None
+            self.ch_roster_panel.hide();self.nba_panel.show();self.nba_panel.set_model(model);self.refresh_catalog()
+            return
+        self.nba_roster=None;self.nba_panel.hide();self.ch_roster_panel.show()
         same_roster=self.roster is model
         context=getattr(self,'_jersey_preview_row',None)
         if context and context.get('preview_player_index') is not None:
@@ -1651,6 +1670,8 @@ class Window(QMainWindow):
         if panel:panel.setCurrentIndex(0)
 
     def undo_roster(self):
+        if self.nba_roster and not self.active:
+            self.nba_roster.undo();self.nba_panel.populate();return
 
         if self.roster and not self.active:
 
@@ -1663,6 +1684,8 @@ class Window(QMainWindow):
             self.run_job("Undo roster edit", undo, self.display_roster)
 
     def redo_roster(self):
+        if self.nba_roster and not self.active:
+            self.nba_roster.redo();self.nba_panel.populate();return
 
         if self.roster and not self.active:
 
@@ -1700,6 +1723,7 @@ class Window(QMainWindow):
         self.run_job('Export decrypted USERDATA',lambda job:export_userdata(self.roster,output))
 
     def save_roster(self):
+        if self.nba_roster:return self.nba_panel.save()
 
         if not self.roster:
             return
@@ -1780,7 +1804,8 @@ class Window(QMainWindow):
         layout.addWidget(self.scene_cutaway)
         self.scene_three_point = QCheckBox('Alignment guide: 3-point lines')
         self.scene_border = QCheckBox('Alignment guide: out-of-bounds borders')
-        for box in (self.scene_three_point, self.scene_border):
+        self.scene_key_center = QCheckBox('Alignment guide: key and center circle')
+        for box in (self.scene_three_point, self.scene_border, self.scene_key_center):
             box.setChecked(False)
             box.toggled.connect(self.select_scene_part)
             layout.addWidget(box)
@@ -1895,7 +1920,7 @@ class Window(QMainWindow):
                 teams.setdefault(row['asset_id'], []).append(row['school_name'])
         if self.archive:
             for entry in sorted(self.archive.entries, key=lambda e:e['name'] or ''):
-                match = re.fullmatch(r's(\d+)\.iff', entry['name'] or '', re.IGNORECASE)
+                match = re.fullmatch(r'[sf](\d+)\.iff', entry['name'] or '', re.IGNORECASE)
                 if not match:continue
                 names = teams.get(int(match[1]), [])
                 label = (names[0] + ' — ') if len(names) == 1 else ''
@@ -2096,8 +2121,8 @@ class Window(QMainWindow):
         from ..formats.scene_palette import COURT_PALETTE_ROUTES
         layers = {b.get('reference_slot')
                   for m in self.scene_meshes if m.get('game_floor_layer') for b in m.get('batches', [])}
-        for box, slot in ((self.scene_three_point, 18), (self.scene_border, 4)):
-            box.setEnabled(slot in layers)
+        for box, slots in ((self.scene_three_point, {18}), (self.scene_border, {4}), (self.scene_key_center, {2, 10, 20})):
+            box.setEnabled(bool(slots & layers))
             box.setToolTip('Fixed stock court alignment guide, raised 1 game unit. '
                            'Independent of roster palettes and floor artwork.')
         self.scene_parts.addItem('All supported parts', -1)
@@ -2135,7 +2160,7 @@ class Window(QMainWindow):
         if self.roster and school is not None:teams=[self.roster.rows['teams'][school]]
         colors = teams[0]['palette_colors'] if len(teams) == 1 else None
         meshes = associate_palette(meshes, colors)
-        meshes = floor_layers(meshes, self.scene_three_point.isChecked(), self.scene_border.isChecked())
+        meshes = floor_layers(meshes, self.scene_three_point.isChecked(), self.scene_border.isChecked(), self.scene_key_center.isChecked())
         if self.scene_uniform_images:
             meshes = [{**mesh,'batches':[{**batch,'texture':'__uniform_'+mesh['uniform_surface'], 'palette_tint':None}
                                         for batch in mesh['batches']]}
@@ -2304,7 +2329,7 @@ class Window(QMainWindow):
             if unapplied:
                 message += f"\n\n{unapplied} overrides could not be applied. Review the details before building."
             else:
-                message += "\n\nYou can now build the JB folder."
+                message += "\n\nYou can now build the JB folder." if result.get('build_supported',True) else "\n\nPreviews are ready. JB rebuilding is not supported for this SDAT source yet."
         else:
             title = "JB build complete"
             message = f"The JB folder was built successfully.\n\nOutput: {result.get('output', '')}"

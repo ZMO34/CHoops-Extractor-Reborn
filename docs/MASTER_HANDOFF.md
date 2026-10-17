@@ -1,3 +1,7 @@
+> **Historical evidence.** This document preserves an earlier implementation or research snapshot.
+> Current support: [documentation index](README.md), CURRENT_STATUS and FEATURE_MATRIX.
+> Do not use old UI, packaging or support claims as current instructions.
+
 # Technical handoff reference index
 
 This public handoff contains portable development guidance. Personal context, session records, environment details and fixture-derived inventories are excluded.

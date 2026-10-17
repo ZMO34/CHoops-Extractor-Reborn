@@ -47,3 +47,9 @@ apron geometry is invented; without the stock reference guides are unavailable.
 These controls change no SCNE, roster or build data and retain the camera.
 
 Reference guide width uses the central 10% of the authored strip UV: U across both 3-point and boundary strips. This thins guides without moving their centerlines or modifying floor geometry.
+
+The separate key/center-circle toggle adds authored S256 routes 20 (Key Line),
+2 (Key Circle Outer) and 10 (Center Circle). Filled paint route 19 is excluded.
+Curved strips use V as their cross-line UV axis; straight key strips use U. The
+central 10% clipping and +1-unit height match the existing guide treatment. This
+changes reference overlays only and does not simulate a new runtime floor shader.
