@@ -296,3 +296,13 @@ reselect original overrides after a source change. Unknown geometry/metadata mus
 not be deleted to force an import. Unsupported errors retain their exact raw text.
 NBA2K14 can prepare supported overrides for preview, but its success message warns
 that authenticated JB rebuilding is not supported yet.
+
+## Key and center-circle alignment guide
+
+Models/Courts includes “Alignment guide: key and center circle” alongside the
+3-point and out-of-bounds toggles. It is off by default and available when the
+stock reference court's matching geometry was loaded. The toggle shows the key
+outline/free-throw circles and center-circle outline; it does not fill the key.
+These thin guides sit one game unit above the court and stay independent of
+school palettes, selected floor texture/layout and the other guide toggles.
+The stock reference requirement and College Hoops guide boundary are unchanged.

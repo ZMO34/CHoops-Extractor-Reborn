@@ -31,6 +31,18 @@ CLI/Qt smoke, Ruff, mypy, generated handoff and diff passed. Final exact-head
 verification is also recorded in the PR handoff.
 No RPCS3/gameplay, EBOOT edits, animation port or real/testing JB build.
 
+# Unreleased — key/center alignment guides
+
+Portable verification: 577 passed, 9 offscreen OpenGL skips, 2 deselected;
+compile, CLI/Qt smoke, Ruff, mypy, handoff and diff checks passed.
+
+Synthetic geometry test checks that routes 2/10/20 are copied from the authored
+reference, raised one unit and thinned on the appropriate UV axis, while filled
+key paint and actual floor draws remain unchanged. Qt regression checks default-off,
+independent enable/disable behavior alongside the existing guide toggles. Read-only
+stock S256 inspection confirms the named batches and radial UV direction. No game
+assets were committed, and no RPCS3 or real/testing JB was run/built.
+
 # v1.17 — automatic PS3 2K layouts
 
 Focused automatic-layout/research suite: 22 passed. Covers both TOC schemas,

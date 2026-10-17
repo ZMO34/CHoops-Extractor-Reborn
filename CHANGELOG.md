@@ -14,6 +14,11 @@
 - Decode observed newer scene buffer/draw/instance variants and resolve separate court packages.
 - Add read-only cross-game animation inventory and portability evidence; no animation port.
 
+## Unreleased — additional court alignment guides
+
+- Add a separate key/free-throw-circle and center-circle guide toggle using stock authored geometry, independent of 3-point/border guides.
+- Keep guides raised, thin, flat-colored and separate from actual floor rendering.
+
 ## v1.17
 
 - Auto-detect shared PS3 2K size32/size64 TOCs and preserve their layouts when rebuilding.
