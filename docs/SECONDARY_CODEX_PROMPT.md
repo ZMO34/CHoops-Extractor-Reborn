@@ -84,6 +84,16 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# NBA 2K11 donor research
+
+The supplied PS3 2K11 archive now opens read-only through observed NPD v3 SDAT
+authentication; v4 behavior and SDAT writer blocking remain unchanged. Inventory:
+6,974 entries, 1,040 resolved PNG names, 4,705 identifiable SingleMoCap records.
+Selected texture/arena/floor/audio blocks decode; full animation/mesh transfers
+and 2K11 roster editing remain unimplemented. See [donor ratings and evidence](NBA2K11_DONOR_ASSESSMENT.md).
+Best near-term donors are adapted artwork/audio; newer AI/physics/blending are
+not imported by copying assets. No RPCS3, EBOOT edits or real/testing JB.
+
 # v1.19 rebuild compatibility follow-up
 
 Folder DDS imports now consistently support a flat image targeting an existing
@@ -174,6 +184,10 @@ certifies game/runtime compatibility. Unknown variants fail explicitly.
 | Animation banks | Inventory/research | Inventory/portability research | Inventory/portability research |
 
 ## Shared features
+
+NBA 2K11 has additional **research-only read/extraction evidence** for the observed
+NPD v3 SDAT/72-byte descriptor copy. No 2K11 roster editor or SDAT build writer is
+enabled. [Donor evidence and limits](NBA2K11_DONOR_ASSESSMENT.md).
 
 - Explorer reads nested records and researched asset references; labels never make
   an unknown hash an established semantic identity.
@@ -505,6 +519,15 @@ formats. This is not a claim that every game/year/platform is compatible. New or
 ambiguous layouts require evidence and fixtures; do not add filename/title guesses
 or silently reinterpret an unknown format.
 
+## NBA 2K11 research access
+
+The observed NPD v3 SDAT variant (flags 0x0100003C) now selects its version-specific
+wrapping key and retains header/block authentication. The supplied 2K11 copy has
+6,974 entries, 72-byte descriptors, size64 TOC rows and mixed raw/SDAT banks.
+Extraction and bounded known inner readers are available; SDAT rebuilding remains
+blocked and no NBA 2K11 roster schema is enabled. See [donor assessment](NBA2K11_DONOR_ASSESSMENT.md)
+for verified sample reads, animation inventory, preview gaps and conversion ratings.
+
 ## NBA 2K9 supplied-copy observations
 
 Read-only inventory: 6 banks, 6,158,907,392 bytes, 5,624 entries, no overlaps.
@@ -711,6 +734,102 @@ uses the same payload dispatch. The source game is never modified.
 
 ---
 
+Embedded source: docs/NBA2K11_DONOR_ASSESSMENT.md
+
+# NBA 2K11 PS3 as a College Hoops 2K8 donor
+
+Read-only assessment, 2026-10-18. Scores are engineering judgments about useful
+results achievable through asset conversion, not measured gameplay improvements.
+No assets have been ported, no EBOOT changed and no RPCS3/gameplay test performed.
+
+**Overall: 8/10 for visual/audio donor material; 6/10 for animation conversion
+research; 1/10 for copying newer gameplay systems.** 2K11 offers more identified
+animation resources than the inspected 2K9 source, but is not established as a
+closer structural match. 2K9 remains the simpler first animation compatibility
+baseline; 2K11 is a valuable next comparison rather than a full-library swap.
+
+## Ratings by update
+
+| Desired update | Candidate rating | Conversion difficulty | Evidence and practical route |
+| --- | --- | --- | --- |
+| Court artwork, logos, signage | **9/10** | Low–medium | Resolved 85 floor names and 216 logo names. Floor `f030.iff` decodes two preview meshes without warnings. Eleven floor entries are 32-byte empty stubs, so names alone are not proof of useful artwork. Re-author/bake for CH UVs/materials and respect its base texture budgets. |
+| Uniform and shoe artwork | **8/10** | Medium | Resolved 138 UA + 138 UH names and nine shoe names (not a complete shoe inventory). Sample uniform DXT5 1024×512, L8 number atlas 1024×128; shoe DXT5 128×128 and DXT1 256×256. Extracted formats are readable. Keep CH cloth/neck/shorts bindings and adapt artwork/number masks; sampled uniform SCNEs are not decoded CH-style mesh replacements. No new alternate assets added. |
+| Arena detail/atmosphere | **7/10** | Medium–high | Fifty named stadium entries. Sample `s734.iff` has an arena with 22 parts / 52 textures; 21 parts decode for static preview with one unsupported UV declaration. Reuse signage and selected adapted props before attempting a whole arena. Lighting, palette/material bindings, collisions, scales and memory remain destination constraints. |
+| Faces and hair | **6/10** | High | 1,040 resolved PNG player-asset names. Sample `png0349.iff` contains two head SCNEs and five TXTRs plus unresolved records. Bench mesh decodes; high-detail mesh declaration is not supported. Sample head header +0x4C values 18/7 differ from CH 12/7. Match UVs, bones, skinning, facial motion and both LODs. CH's seven dedicated likeness slots/shared FaceGen routing still limit independent assignments. No drop-in cyberface port established. |
+| UI/scorebug artwork and presentation styling | **6/10** | High for live layouts | `gamedata.iff`, `frontend.iff`, `global.iff` and `jukebox.iff` parse; familiar SCNE/TXTR/LAYT families exist. Some UI vertex declarations are unsupported. Artwork can guide a CH redesign; score/clock/team-logo/message bindings must remain CH-specific. Do not transplant an entire HUD bank expecting its live logic to work. |
+| Sound effects and arena audio | **8/10** | Low–medium | 1,060 identifiable AUDO records; sampled global effects use the known 36-byte ATRAC3 headers at 48 kHz. One stereo sample decoded to PCM16 WAV (43,008 frames). Convert through WAV into existing CH slots; loop flags, triggers and commentary timing require their own checks. No complete 2K11 jukebox/song catalogue or PA event mapping claimed. |
+| Celebrations, intros and crowd clips | **6/10** | High | Identified SingleMoCap records include global/crowd and other banks. Prefer one low-interaction clip for a converter study. References, track masks and timing differ; events and triggers must be mapped. No new clip currently plays in CH. |
+| On-court dribbling, movement, shooting, contact animations | **6/10 research value; 2/10 direct-swap readiness** | Very high | 4,705 identifiable SingleMoCap records, versus existing inventories of CH 319 / 2K9 904 / 2K14 7,460. Samples include 56/64-byte reference-like and longer packed records. Bone mapping, rotations, root motion, ball/hand contacts, events, clip lookup and selection/blending must be decoded. More clips alone cannot supply smoother gameplay. |
+| Roster data / tendencies / playbooks | **4/10 research value** | High | `roster.iff` decodes a 2,692,320-byte ROST with marker 0x225, distinct from current 2K9 0xD1 and 2K14 0x235 profiles. No 2K11 roster writer enabled. Use already confirmed CH ratings/tendencies for curated authoring; do not reuse NBA offsets or assume NBA tactical logic fits a college roster. |
+| AI, physics, controls, animation blending engine | **1/10 as an asset donor** | New runtime implementation | Assets do not transfer the code that chooses/blends moves, coordinates contacts, interprets controls or runs AI. Under the current read-only EBOOT boundary, these are not file-copy updates. |
+
+## Actual inspection and extraction access
+
+The supplied copy has four banks, **6,974 TOC entries**, 72-byte descriptors and
+the existing size64/hash32/sector32 TOC. Banks 0A/2A use NPD **version 3**, flags
+0x0100003C; 1A/1B are ordinary banks. The existing reader previously accepted
+only v4. It now chooses the v3 wrapping key for this observed variant while
+retaining header and per-block authentication. No flag, integrity check or writer
+guard is relaxed. SDAT/extended archives remain read-only.
+
+The version-specific wrapping-key selection follows the primary format
+implementation in [RPCS3's unedat.cpp](https://github.com/RPCS3/rpcs3/blob/master/rpcs3/Crypto/unedat.cpp)
+and [key_vault.h](https://github.com/RPCS3/rpcs3/blob/master/rpcs3/Crypto/key_vault.h).
+Only source code was consulted; the emulator was not launched. The v3 branch uses
+the older wrapping key while v4 retains its previous key. Versions other than
+3/4, compression/debug flags and other unknown combinations stay rejected.
+
+Authenticated sparse reads passed at beginning/interior/end and across block
+boundaries in **both encrypted banks**. Complete header inventory found 3,511
+standard IFF signatures and 99 CDF-backed metadata signatures; no standard-IFF
+header traversal errors. Of the outer names, 1,936 currently resolve; the rest
+remain hashed rather than receiving speculative labels. The 3,120 flagged H7A
+resources were not all interpreted as IFFs or assigned gameplay semantics.
+
+Identified IFF records include **12,608 TXTR, 8,077 SCNE, 4,705 SingleMoCap,
+1,060 AUDO, 44 AUSB, 476 LAYT and one ROST**. These are structural inventories,
+not numbers of independent fully usable assets/clips. No old SKEL type was found;
+that does not mean 2K11 lacks skeletons. Unresolved record types may contain
+relevant dependencies and remain unclassified.
+
+Selected PNG/uniform/shoe/floor/stadium/global/gamedata/frontend/jukebox/roster/
+crowd and animation-bank blocks decompressed to declared lengths. The read-only
+animation inventory returns 4,705 records, five sample prefixes and unchanged
+source metadata. No track-to-pose decoder or round-trip animation writer exists.
+Native preview gaps are explicit skips/warnings, not successful full rendering.
+
+## Recommended order
+
+1. Convert a floor/signage texture and a shoe/uniform artwork sample onto existing
+   CH geometry, with a reversible asset diff. This is the best immediate payoff.
+2. Evaluate one face donor against CH's dedicated-slot/FaceGen contracts; separate
+   artwork from head mesh/skinning and account for shared CH normal maps.
+3. Convert one audio effect through WAV and an existing CH event slot.
+4. Decode one simple 2K9 clip, then the corresponding 2K11 family. Establish
+   skeleton/track/timing correspondence before allocating effort to gameplay moves.
+5. Study live HUD layouts and tactical data independently, using CH consumers.
+
+These are next-step recommendations, not implemented ports or runtime-certified
+features. Supplied inputs stayed immutable; extracted samples/reports remain local
+and excluded from Git. No game/testing JB was created.
+
+## Reproduce
+
+After preparing the existing Python environment:
+
+```powershell
+python -m choops_py.research.animation_compat "PATH_TO_NBA2K11_JB" --output output/reports/nba11-animations.json
+python -m pytest -q tests/test_sdat_2k14.py
+```
+
+The generic archive/extraction reader now accepts the observed v3 banks. This is
+not general NBA 2K11 GUI/roster/build certification. Existing 2K8/2K9/2K14 reader
+contracts and writer restrictions remain in force. Earlier face research's v3
+access blocker is superseded by this authenticated-reader evidence; its face
+conversion/assignment limits remain valid.
+
+---
+
 Embedded source: docs/ANIMATION_PORTABILITY.md
 
 # NBA animations to College Hoops: research only
@@ -723,10 +842,11 @@ Read-only inventory of supplied PS3 archives finds:
 |---|---:|---:|
 | College Hoops 2K8 | 319 | 1 |
 | NBA 2K9 | 904 | 1 |
+| NBA 2K11 | 4,705 | 0 |
 | NBA 2K14 | 7,460 | 0 |
 
 These are identifiable IFF records, not counts of all gameplay clips. Other raw
-banks remain undecoded. Zero old SKEL records does not mean NBA 2K14 has no skeleton.
+banks remain undecoded. Zero old SKEL records does not mean NBA 2K11/2K14 lack skeletons.
 NBA 2K14 motion.iff also contains three records of unresolved type 0x9D34E89E,
 with sample decoded lengths 166,408 / 15,464 / 8,128 bytes and leading version word
 0x21. Their gameplay lookup/graph semantics are unestablished. players.bin and
@@ -740,6 +860,12 @@ matrix-like data, but names/identity metadata differ. Crowd track masks also dif
 (for example 0x003DF7DD versus 0x003B77DD). Shared type hashes or matrix bytes do not
 prove the same bone ordering, bind pose, event format or clip lookup contract.
 NBA 2K9 is the stronger candidate for a future controlled retargeting study.
+
+The [2K11 donor follow-up](NBA2K11_DONOR_ASSESSMENT.md) authenticated the observed
+v3 SDAT banks and decoded selected SingleMoCap samples: 56/64-byte reference-like
+records and longer packed records. It is a rich next donor to compare after the
+closer 2K9 baseline, not proof of a compatible full library. Track masks, skeleton
+dependencies, events and lookup/selection consumers remain unestablished.
 
 NBA 2K14 uses changed sample envelopes: 32-byte reference-like records and longer
 records with different header organization/packed data. Sharing SingleMoCap's type
@@ -785,7 +911,11 @@ indirect feature reproduces part of the experience in the editor or an external
 workflow. A new engine feature requires executable/runtime logic, not just an IFF
 record with a similar name. EBOOT remains read-only; no emulator is launched.
 
-Our supplied donor evidence is PS3 NBA 2K9 and PS3 NBA 2K14. No modern Gen9 asset
+The [NBA 2K11 donor follow-up](NBA2K11_DONOR_ASSESSMENT.md) adds authenticated v3
+archive access, actual resource samples and per-category ratings. It supersedes
+the earlier 2K11 access blocker, not the requirement for conversion/consumer evidence.
+
+Our supplied donor evidence now includes PS3 NBA 2K9, 2K11 and 2K14. No modern Gen9 asset
 sample was inspected. PS3 2K14 must not be confused with PS4/Gen9 variants or taken
 as a bridge that automatically makes present-day resources compatible.
 
@@ -2431,6 +2561,31 @@ Updated 2026-10-11. CURRENT_STATUS.md and TEST_REPORT.md are the living evidence
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+# NBA 2K11 authenticated-reader and donor research
+
+Windows / Python 3.12.14 source `python tools/dev/verify.py`: **609 passed,
+9 skipped, 2 deselected**; compile, CLI/Qt smoke, Ruff, mypy, generated handoff
+and diff passed. `python -m pytest -q tests/test_sdat_2k14.py`: **8 passed**.
+Existing random reads/header/ciphertext/truncation tests now cover v3 and v4;
+metadata corruption, mixed encrypted/raw banks, write blocking and rejection of
+unknown versions/compressed/debug flags are covered. Six added parameter cases
+retain the original v4 checks. Final isolated exact-head results follow on the PR.
+
+Read-only supplied NBA 2K11: 6,974 archive entries, 72-byte descriptor/size64 TOC;
+both encrypted banks authenticate sparse beginning/interior/end/cross-block reads.
+Full standard-IFF header inventory has zero traversal errors. Generic animation
+inspection reports 4,705 SingleMoCap records and unchanged source metadata.
+Selected texture/SCNE/audio/roster/animation blocks decompress; floor f030 yields
+two preview meshes without warnings. Stadium s734 yields 21 supported arena parts
+and one unsupported UV part. Sample PNG high-detail vertices remain unsupported;
+bench geometry decodes. A 48-kHz stereo ATRAC3 effect exports 43,008 PCM16 WAV frames.
+ROST marker 0x225 is observed but no 2K11 roster editor enabled.
+
+Ratings are conversion judgments, not port/runtime tests. No track poses decoded,
+no direct cyberface/full-arena/HUD port, no Windows release/package requested,
+no EBOOT edits, RPCS3/gameplay or real/testing JB. Reports/artwork/audio stay local
+and excluded from Git. [Assessment and reproduction](NBA2K11_DONOR_ASSESSMENT.md).
 
 # v1.19 Reborn Overrides V5.5 import support
 

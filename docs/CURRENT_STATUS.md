@@ -1,3 +1,13 @@
+# NBA 2K11 donor research
+
+The supplied PS3 2K11 archive now opens read-only through observed NPD v3 SDAT
+authentication; v4 behavior and SDAT writer blocking remain unchanged. Inventory:
+6,974 entries, 1,040 resolved PNG names, 4,705 identifiable SingleMoCap records.
+Selected texture/arena/floor/audio blocks decode; full animation/mesh transfers
+and 2K11 roster editing remain unimplemented. See [donor ratings and evidence](NBA2K11_DONOR_ASSESSMENT.md).
+Best near-term donors are adapted artwork/audio; newer AI/physics/blending are
+not imported by copying assets. No RPCS3, EBOOT edits or real/testing JB.
+
 # v1.19 rebuild compatibility follow-up
 
 Folder DDS imports now consistently support a flat image targeting an existing

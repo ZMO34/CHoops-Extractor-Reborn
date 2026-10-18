@@ -23,6 +23,8 @@ historical claims that all related games behave identically.
 [Modern-feature backport feasibility](MODERN_FEATURE_BACKPORTS.md) separates
 existing asset/data routes, animation conversion research, companion workflows
 and changes requiring new runtime systems.
+[NBA 2K11 donor ratings](NBA2K11_DONOR_ASSESSMENT.md) report actual archive/asset
+inspection and distinguish useful conversion sources from unproven direct ports.
 
 ## Development and evidence
 

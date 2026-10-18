@@ -1,3 +1,28 @@
+# NBA 2K11 authenticated-reader and donor research
+
+Windows / Python 3.12.14 source `python tools/dev/verify.py`: **609 passed,
+9 skipped, 2 deselected**; compile, CLI/Qt smoke, Ruff, mypy, generated handoff
+and diff passed. `python -m pytest -q tests/test_sdat_2k14.py`: **8 passed**.
+Existing random reads/header/ciphertext/truncation tests now cover v3 and v4;
+metadata corruption, mixed encrypted/raw banks, write blocking and rejection of
+unknown versions/compressed/debug flags are covered. Six added parameter cases
+retain the original v4 checks. Final isolated exact-head results follow on the PR.
+
+Read-only supplied NBA 2K11: 6,974 archive entries, 72-byte descriptor/size64 TOC;
+both encrypted banks authenticate sparse beginning/interior/end/cross-block reads.
+Full standard-IFF header inventory has zero traversal errors. Generic animation
+inspection reports 4,705 SingleMoCap records and unchanged source metadata.
+Selected texture/SCNE/audio/roster/animation blocks decompress; floor f030 yields
+two preview meshes without warnings. Stadium s734 yields 21 supported arena parts
+and one unsupported UV part. Sample PNG high-detail vertices remain unsupported;
+bench geometry decodes. A 48-kHz stereo ATRAC3 effect exports 43,008 PCM16 WAV frames.
+ROST marker 0x225 is observed but no 2K11 roster editor enabled.
+
+Ratings are conversion judgments, not port/runtime tests. No track poses decoded,
+no direct cyberface/full-arena/HUD port, no Windows release/package requested,
+no EBOOT edits, RPCS3/gameplay or real/testing JB. Reports/artwork/audio stay local
+and excluded from Git. [Assessment and reproduction](NBA2K11_DONOR_ASSESSMENT.md).
+
 # v1.19 Reborn Overrides V5.5 import support
 
 Read-only discovery against the supplied V5.5 folder and vanilla College Hoops

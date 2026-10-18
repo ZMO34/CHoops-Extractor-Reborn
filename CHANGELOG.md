@@ -1,3 +1,8 @@
+# Unreleased — NBA 2K11 donor research
+
+- Read the observed v3 SDAT variant with version-specific key selection and retained authentication; keep SDAT output blocked.
+- Document actual NBA 2K11 asset/animation samples and donor suitability ratings; no gameplay, face or animation port implemented.
+
 # v1.19
 
 - Apply folder single-face cubemap compatibility consistently to Python manifests and paired CDF imports; preserve five base faces and report +X updates.
