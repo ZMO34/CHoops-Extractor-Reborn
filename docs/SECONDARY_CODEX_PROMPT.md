@@ -84,7 +84,25 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
-# Current status — v1.18
+# v1.19 rebuild compatibility follow-up
+
+Folder DDS imports now consistently support a flat image targeting an existing
+cubemap in both legacy and Python-manifest paths (standard IFF and CDF). This
+updates +X and preserves the other five base faces; complete cubes still replace
+all six faces. Direct texture editing remains strict. Reports identify +X imports.
+No cube flag is removed and no 2D image is duplicated across the other faces.
+
+IFF failures now identify archive, input role and magic, with corrective GUI
+advice. Invalid containers remain rejected; opaque bytes are not guessed/repaired.
+The supplied frontend_sync/legalpage ZIP passes preparation and build preflight
+against original 2K8. The locally supplied halftime complete HDR cube preserves
+all supplied artwork, scene headers and image capacity. Original inputs unchanged.
+The exact supplied ZIP also passes preparation/preflight in an isolated v1.16
+checkout. Its generic screenshot failure is not reproduced; the offending input
+or differing source/workspace is still needed to establish that specific cause.
+No RPCS3 or real/testing JB. Integrates research PR #28; no animation port added.
+
+# v1.18 foundation (retained context)
 
 This release integrates the NBA support/split-header repair from PR #25 and the
 key/center-circle court guide from PR #26, then refreshes the public documentation.
@@ -282,6 +300,8 @@ Do not replace a structural error with guessed identities or silently skipped by
 | Incomplete archive header | Check all split banks and their names/sizes. The current reader follows header/TOC boundaries across banks. Restore a truncated or missing bank from the original; send the named details if it persists. |
 | Geometry overlaps a texture image | The replacement image/geometry ranges cannot safely coexist. Use the reported record to check its SCNE and image layout; preserve the originals. Supported relocation is format-specific, not a blanket permission to overlap. |
 | Unknown/ambiguous record or no unique archive record | The selector matches none/multiple destination records. Verify the correct source JB and rip identity, nested name/hash and CDF partner. Do not rename every record to a generic logo. |
+| Not a standard PS3 IFF | Read the archive name, source/replacement role and hex magic. Raw TXTR/SCNE records belong under their archive record folder, not renamed to complete .iff files. Restore damaged containers from the same rip. |
+| Base cubemap faces error | Update/reselect overrides: flat folder DDS imports update +X and preserve five base faces, including manifests. For complete replacement use a six-face cube. Direct texture imports remain strict. |
 | Unsupported texture layout | Confirm 2D or a supported complete cube. A stored depth-one volume has specific support; true deeper volumes, DX10/arrays and unknown encodings remain restricted. |
 | Overrides show JB fallback | Check the chosen root, recognized archive/SCNE structure and matching selector. Reselect after edits and inspect diagnostics. DDS must belong to the resolved override record. |
 | Old artwork despite replacement | Check both selected SCNE and DDS paths, the global source dropdown and fallback labels. Compare source vs override, not just the IFF display name. Report the specific asset/record and folder structure. |
@@ -2403,6 +2423,21 @@ Updated 2026-10-11. CURRENT_STATUS.md and TEST_REPORT.md are the living evidence
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+# v1.19 compatibility verification
+
+Windows / Python 3.12.14 portable checks: **603 passed, 9 offscreen GL skips,
+2 deselected**; compile, CLI/Qt, Ruff, mypy, handoff and diff checks passed.
+
+Five new synthetic cases cover flat DDS cubemap imports through authoritative
+Python manifests for TXTR and SCNE, retained five faces/header bytes and report
+semantics, a paired-CDF face preservation case, named invalid-IFF roles/magic and retained structural error codes.
+No invalid-container acceptance is added. Read-only actual checks prepare and
+preflight the supplied frontend/legal ZIP; full halftime HDR cube artwork matches
+the imported DDS, scene headers/capacity remain unchanged. No source bank writes.
+The same ZIP also passes in an isolated v1.16 checkout; its generic screenshot
+failure is not reproduced. Final portable/isolated/frozen results are recorded
+on the release PR.
 
 # Verification — v1.18
 

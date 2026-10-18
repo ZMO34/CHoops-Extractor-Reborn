@@ -1,4 +1,22 @@
-# Current status — v1.18
+# v1.19 rebuild compatibility follow-up
+
+Folder DDS imports now consistently support a flat image targeting an existing
+cubemap in both legacy and Python-manifest paths (standard IFF and CDF). This
+updates +X and preserves the other five base faces; complete cubes still replace
+all six faces. Direct texture editing remains strict. Reports identify +X imports.
+No cube flag is removed and no 2D image is duplicated across the other faces.
+
+IFF failures now identify archive, input role and magic, with corrective GUI
+advice. Invalid containers remain rejected; opaque bytes are not guessed/repaired.
+The supplied frontend_sync/legalpage ZIP passes preparation and build preflight
+against original 2K8. The locally supplied halftime complete HDR cube preserves
+all supplied artwork, scene headers and image capacity. Original inputs unchanged.
+The exact supplied ZIP also passes preparation/preflight in an isolated v1.16
+checkout. Its generic screenshot failure is not reproduced; the offending input
+or differing source/workspace is still needed to establish that specific cause.
+No RPCS3 or real/testing JB. Integrates research PR #28; no animation port added.
+
+# v1.18 foundation (retained context)
 
 This release integrates the NBA support/split-header repair from PR #25 and the
 key/center-circle court guide from PR #26, then refreshes the public documentation.

@@ -1,6 +1,6 @@
 # Documentation index
 
-Current release: **v1.18**. This index separates usable instructions from format
+Current release: **v1.19**. This index separates usable instructions from format
 research and earlier development records. A documented parser result is not proof
 of gameplay compatibility. The per-game support matrix takes precedence over
 historical claims that all related games behave identically.

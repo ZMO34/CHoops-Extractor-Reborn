@@ -11,7 +11,7 @@ from .manifests import OUTPUT,build_destination as safe_output,digest
 from ..core.reports import save_build_json
 from ..core.paths import reject_links
 from ..core.errors import ToolError
-from ..formats.standard_iff import StandardIFF
+from .iff_validation import standard_iff
 from ..formats.standard_iff_writer import record,record_blocks,replace_records
 from ..formats.tool_wrapper import unwrap
 from ..formats.cdf_backed_iff import CDFPair
@@ -86,19 +86,19 @@ def preflight(source,mod,job=None,*,for_build=True):
                 finally:
                     shutil.rmtree(work)
             elif row['subfile'] is not None:
-                iff=StandardIFF(data);rec=record(iff,row['subfile'])
+                iff=standard_iff(data,name,'subfile destination');rec=record(iff,row['subfile'])
                 parts=unwrap(replacement)[1] if replacement[:4]==b'2kTl' else [replacement]
                 data=replace_records(iff,{rec['index']:parts})
             else:data=replacement
         if data[:4]==bytes.fromhex('ff3bef94'):
             from ..formats.standard_iff_writer import repair_compression
-            data,_=repair_compression(StandardIFF(data))
+            data,_=repair_compression(standard_iff(data,name,'replacement'))
         if len(data)>len(original) and not allow_growth:raise ToolError('archive_extent_capacity_exceeded',f'{name} needs {len(data)} bytes; allocation {len(original)}')
         if len(data)<len(original):
             if data[:4]!=bytes.fromhex('ff3bef94') and not name.endswith('.cdf'):raise ToolError('archive_size_change_blocked',name)
-            if data[:4]==bytes.fromhex('ff3bef94'):StandardIFF(data)
+            if data[:4]==bytes.fromhex('ff3bef94'):standard_iff(data,name,'replacement')
             data+=b'\0'*(len(original)-len(data))
-        if data[:4]==bytes.fromhex('ff3bef94'):StandardIFF(data)
+        if data[:4]==bytes.fromhex('ff3bef94'):standard_iff(data,name,'replacement')
         patches.append((entry,data))
     # Preconditions for assets not being replaced are still checked, but streamed.
     for index,expected in expected_sources.items():

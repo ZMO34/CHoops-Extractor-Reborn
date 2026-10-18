@@ -27,3 +27,12 @@ unknown shared ranges/offsets remain rejected. CDF uses validated paired edits,
 not unrestricted relocation. Keep original headers/unknown bits/trailers and
 unrelated records; reparse and compare untouched data. See SINGLE_SURFACE_COURT.md
 for bump routing, floor-only draw suppression and texture memory limitations.
+
+## Folder cubemap compatibility (v1.19)
+
+A flat DDS supplied through an overrides folder can replace the existing cube's
+first (+X) face. Its dimensions/format/mips are conformed to that face; five base
+faces are retained byte-for-byte in DDS pixel order. This now also applies to
+Python manifest selectors and paired CDF imports. Complete cube inputs retain
+six-face behavior. Direct generic DDS editing does not silently enable this path.
+Reports state which face changed. No spherical projection conversion is inferred.

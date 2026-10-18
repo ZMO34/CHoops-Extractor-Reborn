@@ -1,3 +1,10 @@
+# v1.19
+
+- Apply folder single-face cubemap compatibility consistently to Python manifests and paired CDF imports; preserve five base faces and report +X updates.
+- Identify archive/role/magic for invalid IFF errors and provide targeted corrective advice without bypassing validation.
+- Verify supplied frontend/legal overrides and complete halftime HDR cubemap using Python-only preparation/preflight; no real testing JB.
+- Integrate modern-feature feasibility research PR #28. No gameplay/animation backport implemented.
+
 # v1.18
 
 - Integrate NBA 2K14 reading, detected NBA roster editors and split-header repair (PR #25).

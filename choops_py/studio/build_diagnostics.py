@@ -4,6 +4,12 @@
 def diagnose(error):
     detail=str(error);text=detail.casefold()
     rules=(
+        (('not a standard ps3 iff','invalid_iff_override'),
+         'The named input is not a complete supported PS3 IFF container.',
+         'Read the archive name, source/replacement role and magic in Details. Keep raw TXTR/SCNE files inside their archive record folder; do not rename them to .iff. Restore a damaged complete IFF from the same rip and reselect the original overrides.'),
+        (('base cubemap faces',),
+         'Flat artwork was supplied for a six-face cubemap.',
+         'Folder imports update the first (+X) face and preserve the other five base faces. Reselect overrides in the current version. Direct texture edits remain strict: supply a complete cube to replace every face.'),
         (('incomplete archive header','incomplete_archive_header','short split-bank','short archive read','archive part size mismatch'),
          'The source archive header could not be read completely.',
          'Headers may span multiple banks. Update to the split-header fix. If it still fails, restore the named missing/truncated source banks from the same rip, then reselect the source JB. Renaming DDS overrides cannot repair source banks.'),

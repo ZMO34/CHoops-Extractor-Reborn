@@ -59,7 +59,7 @@ def code_identity():
     from ..core.code_identity import module_bytes
     root=Path(__file__).resolve().parents[1];identity=hashlib.sha256(b'choops-prepared-cache-1')
     if getattr(sys,'frozen',False):
-        modules=('archive.folder_import','archive.parallel_import','archive.layouts','formats.record_labels','formats.package','formats.txtr',
+        modules=('archive.folder_import','archive.iff_validation','archive.parallel_import','archive.layouts','formats.record_labels','formats.package','formats.txtr',
                  'formats.standard_iff','formats.standard_iff_writer','formats.cdf_backed_iff',
                  'formats.cdf_backed_iff_writer','formats.compression','formats.native_codec',
                  'texture_tools.override_import','texture_tools.archive_layout','texture_tools.builtin_converter',
