@@ -86,6 +86,14 @@ Embedded source: docs/CURRENT_STATUS.md
 
 # v1.19 rebuild compatibility follow-up
 
+PR #30's merged override changes were reviewed against all v1.16-v1.19 release
+tags; their histories and features remain present. The isolated merge passes
+portable checks (602 passed, 10 skipped, 2 deselected). Nine additional synthetic
+cases verify named/numeric folder DDS priority, legacy spelling resolution,
+complete IFF discovery, invalid index/root rejection and append/repack raw BIN
+preservation. See [the compatibility review](PR30_COMPATIBILITY_REVIEW.md).
+No runtime claim or additional merged feature PR is implied by this review.
+
 Folder DDS imports now consistently support a flat image targeting an existing
 cubemap in both legacy and Python-manifest paths (standard IFF and CDF). This
 updates +X and preserves the other five base faces; complete cubes still replace
@@ -2432,7 +2440,24 @@ Updated 2026-10-11. CURRENT_STATUS.md and TEST_REPORT.md are the living evidence
 
 Embedded source: docs/TEST_REPORT.md
 
-# v1.19 Reborn Overrides V5.5 import support
+# PR #30 merged compatibility audit
+
+Reviewed merge `fd9eae5d43f0dec436411661dcf99c52f326e562` in an isolated
+checkout with `tools/dev/verify.py --python <prepared Python 3.12 interpreter>`:
+**602 passed, 10 skipped, 2 deselected**. Compile, CLI/Qt smoke, Ruff, mypy,
+handoff and diff checks passed. Offscreen OpenGL and the absent optional native
+converter are skipped. Each of v1.16, v1.17, v1.18 and v1.19 is an ancestor.
+
+Nine added synthetic regressions pass. Full follow-up source verification with
+`python tools/dev/verify.py`: **612 passed, 9 skipped, 2 deselected**, all other
+portable checks passed. Final exact-head isolated results are posted on the
+follow-up PR. No production parser behavior changed in this audit.
+See [scope and retained feature coverage](PR30_COMPATIBILITY_REVIEW.md).
+No Windows package was rebuilt because dependencies, packaging and application
+code are unchanged. No RPCS3, gameplay, EBOOT editing or real/testing JB copy;
+small generated archive fixture outputs only. Unknown formats remain guarded.
+
+# v1.19 Reborn Overrides V5.5 import support (original submission evidence)
 
 Read-only discovery against the supplied V5.5 folder and vanilla College Hoops
 2K8 archive recognized 1,946 archive groups and scanned 25,428 files, including

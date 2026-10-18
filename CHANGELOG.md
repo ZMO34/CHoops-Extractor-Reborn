@@ -1,3 +1,8 @@
+# Unreleased — merged override compatibility audit
+
+- Verify PR #30 retains the v1.16-v1.19 feature history and existing regression suite.
+- Add regression coverage for numeric/named override folders, DDS priority, legacy record aliases and opaque BIN relocation without changing existing import policies.
+
 # v1.19
 
 - Apply folder single-face cubemap compatibility consistently to Python manifests and paired CDF imports; preserve five base faces and report +X updates.
