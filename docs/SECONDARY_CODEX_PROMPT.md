@@ -2075,7 +2075,9 @@ python -m choops_py.formats.scorebug YOUR_JB
 python -m choops_py.modding.scorebug_layout input.scne layout.json output/edited.scne
 ```
 
-The inventory includes sixth-man scenes and named authored text anchors. A layout
+The inventory includes sixth-man scenes and named authored text anchors. The [test02 geometry profiles](examples/scorebug-test02-layout.json) contain only
+configuration, with no game assets. Select the profile object for one named scene.
+A layout
 profile has `parts` keyed by exact part name and `text` keyed by exact anchor name.
 Part options: bounds [left,bottom,right,top], rectify_uv, single_quad, rgb_scale,
 z_offset, hide. Only observed split float3/float4, half2 UV/restart-strip layouts
