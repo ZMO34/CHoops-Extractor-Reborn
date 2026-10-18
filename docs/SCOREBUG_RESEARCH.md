@@ -354,8 +354,9 @@ Stock NAME metadata and read-only resource loading identify type **0xA423B39E** 
 0xE33E3B9C, U32 row count at +4 and relative row-table pointer at +8 (table at32).
 Each row has U32 tagged ID and a relative token-stream pointer. IDs are strictly
 sorted odd values. The final 0xFFFFFFFF row has an even **opaque word**, not a
-relative pointer; the native pointer fixup leaves untagged values alone. Its
-meaning is not invented, and its bytes are preserved exactly.
+relative pointer interpreted by this reader. Its meaning remains unestablished;
+its bytes are preserved exactly. The earlier claim that the native fixup skips
+even words was incorrect: the inspected generic fixup is unconditional.
 
 `loc_system.add_literal` supports one isolated ASCII/newline entry in this observed
 English layout. Literal tokens are 0x01 followed by an ASCII byte; NUL terminates
@@ -364,9 +365,9 @@ old relative pointers, and appends only the new literal. All old IDs/token bytes
 and sentinel remain intact. Other encodings, duplicate/reserved/even IDs, bad
 pointers, missing terminators and unknown layouts are rejected.
 
-The expanding standard-IFF writer permits this known type only with one independent
-slice and a validated extension: existing header metadata, ID mappings, token pool
-and sentinel must remain unchanged. A general translation rewrite is not enabled
+The expanding standard-IFF writer routes this known type through a dedicated
+writer requiring one complete block at offset zero and a validated extension:
+existing header metadata, ID mappings, token pool and sentinel remain unchanged. A general translation rewrite is not enabled
 by this growth exception. Existing strict behavior for unrelated types is retained.
 Synthetic tests exercise the IFF round trip and reject changed existing text.
 
@@ -377,3 +378,28 @@ changes; apply the documented Python extension to a custom English source to ret
 those instead. The alternative replacement_iff route contains both complete IFFs.
 Use one installation route and fully restart the game after rebuilding so it reloads
 localization. No EBOOT or font-bank changes, and no emulator test is performed here.
+
+### User-reported native test04 startup failure
+
+The supplied user log reports native asynchronous IFF loading at PC 0x00845E14
+with an unmapped read at 0x4D4C0002. New branding token bytes occur in the faulting
+thread; the English IFF extracted from the built JB matches the native test04
+package. This establishes a startup resource-load failure, not a HUD draw failure.
+The full build contains many additional mod archives. No new emulator run or
+controlled one-archive gameplay test has been performed.
+
+The old generic growth writer preserved the original 1,847,762-byte block and
+appended the complete enlarged table, yielding 3,695,588 decoded bytes. That
+unnecessary representation is withdrawn. The dedicated localization writer now
+writes a single 1,847,812-byte table at offset zero and stores it uncompressed,
+with equal stored/logical sizes. Read-only executable inspection of the native
+IFF loader confirms that equal lengths select direct reading, bypassing compressed
+loading. Old translations, title-case branding, outer metadata and NAME trailer
+remain intact; the gamedata revision does not change.
+
+This correction removes the implicated compressed representation and redundant
+heap. It does not prove the precise native corruption mechanism or certify that
+all remaining overrides boot. Runtime confirmation is required. Use the corrected
+local test04-crashfix package, replacing the previous English override; keep both
+supplied archive replacements, select the new overrides again, and rebuild.
+Do not layer old/new English IFFs. No EBOOT or font-bank changes.

@@ -84,6 +84,26 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# Unreleased — native test04 startup-crash correction candidate
+
+User crash logs show a startup asynchronous-IFF-loader access violation at
+0x00845E14, reading 0x4D4C0002. The built English archive matches native test04;
+branding token bytes appear in the failing thread. The build also contains many
+other overrides, so a complete runtime exclusion of those inputs is not claimed.
+
+The generic growth path unnecessarily retained the original English table and
+appended a new complete table, expanding its decoded block from 1,847,762 to
+3,695,588 bytes. Localization now requires a sole complete block at offset zero,
+validates all existing entries, and writes one uncompressed table (1,847,812 bytes).
+Equal stored/logical descriptor lengths select the native direct-read branch,
+bypassing the compressed path implicated by the log. Other resource writers retain
+their existing behavior. Local test04-crashfix ZIP keeps all five scene edits.
+
+This is a targeted correction candidate, not a gameplay-certified root-cause fix:
+the exact cause of corruption inside the compressed native load is not established.
+User retesting is required. Do not use the superseded native test04 English IFF.
+No emulator launch, executable write or new JB build. Continues PR #32.
+
 # Unreleased — scorebug test04 native branding and live team names
 
 Test04 connects home_city/away_city callbacks beside the logos and selects actual
@@ -2317,8 +2337,9 @@ Stock NAME metadata and read-only resource loading identify type **0xA423B39E** 
 0xE33E3B9C, U32 row count at +4 and relative row-table pointer at +8 (table at32).
 Each row has U32 tagged ID and a relative token-stream pointer. IDs are strictly
 sorted odd values. The final 0xFFFFFFFF row has an even **opaque word**, not a
-relative pointer; the native pointer fixup leaves untagged values alone. Its
-meaning is not invented, and its bytes are preserved exactly.
+relative pointer interpreted by this reader. Its meaning remains unestablished;
+its bytes are preserved exactly. The earlier claim that the native fixup skips
+even words was incorrect: the inspected generic fixup is unconditional.
 
 `loc_system.add_literal` supports one isolated ASCII/newline entry in this observed
 English layout. Literal tokens are 0x01 followed by an ASCII byte; NUL terminates
@@ -2327,9 +2348,9 @@ old relative pointers, and appends only the new literal. All old IDs/token bytes
 and sentinel remain intact. Other encodings, duplicate/reserved/even IDs, bad
 pointers, missing terminators and unknown layouts are rejected.
 
-The expanding standard-IFF writer permits this known type only with one independent
-slice and a validated extension: existing header metadata, ID mappings, token pool
-and sentinel must remain unchanged. A general translation rewrite is not enabled
+The expanding standard-IFF writer routes this known type through a dedicated
+writer requiring one complete block at offset zero and a validated extension:
+existing header metadata, ID mappings, token pool and sentinel remain unchanged. A general translation rewrite is not enabled
 by this growth exception. Existing strict behavior for unrelated types is retained.
 Synthetic tests exercise the IFF round trip and reject changed existing text.
 
@@ -2340,6 +2361,31 @@ changes; apply the documented Python extension to a custom English source to ret
 those instead. The alternative replacement_iff route contains both complete IFFs.
 Use one installation route and fully restart the game after rebuilding so it reloads
 localization. No EBOOT or font-bank changes, and no emulator test is performed here.
+
+### User-reported native test04 startup failure
+
+The supplied user log reports native asynchronous IFF loading at PC 0x00845E14
+with an unmapped read at 0x4D4C0002. New branding token bytes occur in the faulting
+thread; the English IFF extracted from the built JB matches the native test04
+package. This establishes a startup resource-load failure, not a HUD draw failure.
+The full build contains many additional mod archives. No new emulator run or
+controlled one-archive gameplay test has been performed.
+
+The old generic growth writer preserved the original 1,847,762-byte block and
+appended the complete enlarged table, yielding 3,695,588 decoded bytes. That
+unnecessary representation is withdrawn. The dedicated localization writer now
+writes a single 1,847,812-byte table at offset zero and stores it uncompressed,
+with equal stored/logical sizes. Read-only executable inspection of the native
+IFF loader confirms that equal lengths select direct reading, bypassing compressed
+loading. Old translations, title-case branding, outer metadata and NAME trailer
+remain intact; the gamedata revision does not change.
+
+This correction removes the implicated compressed representation and redundant
+heap. It does not prove the precise native corruption mechanism or certify that
+all remaining overrides boot. Runtime confirmation is required. Use the corrected
+local test04-crashfix package, replacing the previous English override; keep both
+supplied archive replacements, select the new overrides again, and rebuild.
+Do not layer old/new English IFFs. No EBOOT or font-bank changes.
 
 ---
 
@@ -2783,6 +2829,25 @@ Updated 2026-10-11. CURRENT_STATUS.md and TEST_REPORT.md are the living evidence
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+# Native test04 startup-crash correction candidate
+
+Read-only user log: asynchronous resource-loader PC 0x00845E14, access violation
+reading 0x4D4C0002, before HUD rendering. The failing thread contains added branding
+tokens. Built English content matches the supplied native test04 IFF. Its decoded
+block contains the old table plus an appended full replacement. Other build mods
+are present; neither universal mod compatibility nor a fully isolated gameplay
+root cause is claimed.
+
+Targeted layout/style/font/localization suite: **21 passed**. Regression checks
+require offset zero, one table, exact stored/logical-size equality and no H7A
+wrapper, plus rejection of prefix/alias/multiple-resource layouts. All old actual
+English translations remain byte-identical; new decoded size is old size +50 bytes.
+The corrected ZIP preserves gamedata bytes from native test04. Source portable verification: **624 passed, 9 skipped, 2 deselected**; compile,
+CLI/Qt, Ruff, mypy, handoff and diff passed. Corrected two-archive preparation and
+build preflight passed with zero unapplied DDS. Exact-head isolated results are
+recorded in the PR handoff.
+No emulator run, executable write or new game build; user runtime retest remains.
 
 # Test04 native branding follow-up
 

@@ -17,7 +17,7 @@ def entries(data):
     for i in range(count):
         at=table+i*8;key=b.u32(at)
         # Observed final invalid-ID sentinel carries an even opaque word, not a
-        # tagged relative pointer. The native fixup ignores untagged values.
+        # usable string pointer. Preserve it without interpreting its target.
         if key==0xffffffff:
             if i!=count-1 or b.u32(at+4)&1:raise ValueError('Invalid loc-system sentinel')
             rows.append((key,None));previous=key;continue

@@ -1,3 +1,22 @@
+# Native test04 startup-crash correction candidate
+
+Read-only user log: asynchronous resource-loader PC 0x00845E14, access violation
+reading 0x4D4C0002, before HUD rendering. The failing thread contains added branding
+tokens. Built English content matches the supplied native test04 IFF. Its decoded
+block contains the old table plus an appended full replacement. Other build mods
+are present; neither universal mod compatibility nor a fully isolated gameplay
+root cause is claimed.
+
+Targeted layout/style/font/localization suite: **21 passed**. Regression checks
+require offset zero, one table, exact stored/logical-size equality and no H7A
+wrapper, plus rejection of prefix/alias/multiple-resource layouts. All old actual
+English translations remain byte-identical; new decoded size is old size +50 bytes.
+The corrected ZIP preserves gamedata bytes from native test04. Source portable verification: **624 passed, 9 skipped, 2 deselected**; compile,
+CLI/Qt, Ruff, mypy, handoff and diff passed. Corrected two-archive preparation and
+build preflight passed with zero unapplied DDS. Exact-head isolated results are
+recorded in the PR handoff.
+No emulator run, executable write or new game build; user runtime retest remains.
+
 # Test04 native branding follow-up
 
 Targeted layout/style/font/localization regressions: **20 passed**. Covers explicit

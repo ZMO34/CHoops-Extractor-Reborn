@@ -1,3 +1,23 @@
+# Unreleased — native test04 startup-crash correction candidate
+
+User crash logs show a startup asynchronous-IFF-loader access violation at
+0x00845E14, reading 0x4D4C0002. The built English archive matches native test04;
+branding token bytes appear in the failing thread. The build also contains many
+other overrides, so a complete runtime exclusion of those inputs is not claimed.
+
+The generic growth path unnecessarily retained the original English table and
+appended a new complete table, expanding its decoded block from 1,847,762 to
+3,695,588 bytes. Localization now requires a sole complete block at offset zero,
+validates all existing entries, and writes one uncompressed table (1,847,812 bytes).
+Equal stored/logical descriptor lengths select the native direct-read branch,
+bypassing the compressed path implicated by the log. Other resource writers retain
+their existing behavior. Local test04-crashfix ZIP keeps all five scene edits.
+
+This is a targeted correction candidate, not a gameplay-certified root-cause fix:
+the exact cause of corruption inside the compressed native load is not established.
+User retesting is required. Do not use the superseded native test04 English IFF.
+No emulator launch, executable write or new JB build. Continues PR #32.
+
 # Unreleased — scorebug test04 native branding and live team names
 
 Test04 connects home_city/away_city callbacks beside the logos and selects actual

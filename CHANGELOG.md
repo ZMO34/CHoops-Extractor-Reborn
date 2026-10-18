@@ -1,3 +1,12 @@
+## Unreleased — native test04 startup correction
+
+- Replace the experimental duplicated compressed English heap with a single
+  uncompressed localization resource at offset zero. Preserve old translations,
+  resource metadata, NAME trailer and native title-case branding ID.
+- Reject localization compaction when unknown prefix bytes or other resources
+  could be moved. Add regressions for the native direct-read descriptor contract.
+- Record user-provided startup crash evidence and the remaining runtime uncertainty.
+
 ## Unreleased — test04 native branding follow-up
 
 - Route title-case College Hoops / Reborn through the existing native label renderer

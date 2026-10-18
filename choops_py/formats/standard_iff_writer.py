@@ -85,6 +85,12 @@ def replace_records(iff, changes):
 def replace_records_expanding(iff,changes):
     if iff.record_table != 32+len(iff.blocks)*32:
         raise ToolError('extended_iff_read_only','Extended IFF header metadata is not yet safe to rewrite')
+    localization=[index for index in changes if record(iff,index)['type_hash']==0xa423b39e]
+    if localization:
+        # Localization is loaded during startup. Do not append another complete
+        # table to its compressed heap: that experimental representation is
+        # implicated by the native startup failure despite Python round trips.
+        return _replace_localization(iff,changes)
     """Keep original logical addresses; append only enlarged or aliased slices.
 
     Complete TXTR/SCNE slices carry their own local relative pointers. Unchanged
@@ -101,12 +107,7 @@ def replace_records_expanding(iff,changes):
             if new==old:continue
             shared=any(other['index']!=index and any(b==block and start<e and s<end for b,s,e in iff.spans(other)) for other in iff.records)
             if len(new)>len(old) or shared:
-                if rec['type']=='TXT loc system' and rec['type_hash']==0xa423b39e:
-                    if shared or len(spans)!=1:raise ToolError('unsupported_record_growth','Localization requires one independent slice')
-                    from .loc_system import validate_extension
-                    try:validate_extension(old,bytes(new))
-                    except ValueError as error:raise ToolError('unsafe_localization_growth',str(error)) from error
-                elif rec['type'] not in ('TXTR','SCNE','NAME','CDAN','LAYT','ROST','AUDO'):raise ToolError('unsupported_record_growth',rec['name']+'.'+rec['type'])
+                if rec['type'] not in ('TXTR','SCNE','NAME','CDAN','LAYT','ROST','AUDO'):raise ToolError('unsupported_record_growth',rec['name']+'.'+rec['type'])
                 alignment=128 if iff.blocks[block]['fields'][0]==0x411536D5 else 16
                 target=(len(mutable[block])+alignment-1)&~(alignment-1)
                 mutable[block]+=b'\0'*(target-len(mutable[block]));mutable[block]+=new
@@ -170,6 +171,41 @@ def replace_records_expanding(iff,changes):
             wanted=expected.get((rec['index'],block),original_blocks[block][start:stop])
             raw=checked_blocks[new_block]
             if raw[new_start:new_start+len(wanted)]!=wanted:raise ToolError('writer_validation_failed','Record bytes differ after expansion')
+    return result
+
+
+def _replace_localization(iff,changes):
+    """Extend the observed sole English resource at offset zero, without H7A.
+
+    The native loader's equal stored/logical-size branch reads this block
+    directly. Keep the original outer metadata and NAME trailer; reject layouts
+    for which compacting would relocate any other resource or unknown heap data.
+    """
+    from .loc_system import validate_extension
+    if len(iff.records)!=1 or len(iff.blocks)!=1 or set(changes)!={0} or len(changes[0])!=1:
+        raise ToolError('unsupported_record_growth','Localization requires a sole complete block')
+    rec=iff.records[0];block=iff.blocks[0]
+    if rec['type_hash']!=0xa423b39e or rec['offsets']!=[0]:
+        raise ToolError('unsupported_record_growth','Localization requires a sole complete block at offset zero')
+    old=decode(iff.raw[block['start']:block['start']+block['size']],block['logical_size'])
+    new=bytes(changes[0][0])
+    if new==old:return iff.raw
+    try:validate_extension(old,new)
+    except ValueError as error:raise ToolError('unsafe_localization_growth',str(error)) from error
+    if len(new)>512*1024*1024:raise ToolError('oversized_logical_block','Expanded localization exceeds limit')
+    trailer=iff.raw[iff.file_length:];meaningful=0
+    if trailer[:4]==bytes.fromhex('aa171516'):meaningful=8+Binary(trailer).u32(4,'<')
+    if meaningful>len(trailer) or any(trailer[meaningful:]):
+        raise ToolError('unknown_trailer','Unclassified localization trailer')
+    header=bytearray(iff.raw[:iff.header_size]);end=block['start']+len(new)
+    suffix=iff.raw[block['start']+block['size']:iff.file_length]
+    struct.pack_into('>I',header,8,end+len(suffix))
+    struct.pack_into('>I',header,44,len(new))
+    struct.pack_into('>I',header,56,len(new))
+    result=bytes(header)+iff.raw[iff.header_size:block['start']]+new+suffix+trailer[:meaningful]
+    check=StandardIFF(result)
+    if check.records!=iff.records or record_blocks(check,check.records[0])[0][3]!=new:
+        raise ToolError('writer_validation_failed','Compact localization differs after writing')
     return result
 
 
