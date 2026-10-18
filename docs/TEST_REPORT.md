@@ -1,3 +1,16 @@
+# Scorebug test03 follow-up
+
+Targeted layout/native font regressions: **11 passed**. Covers partial-draw
+preservation, gradient flattening, unchanged UVs on shear removal, text basis and
+translated-marker offsets, ordered edits, native glyph coverage/spacing and
+malformed glyph rejection. Local scene-only overrides prepare/preflight with
+one gamedata archive, five SCNEs and no unapplied DDS. All 257 other stock records
+and all scene block sizes remain identical. Source portable verification: **614 passed, 9 offscreen GL skips, 2 deselected**;
+compile/CLI/Qt/Ruff/mypy/handoff checks passed. Exact-head isolated verification
+is recorded on PR #32. An initial sandbox run could not create pytest temporary
+fixtures; rerunning with normal filesystem permissions passed. Runtime text/meter/popup behavior is not
+certified; no emulator, executable writes or new JB build.
+
 # Scorebug test02 follow-up
 
 Portable Windows/Python 3.12.14 verification: **608 passed, 9 offscreen GL skips,

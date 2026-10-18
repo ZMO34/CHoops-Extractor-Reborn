@@ -84,6 +84,18 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# Unreleased — scorebug test03 alignment refinement
+
+Supersedes test02 artwork/layout: continuous rectangular backing, rectangular
+panel borders, clipped palette rectangles without the stock vertex gradient,
+larger square team logos and authored score text, narrower/lower body, native
+Stratum2 right-hand lettering, and black sixth-man/message backing geometry.
+Read-only executable research establishes separate home/away meter translations;
+all 19 meter draws and live palette/logo bindings remain intact. Five gamedata
+SCNEs change; 257 other records remain identical. User runtime testing is still
+required for text transforms, popup event states and meter animation. No emulator,
+executable modification or new JB build. Local test03 ZIP; code continues PR #32.
+
 # Unreleased — scorebug test02 and authored HUD editor
 
 Bounded experimental scene editing, sixth-man/text-anchor inventory and test02
@@ -2096,6 +2108,87 @@ aspect; team-color accuracy; sixth-man empty/filled states for home and away;
 message length/clipping during fouls, substitutions and timeouts; collision with
 clocks and right artwork. Further runtime bindings need evidence from those states.
 
+
+## Test03: continuous panels and native lettering
+
+Test03 supersedes test02 geometry/artwork. Runtime reference images revealed
+cutout corners, strip gaps, a detached sixth-man fill, a strong panel gradient
+and undersized non-native static lettering. The game resources, not the runtime
+screenshots alone, establish the following changes:
+
+- `polySurface16` consists of seven separate restart strips with spaces between
+  them. One validated independent quad now covers the whole backing; the other
+  strips are transparent. Index buffers and resource identities stay unchanged.
+- The shared frame atlas contains slanted transparent corners. Straight rectangular
+  artwork and rectified UVs replace them. Team colors stop inside the panel edges;
+  a continuous opaque backing covers joins. This addresses spill for all schools,
+  rather than special-casing Florida.
+- Team plates used vertex RGB ranging from 0.1 to 1.0. Test03 uses a uniform 0.72
+  multiplier; palette material bindings remain live. This removes the authored
+  gradient, but is not a claim of colorimetric equivalence to a television feed.
+- The body spans X −360..360, Y −208.5..−168.5; shadow reaches −211.5. Compared
+  with test02, width decreases from 760 to 720 world units and the body moves down
+  13.5 units. Team logos are square 38-unit quads. Scores use a 1.25 authored basis
+  scale. Font resources, score strings and callbacks remain unchanged; runtime
+  interpretation of the authored scale still needs user verification.
+- Read-only meter rendering code indexes two X translations, −185 and −337, then
+  subtracts 153 from Y. Its existing 19 material/draw bindings are preserved.
+  Local X60..145 and Y−15.5..−11.5 place the meters at X−125..−40 or −277..−192,
+  Y−168.5..−164.5. Both fit inside the black header X−340..−35,
+  Y−168.5..−152.5. Labels sit before each respective meter; the small slanted black
+  decoration is hidden independently of the rectangular background.
+- A fifth scene, `scorebug_blackbar`, receives a right-side backing rectangle
+  X55..360, Y−168.5..−138.5. Only its four visible background vertices move;
+  the unrelated three-vertex dummy draw remains byte-identical. Its `info` text
+  has a translated parent marker: the confirmed marker offset is preserved, not
+  flattened into the text's local position. Bottom-bar candidate popup anchors
+  move above the same region. This changes authored placement, not message event
+  dispatch or visibility. All foul/rebound/points states need manual confirmation.
+
+### Actual game font, not a platform font substitute
+
+The bottom-bar author properties explicitly name **Stratum2 22 32** for score,
+clock and period nodes, **Stratum2 18 26** for info/team text, and **Stratum2 12**
+for sixth-man labels. `fonts.iff` contains the corresponding FONT resources.
+Test03's static COLLEGE HOOPS / REBORN artwork uses the **STRATUM2_22_32** atlas.
+No font bank or executable is modified.
+
+Observed FONT structure: first/last codepoint are big-endian U16 at +0/+2;
+space advance is U32 +12; +8 is a relative map pointer. The map repeats the
+codepoint range and points from +4 to a contiguous 96-byte glyph table. Each glyph
+has U32 advance at +0, four float4 corner records at +16, and UV rectangle at +80.
+An embedded TXTR begins at FONT header +32, with a separate image block. The green
+channel contains coverage; taking DXT1 alpha instead would produce solid boxes.
+`native_font_art.render_line` composes those glyphs with recorded advances and
+bearings. It rejects missing characters and invalid/out-of-bounds metrics.
+Kerning tables remain undecoded: this uses native artwork and advances, not a
+claim of identical runtime kerning. The artwork keeps the 22-pixel cap height in
+an inferred half-scale HUD canvas (11 world units); actual runtime sizing must
+be checked against the user's next screenshot.
+
+### Updated developer profile options
+
+[Test03 profiles](examples/scorebug-test03-layout.json) retain only asset-free
+geometry configuration. Select one named scene object for the CLI. A part may
+contain one operation or a list applied in order. Additional bounded options:
+`straighten` removes shear without changing UVs; `vertex_range` is a half-open
+[first,last] range within one existing stream; `rgb` sets a uniform RGB value
+without replacing material palette bindings. Bounds are recomputed over the
+whole stream so an untouched dummy draw is not excluded by a partial edit.
+Text accepts either [x,y] or an object with `position`, optional `scale`, and a
+confirmed `marker_offset`. The latter is checked against source world/local
+copies before writing and retained afterward. A scale changes the authored 3x3
+basis, preserving resource pointers, translation Z and marker offsets.
+
+The local test03 ZIP contains five SCNE overrides with their matching DDS files,
+plus a separate complete stock-based gamedata IFF alternative. Use one route only.
+The scene route preserves unrelated custom gamedata edits. Replacing just SCNEs
+while retaining test02 DDS would restore the old atlas through DDS priority.
+257 other stock records, all original inputs, block sizes, live logo/palette IDs,
+all 19 meter draws and unrelated dummy vertices are checked for preservation.
+Static inspection and import/build preflight are not gameplay certification.
+No RPCS3, EBOOT writes or new real/testing JB. Derived assets remain local.
+
 ---
 
 Embedded source: docs/PROJECT_SOURCE_OF_TRUTH.md
@@ -2538,6 +2631,19 @@ Updated 2026-10-11. CURRENT_STATUS.md and TEST_REPORT.md are the living evidence
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+# Scorebug test03 follow-up
+
+Targeted layout/native font regressions: **11 passed**. Covers partial-draw
+preservation, gradient flattening, unchanged UVs on shear removal, text basis and
+translated-marker offsets, ordered edits, native glyph coverage/spacing and
+malformed glyph rejection. Local scene-only overrides prepare/preflight with
+one gamedata archive, five SCNEs and no unapplied DDS. All 257 other stock records
+and all scene block sizes remain identical. Source portable verification: **614 passed, 9 offscreen GL skips, 2 deselected**;
+compile/CLI/Qt/Ruff/mypy/handoff checks passed. Exact-head isolated verification
+is recorded on PR #32. An initial sandbox run could not create pytest temporary
+fixtures; rerunning with normal filesystem permissions passed. Runtime text/meter/popup behavior is not
+certified; no emulator, executable writes or new JB build.
 
 # Scorebug test02 follow-up
 

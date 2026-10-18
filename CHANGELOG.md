@@ -1,3 +1,13 @@
+## Unreleased — scorebug test03
+
+- Bounded HUD part ranges, ordered edits, shear removal, uniform vertex RGB and
+  authored text basis scaling with translated-marker preservation.
+- Native FONT glyph artwork composition using recorded bearings/advances and
+  coverage, without installing substitute fonts or modifying the font bank.
+- Documented local test03 layout: continuous backing/panel joins, adjusted logos,
+  palettes, sixth-man enclosure, message backing and native static lettering.
+  Runtime placement remains for user testing; no new application release.
+
 # Unreleased
 
 - Add bounded experimental authored HUD geometry/UV/color/text-anchor editing and sixth-man/text inventory.

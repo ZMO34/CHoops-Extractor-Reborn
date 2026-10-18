@@ -1,3 +1,15 @@
+# Unreleased — scorebug test03 alignment refinement
+
+Supersedes test02 artwork/layout: continuous rectangular backing, rectangular
+panel borders, clipped palette rectangles without the stock vertex gradient,
+larger square team logos and authored score text, narrower/lower body, native
+Stratum2 right-hand lettering, and black sixth-man/message backing geometry.
+Read-only executable research establishes separate home/away meter translations;
+all 19 meter draws and live palette/logo bindings remain intact. Five gamedata
+SCNEs change; 257 other records remain identical. User runtime testing is still
+required for text transforms, popup event states and meter animation. No emulator,
+executable modification or new JB build. Local test03 ZIP; code continues PR #32.
+
 # Unreleased — scorebug test02 and authored HUD editor
 
 Bounded experimental scene editing, sixth-man/text-anchor inventory and test02

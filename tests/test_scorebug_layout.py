@@ -77,3 +77,48 @@ def test_single_quad_requires_confirmed_restart_topology_and_keeps_indices():
     assert all(struct.unpack_from('>f',result[1],i*36+28)[0]==0 for i in range(4,8))
     head[128+0xa4:128+0xa8]=bytes(4)
     with pytest.raises(ValueError,match='restart strips'):edit_scene([bytes(head),payload],{'parts':{'quad':{'bounds':[0,0,4,4],'rectify_uv':True,'single_quad':True}}})
+
+
+def test_partial_range_preserves_other_draw_and_flattens_gradient():
+    source=fixture();result,_=edit_scene(source,{'parts':{'quad':{
+        'vertex_range':[0,2], 'bounds':[10,20,12,22], 'rgb':[.7,.7,.7]}}})
+    assert result[1][72:]==source[1][72:]
+    for i in range(2):
+        assert struct.unpack_from('>4f',result[1],i*36+16)==pytest.approx([.7,.7,.7,.8])
+    for selected in ([-1,2],[0,5],[1,1],[0,True]):
+        with pytest.raises(ValueError,match='vertex range'):
+            edit_scene(source,{'parts':{'quad':{'vertex_range':selected}}})
+
+
+def test_straightening_keeps_original_atlas_coordinates():
+    source=fixture();result,_=edit_scene(source,{'parts':{'quad':{
+        'bounds':[20,30,24,34],'straighten':True}}})
+    for i in range(4):
+        assert result[1][i*36+12:i*36+16]==source[1][i*36+12:i*36+16]
+    assert [struct.unpack_from('>2f',result[1],i*36) for i in range(4)]==[(20,30),(20,34),(24,30),(24,34)]
+
+
+def test_native_text_basis_scale_preserves_pointers_and_translated_marker():
+    source=fixture();head=bytearray(source[0])
+    for at in (640,660,680):struct.pack_into('>f',head,at,1)
+    struct.pack_into('>3f',head,848,10,120,8)
+    original=bytes(head)
+    with pytest.raises(ValueError,match='matching HUD marker'):
+        edit_scene([original,source[1]],{'text':{'message':[30,40]}})
+    result,_=edit_scene([original,source[1]],{'text':{'message':{
+        'position':[30,40],'scale':1.25,'marker_offset':[0,100,5]}}})
+    for at in (640,660,680):assert struct.unpack_from('>f',result[0],at)[0]==1.25
+    assert struct.unpack_from('>3f',result[0],848)==(30,140,8)
+    assert struct.unpack_from('>3f',result[0],864)==(30,40,3)
+    assert result[0][704:708]==original[704:708]
+    assert result[1]==source[1]
+
+
+def test_ordered_operations_preserve_relocated_vertices_when_hiding_other_draw():
+    source=fixture()
+    result,_=edit_scene(source,{'parts':{'quad':[
+        {'bounds':[20,30,24,34],'straighten':True},
+        {'vertex_range':[2,4],'hide':True}]}})
+    assert [struct.unpack_from('>2f',result[1],i*36) for i in range(4)]==[(20,30),(20,34),(24,30),(24,34)]
+    assert struct.unpack_from('>f',result[1],28)[0]==pytest.approx(.8)
+    assert struct.unpack_from('>f',result[1],100)[0]==0
