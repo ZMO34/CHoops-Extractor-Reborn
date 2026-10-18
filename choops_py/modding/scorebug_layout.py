@@ -13,6 +13,8 @@ from ..formats.tool_wrapper import unwrap,wrap
 
 
 def edit_scene(parts, profile):
+    if not isinstance(profile,dict) or set(profile)-{'parts','text'}:
+        raise ValueError('Profile requires parts/text keys; select one scene profile object')
     if len(parts)!=2:
         raise ValueError('HUD editing requires a split header/vertex SCNE')
     original=bytes(parts[0]);b=Binary(original);out=[bytearray(p) for p in parts]

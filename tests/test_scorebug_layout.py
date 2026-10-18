@@ -40,6 +40,7 @@ def test_rectification_preserves_interleaved_data_and_moves_all_text_copies():
 
 def test_bad_target_or_unmatched_marker_does_not_mutate_input():
     source=fixture();before=list(source)
+    with pytest.raises(ValueError,match='one scene profile'):edit_scene(source,{'scorebug_bottombar':{}})
     with pytest.raises(ValueError,match='Unknown HUD part'):edit_scene(source,{'parts':{'missing':{'hide':True}}})
     with pytest.raises(ValueError,match='HUD rectangle'):edit_scene(source,{'parts':{'quad':{'bounds':[0,0,0,4]}}})
     head=bytearray(source[0]);struct.pack_into('>f',head,864,999)
