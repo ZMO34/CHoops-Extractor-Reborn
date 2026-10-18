@@ -1,3 +1,12 @@
+## Unreleased — test04 native branding follow-up
+
+- Route title-case College Hoops / Reborn through the existing native label renderer
+  using an isolated tagged English literal ID and matching clock font/style values.
+- Guarded English loc-system extension preserves every existing token/ID/sentinel;
+  recognize the researched TXT loc-system type and validate independent IFF growth.
+- Preserve the native sixth-man visibility contract; the small left label now uses
+  native-glyph artwork. No executable/font-bank hook or gameplay certification.
+
 ## Unreleased — scorebug test04
 
 - Bounded native SCNE font-style inspection and edits, with independent live text

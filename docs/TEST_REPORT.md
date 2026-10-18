@@ -1,3 +1,17 @@
+# Test04 native branding follow-up
+
+Targeted layout/style/font/localization regressions: **20 passed**. Covers explicit
+ID low/high-float packing, preserved flags/vector tails, sorted localization insertion,
+opaque sentinel/old-pool preservation, malformed/duplicate/encoding rejection, safe
+IFF growth and rejection of changes to existing translations. Actual native-label
+style matches clock font alias, RGB, alpha and shadow values. All 21,637 existing
+localization rows and old token bytes are preserved; only one tagged literal is added.
+Two-archive override preparation/preflight passes with zero unapplied DDS.
+Source portable verification: **623 passed, 9 skipped, 2 deselected**; compile,
+CLI/Qt, Ruff, mypy, handoff and diff passed. Final exact-head isolated results
+are recorded on PR #32. No emulator, executable
+writes or native test04 JB built; runtime placement/visibility awaits user testing.
+
 # Scorebug test04 follow-up
 
 Targeted native style/layout/font checks: **15 passed**. New regressions distinguish

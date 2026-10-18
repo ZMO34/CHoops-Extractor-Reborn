@@ -4,6 +4,8 @@ from ..archive.manifests import safe_name, write_bytes, report
 MAGIC=0xFF3BEF94
 TYPES={0x5C369069:"TXTR",0xE26C9B5D:"SCNE",0x86A1AC9E:"LAYT",0xC61649B2:"ROST",0x1AEDDA1F:"AUDO",0x68B693B2:"NAME",0xA7701F00:"CDAN"}
 TYPES[0x61df2234]='AUSB'
+# Stock English NAME metadata and read-only resource loader identify this table.
+TYPES[0xa423b39e]='TXT loc system'
 # Embedded NAME metadata in stock gumbel/crowd/gamedata banks identifies this
 # family. Raw extraction is lossless; skeletal track interpretation is pending.
 TYPES[0x60900D71]='SingleMoCap'

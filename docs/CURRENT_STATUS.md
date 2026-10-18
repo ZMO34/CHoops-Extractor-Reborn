@@ -1,14 +1,18 @@
-# Unreleased — scorebug test04 live names and native font styles
+# Unreleased — scorebug test04 native branding and live team names
 
-Test04 connects the existing ABL text slots to registered home_city/away_city
-callbacks while retaining their original bone bindings. Scores, period and clocks
-select the actual Stratum2 25 style instead of an authored basis scale that runtime
-rebuilds. Full-panel frames become narrow gray separators, with an opaque popup
-backing in the main bottom scene. Branding reads College Hoops / Reborn in title
-case using matching FONT glyphs, RGB and shadow artwork. It remains texture-based:
-identical live-font shader/filtering and all event-state positions are not certified.
-No executable/localization/font-bank edit, emulator run or test04 JB build. Local
-asset ZIP and existing PR #32; source/public application release stays unchanged.
+Test04 connects home_city/away_city callbacks beside the logos and selects actual
+Stratum2 25 styles for scores, period and clocks. Narrow gray separators replace
+full-panel overlays; opaque popup/header backing is restored. College Hoops / Reborn
+is now title-case **native text**, using the existing sixth-man label draw path and
+a new isolated English localization ID. Font, RGB, alpha and shadow values match the
+clock. The small left 6th Man label becomes matching native-glyph texture artwork.
+
+Two IFFs are required: five SCNEs in gamedata.iff and one added tagged literal ID in
+english.iff. All 257 other gamedata records, all 21,637 existing localization rows,
+the opaque sentinel and old token pool remain intact. Branding shares the original
+sixth-man scene's visibility; disabled-feature/mode states and popup transitions
+still require user testing. No executable/font-bank/roster edit, emulator run or
+test04 JB build. Local native test04 ZIP; code continues PR #32.
 
 # Unreleased — scorebug test03 alignment refinement
 

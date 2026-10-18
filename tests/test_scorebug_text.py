@@ -14,10 +14,11 @@ def fixture():
     h[1000:1016]='message\0'.encode('utf-16-be')
     h[1600:1616]='message\0'.encode('utf-16-be')
     alias='Stratum2 22 32\0'.encode('utf-16-be');h[1500:1500+len(alias)]=alias
-    u(1200,3)
-    for i,(kind,key) in enumerate([(3,0xbf045bdb),(3,0xae7e1958),(0,0x6109ea5a)]):
+    u(1200,5)
+    for i,(kind,key) in enumerate([(3,0xbf045bdb),(3,0xae7e1958),(0,0x6109ea5a),(0,0x72b6694d),(2,0x92f9b3f9)]):
         at=1216+i*32;u(at+16,kind);u(at+20,key)
-    ptr(1216,1500);ptr(1248,1600);u(1280,222)
+    ptr(1216,1500);ptr(1248,1600);u(1280,222);u(1312,0x10090)
+    struct.pack_into('>4f',h,1344,31793,59031,7,9)
     return [bytes(h),b'untouched payload']
 
 
@@ -55,3 +56,14 @@ def test_shared_font_property_and_duplicate_binding_are_not_silently_changed():
         edit_styles([bytes(h),source[1]],{'message':{'font':'Stratum2 25'}})
     with pytest.raises(ValueError,match='already exists'):
         edit_styles([bytes(h),source[1]],{'message':{'binding':'second'}})
+
+
+def test_native_literal_id_vector_and_center_flags_follow_loader_pack_order():
+    source=fixture();assert inspect_styles(source[0])[0]['literal_id']==0xe6977c31
+    result,_=edit_styles(source,{'message':{'literal_id':0xc8b40001,'align':'center'}})
+    assert inspect_styles(result[0])[0]['literal_id']==0xc8b40001
+    assert struct.unpack_from('>4f',result[0],1344)==(1,51380,7,9)
+    assert struct.unpack_from('>I',result[0],1312)[0]==0x30090
+    assert result[1]==source[1]
+    for key in [0,2,0xffffffff]:
+        with pytest.raises(ValueError,match='literal'):edit_styles(source,{'message':{'literal_id':key}})

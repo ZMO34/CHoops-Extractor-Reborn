@@ -21,5 +21,12 @@
     "home_ABL": {
       "binding": "home_city"
     }
+  },
+  "6th_topbar": {
+    "th_man": {
+      "font": "Stratum2 25",
+      "literal_id": 3367239681,
+      "align": "center"
+    }
   }
 }

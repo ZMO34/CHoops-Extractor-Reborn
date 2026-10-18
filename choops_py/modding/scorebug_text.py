@@ -4,6 +4,7 @@ Style entries serialize a 16-byte value followed by type/key/reserved words.
 They are not key/value records starting at the type word. Runtime text callbacks
 select by text-record name; bone names stay independent of those bindings.
 """
+import math
 import struct
 
 from ..formats.binary import Binary
@@ -43,7 +44,14 @@ def inspect_styles(header):
             font=b.utf16(b.relative(value),'be') if b.u32(value) else ''
         def values(keys):
             return [b.u32(properties[k][0]) if k in properties and properties[k][1]==0 else None for k in keys]
-        rows.append(dict(binding=name,font=font,color=values(COLOR),shadow=values(SHADOW)))
+        literal=None
+        if 0x72b6694d in properties and 0x92f9b3f9 in properties:
+            flags,flag_type=properties[0x72b6694d];vector,vector_type=properties[0x92f9b3f9]
+            if flag_type==0 and vector_type==2 and b.u32(flags)&0x10:
+                lo,hi=struct.unpack('>2f',b.slice(vector,8))
+                if not all(math.isfinite(v) and 0<=v<=65535 and v==int(v) for v in (lo,hi)):raise ValueError('Invalid literal text ID vector')
+                literal=(int(hi)<<16)|int(lo)|1
+        rows.append(dict(binding=name,font=font,color=values(COLOR),shadow=values(SHADOW),literal_id=literal))
     return rows
 
 
@@ -52,7 +60,7 @@ def edit_styles(parts, changes):
     b,records=_records(parts[0]);out=bytearray(parts[0]);names=set(records);report=[]
     for name,change in changes.items():
         if name not in records:raise ValueError('Unknown SCNE text binding '+name)
-        if set(change)-{'font','binding'}:raise ValueError('Unsupported SCNE text style edit')
+        if set(change)-{'font','binding','literal_id','align'}:raise ValueError('Unsupported SCNE text style edit')
         at,properties=records[name]
         for option in ('font','binding'):
             if option not in change:continue
@@ -67,6 +75,21 @@ def edit_styles(parts, changes):
                 names.discard(name);names.add(value);field=at+64
             out.extend(bytes((-len(out))%4));target=len(out);out.extend(value.encode('utf-16-be')+bytes(2))
             struct.pack_into('>I',out,field,target-field+1)
+        if 'literal_id' in change or 'align' in change:
+            flags=properties.get(0x72b6694d)
+            if flags is None or flags[1]!=0:raise ValueError('Missing integer text flags')
+            if sum(1 for _,props in records.values() if props.get(0x72b6694d)==flags)!=1:raise ValueError('Text flags are shared by another record')
+            value=b.u32(flags[0])
+            if 'literal_id' in change:
+                key=change['literal_id'];vector=properties.get(0x92f9b3f9)
+                if type(key) is not int or not 0<key<0xffffffff or not key&1:raise ValueError('Invalid literal text ID')
+                if vector is None or vector[1]!=2:raise ValueError('Missing literal ID vector')
+                if sum(1 for _,props in records.values() if props.get(0x92f9b3f9)==vector)!=1:raise ValueError('Literal vector is shared by another record')
+                struct.pack_into('>2f',out,vector[0],key&0xffff,key>>16);value|=0x10
+            if 'align' in change:
+                if change['align']!='center':raise ValueError('Only confirmed center alignment is writable')
+                value=(value&~0x30000)|0x30000
+            struct.pack_into('>I',out,flags[0],value)
         report.append(dict(source=name,**change))
     if len(out)>len(parts[0]):out.extend(bytes((-len(out))%4))
     result=[bytes(out),parts[1]]

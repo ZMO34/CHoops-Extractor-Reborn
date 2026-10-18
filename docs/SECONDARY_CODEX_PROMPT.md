@@ -84,17 +84,21 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
-# Unreleased — scorebug test04 live names and native font styles
+# Unreleased — scorebug test04 native branding and live team names
 
-Test04 connects the existing ABL text slots to registered home_city/away_city
-callbacks while retaining their original bone bindings. Scores, period and clocks
-select the actual Stratum2 25 style instead of an authored basis scale that runtime
-rebuilds. Full-panel frames become narrow gray separators, with an opaque popup
-backing in the main bottom scene. Branding reads College Hoops / Reborn in title
-case using matching FONT glyphs, RGB and shadow artwork. It remains texture-based:
-identical live-font shader/filtering and all event-state positions are not certified.
-No executable/localization/font-bank edit, emulator run or test04 JB build. Local
-asset ZIP and existing PR #32; source/public application release stays unchanged.
+Test04 connects home_city/away_city callbacks beside the logos and selects actual
+Stratum2 25 styles for scores, period and clocks. Narrow gray separators replace
+full-panel overlays; opaque popup/header backing is restored. College Hoops / Reborn
+is now title-case **native text**, using the existing sixth-man label draw path and
+a new isolated English localization ID. Font, RGB, alpha and shadow values match the
+clock. The small left 6th Man label becomes matching native-glyph texture artwork.
+
+Two IFFs are required: five SCNEs in gamedata.iff and one added tagged literal ID in
+english.iff. All 257 other gamedata records, all 21,637 existing localization rows,
+the opaque sentinel and old token pool remain intact. Branding shares the original
+sixth-man scene's visibility; disabled-feature/mode states and popup transitions
+still require user testing. No executable/font-bank/roster edit, emulator run or
+test04 JB build. Local native test04 ZIP; code continues PR #32.
 
 # Unreleased — scorebug test03 alignment refinement
 
@@ -2202,7 +2206,7 @@ Static inspection and import/build preflight are not gameplay certification.
 No RPCS3, EBOOT writes or new real/testing JB. Derived assets remain local.
 
 
-## Test04: live roster names and actual text style selection
+## Test04 interim texture prototype (superseded by native revision below)
 
 The user's test03 screenshot establishes that the team names are absent, the
 horizontal panel overlays remain intrusive, and texture lettering differs from
@@ -2275,6 +2279,67 @@ are enabled. Native constant branding and exact live-font rendering remain open.
 No EBOOT/font bank/roster/uniform archive is changed. All five edited records reparse,
 all other 257 stock gamedata records remain identical, and scene-only overrides pass
 preparation/build preflight. No test04 JB, RPCS3 or gameplay test is run automatically.
+
+
+## Test04 native revision: the same live text renderer for branding
+
+The texture prototype above is superseded. The final native test04 package changes
+**gamedata.iff and english.iff**. It does not add executable callbacks or edit EBOOT.
+
+The existing `6th_topbar` dispatcher loops its text records, builds the style and
+calls the native default-text renderer. The `th_man` style has flag bit 0x10 set:
+its property **0x92F9B3F9** stores a tagged localization ID in two floats. The loader
+converts X to the low U16, Y to the high U16, packs them and sets bit zero. Stock
+values X31793/Y59031 reconstruct **0xE6977C31**, which points to the actual encoded
+`6th Man` translation in English. Existing newline translations use 0x010A tokens.
+These are numeric tagged string IDs, not archive CRCs.
+
+The native revision adds isolated literal ID **0xC8B40001** with tokens for
+`College Hoops\nReborn`. Its `th_man` style selects that ID, Stratum2 25 and the same
+center-alignment bits used by the score text. Its existing bone moves to the right
+panel at (294,−183); the native renderer handles the two lines, lowercase glyphs,
+coverage, shading and shadow. Direct resource checks show font alias, RGB 222 each,
+alpha 1, shadow RGB 10 each and shadow offsets −0.75/+0.5 match the clock. The old
+right-hand textured branding is removed. The former branding quad now supplies a
+small left `6th Man` label using native font-12 glyph artwork, inside the black
+header. There is no extra text record, new skeleton bone or new native callback.
+
+Branding inherits the original sixth-man scene visibility. The mode/option where
+that whole scene is disabled may also hide the branding; no separate always-on
+render hook is claimed. Runtime multi-line placement, long school names, popup
+transitions and all visibility options still require user screenshots. The popup
+backing remains always visible as documented for the interim prototype.
+
+### Bounded English localization extension
+
+Stock NAME metadata and read-only resource loading identify type **0xA423B39E** as
+`TXT loc system`. The observed English table starts with the English name CRC
+0xE33E3B9C, U32 row count at +4 and relative row-table pointer at +8 (table at32).
+Each row has U32 tagged ID and a relative token-stream pointer. IDs are strictly
+sorted odd values. The final 0xFFFFFFFF row has an even **opaque word**, not a
+relative pointer; the native pointer fixup leaves untagged values alone. Its
+meaning is not invented, and its bytes are preserved exactly.
+
+`loc_system.add_literal` supports one isolated ASCII/newline entry in this observed
+English layout. Literal tokens are 0x01 followed by an ASCII byte; NUL terminates
+the stream. It inserts a sorted row, shifts the old pool by eight bytes, recomputes
+old relative pointers, and appends only the new literal. All old IDs/token bytes
+and sentinel remain intact. Other encodings, duplicate/reserved/even IDs, bad
+pointers, missing terminators and unknown layouts are rejected.
+
+The expanding standard-IFF writer permits this known type only with one independent
+slice and a validated extension: existing header metadata, ID mappings, token pool
+and sentinel must remain unchanged. A general translation rewrite is not enabled
+by this growth exception. Existing strict behavior for unrelated types is retained.
+Synthetic tests exercise the IFF round trip and reject changed existing text.
+
+Installation requires **both** supplied archives. The scene_override route contains
+five gamedata SCNEs with DDSes, plus a complete English IFF containing the isolated
+entry. A stock-based English replacement will replace unrelated custom English
+changes; apply the documented Python extension to a custom English source to retain
+those instead. The alternative replacement_iff route contains both complete IFFs.
+Use one installation route and fully restart the game after rebuilding so it reloads
+localization. No EBOOT or font-bank changes, and no emulator test is performed here.
 
 ---
 
@@ -2718,6 +2783,20 @@ Updated 2026-10-11. CURRENT_STATUS.md and TEST_REPORT.md are the living evidence
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+# Test04 native branding follow-up
+
+Targeted layout/style/font/localization regressions: **20 passed**. Covers explicit
+ID low/high-float packing, preserved flags/vector tails, sorted localization insertion,
+opaque sentinel/old-pool preservation, malformed/duplicate/encoding rejection, safe
+IFF growth and rejection of changes to existing translations. Actual native-label
+style matches clock font alias, RGB, alpha and shadow values. All 21,637 existing
+localization rows and old token bytes are preserved; only one tagged literal is added.
+Two-archive override preparation/preflight passes with zero unapplied DDS.
+Source portable verification: **623 passed, 9 skipped, 2 deselected**; compile,
+CLI/Qt, Ruff, mypy, handoff and diff passed. Final exact-head isolated results
+are recorded on PR #32. No emulator, executable
+writes or native test04 JB built; runtime placement/visibility awaits user testing.
 
 # Scorebug test04 follow-up
 
