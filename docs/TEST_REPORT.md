@@ -1,3 +1,16 @@
+# v1.19 Reborn Overrides V5.5 import support
+
+Read-only discovery against the supplied V5.5 folder and vanilla College Hoops
+2K8 archive recognized 1,946 archive groups and scanned 25,428 files, including
+17,596 DDS files and 7,794 record files. Numeric folders 1004 and 1055 resolved
+to `shoe_100_04.iff` and `shoe_100_11.iff`; folder 1376 resolved to `uy011.iff`.
+The V5.5 `icon_tatoo` path resolved to `icon_tattoo`. No game or override source
+files were written. No JB copy was built. This is supplied-input discovery
+evidence, not a game/runtime compatibility claim.
+
+`git diff --check` passed on the submitted source changes. No full test suite or
+package rebuild was run on the v1.19 branch in this update.
+
 # v1.19 compatibility verification
 
 Windows / Python 3.12.14 portable checks: **603 passed, 9 offscreen GL skips,

@@ -8,6 +8,10 @@ No cube flag is removed and no 2D image is duplicated across the other faces.
 
 IFF failures now identify archive, input role and magic, with corrective GUI
 advice. Invalid containers remain rejected; opaque bytes are not guessed/repaired.
+The legacy Reborn Overrides V5.5 layout is recognized through direct numeric
+source-TOC folders, including nested TXTR/DDS artwork and complete IFF replacements.
+Its `icon_tatoo` record spelling maps to the source's `icon_tattoo` record. Raw
+`.bin` replacements such as `cribmusic.bin` retain their bytes without IFF parsing.
 The supplied frontend_sync/legalpage ZIP passes preparation and build preflight
 against original 2K8. The locally supplied halftime complete HDR cube preserves
 all supplied artwork, scene headers and image capacity. Original inputs unchanged.

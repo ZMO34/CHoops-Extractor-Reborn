@@ -33,7 +33,8 @@ def plan(source, additions, replacements=None, job=None):
     supplied={**additions,**replacements}
     for position,(name,data) in enumerate(supplied.items()):
         if job:job.check();job.progress(position,len(supplied),"Validating added archive assets")
-        if not re.fullmatch(r'[A-Za-z0-9_-]+\.(?:iff|cdf)',name,re.IGNORECASE):raise ValueError('Unsupported asset name')
+        allowed_ext=r'iff|cdf|bin' if name in replacements else r'iff|cdf'
+        if not re.fullmatch(r'[A-Za-z0-9_-]+\.(?:'+allowed_ext+r')',name,re.IGNORECASE):raise ValueError('Unsupported asset name')
         h=replacement_hash(name) if name in replacements else hash_name(name)
         if (name in additions and h in by_hash) or (name in replacements and h not in by_hash):raise ValueError('New/replacement asset identity conflict')
         if h in contents:raise ValueError('Duplicate asset hash')
