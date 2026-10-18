@@ -84,6 +84,18 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# Unreleased — scorebug test04 live names and native font styles
+
+Test04 connects the existing ABL text slots to registered home_city/away_city
+callbacks while retaining their original bone bindings. Scores, period and clocks
+select the actual Stratum2 25 style instead of an authored basis scale that runtime
+rebuilds. Full-panel frames become narrow gray separators, with an opaque popup
+backing in the main bottom scene. Branding reads College Hoops / Reborn in title
+case using matching FONT glyphs, RGB and shadow artwork. It remains texture-based:
+identical live-font shader/filtering and all event-state positions are not certified.
+No executable/localization/font-bank edit, emulator run or test04 JB build. Local
+asset ZIP and existing PR #32; source/public application release stays unchanged.
+
 # Unreleased — scorebug test03 alignment refinement
 
 Supersedes test02 artwork/layout: continuous rectangular backing, rectangular
@@ -2189,6 +2201,81 @@ all 19 meter draws and unrelated dummy vertices are checked for preservation.
 Static inspection and import/build preflight are not gameplay certification.
 No RPCS3, EBOOT writes or new real/testing JB. Derived assets remain local.
 
+
+## Test04: live roster names and actual text style selection
+
+The user's test03 screenshot establishes that the team names are absent, the
+horizontal panel overlays remain intrusive, and texture lettering differs from
+live HUD text. Test04 changes the following:
+
+- The bottom-bar dispatcher registers `home_city` and `away_city`, in addition to
+  scores/clocks. Those names are absent from the original bottom scene. The existing
+  home_ABL/away_ABL text **record names** now bind to those two callbacks. Their
+  `Score_bug` parent and ABL bone names remain unchanged. The callbacks select the
+  current game teams and their text IDs; names are not baked for one matchup or
+  copied from a particular private roster. Special game modes can select alternate
+  team-label paths. Exact display/clipping still needs user testing.
+- Scores, half/period, game clock and shot clock use the actual `Stratum2 25` font
+  alias. Test03 only scaled the authored text-record basis. The runtime style loader
+  reconstructs its matrix from the named parent/bone, so that basis edit is not a
+  dependable font-size control. Test04 does not rely on it.
+- Gray section separators are narrow vertical geometry, with gray top/bottom edges.
+  The shared atlas is solid gray, so no full-panel transparent frame silhouette
+  crosses the colored name panels. Former frame8_glare is a black popup backing
+  using the existing untextured black material, above the right side of the body.
+  It is always visible; it is not newly wired to popup event visibility.
+- Right popup candidate anchors move 25 world units left from test03. This corrects
+  the displacement observed in the supplied screenshot while retaining the native
+  message callbacks. The separate parented blackbar stays in the test03 layout;
+  it was not sufficient to back all bottom-bar popup callback states on its own.
+- The sixth-man header's visible draws use its existing untextured black material,
+  avoiding the partial texture-backed enclosure. All 19 live meter draws remain.
+- Branding is **College Hoops / Reborn**, not all caps. Its texture uses native
+  STRATUM2_25 glyphs at the same chosen font size, RGB 222/222/222 and shadow
+  10/10/10 with the native negative-X/positive-Y shadow direction. The right box is
+  widened to 132 world units so title-case text fits without squeezing its width.
+  Clock and shot-clock centers/separators are adjusted accordingly. The branding
+  material copies the known white left plate's sampler/state, retaining its own
+  texture resource. It is still textured geometry, not a new native text callback.
+  Identical runtime shader/filtering cannot be claimed. A native constant-text
+  registration/localization route remains unresolved; executable editing is barred.
+
+### Corrected serialized text-property layout
+
+The text record's +80 relative pointer leads to a property object with count at
++0. Its entries start at +16, each 32 bytes: **16-byte value, U32 type, U32 key,
+8 reserved bytes**. Reading a value after the key misassociates it with the next
+property. This corrects the earlier informal test03 property-offset investigation.
+The font-atlas identity was correct, but some claimed scalar associations were not.
+
+Confirmed style keys from the read-only loader:
+
+| Key | Purpose / observed value |
+| --- | --- |
+| 0x7714781F | Default localized text key, not font alias |
+| 0xBF045BDB | Font alias, e.g. Stratum2 22 32 |
+| 0x6109EA5A / 0x97DE0310 / 0x6814845A | Main RGB components, 222 each |
+| 0x53C67207 / 0x661F09B0 / 0x7DFC668B | Shadow RGB components, 10 each |
+| 0x4884F64A / 0x3F83C6DC | Shadow X/Y offsets, −0.75 / +0.5 |
+| 0xE27EC83B / 0xAE7E1958 | Parent scene instance / bone names |
+
+`scorebug_text.inspect_styles` reads bounded tables. `edit_styles` appends new
+UTF-16 strings and changes only selected font/name pointers. It preserves original
+strings, bone bindings, property types/keys, text counts and vertex buffers; duplicate
+bindings and invalid properties are rejected. Header growth is explicit and handled
+by the existing expanding IFF writer. Native bindings and font styles are asset-free
+[configuration](examples/scorebug-test04-text-styles.json); separate
+[geometry profiles](examples/scorebug-test04-layout.json) omit the generator's
+explicit draw-material reassignment and texture artwork. These are developer APIs,
+not a new scorebug GUI mode or a claim that geometry JSON alone recreates the ZIP.
+
+Read-only English localization inspection found a tagged string table and literal
+character tokens. No localization writer, new translation IDs or fallback guesses
+are enabled. Native constant branding and exact live-font rendering remain open.
+No EBOOT/font bank/roster/uniform archive is changed. All five edited records reparse,
+all other 257 stock gamedata records remain identical, and scene-only overrides pass
+preparation/build preflight. No test04 JB, RPCS3 or gameplay test is run automatically.
+
 ---
 
 Embedded source: docs/PROJECT_SOURCE_OF_TRUTH.md
@@ -2631,6 +2718,19 @@ Updated 2026-10-11. CURRENT_STATUS.md and TEST_REPORT.md are the living evidence
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+# Scorebug test04 follow-up
+
+Targeted native style/layout/font checks: **15 passed**. New regressions distinguish
+value-before-type/key properties, preserve ABL bone references when callback names
+change, preserve all other original header bytes/payload, reject malformed font
+properties reject shared font-property writes and duplicate bindings, and restore an explicitly hidden draw's alpha. Actual scene-only overrides
+prepare/preflight successfully; five scenes, one archive, zero unapplied DDS.
+Source portable verification: **618 passed, 9 skipped, 2 deselected**; compile,
+CLI/Qt smoke, Ruff, mypy, handoff and diff passed. Exact-head isolated results
+are recorded on PR #32. Runtime names,
+font sizes, popup states and exact branding appearance remain for user testing.
+No RPCS3, EBOOT writes or test04 JB built.
 
 # Scorebug test03 follow-up
 

@@ -1,3 +1,15 @@
+# Unreleased — scorebug test04 live names and native font styles
+
+Test04 connects the existing ABL text slots to registered home_city/away_city
+callbacks while retaining their original bone bindings. Scores, period and clocks
+select the actual Stratum2 25 style instead of an authored basis scale that runtime
+rebuilds. Full-panel frames become narrow gray separators, with an opaque popup
+backing in the main bottom scene. Branding reads College Hoops / Reborn in title
+case using matching FONT glyphs, RGB and shadow artwork. It remains texture-based:
+identical live-font shader/filtering and all event-state positions are not certified.
+No executable/localization/font-bank edit, emulator run or test04 JB build. Local
+asset ZIP and existing PR #32; source/public application release stays unchanged.
+
 # Unreleased — scorebug test03 alignment refinement
 
 Supersedes test02 artwork/layout: continuous rectangular backing, rectangular

@@ -1,3 +1,16 @@
+# Scorebug test04 follow-up
+
+Targeted native style/layout/font checks: **15 passed**. New regressions distinguish
+value-before-type/key properties, preserve ABL bone references when callback names
+change, preserve all other original header bytes/payload, reject malformed font
+properties reject shared font-property writes and duplicate bindings, and restore an explicitly hidden draw's alpha. Actual scene-only overrides
+prepare/preflight successfully; five scenes, one archive, zero unapplied DDS.
+Source portable verification: **618 passed, 9 skipped, 2 deselected**; compile,
+CLI/Qt smoke, Ruff, mypy, handoff and diff passed. Exact-head isolated results
+are recorded on PR #32. Runtime names,
+font sizes, popup states and exact branding appearance remain for user testing.
+No RPCS3, EBOOT writes or test04 JB built.
+
 # Scorebug test03 follow-up
 
 Targeted layout/native font regressions: **11 passed**. Covers partial-draw

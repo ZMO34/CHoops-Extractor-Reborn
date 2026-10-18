@@ -1,3 +1,12 @@
+## Unreleased — scorebug test04
+
+- Bounded native SCNE font-style inspection and edits, with independent live text
+  callback names and preserved scene/bone references.
+- Local test layout connects live school names, selects larger native font styles,
+  uses narrow gray separators and opaque popup/header backing, and changes branding
+  to title case with native glyph/color/shadow artwork. Exact live-font rendering
+  remains unresolved; no new runtime/executable hook is implemented.
+
 ## Unreleased — scorebug test03
 
 - Bounded HUD part ranges, ordered edits, shear removal, uniform vertex RGB and

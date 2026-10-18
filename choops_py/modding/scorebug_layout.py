@@ -73,6 +73,8 @@ def edit_scene(parts, profile):
         if not math.isfinite(z_offset) or abs(z_offset)>100:raise ValueError('Invalid HUD depth offset')
         scale=change.get('rgb_scale',1.)
         if not math.isfinite(scale) or not 0<=scale<=1:raise ValueError('HUD color multiplier must be 0..1')
+        alpha=change.get('alpha')
+        if alpha is not None and (not math.isfinite(alpha) or not 0<=alpha<=1):raise ValueError('HUD alpha must be 0..1')
         rgb=change.get('rgb')
         if rgb is not None and (len(rgb)!=3 or not all(math.isfinite(v) and 0<=v<=1 for v in rgb)):
             raise ValueError('HUD RGB must contain three values in 0..1')
@@ -108,7 +110,7 @@ def edit_scene(parts, profile):
             if z_offset:struct.pack_into('>f',out[1],at+8,point[2]+z_offset)
             color=struct.unpack_from('>4f',parts[1],at+rgba)
             if not all(math.isfinite(v) for v in color):raise ValueError('Non-finite HUD vertex color')
-            struct.pack_into('>4f',out[1],at+rgba,*(v*scale for v in (rgb if rgb is not None else color[:3])),0. if change.get('hide') or (single_quad and j>=4) else color[3])
+            struct.pack_into('>4f',out[1],at+rgba,*(v*scale for v in (rgb if rgb is not None else color[:3])),0. if change.get('hide') or (single_quad and j>=4) else (color[3] if alpha is None else alpha))
         if bounds is not None or z_offset:
             all_points=[struct.unpack_from('>3f',out[1],start+j*stride) for j in range(n)]
             lower=[min(p[k] for p in all_points) for k in range(3)]

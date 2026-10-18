@@ -1,0 +1,25 @@
+{
+  "scorebug_bottombar": {
+    "home_score": {
+      "font": "Stratum2 25"
+    },
+    "away_score": {
+      "font": "Stratum2 25"
+    },
+    "gameclock": {
+      "font": "Stratum2 25"
+    },
+    "shotclock": {
+      "font": "Stratum2 25"
+    },
+    "quarter": {
+      "font": "Stratum2 25"
+    },
+    "away_ABL": {
+      "binding": "away_city"
+    },
+    "home_ABL": {
+      "binding": "home_city"
+    }
+  }
+}

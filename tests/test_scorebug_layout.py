@@ -122,3 +122,10 @@ def test_ordered_operations_preserve_relocated_vertices_when_hiding_other_draw()
     assert [struct.unpack_from('>2f',result[1],i*36) for i in range(4)]==[(20,30),(20,34),(24,30),(24,34)]
     assert struct.unpack_from('>f',result[1],28)[0]==pytest.approx(.8)
     assert struct.unpack_from('>f',result[1],100)[0]==0
+
+
+def test_explicit_alpha_restores_a_previously_hidden_draw():
+    source=fixture();hidden,_=edit_scene(source,{'parts':{'quad':{'hide':True}}})
+    restored,_=edit_scene(hidden,{'parts':{'quad':{'alpha':1}}})
+    assert all(struct.unpack_from('>f',restored[1],i*36+28)[0]==1 for i in range(4))
+    with pytest.raises(ValueError,match='alpha'):edit_scene(source,{'parts':{'quad':{'alpha':2}}})
