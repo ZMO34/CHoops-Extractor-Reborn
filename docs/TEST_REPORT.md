@@ -1,3 +1,16 @@
+# Unreleased Legacy save editor foundation
+
+Read-only inspection of the supplied 5,523,948-byte Legacy-mode save found a
+validated roster payload at offset `0x438`, length `0x003DF800`, followed by
+1,461,684 bytes of additional mode data. The embedded payload passed the current
+roster model's structural validation with 5,685 players, 379 arenas, 443 teams,
+1,373 coaches, 39 conferences and 988 uniform rows, with zero validation issues.
+The adapter's unchanged encode returned bytes identical to the input. No source
+save was edited; no saved output or JB was produced. The additional mode data's
+semantics remain unknown.
+
+`git diff --check` passed. No full test suite or package rebuild was run.
+
 # v1.19 compatibility verification
 
 Windows / Python 3.12.14 portable checks: **603 passed, 9 offscreen GL skips,

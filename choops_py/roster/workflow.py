@@ -33,6 +33,10 @@ def save_model(model,output):
     if not result['valid']:raise ToolError('roster_validation_failed',str(result['issues'][:10]))
     data=model.source.encode(bytes(model.data));decoded=load_bytes(data)
     if decoded.kind!=model.source.kind or decoded.payload!=bytes(model.data):raise ToolError('roster_wrapper_validation_failed','Wrapper/payload round trip differs')
+    if model.source.kind=='legacy-save':
+        start=model.source.legacy_save_offset;end=start+len(model.source.payload)
+        if data[:start]!=model.source.original[:start] or data[end:]!=model.source.original[end:]:
+            raise ToolError('legacy_save_outer_bytes_changed','Legacy mode data outside the embedded roster changed')
     out=safe_output(output,[model.source.source_path.split('!')[0]] if model.source.source_path else [])
     write_bytes(out,data,[model.source.source_path.split('!')[0]] if model.source.source_path else [])
     report={'status':'success','source_type':model.source.kind,'source_sha256':digest(model.source.original),'output_sha256':digest(data),'edits':model.edits,'validation':result,'unknown_bytes_preserved':True}
@@ -61,6 +65,8 @@ def save(path,patch,output):
 
 def export_userdata(model,output):
     """Export decrypted save payload; encryption and PARAM files are not invented."""
+    if model.source.kind=='legacy-save':
+        raise ToolError('legacy_save_wrapper_export_blocked','Exporting USERDATA would omit Legacy-mode data; use Save copy to preserve the complete save')
     import struct
     validation=model.validate()
     if not validation['valid']:raise ToolError('roster_validation_failed',str(validation['issues'][:10]))

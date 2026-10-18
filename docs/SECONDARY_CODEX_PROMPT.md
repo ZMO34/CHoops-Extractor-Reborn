@@ -86,6 +86,12 @@ Embedded source: docs/CURRENT_STATUS.md
 
 # v1.19 rebuild compatibility follow-up
 
+Unreleased Legacy save support recognizes the observed 2K8 `USERDATA` profile and
+exposes its embedded roster through the roster editor. The copy writer is fixed-
+extent and verifies every byte outside that region remains unchanged. Legacy-mode
+state after the embedded roster is still unmapped and read-only; a single save
+cannot establish the meaning of those fields.
+
 Folder DDS imports now consistently support a flat image targeting an existing
 cubemap in both legacy and Python-manifest paths (standard IFF and CDF). This
 updates +X and preserves the other five base faces; complete cubes still replace
@@ -2065,7 +2071,7 @@ editable through declared masks. The older restricted-field paragraph below is
 historical; ROSTER_EDITOR.md and projects/ define current scope. Six palette words
 remain unresolved; long string rebuilding and unknown fields remain blocked.
 
-Roster adapters support standard IFF ROST, raw ROST, type-21 wrapper, decrypted USERDATA with 4-byte prefix, and one-USERDATA decrypted ZIP. No encrypted-save decryption is provided. Known tables: players 0x0271AC/5685/308, arenas 0x1D5C84/379/28, teams 0x1D85E0/443/704, coaches 0x23F78C/1373/44.
+Roster adapters support standard IFF ROST, raw ROST, type-21 wrapper, length-prefixed decrypted USERDATA, one-USERDATA decrypted ZIP, and the observed CH2K8 Legacy-mode USERDATA profile. In that profile, a validated ROST-shaped payload begins at save offset 0x438 and has the standard 0x003DF800-byte extent; the remaining mode data is preserved, not interpreted. The writer allows only fixed-size edits to this embedded roster and checks bytes before/after it remain unchanged. No encrypted-save decryption is provided. Known ROST tables: players 0x0271AC/5685/308, arenas 0x1D5C84/379/28, teams 0x1D85E0/443/704, coaches 0x23F78C/1373/44.
 
 ROST runtime string pointers are field + signed delta - 1, consumed as UTF-16BE (77FB1C / 7C5818). Stored reference anchors retain the documented +1 biases. Player last/first pointers +0x10/+0x14 target aligned big-endian text; do not use the shifted ASCII-only LE interpretation. Jersey number is byte +0x1B (preserve adjacent flags and player ID +0x18), height +0x3A, position +0x3B. Team roster references +0x6C, 18 slots, point to player row +0x11. Team arena +0x44 targets arena row +0x19, coaches +0x60/+0x64/+0x68 target coach row +0x15, rivals +0x4C/+0x50/+0x54 target team row +0x31. Asset IDs are high u16 at +0x18C/+0x190/+0x194; preserve low words and require consistent existing IDs. Conference record fields +0x0A..+0x22 are exposed with their source labels and original u16/RGB widths, based on the public CH2k8 roster parser and cross-checked against supplied USERDATA record values. The source labels identify founded year, championship-order values, Final Fours, prior-year bids, rank, tournament settings, and color; gameplay effects are not independently verified. Prestige and unknown appearance fields remain read-only. Names use copy-on-write UTF-16 growth with preserved aliases and fixed table locations; keyboard limits are advisory. Conference +0x1A is now confirmed as a tournament index and protected pending a backlink writer; logo routing uses 900 + conference index. See CONFERENCE_ASSETS.md.
 
@@ -2423,6 +2429,19 @@ Updated 2026-10-11. CURRENT_STATUS.md and TEST_REPORT.md are the living evidence
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+# Unreleased Legacy save editor foundation
+
+Read-only inspection of the supplied 5,523,948-byte Legacy-mode save found a
+validated roster payload at offset `0x438`, length `0x003DF800`, followed by
+1,461,684 bytes of additional mode data. The embedded payload passed the current
+roster model's structural validation with 5,685 players, 379 arenas, 443 teams,
+1,373 coaches, 39 conferences and 988 uniform rows, with zero validation issues.
+The adapter's unchanged encode returned bytes identical to the input. No source
+save was edited; no saved output or JB was produced. The additional mode data's
+semantics remain unknown.
+
+`git diff --check` passed. No full test suite or package rebuild was run.
 
 # v1.19 compatibility verification
 
