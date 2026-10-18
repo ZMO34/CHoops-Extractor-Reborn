@@ -1,3 +1,17 @@
+# Scorebug test02 follow-up
+
+Portable Windows/Python 3.12.14 verification: **608 passed, 9 offscreen GL skips,
+2 deselected**; compile, CLI/Qt, Ruff, mypy, handoff and diff passed.
+Scene-only overrides prepared/preflighted successfully with zero unapplied DDS.
+Final exact-head isolated review is recorded on the PR.
+
+Synthetic layout regressions cover vertex/UV/color/alpha/depth changes, preserved
+unknown interleaved data, paired text matrices/markers, invalid-target rejection,
+restart-strip topology and inventory of sixth-man text anchors. Actual static
+asset checks preserve all 258 unedited gamedata records and scene block sizes.
+No runtime placement, popup visibility or font behavior is certified. See the
+scorebug research and PR for exact final-head checks and local artifact evidence.
+
 # v1.19 compatibility verification
 
 Windows / Python 3.12.14 portable checks: **603 passed, 9 offscreen GL skips,

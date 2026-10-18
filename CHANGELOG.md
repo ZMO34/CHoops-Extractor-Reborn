@@ -1,3 +1,8 @@
+# Unreleased
+
+- Add bounded experimental authored HUD geometry/UV/color/text-anchor editing and sixth-man/text inventory.
+- Document scorebug test02 corrections and runtime boundaries; derived user-test assets remain local, not distributed through Git.
+
 # v1.19
 
 - Apply folder single-face cubemap compatibility consistently to Python manifests and paired CDF imports; preserve five base faces and report +X updates.

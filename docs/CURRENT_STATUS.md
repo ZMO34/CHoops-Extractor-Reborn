@@ -1,3 +1,13 @@
+# Unreleased — scorebug test02 and authored HUD editor
+
+Bounded experimental scene editing, sixth-man/text-anchor inventory and test02
+asset evidence are in SCOREBUG_RESEARCH.md. Restores the prior team RGB multiplier,
+rectifies team-logo UVs, attaches CHRB to a fixed left quad, adds fixed right-side
+COLLEGE HOOPS/REBORN artwork and adjusts authored meter/message placement.
+Runtime messages/timing and dynamic tournament labels are not newly implemented.
+No executable edits, emulator runs or real/testing JB. Local user-test ZIP only;
+no game assets in Git. Current public application release remains v1.19.
+
 # v1.19 rebuild compatibility follow-up
 
 Folder DDS imports now consistently support a flat image targeting an existing
