@@ -57,6 +57,17 @@ def test_hide_changes_only_alpha_and_unknown_vertex_words_stay_exact():
         assert result[1][i*36+32:i*36+36]==source[1][i*36+32:i*36+36]
 
 
+def test_disable_native_label_loop_preserves_records_bones_and_geometry():
+    source=fixture();result,report=edit_scene(source,{'disable_text':True})
+    assert struct.unpack_from('>I',result[0],0x4c)[0]==0
+    assert result[0][:0x4c]==source[0][:0x4c] and result[0][0x50:]==source[0][0x50:]
+    assert result[1]==source[1] and report==[{'disabled_text_records':1}]
+    # Ordered part operations must not lose the final label-suppression action.
+    repeated,_=edit_scene(source,{'parts':{'quad':[{'hide':True}]},'disable_text':True})
+    assert struct.unpack_from('>I',repeated[0],0x4c)[0]==0
+    with pytest.raises(ValueError,match='boolean'):edit_scene(source,{'disable_text':1})
+
+
 def test_inventory_includes_sixth_man_and_named_authored_anchor():
     from support import iff_fixture
     from choops_py.formats.cdf_backed_iff_writer import name_trailer

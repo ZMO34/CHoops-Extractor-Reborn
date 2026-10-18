@@ -14,8 +14,8 @@ def fixture():
     h[1000:1016]='message\0'.encode('utf-16-be')
     h[1600:1616]='message\0'.encode('utf-16-be')
     alias='Stratum2 22 32\0'.encode('utf-16-be');h[1500:1500+len(alias)]=alias
-    u(1200,5)
-    for i,(kind,key) in enumerate([(3,0xbf045bdb),(3,0xae7e1958),(0,0x6109ea5a),(0,0x72b6694d),(2,0x92f9b3f9)]):
+    u(1200,6)
+    for i,(kind,key) in enumerate([(3,0xbf045bdb),(3,0xae7e1958),(0,0x6109ea5a),(0,0x72b6694d),(2,0x92f9b3f9),(1,0xad44372a)]):
         at=1216+i*32;u(at+16,kind);u(at+20,key)
     ptr(1216,1500);ptr(1248,1600);u(1280,222);u(1312,0x10090)
     struct.pack_into('>4f',h,1344,31793,59031,7,9)
@@ -67,3 +67,15 @@ def test_native_literal_id_vector_and_center_flags_follow_loader_pack_order():
     assert result[1]==source[1]
     for key in [0,2,0xffffffff]:
         with pytest.raises(ValueError,match='literal'):edit_styles(source,{'message':{'literal_id':key}})
+
+
+def test_popup_alpha_restoration_preserves_events_bones_and_property_tails():
+    source=fixture();assert inspect_styles(source[0])[0]['alpha']==0
+    result,_=edit_styles(source,{'message':{'alpha':1}})
+    assert inspect_styles(result[0])[0]['alpha']==1
+    assert all(a==b for i,(a,b) in enumerate(zip(source[0],result[0])) if i not in range(1376,1380))
+    assert result[1]==source[1]
+    for alpha in [-1,2,float('nan'),'1']:
+        with pytest.raises(ValueError,match='alpha'):edit_styles(source,{'message':{'alpha':alpha}})
+    with pytest.raises(ValueError,match='Missing typed'):edit_styles(source,{'message':{'color':[222,222,222]}})
+    with pytest.raises(ValueError,match='color'):edit_styles(source,{'message':{'color':[222,222,256]}})

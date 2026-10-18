@@ -1,3 +1,14 @@
+## Unreleased — scorebug test05
+
+- Remove HUD dividers and relocate obsolete depth masks away from the new layout.
+- Restore authored palette vertex values; retain enlarged logos and clock/score
+  sizes. Center popup text, restore its alpha and align its black backing.
+- Use one native sixth-man label; move native title-case branding to the bottom
+  bar's default-text route. Enlarge all 19 live meter segments within the header.
+- Add bounded native text alpha/RGB editing and count-only label-loop suppression.
+- Correct earlier live-team-name claims: native normal-game callbacks suppress
+  names. Owner chose to retain read-only EBOOT and leave names unresolved.
+
 ## Unreleased — native test04 startup correction
 
 - Replace the experimental duplicated compressed English heap with a single

@@ -51,7 +51,9 @@ def inspect_styles(header):
                 lo,hi=struct.unpack('>2f',b.slice(vector,8))
                 if not all(math.isfinite(v) and 0<=v<=65535 and v==int(v) for v in (lo,hi)):raise ValueError('Invalid literal text ID vector')
                 literal=(int(hi)<<16)|int(lo)|1
-        rows.append(dict(binding=name,font=font,color=values(COLOR),shadow=values(SHADOW),literal_id=literal))
+        alpha=properties.get(0xad44372a)
+        alpha=struct.unpack('>f',b.slice(alpha[0],4))[0] if alpha and alpha[1]==1 else None
+        rows.append(dict(binding=name,font=font,color=values(COLOR),shadow=values(SHADOW),literal_id=literal,alpha=alpha))
     return rows
 
 
@@ -60,8 +62,20 @@ def edit_styles(parts, changes):
     b,records=_records(parts[0]);out=bytearray(parts[0]);names=set(records);report=[]
     for name,change in changes.items():
         if name not in records:raise ValueError('Unknown SCNE text binding '+name)
-        if set(change)-{'font','binding','literal_id','align'}:raise ValueError('Unsupported SCNE text style edit')
+        if set(change)-{'font','binding','literal_id','align','alpha','color'}:raise ValueError('Unsupported SCNE text style edit')
         at,properties=records[name]
+        for option,keys,kind in [('alpha',(0xad44372a,),1),('color',COLOR,0)]:
+            if option not in change:continue
+            values=[change[option]] if option=='alpha' else change[option]
+            if not isinstance(values,(list,tuple)) or len(values)!=len(keys):raise ValueError('Invalid text '+option)
+            if option=='alpha':
+                if any(type(v) not in (int,float) or not math.isfinite(v) or not 0<=v<=1 for v in values):raise ValueError('Invalid text alpha')
+            elif any(type(v) is not int or not 0<=v<=255 for v in values):raise ValueError('Invalid text color')
+            for key,value in zip(keys,values):
+                prop=properties.get(key)
+                if prop is None or prop[1]!=kind:raise ValueError('Missing typed text '+option+' property')
+                if sum(1 for _,props in records.values() if props.get(key)==prop)!=1:raise ValueError('Text '+option+' property is shared')
+                struct.pack_into('>f' if kind==1 else '>I',out,prop[0],value)
         for option in ('font','binding'):
             if option not in change:continue
             value=change[option]

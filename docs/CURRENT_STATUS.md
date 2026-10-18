@@ -1,3 +1,29 @@
+# Unreleased — scorebug test05 visual corrections
+
+User screenshots establish that native test04 still has no ordinary-game school
+names, washed-out palette panels, dividers, overlapping sixth-man lettering and
+clipped popup text. Test05 retains the enlarged body/logos/score/clock font sizes,
+removes dividers, restores authored vertex RGB 0.1 instead of 0.72, and moves both
+old text-mask meshes outside the HUD. Popup styles regain opacity and centered
+white text; their anchors/backing now cover the same right-side section.
+
+Only one native sixth-man label remains, using the existing null-callback ABL
+slot and stock localization ID. The other ABL slot displays title-case native
+College Hoops / Reborn. Duplicate topbar label loops and bitmap label are disabled.
+The 19 live meter draws remain intact; their complete span grows from 85x4 to
+125x5 world units. Both native team translations fit inside the existing header.
+
+Read-only executable analysis shows the city-name provider deliberately leaves
+ordinary-game names empty. Renaming the SCNE bindings did not enable them. The
+owner explicitly declined an optional executable patch: **keep EBOOT read-only;
+leave team names unresolved**. No name/logo texture hack or executable patch is
+included. Previous claims of completed live team names are superseded.
+
+Local test05 includes five gamedata SCNEs and the compact direct-read English IFF.
+Source inputs remain unchanged. Runtime appearance/popups still need user testing;
+static checks cannot certify in-game appearance. No emulator or new JB build.
+Continues PR #32; documentation and asset-free profiles are maintained.
+
 # Unreleased — native test04 startup-crash correction candidate
 
 User crash logs show a startup asynchronous-IFF-loader access violation at

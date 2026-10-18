@@ -1,3 +1,18 @@
+# Scorebug test05 verification
+
+Targeted style/layout/localization/native-font suite: **23 passed**. New regressions
+cover alpha restoration with unrelated properties/bones/events/payload unchanged,
+invalid alpha/RGB rejection, count-only native-label suppression and propagation
+through ordered mesh operations. Actual five-scene package prepares/preflights
+both required archives without unapplied DDS. Source portable verification: **626 passed, 9 skipped, 2 deselected**; compile,
+CLI/Qt, Ruff, mypy, handoff and diff passed. Exact-head isolated results are
+recorded in the PR handoff.
+
+Read-only built-archive analysis confirms test04 inputs were current; native code
+shows normal-game city-name suppression. Owner declined an executable patch and
+left names unresolved. Current scene/property checks do not certify gameplay or
+claim names have been fixed. No emulator launch, EBOOT write or new JB build.
+
 # Native test04 startup-crash correction candidate
 
 Read-only user log: asynchronous resource-loader PC 0x00845E14, access violation

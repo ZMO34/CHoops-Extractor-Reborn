@@ -403,3 +403,65 @@ all remaining overrides boot. Runtime confirmation is required. Use the correcte
 local test04-crashfix package, replacing the previous English override; keep both
 supplied archive replacements, select the new overrides again, and rebuild.
 Do not layer old/new English IFFs. No EBOOT or font-bank changes.
+
+## Test05 — screenshot-driven corrections and team-name limitation
+
+The user's native-test04 screenshots show enlarged score/clock text but no team
+names, overlapping sixth-man text, short meter fills, gray dividers and truncated
+popup prefixes. The built game's scene styles match the supplied revision, so
+this is not stale override selection.
+
+### Why renaming to city callbacks did not show names
+
+Read-only initialization registers home_city and away_city with update providers
+at 0x4EF9A4 and 0x4EFABC. Those call the mode gate at 0x4EED80/0x4EEB3C. During an
+ordinary game that path returns success without filling the string; the nonzero
+branch skips the existing fallback formatter at 0x4EF92C, which otherwise reads
+the current team's name. Therefore SCNE renaming alone does not enable live names.
+The prior inference that registering the city callback completed the feature was
+incorrect. It is not merely a font, spelling or clipping issue.
+
+A possible two-branch executable change was identified but **not applied**. The
+owner explicitly selected "Keep EBOOT read-only; leave names unresolved." Do not
+introduce that patch or replace uniform logos with baked names as an implicit
+workaround. This revision preserves the asset-only scope and source executable.
+
+### Asset corrections
+
+- Body width/height, 38-unit logos and Stratum2 25 score/period/clock aliases remain.
+  Gray frame/top/bottom dividers are hidden. Palette material IDs and runtime logo
+  references stay intact. Color-panel vertex RGB returns to the stock authored
+  0.1, replacing test03/04's flat 0.72. No global roster color edit is made and no
+  unverified fragment-shader formula is claimed.
+- Both bottom-bar and topbar text_nodeMask meshes are moved outside the HUD.
+  Their old coordinates/depths still intersect the relocated popup/branding area;
+  alpha-only hiding can leave a depth-writing mask active. Unknown index buffers,
+  draw records, material states and skeleton data stay intact.
+- Bottom-bar away_ABL/home_ABL have existing null callbacks and fall back to the
+  native default-text renderer. Use those existing bindings for the stock 6th Man
+  literal (Stratum2 12) and isolated College Hoops / Reborn literal (Stratum2 25).
+  The sixth-man header font baseline is -159; branding's first baseline is -193.
+  Native RGB/shadow styling is retained. No new text record/bone/callback is added.
+  Both separate topbar native-label counts become zero without deleting their
+  serialized records or bones. The bitmap label is hidden to prevent duplication.
+- The meter remains 19 distinct live draws/material bindings. Authored meter bounds
+  become [20,-13.5,145,-8.5], a 125x5 span. Existing native X offsets -337/-185 and
+  Y offset -153 produce spans [-317,-192] and [-165,-40], Y[-166.5,-161.5], inside
+  the unchanged header [-340,-35] by [-168.5,-152.5]. Actual green fill still comes
+  from game state; no artificial full-meter or changed threshold is introduced.
+- Popup player_info and textNode_1 had authored alpha zero. Restore typed alpha to
+  one; use white RGB222 and center alignment. Anchors are centered at X207.5 over
+  the right-side backing [55,360]. Popup lines use baselines -160/-151; the separate
+  blackbar info anchor maps to baseline -160 through its preserved parent offset.
+  Runtime selection/timing remains native, and its backing remains always present.
+
+Asset-free test05 layout/style JSONs describe the edits. `disable_text` modifies
+only the checked text count after authored edits; records/properties/geometry are
+retained. Typed alpha/color edits reject malformed values, missing properties and
+shared storage. The compact uncompressed English resource from the startup
+correction remains. All 257 other gamedata records remain byte-identical.
+
+These are asset corrections checked by parsing, preservation and source-bound
+preparation/preflight. In-game popup transitions, masks, palette appearance and
+native branding placement still require user screenshots. No emulator was run,
+new JB built or executable patched.

@@ -13,8 +13,9 @@ from ..formats.tool_wrapper import unwrap,wrap
 
 
 def edit_scene(parts, profile):
-    if not isinstance(profile,dict) or set(profile)-{'parts','text'}:
+    if not isinstance(profile,dict) or set(profile)-{'parts','text','disable_text'}:
         raise ValueError('Profile requires parts/text keys; select one scene profile object')
+    if type(profile.get('disable_text',False)) is not bool:raise ValueError('disable_text must be boolean')
     if len(parts)!=2:
         raise ValueError('HUD editing requires a split header/vertex SCNE')
     if any(isinstance(v,list) for v in profile.get('parts',{}).values()):
@@ -23,7 +24,7 @@ def edit_scene(parts, profile):
             for operation in operations if isinstance(operations,list) else [operations]:
                 if not isinstance(operation,dict):raise ValueError('HUD part operations must be objects')
                 result,rows=edit_scene(result,{'parts':{name:operation}});reports.extend(rows)
-        result,rows=edit_scene(result,{'text':profile.get('text',{})});reports.extend(rows)
+        result,rows=edit_scene(result,{'text':profile.get('text',{}),'disable_text':profile.get('disable_text',False)});reports.extend(rows)
         return result,reports
     original=bytes(parts[0]);b=Binary(original);out=[bytearray(p) for p in parts]
     table=b.relative(0x48);count=b.u32(0x44)
@@ -119,6 +120,7 @@ def edit_scene(parts, profile):
             struct.pack_into('>f',out[0],off+0x10,math.sqrt(sum((a-c)**2 for a,c in zip(lower,upper)))/2)
         reports.append(dict(part=name,vertices=last-first,vertex_range=[first,last],bounds=bounds,hidden=bool(change.get('hide')),rgb_scale=scale))
     text_count=b.u32(0x4c);texts=b.relative(0x50) if text_count else 0
+    if text_count>4096:raise ValueError('HUD text count exceeds limit')
     b.slice(texts,text_count*144)
     for name,position in profile.get('text',{}).items():
         options=position if isinstance(position,dict) else {'position':position}
@@ -148,6 +150,11 @@ def edit_scene(parts, profile):
             if not all(math.isfinite(v) for v in values):raise ValueError('Non-finite HUD text basis')
             for field,value in zip(basis,values):struct.pack_into('>f',out[0],field,value*text_scale)
         reports.append(dict(text=name,position=xy,matching_marker=True))
+    if profile.get('disable_text'):
+        # Native HUD dispatchers check this count before their label loop. Keep
+        # all record/property/bone bytes rather than relocating or deleting them.
+        struct.pack_into('>I',out[0],0x4c,0)
+        reports.append(dict(disabled_text_records=text_count))
     result=list(map(bytes,out))
     if list(map(len,result))!=list(map(len,parts)):raise ValueError('HUD edit changed block sizes')
     return result,reports
