@@ -1,3 +1,8 @@
+# Unreleased — player-face research
+
+- Document the seven dedicated College Hoops likeness slots, generated-face routing, paired texture/preset banks and cross-game conversion limits.
+- Add a read-only face inventory command with synthetic bounds/family/preservation checks; no face editor or EBOOT changes.
+
 # v1.19
 
 - Apply folder single-face cubemap compatibility consistently to Python manifests and paired CDF imports; preserve five base faces and report +X updates.
