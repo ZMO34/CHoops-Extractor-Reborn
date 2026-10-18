@@ -8,11 +8,14 @@ bank available together. For SDAT input, extraction is authenticated and bounded
 a successful read does not imply the editor can sign/rebuild that container.
 
 Choose **Select overrides folder** in Explorer. Discovery is recursive and handles
-supported current and legacy rip structures. Geometry SCNE replacements override
+supported current and legacy rip structures, including V5.5 exports whose top-level
+numeric folders are source archive TOC indices. Keep those folder names intact.
+Geometry SCNE replacements override
 vanilla SCNE records; corresponding DDS artwork wins over TXTR artwork. A TXTR
 is used when its DDS does not exist. This preparation resolves identities,
 validates layouts and caches conversions; it does not create the game output.
 Do not rename unrelated files merely to bypass an ambiguous selector error.
+Opaque `.bin` replacements are preserved as binary payloads and are not parsed as IFF.
 
 Selecting unchanged sources reuses cached work. Source metadata changes invalidate
 matching entries, and content/conversion keys protect supported prepared operations.

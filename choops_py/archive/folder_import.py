@@ -7,6 +7,11 @@ from collections import defaultdict
 from .hash_names import replacement_hash as hash_name
 
 RECORD_TYPES={'.txtr':'TXTR','.scne':'SCNE','.name':'NAME','.cdan':'CDAN','.layt':'LAYT','.rost':'ROST'}
+LEGACY_RECORD_ALIASES={'icon_tatoo':'icon_tattoo'}
+
+
+def legacy_record_name(name):
+    return LEGACY_RECORD_ALIASES.get(name.casefold(),name)
 
 
 def discover(archive,folder,job=None):
@@ -33,6 +38,15 @@ def discover(archive,folder,job=None):
             name=parent_name if Path(parent_name).suffix.lower() in ('.iff','.bin') else parent_name+'.iff'
             e=hashes.get(hash_name(name)) if name.isascii() else None
             if e:return e,identity_name(e,name)
+            # Some legacy exports use the source JB's TOC index as the top
+            # folder (for example, 1004/shoe_sole.txtr). Resolve only a direct
+            # numeric child of this selected override root.
+            if parent.parent==folder and parent.name.isdecimal():
+                index=int(parent.name)
+                if index<len(archive.entries):
+                    e=archive.entries[index]
+                    resolved=identity_name(e,'')
+                    if resolved:return e,resolved
             if parent==folder:break
         return None,None
     def add(group,kind,key,file):
@@ -94,8 +108,10 @@ def discover(archive,folder,job=None):
         ext=file.suffix.lower()
         if ext in ('.iff','.cdf','.bin'):
             e=hashes.get(hash_name(file.name)) if file.name.isascii() else None
+            name=file.name
+            if e is None:e,name=owner(file)
             if not e:issues.append('Unknown archive filename: '+str(file.relative_to(folder)));continue
-            group=groups[e['hash']];group['entry']=e;group['name']=identity_name(e,file.name)
+            group=groups[e['hash']];group['entry']=e;group['name']=identity_name(e,name)
             if group['whole']:issues.append('Duplicate archive replacement: '+file.name)
             group['whole']=file;continue
         if ext not in RECORD_TYPES and ext!='.dds':ignored+=1;continue
@@ -104,7 +120,7 @@ def discover(archive,folder,job=None):
         group=groups[e['hash']];group['entry']=e;group['name']=name
         if ext in RECORD_TYPES:
             formats.add('legacy-record-folders')
-            add(group,'records',(file.stem,RECORD_TYPES[ext]),file)
+            add(group,'records',(legacy_record_name(file.stem),RECORD_TYPES[ext]),file)
         else:
             formats.add('legacy-record-folders')
             duplicate=re.fullmatch(r'(.+?)\s*\([0-9]+\)',file.stem)
@@ -112,7 +128,7 @@ def discover(archive,folder,job=None):
             context=next((p for p in file.parents if p.suffix.lower() in RECORD_TYPES),None)
             category=next((p for p in file.parents if p.parent.name.upper() in ('TXTR','SCNE') and p.is_relative_to(folder)),None)
             if context:
-                record_name=context.stem.removeprefix('_');typ=RECORD_TYPES[context.suffix.lower()]
+                record_name=legacy_record_name(context.stem.removeprefix('_'));typ=RECORD_TYPES[context.suffix.lower()]
                 if typ=='SCNE':selector=record_name+'/'+texture_stem
                 elif typ=='TXTR':selector=record_name
                 else:ignored+=1;continue
@@ -120,7 +136,7 @@ def discover(archive,folder,job=None):
                 # Older exports use TXTR/record/artwork.dds rather than a
                 # record.txtr directory. The record folder is authoritative;
                 # artwork may have a generic name such as logo.dds.
-                record_name=category.name.removeprefix('_')
+                record_name=legacy_record_name(category.name.removeprefix('_'))
                 selector=record_name+'/'+texture_stem if category.parent.name.upper()=='SCNE' else record_name
             else:selector=texture_stem
             rank=(2 if context or category else 1)-(1 if duplicate else 0)

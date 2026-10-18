@@ -94,6 +94,10 @@ No cube flag is removed and no 2D image is duplicated across the other faces.
 
 IFF failures now identify archive, input role and magic, with corrective GUI
 advice. Invalid containers remain rejected; opaque bytes are not guessed/repaired.
+The legacy Reborn Overrides V5.5 layout is recognized through direct numeric
+source-TOC folders, including nested TXTR/DDS artwork and complete IFF replacements.
+Its `icon_tatoo` record spelling maps to the source's `icon_tattoo` record. Raw
+`.bin` replacements such as `cribmusic.bin` retain their bytes without IFF parsing.
 The supplied frontend_sync/legalpage ZIP passes preparation and build preflight
 against original 2K8. The locally supplied halftime complete HDR cube preserves
 all supplied artwork, scene headers and image capacity. Original inputs unchanged.
@@ -209,11 +213,14 @@ bank available together. For SDAT input, extraction is authenticated and bounded
 a successful read does not imply the editor can sign/rebuild that container.
 
 Choose **Select overrides folder** in Explorer. Discovery is recursive and handles
-supported current and legacy rip structures. Geometry SCNE replacements override
+supported current and legacy rip structures, including V5.5 exports whose top-level
+numeric folders are source archive TOC indices. Keep those folder names intact.
+Geometry SCNE replacements override
 vanilla SCNE records; corresponding DDS artwork wins over TXTR artwork. A TXTR
 is used when its DDS does not exist. This preparation resolves identities,
 validates layouts and caches conversions; it does not create the game output.
 Do not rename unrelated files merely to bypass an ambiguous selector error.
+Opaque `.bin` replacements are preserved as binary payloads and are not parsed as IFF.
 
 Selecting unchanged sources reuses cached work. Source metadata changes invalidate
 matching entries, and content/conversion keys protect supported prepared operations.
@@ -300,6 +307,7 @@ Do not replace a structural error with guessed identities or silently skipped by
 | Incomplete archive header | Check all split banks and their names/sizes. The current reader follows header/TOC boundaries across banks. Restore a truncated or missing bank from the original; send the named details if it persists. |
 | Geometry overlaps a texture image | The replacement image/geometry ranges cannot safely coexist. Use the reported record to check its SCNE and image layout; preserve the originals. Supported relocation is format-specific, not a blanket permission to overlap. |
 | Unknown/ambiguous record or no unique archive record | The selector matches none/multiple destination records. Verify the correct source JB and rip identity, nested name/hash and CDF partner. Do not rename every record to a generic logo. |
+| No archive folder for a numeric V5.5 path | Update Studio and select the folder against the matching vanilla JB. Numeric folders map to source TOC indices, so keep the original numeric folder names and use the correct source archive. |
 | Not a standard PS3 IFF | Read the archive name, source/replacement role and hex magic. Raw TXTR/SCNE records belong under their archive record folder, not renamed to complete .iff files. Restore damaged containers from the same rip. |
 | Base cubemap faces error | Update/reselect overrides: flat folder DDS imports update +X and preserve five base faces, including manifests. For complete replacement use a six-face cube. Direct texture imports remain strict. |
 | Unsupported texture layout | Confirm 2D or a supported complete cube. A stored depth-one volume has specific support; true deeper volumes, DX10/arrays and unknown encodings remain restricted. |
@@ -2423,6 +2431,19 @@ Updated 2026-10-11. CURRENT_STATUS.md and TEST_REPORT.md are the living evidence
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+# v1.19 Reborn Overrides V5.5 import support
+
+Read-only discovery against the supplied V5.5 folder and vanilla College Hoops
+2K8 archive recognized 1,946 archive groups and scanned 25,428 files, including
+17,596 DDS files and 7,794 record files. Numeric folders 1004 and 1055 resolved
+to `shoe_100_04.iff` and `shoe_100_11.iff`; folder 1376 resolved to `uy011.iff`.
+The V5.5 `icon_tatoo` path resolved to `icon_tattoo`. No game or override source
+files were written. No JB copy was built. This is supplied-input discovery
+evidence, not a game/runtime compatibility claim.
+
+`git diff --check` passed on the submitted source changes. No full test suite or
+package rebuild was run on the v1.19 branch in this update.
 
 # v1.19 compatibility verification
 

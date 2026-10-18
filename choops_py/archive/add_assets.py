@@ -41,6 +41,10 @@ def validate_payload(data):
 
 
 def asset_payload(name,data,changes):
+    # Opaque binary replacements (for example, cribmusic.bin) are not IFF
+    # containers. Preserve their bytes and avoid IFF trimming/parsing.
+    if name.lower().endswith('.bin'):
+        return data
     if name.lower().endswith('.cdf') or data[:4]==bytes.fromhex('f0985030'):
         from ..formats.cdf_backed_iff import CDFPair
         from ..formats.compression import decode
@@ -182,7 +186,8 @@ def build(source, additions, output, replacements=None, job=None):
                     raise ValueError('Existing entry verification failed')
             else:
                 replacement_name=replacements_by_hash[e['hash']][0]
-                content=replacement if replacement_name.lower().endswith('.cdf') else meaningful_iff(replacement)
+                content=(replacement if replacement_name.lower().endswith(('.cdf','.bin'))
+                         else meaningful_iff(replacement))
                 span=e['size'] if new['offset']==e['offset'] else new['size']
                 expected=hashlib.sha256(content+b'\0'*(span-len(content))).hexdigest()
                 if checksum(result.chunks({**new,'size':span}))!=expected:
