@@ -1,3 +1,18 @@
+# v1.19 compatibility verification
+
+Windows / Python 3.12.14 portable checks: **603 passed, 9 offscreen GL skips,
+2 deselected**; compile, CLI/Qt, Ruff, mypy, handoff and diff checks passed.
+
+Five new synthetic cases cover flat DDS cubemap imports through authoritative
+Python manifests for TXTR and SCNE, retained five faces/header bytes and report
+semantics, a paired-CDF face preservation case, named invalid-IFF roles/magic and retained structural error codes.
+No invalid-container acceptance is added. Read-only actual checks prepare and
+preflight the supplied frontend/legal ZIP; full halftime HDR cube artwork matches
+the imported DDS, scene headers/capacity remain unchanged. No source bank writes.
+The same ZIP also passes in an isolated v1.16 checkout; its generic screenshot
+failure is not reproduced. Final portable/isolated/frozen results are recorded
+on the release PR.
+
 # Verification — v1.18
 
 Full portable verification on Windows / Python 3.12.14: **598 passed,

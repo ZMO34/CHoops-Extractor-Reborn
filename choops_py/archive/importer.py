@@ -4,7 +4,7 @@ import json
 from ..archive.manifests import safe_output,write_bytes,digest
 from ..core.reports import save_json
 from ..core.errors import ToolError
-from ..formats.standard_iff import StandardIFF
+from .iff_validation import standard_iff
 from ..texture_tools.dds import inspect as inspect_dds
 
 def asset_name(name):
@@ -25,7 +25,7 @@ def stage(mod,file,iff,sub=None):
     if kind=='dds':
         if not sub:raise ToolError('texture_selector_required','DDS staging requires --sub texture name or SCNE/texture_N')
         inspect_dds(data)
-    elif kind=='archive' and source.suffix.lower()=='.iff' and data[:4]==bytes.fromhex('ff3bef94'):StandardIFF(data)
+    elif kind=='archive' and source.suffix.lower()=='.iff' and data[:4]==bytes.fromhex('ff3bef94'):standard_iff(data,name,'replacement')
     target=f'assets/{len(rows):04d}.bin';write_bytes(mod/target,data,[file]);row={'archive':name,'subfile':sub,'kind':kind,'original_name':source.name,'path':target,'sha256':digest(data),'size':len(data)}
     rows.append(row);save_json(mod/'overrides.json',rows,[file]);return row
 
@@ -40,6 +40,6 @@ def validate(mod):
         if digest(data)!=row['sha256'] or len(data)!=row['size']:raise ToolError('staged_asset_changed','Reimport changed assets so their fingerprints are reviewed')
         if row.get('kind')=='dds':inspect_dds(data)
         elif row['subfile'] is None and row['archive'].lower().endswith('.iff'):
-            if data[:4]==bytes.fromhex('ff3bef94'):StandardIFF(data)
-            elif data[:4]!=bytes.fromhex('f0985030'):raise ToolError('invalid_iff_override','Unrecognized PS3 IFF magic')
+            if data[:4]==bytes.fromhex('ff3bef94'):standard_iff(data,row['archive'],'prepared replacement')
+            elif data[:4]!=bytes.fromhex('f0985030'):raise ToolError('invalid_iff_override',f"{row['archive']}: Unrecognized PS3 IFF magic {data[:4].hex() or 'empty'}; select a complete IFF, not a raw TXTR/SCNE subrecord")
     return rows

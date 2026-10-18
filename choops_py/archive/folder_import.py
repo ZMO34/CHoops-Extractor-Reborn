@@ -255,8 +255,9 @@ def compile_group(archive,group,job=None):
     preserve=not stadium_archive(group)
     if not group['records'] and not group['dds'] and not group['package_records'] and not group.get('cdf_whole') and (not preserve or data[:4] not in (bytes.fromhex('ff3bef94'),bytes.fromhex('f0985030'))):return data,[]
     if data[:4]==bytes.fromhex('f0985030'):return compile_cdf_group(archive,group,data,job)
-    iff=StandardIFF(data);decoded={};changes={};details=[];scene_baselines={}
-    base=StandardIFF(original) if preserve else None;base_decoded={}
+    from .iff_validation import standard_iff
+    iff=standard_iff(data,group['name'],'replacement');decoded={};changes={};details=[];scene_baselines={}
+    base=standard_iff(original,group['name'],'source') if preserve else None;base_decoded={}
     def base_parts(rec):
         matches=[r for r in base.records if r['name'].casefold()==rec['name'].casefold() and r['type']==rec['type']]
         if len(matches)!=1:raise ValueError('Texture record has no unique base-JB reference: '+rec['name'])
@@ -339,7 +340,7 @@ def compile_group(archive,group,job=None):
                 matches=[t for t in package_textures(reference) if t.header[:4]==current.header[:4]]
                 if len(matches)!=1:raise ValueError('Scene texture has no unique base-JB identity: '+selector)
                 target=TXTR([matches[0].header,matches[0].payload])
-            options=dict(preserve_layout=True,reference=target,allow_single_cube_face=group.get('dds_rank',{}).get(selector,3)<3)
+            options=dict(preserve_layout=True,reference=target,allow_single_cube_face=True)
         try:changed,info=apply_dds(parts(rec),rec['type'],texture,file,job,**options)
         except (ValueError,OSError) as error:raise ValueError(selector+': '+str(error)) from error
         changes[rec['index']]=changed
@@ -396,7 +397,7 @@ def compile_cdf_group(archive,group,data,job=None):
         rec=find(name);options={}
         if preserve:
             from ..formats.txtr import TXTR
-            options=dict(preserve_layout=True,reference=TXTR(base_parts(rec)))
+            options=dict(preserve_layout=True,reference=TXTR(base_parts(rec)),allow_single_cube_face=True)
         changed,info=apply_dds(parts(rec),'TXTR',name,file,job,**options)
         changes[rec['index']]=changed;details.append(dict(selector=name,**info))
     if preserve:
