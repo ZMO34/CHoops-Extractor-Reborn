@@ -1,5 +1,13 @@
 # Modern-feature backport feasibility for College Hoops 2K8
 
+Follow-up, 2026-10-19: [executable modernization research](EBOOT_MODERNIZATION_RESEARCH.md)
+adds verified menu-handler/TOC routes and ranks small executable candidates.
+Scorebug PR #32 has since traced live native name/style providers and developed
+authored layout tooling; its normal-game name suppression remains unresolved
+under the owner's read-only EBOOT decision. The older matrix below records the
+2026-10-17 baseline and must not supersede that newer, separately scoped evidence.
+No patch or new runtime feature is implemented by either assessment.
+
 Research assessment, 2026-10-17. No gameplay feature, asset port, executable patch
 or new alternate asset is implemented by this document. This targets **PS3 College
 Hoops 2K8**, not an assumed interchangeable NBA 2K8 binary. Confidence below is

@@ -1,3 +1,15 @@
+# Read-only executable modernization research — 2026-10-19
+
+[Executable modernization candidates](EBOOT_MODERNIZATION_RESEARCH.md) ranks
+native scorebug names, camera customization, broadcast presentation and rules
+against actual executable evidence. Newly traced CameraMenu event handlers use
+bounded 44-byte records; Game Rules initialization takes several mode-dependent
+paths. Neither establishes a one-constant modern-rules or FOV patch. Replay,
+indicator and autosave routes are distinguished from unproven runtime semantics.
+The smallest known executable candidate is the native-name fallback investigated
+in separate PR #32; the owner declined applying it, so names remain unresolved.
+No production feature or EBOOT changed. No emulator or real/testing JB.
+
 # v1.19 rebuild compatibility follow-up
 
 Folder DDS imports now consistently support a flat image targeting an existing

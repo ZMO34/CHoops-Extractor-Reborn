@@ -1,3 +1,11 @@
+# Unreleased — executable modernization research
+
+- Document read-only CameraMenu, Game Rules, replay, indicator and autosave routes;
+  rank practical modernization candidates and reject unsupported constant guesses.
+- Carry forward the native scorebug name-fallback evidence from separate PR #32
+  while preserving the owner's decision against executable changes.
+- No runtime/editor feature, executable patch or release added.
+
 # v1.19
 
 - Apply folder single-face cubemap compatibility consistently to Python manifests and paired CDF imports; preserve five base faces and report +X updates.

@@ -24,6 +24,10 @@ historical claims that all related games behave identically.
 existing asset/data routes, animation conversion research, companion workflows
 and changes requiring new runtime systems.
 
+[Executable modernization research](EBOOT_MODERNIZATION_RESEARCH.md) ranks small
+EBOOT candidates using named code paths, separating confirmed routes from
+unverified camera, rules, timing and save semantics. EBOOT remains read-only.
+
 ## Development and evidence
 
 [Developer guide](DEVELOPER_GUIDE.md) explains the modules and prerequisites.

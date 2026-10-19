@@ -1,3 +1,21 @@
+# Executable modernization research — 2026-10-19
+
+Documentation-only update on Windows / Python 3.12.14. Read-only ELF mapping,
+function-descriptor/TOC inspection and PPC64 big-endian Capstone disassembly
+followed named menu registrations. The bounded scan recorded 580 candidate
+strings / 75 TOC references; these are not an exhaustive executable analysis.
+Input digest matched before/after scanning. No game data or executable writes.
+Additional read-only assertions passed for both prior name-suppression branch
+sites, CameraMenu table/handler descriptors, Game Rules table/callback and
+non-file-backed camera state pointers; a second before/after digest matched.
+
+Scoped verification: generated handoff/check, Ruff for the changed handoff
+generator, local Markdown-link resolution and `git diff --check`. Exact committed
+head results are recorded in the PR. Runtime suites and Windows packaging were
+not rerun: no runtime/package code changed. Historical suite counts below do not
+validate the newly proposed executable candidates. No Ghidra, RPCS3/gameplay,
+executable patch, real/testing JB or release.
+
 # v1.19 Reborn Overrides V5.5 import support
 
 Read-only discovery against the supplied V5.5 folder and vanilla College Hoops
