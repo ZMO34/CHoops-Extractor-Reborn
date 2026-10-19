@@ -1,3 +1,23 @@
+# Local executable experiment 01 — 2026-10-19
+
+The owner authorized separate experimental copies for modern NCAA arc/corner
+scoring, native scorebug names and removal of new-transfer sit-out assignment.
+[Experiment evidence and limits](EBOOT_EXPERIMENT_01.md) records five private
+variants, a companion scorebug package, preservation checks and manual test order.
+Original executables/game inputs are unchanged. No executable patching is added
+to the editor and no patch code, game assets or executable copies enter Git.
+Static audits, 60,000 geometry samples, 30,000 transfer-mask cases and companion
+two-archive preparation/preflight pass. Boot/gameplay/physical-PS3 compatibility,
+new text-node/span acceptance and existing-save eligibility remain unverified.
+No emulator, real/testing JB, merge or release. This narrow local authorization
+supersedes the earlier refusal only for these prototypes.
+
+Cleanup removes 1,502 generated fixture folders, 99 standalone synthetic IFFs,
+three disposable caches and two clean review worktrees. Active regression sources
+and user inputs/builds remain.
+Historical release/test package deletion was blocked by automatic approval review
+and remains pending specific owner approval; see experiment notes.
+
 # Read-only executable modernization research — 2026-10-19
 
 [Executable modernization candidates](EBOOT_MODERNIZATION_RESEARCH.md) ranks

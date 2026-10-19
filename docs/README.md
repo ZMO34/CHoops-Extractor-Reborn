@@ -27,6 +27,8 @@ and changes requiring new runtime systems.
 [Executable modernization research](EBOOT_MODERNIZATION_RESEARCH.md) ranks small
 EBOOT candidates using named code paths, separating confirmed routes from
 unverified camera, rules, timing and save semantics. EBOOT remains read-only.
+The subsequent [local executable experiment](EBOOT_EXPERIMENT_01.md) is a narrow
+owner-authorized exception using separate copies; patching is not in the editor.
 
 ## Development and evidence
 

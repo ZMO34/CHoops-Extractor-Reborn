@@ -17,7 +17,10 @@ current handoff; dated historical research is supporting evidence.
   automatic/testing JB folders. Use synthetic fixtures, Python checks, read-only
   supplied inputs and Qt/packaged startup checks. The user builds JB manually.
 - Keep source JB files, supplied overrides, ZIPs, rosters and executable copies
-  immutable. EBOOT is read-only research; song-name editing must not require
+  immutable. EBOOT is read-only research by default; an explicit owner-authorized
+  local experiment must use separate outputs and document its narrow scope.
+  Do not add executable patching to the editor without a separate owner request.
+  Song-name editing must not require
   EBOOT writes. Public D1-conversion and alternate/independent-asset actions are
   removed in v1.10; realignment stays available. Do not reintroduce them or add
   alternate assets without a new explicit owner request.

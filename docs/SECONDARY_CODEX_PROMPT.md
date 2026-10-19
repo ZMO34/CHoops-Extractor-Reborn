@@ -36,7 +36,11 @@ supersede its dated observations. Treat research hypotheses as hypotheses.
    synthetic fixtures, Qt/source/packaged startup and read-only private input
    inspection. Tiny synthetic archive fixtures are okay; copied game tests are not.
 6. Keep JB source, overrides, rosters, templates and EBOOT immutable. EBOOT may be
-   read for research but never patched. If jukebox name changes need executable
+   read for research. Only an explicit owner-authorized local experiment may
+   create separate modified copies; preserve originals, document its narrow
+   scope, and do not add patching to the editor without a separate request.
+   The local experiment in EBOOT_EXPERIMENT_01.md is not blanket authorization
+   for another instance to modify executables. If jukebox name changes need executable
    edits, do not implement them. v1.10 removes D1/alternate/independent-asset public
    actions. Keep realignment, but do not restore those actions or add alternates
    without an explicit new owner request. Read PLAYER_QOL_RESEARCH.md.
@@ -83,6 +87,26 @@ source docs; update those docs, then regenerate rather than editing this output.
 ---
 
 Embedded source: docs/CURRENT_STATUS.md
+
+# Local executable experiment 01 — 2026-10-19
+
+The owner authorized separate experimental copies for modern NCAA arc/corner
+scoring, native scorebug names and removal of new-transfer sit-out assignment.
+[Experiment evidence and limits](EBOOT_EXPERIMENT_01.md) records five private
+variants, a companion scorebug package, preservation checks and manual test order.
+Original executables/game inputs are unchanged. No executable patching is added
+to the editor and no patch code, game assets or executable copies enter Git.
+Static audits, 60,000 geometry samples, 30,000 transfer-mask cases and companion
+two-archive preparation/preflight pass. Boot/gameplay/physical-PS3 compatibility,
+new text-node/span acceptance and existing-save eligibility remain unverified.
+No emulator, real/testing JB, merge or release. This narrow local authorization
+supersedes the earlier refusal only for these prototypes.
+
+Cleanup removes 1,502 generated fixture folders, 99 standalone synthetic IFFs,
+three disposable caches and two clean review worktrees. Active regression sources
+and user inputs/builds remain.
+Historical release/test package deletion was blocked by automatic approval review
+and remains pending specific owner approval; see experiment notes.
 
 # Read-only executable modernization research — 2026-10-19
 
@@ -909,6 +933,12 @@ Embedded source: docs/EBOOT_MODERNIZATION_RESEARCH.md
 
 # College Hoops 2K8 executable modernization candidates
 
+Follow-up: the owner subsequently authorized separate local experimental copies
+for three specific changes. [Experiment 01](EBOOT_EXPERIMENT_01.md) records the
+new scoring/transfer findings, private prototypes and unverified runtime limits.
+The original executable remains unchanged and the editor has no patching feature.
+The read-only investigation below is the earlier research record.
+
 Read-only investigation, 2026-10-19. Target: the supplied **PS3 College Hoops
 2K8** executable. Addresses below are virtual addresses in this particular
 decoded ELF, not portable file offsets or a patch for other game revisions.
@@ -1027,7 +1057,10 @@ or asset are distributed in this PR.
    and descriptor registrations. The bounded vocabulary scan collected 580
    candidate strings and 75 TOC references. These are search results, not a full
    executable map, feature count or exhaustive reference inventory.
-3. Decode function descriptors in the observed `0x9F82B0..0xA54AC8` region.
+3. Decode the actual OPD section from the ELF section headers: virtual range
+   `0xA082B0..0xA4CAC8`, file range `0x9F82B0..0xA3CAC8`. The earlier broad scan
+   window extended into adjacent data; the experiment follow-up tightens this
+   bound and validates TOCs instead of accepting nearby pointer-like words.
    Select each function's actual TOC. Main game routines commonly use `0xA64A94`,
    while another group uses `0xA54AC8`; using one TOC universally gives false
    string/constant annotations.
@@ -1065,6 +1098,162 @@ emulator acceptance alone cannot certify that. Actual PS3 behavior, saved-game
 compatibility, gameplay transitions and longer sessions remain user-run acceptance
 work. Do not claim backend isolation without tracing dependencies and testing.
 No patch framework, hook, altered EBOOT, release or testing JB is delivered here.
+
+---
+
+Embedded source: docs/EBOOT_EXPERIMENT_01.md
+
+# Owner-authorized local executable experiment 01
+
+2026-10-19. The owner explicitly authorized separate experimental copies for
+modern NCAA three-point distance, native scorebug text and removal of transfer
+sit-out assignment. This supersedes the earlier read-only decision **only for
+these local experiments**. Originals remain immutable; no patching feature,
+dependency, CLI, hook installer or executable writer is added to the editor.
+Experimental executables, game artwork, fingerprints and local generators remain
+outside Git. No merge or release is included.
+
+## Deliverables and evidence boundary
+
+Five local executable variants were generated: unchanged-code packaging control,
+native scorebug names only, new-transfer sit-out removal only, modern three-point
+logic only, and the combined prototype. Each has an audit manifest. Local ELF
+copies remain available for inspection; the private ZIP includes five EBOOT.BIN
+variants, companion overrides, validation summaries and manual test instructions.
+
+These are debug/fake SELF envelopes, not retail-signed executables. The source's
+authority/application/version/capability metadata is retained; no signing keys
+are distributed. ELF-to-SELF payload/segment round trips pass. Acceptance by a
+particular loader or physical PS3 is **not established**. The unchanged-code
+control must be tested first to separate packaging failures from code changes.
+No emulator/game was launched and no real/testing JB was built.
+
+## Modern NCAA three-point boundary
+
+The current [NCAA court diagram](https://ncaaorg.s3.amazonaws.com/championships/sports/basketball/rules/common/PRXBB_CourtDiagram.pdf)
+specifies a 22 ft 1¾ in arc and 21 ft 7⅞ in corners, measured to the outside edge.
+The prototype uses those imperial dimensions converted to 675.005 / 660.0825 cm.
+It implements the clipped circular shape, including the straight corner segments;
+increasing a circle's radius alone would give the wrong corner region.
+
+New tracing establishes the following route in the supplied executable revision:
+
+- `0x534FCC` initializes court dimensions. The path at `0x535054` derives two
+  boundary globals at `0x12CAB9A4` / `0x12CAB9A0`, originally clamped together using
+  612.1399536132812 cm. This old value is documented as code evidence, not an
+  assumed exact correspondence to painted line dimensions.
+- `0x3CA128` tests a point against the arc/side boundary with an input margin.
+  `0x3CA344` transforms four authored sample points through player matrices and
+  requires all four to pass. That four-point sampling remains intact.
+- `0x3CB494` calls the four-point predicate; the surrounding decision selects
+  3 at `0x3CB378` or 2 at `0x3CB4A0`. This is substantially stronger evidence than
+  a matching numeric literal near a resource name.
+- `0x3CBE08` computes signed distance to the same old boundary and is used by
+  other court/gameplay paths. The prototype updates it alongside the predicate.
+
+The experimental implementation redirects three entry points to small routines
+inside verified zero file padding after the first executable LOAD. Its filesz
+and memsz expand without moving original addresses, the entry point, imports,
+TLS, other program headers or any original initialized data. Added routines use
+volatile registers, preserve the existing TOC contract and balance stack/LR around
+calls. This is static on-disk code redirection, not runtime memory injection.
+
+The updated initializer retains the small-court width clamp but assigns separate
+arc and corner limits. The distance helper evaluates the maximum of the side
+distance and the circular distance on the front side of the basket. The point
+predicate compares that signed distance to its existing margin. Basket placement,
+court length, sampling points and unrelated tuning fields remain unchanged.
+
+Painted textures, floor SCNE line geometry and editor alignment guides are **not
+redrawn**. Use matching modern artwork for a meaningful visual test. Actual foot
+contact, line-edge tolerance, scoring/statistics, simulation and special modes
+remain user-test questions; synthetic geometry does not certify those behaviors.
+
+## Native scorebug names and companion
+
+Two conditional branch sites, `0x4EF9F0` / `0x4EFB08`, now reach the existing
+team-name fallback in the experimental variants. The provider and fallback bodies
+are unchanged. This is scoped to the supplied revision; it is not a universal
+patch. Special tournament/mode behavior and localization remain untested.
+
+The private companion builds on [scorebug PR #32](https://github.com/ZMO34/CHoops-Extractor-Reborn/pull/32)
+test05 assets at `e7175a1c6a3a0a5009f06eaa3c5a9dbcb5ce68b0`. It adds two native
+home_city/away_city text records beside the logos, retaining the ten original
+text records' interpreted styles, enlarged scores/clocks, native title-case
+branding, sixth-man label/meter and existing popup configuration. No names are
+baked into logos. Only gamedata.iff and the existing companion english.iff are
+supplied as overrides; original files are unchanged.
+
+The text table, cloned styles and string references reparse, and the vertex stream
+is byte-identical. Every original decoded logical byte remains unchanged; 261
+other original record payloads remain as prefixes. **Their inferred spans are not
+all identical:** moving the enlarged SCNE makes the preceding msd65d1 span include
+44,720 abandoned original bytes. Native acceptance of that span extension and the
+two new text records remains unverified. This is explicitly experimental asset
+growth, not a certified runtime writer result. The manual sequence tests the
+unchanged-code control with and without the companion before changed EBOOT code.
+Preparation/build preflight accepts the two archives with no unapplied overrides.
+
+## Transfer sit-out assignment
+
+The transfer-finalization routine at `0x5BC250` removes players through the existing
+membership path, updates its count byte, then processes destinations. The path at
+`0x5BC314` retains scholarship assignment. After clearing the two redshirt bits
+in player-anchor +0x84 (roster row +0x94), the instruction at `0x5BC334` inserts
+Transfer code 2, followed by the normal destination-membership call.
+
+The local prototype removes only that insertion instruction. The preceding clear
+and following store remain, yielding None instead of Transfer for **new transfers
+processed by this path**. Membership, transfer count and scholarship writes are
+retained. Ordinary and medical redshirt handling elsewhere is unchanged.
+No transfer flags already stored in existing saves are cleared. This is not a
+retroactive save conversion or proof of every transfer/eligibility route. Check
+lineups, actual participation, season progression and save/reload in a disposable
+Legacy save before calling the sit-out rule removed in practice.
+
+## Verification and manual acceptance
+
+- Five variants pass diff allowlists, original-source digest checks, bounded
+  branch-target checks and debug SELF/ELF payload round trips. The control ELF is
+  identical to the original decoded ELF.
+- Only the first LOAD grows for court variants. Other program headers, entry,
+  original addresses/data and source files remain unchanged. Added routines are
+  independently disassembled; nonvolatile register/TOC/LR contracts are reviewed.
+- Synthetic geometry covers 60,000 samples across both directions, equivalence
+  with the old equal-radius circle, margins and explicit apex/corner/join cases.
+  A case inside the new circle but outside the straight corner catches the
+  incomplete radius-only approach.
+- 30,000 transfer-mask cases preserve every neighboring bit while removing code
+  2 insertion. The actual original source and output code were also inspected.
+- Companion reparse/resource preservation and two-archive preparation/preflight
+  pass. ZIP integrity and exact private output fingerprints are recorded locally.
+
+These checks do not execute game code. A byte allowlist bounds written bytes, not
+all possible runtime effects. Full editor runtime suites are not rerun for this
+documentation-only PR update; its public runtime code is unchanged. Exact-head
+documentation checks are recorded in TEST_REPORT and the PR.
+
+Manual order: unchanged-code control; control plus companion; names plus companion;
+new transfer processing alone; modern arc/corners alone at both baskets; combined
+prototype after individual cases. Keep a disposable build/save and restore its
+original executable to roll back. No installation into the source game is done
+by this work. Boot/gameplay/physical-PS3 acceptance remains entirely unverified.
+
+## Cleanup scope
+
+The local cleanup removed 1,502 generated fixture directories, 99 standalone
+synthetic IFF outputs, three disposable test/type/lint caches and two clean,
+reproducible review worktrees. Tracked active
+regression tests, original games, supplied overrides, saves, user builds, research
+evidence and the current experiment are preserved. Source tests are not obsolete
+simply because their first commit is old.
+
+Automatic approval review rejected a broader permanent deletion that included
+historical release and scorebug packages, citing potentially useful artifacts.
+Those historical packages remain pending the owner's specific approval. The
+rejection was not bypassed; the completed cleanup was narrowed to verified
+generated fixtures/caches and clean review checkouts. No GitHub release, branch,
+open feature PR or source feature is deleted by this cleanup.
 
 ---
 
@@ -2614,6 +2803,30 @@ Updated 2026-10-11. CURRENT_STATUS.md and TEST_REPORT.md are the living evidence
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+# Local executable experiment 01 — 2026-10-19
+
+Private-only prototypes generated and audited on Windows / Python 3.12.14,
+Capstone PPC64 big-endian and locally installed Keystone 0.9.2. Keystone is not
+an editor dependency. Original decoded ELF and retail SELF digests match after
+all work. Five variants pass allowlisted diff/header/branch and debug SELF payload
+round trips; the control ELF is identical. No game code is executed by these
+checks. 60,000 geometry samples cover both directions plus modern apex/corners/
+joins and old-circle equivalence; 30,000 transfer-mask cases preserve neighboring
+bits. Added instructions' register/TOC/stack/LR usage was reviewed.
+
+The companion reparses with 10 old text styles retained and two native labels
+added. Original decoded bytes and vertex data remain unchanged. Its relocated
+SCNE extends an unrelated inferred span over 44,720 abandoned original bytes;
+runtime acceptance is unverified and explicitly documented. Two-archive override
+preparation/preflight passes with zero unapplied overrides; ZIP integrity is
+checked locally. No automatic/testing JB, emulator, gameplay or physical-PS3 test.
+
+Public changes are documentation/handoff configuration only. Scoped exact-head
+handoff, Ruff, local-link and diff checks are recorded in the PR. Full runtime
+suites and packaging are not rerun and historical passes do not certify EBOOT.
+The cleanup preserves active tracked regression tests and user builds/inputs;
+broader historical package deletion remains approval-blocked.
 
 # Executable modernization research — 2026-10-19
 

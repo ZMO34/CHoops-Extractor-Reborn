@@ -1,5 +1,11 @@
 # College Hoops 2K8 executable modernization candidates
 
+Follow-up: the owner subsequently authorized separate local experimental copies
+for three specific changes. [Experiment 01](EBOOT_EXPERIMENT_01.md) records the
+new scoring/transfer findings, private prototypes and unverified runtime limits.
+The original executable remains unchanged and the editor has no patching feature.
+The read-only investigation below is the earlier research record.
+
 Read-only investigation, 2026-10-19. Target: the supplied **PS3 College Hoops
 2K8** executable. Addresses below are virtual addresses in this particular
 decoded ELF, not portable file offsets or a patch for other game revisions.
@@ -118,7 +124,10 @@ or asset are distributed in this PR.
    and descriptor registrations. The bounded vocabulary scan collected 580
    candidate strings and 75 TOC references. These are search results, not a full
    executable map, feature count or exhaustive reference inventory.
-3. Decode function descriptors in the observed `0x9F82B0..0xA54AC8` region.
+3. Decode the actual OPD section from the ELF section headers: virtual range
+   `0xA082B0..0xA4CAC8`, file range `0x9F82B0..0xA3CAC8`. The earlier broad scan
+   window extended into adjacent data; the experiment follow-up tightens this
+   bound and validates TOCs instead of accepting nearby pointer-like words.
    Select each function's actual TOC. Main game routines commonly use `0xA64A94`,
    while another group uses `0xA54AC8`; using one TOC universally gives false
    string/constant annotations.

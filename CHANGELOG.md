@@ -1,5 +1,10 @@
 # Unreleased — executable modernization research
 
+- Record owner-authorized private experimental copies for modern NCAA arc/corner
+  scoring, native HUD names and new-transfer sit-out assignment; maintain immutable
+  originals and document unverified runtime/packaging limits. No editor patching.
+- Document verified generated-fixture/cache/review-checkout cleanup and the blocked
+  historical-package deletion; retain current regression source coverage.
 - Document read-only CameraMenu, Game Rules, replay, indicator and autosave routes;
   rank practical modernization candidates and reject unsupported constant guesses.
 - Carry forward the native scorebug name-fallback evidence from separate PR #32

@@ -1,3 +1,27 @@
+# Local executable experiment 01 — 2026-10-19
+
+Private-only prototypes generated and audited on Windows / Python 3.12.14,
+Capstone PPC64 big-endian and locally installed Keystone 0.9.2. Keystone is not
+an editor dependency. Original decoded ELF and retail SELF digests match after
+all work. Five variants pass allowlisted diff/header/branch and debug SELF payload
+round trips; the control ELF is identical. No game code is executed by these
+checks. 60,000 geometry samples cover both directions plus modern apex/corners/
+joins and old-circle equivalence; 30,000 transfer-mask cases preserve neighboring
+bits. Added instructions' register/TOC/stack/LR usage was reviewed.
+
+The companion reparses with 10 old text styles retained and two native labels
+added. Original decoded bytes and vertex data remain unchanged. Its relocated
+SCNE extends an unrelated inferred span over 44,720 abandoned original bytes;
+runtime acceptance is unverified and explicitly documented. Two-archive override
+preparation/preflight passes with zero unapplied overrides; ZIP integrity is
+checked locally. No automatic/testing JB, emulator, gameplay or physical-PS3 test.
+
+Public changes are documentation/handoff configuration only. Scoped exact-head
+handoff, Ruff, local-link and diff checks are recorded in the PR. Full runtime
+suites and packaging are not rerun and historical passes do not certify EBOOT.
+The cleanup preserves active tracked regression tests and user builds/inputs;
+broader historical package deletion remains approval-blocked.
+
 # Executable modernization research — 2026-10-19
 
 Documentation-only update on Windows / Python 3.12.14. Read-only ELF mapping,
