@@ -1,3 +1,7 @@
+## Scorebug research follow-up
+
+- Add bounded read-only native popup descriptor inspection and malformed-input tests.
+- Document queue priority, update heartbeat and formatter limitations.
 ## Unreleased — uniform solver shape correction
 
 - Adapt native stretch/bend distances when importing edited garment positions,

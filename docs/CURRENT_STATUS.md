@@ -1,3 +1,11 @@
+# Scorebug popup runtime inspection
+
+A read-only decoded-ELF inspector validates the observed 83-type popup dispatch
+table, 119 provider slots, four queues and two priority levels. Native queue
+updates use a draw-pass heartbeat; priority is independent of provider count.
+Localization templates use mixed tokens, so literal-only insertion is not a
+validated dynamic formatter. No executable writes or new in-game layout claims.
+See SCOREBUG_RESEARCH.md.
 # Uniform runtime distance correction
 
 The modern uniform importer now adapts both native SPU stretch/bend distance

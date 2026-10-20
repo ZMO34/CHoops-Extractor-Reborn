@@ -88,6 +88,14 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# Scorebug popup runtime inspection
+
+A read-only decoded-ELF inspector validates the observed 83-type popup dispatch
+table, 119 provider slots, four queues and two priority levels. Native queue
+updates use a draw-pass heartbeat; priority is independent of provider count.
+Localization templates use mixed tokens, so literal-only insertion is not a
+validated dynamic formatter. No executable writes or new in-game layout claims.
+See SCOREBUG_RESEARCH.md.
 # Uniform runtime distance correction
 
 The modern uniform importer now adapts both native SPU stretch/bend distance
@@ -3822,6 +3830,37 @@ preparation/preflight. In-game popup transitions, masks, palette appearance and
 native branding placement still require user screenshots. No emulator was run,
 new JB built or executable patched.
 
+## Native popup dispatch and timing
+
+Read-only CH2K8 analysis confirms an83-row table at0x125A37D4,20 bytes per
+row: queue index, priority and three optional PPC64 function descriptors. There
+are119 non-null provider slots. Queue distribution is35/14/32/2;49 types have
+one provider,32 have two and two have three. Types79/80 have priority2 with
+one provider: priority is not a line count. Some entries are legacy/mode specific;
+table presence alone does not prove their use during normal college gameplay.
+
+The getter0x509528 returns0x12C9B720 + queue*0x4D4. Initialization0x50987C
+creates16 event slots of0x48 bytes per queue, reserving a linked-list sentinel.
+At event+0x20/+0x24 are remaining/reset durations,+0x28 is an update gate and
++0x2C is repeat count.0x5099B4 advances eligible events;0x509B80 marks the
+update gate during the main HUD draw pass at0x4F455C. This is a draw-pass
+heartbeat, not acknowledgment from each text callback. Removing the pass can
+therefore alter event lifetime.0x509C54 prefers queue3 over queue2.
+
+Bindings bottombar_textNode_1/2 use queue0. text1/text2/text3/text3_b select
+queue2/3 providers under HUD state gates. The authored asset route for those
+additional text bindings remains unresolved. The native colored statistics
+draw routine0x4F1620 and localization argument contracts must be preserved.
+All119 provider slots resolve statically to68 localization format IDs in the
+inspected input. Formats mix0x00/0x01 tokens, placeholders and color controls;
+loc_system.add_literal is not a general dynamic template writer.
+
+`inspect-scorebug-runtime` validates these observed descriptors from a decoded
+ELF without changing it. It reports static metadata, not live state or game
+compatibility. Conditional popup backgrounds still require matching visibility,
+opacity and transition state. No new executable or installable scorebug is
+produced by this inspection.
+
 ---
 
 Embedded source: docs/PROJECT_SOURCE_OF_TRUTH.md
@@ -4272,6 +4311,12 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 
 Embedded source: docs/TEST_REPORT.md
 
+# Scorebug popup inspection
+
+Synthetic ELF tests cover table bounds, OPD alignment, executable mappings, TOC
+validation, priority independent of provider count and CLI source protection.
+Targeted suite: 11 passed. Supplied decoded executable: 83 types /119 providers.
+No RPCS3, executable writes or JB builds. Full release verification follows.
 # Uniform runtime distance correction
 
 Targeted synthetic verification: 22 cases pass across uniform OBJ/IFF reimport

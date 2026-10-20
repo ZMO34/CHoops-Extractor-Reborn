@@ -94,6 +94,14 @@ def execute(a):
                     source_profile=a.profile, target_profile=a.target_profile,
                     scope='packed-pose-channels-only', bone_retargeted=False,
                     gameplay_ready=False)
+    if c == 'inspect-scorebug-runtime':
+        from .formats.embedded_motion import MAX_ELF
+        from .research.scorebug_runtime import inspect_runtime
+        if Path(a.input).stat().st_size > MAX_ELF:
+            raise ValueError('Native analysis ELF exceeds inspection bounds')
+        result = inspect_runtime(Path(a.input).read_bytes())
+        save_json(a.output, result, [a.input])
+        return result
     if c == 'inspect-embedded-motion':
         from .formats.embedded_motion import inspect_embedded
         result = inspect_embedded(Path(a.input).read_bytes(), a.profile)
