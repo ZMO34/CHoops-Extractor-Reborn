@@ -88,10 +88,24 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# Executable-held animation inspection
+
+Read-only indexing now covers the observed native full-body motion-header family
+inside decoded CH2K8/NBA11 executables: 7,055/18,831 structurally mapped candidates
+in supplied analysis copies. Ghidra confirms CH native pointer/group selection,
+including fallback handling. Candidate metadata is not a decoded or complete clip
+library. Added a bounded research CLI; no executable/animation writer.
+
+Owner control target remains modern right-stick default, original controls in
+preset A. Neither that change nor a donor gameplay-animation port is implemented.
+Packed pose codecs, skeleton/contact retargeting, transition graphs and gameplay
+consumers remain unresolved. No RPCS3, executable edits or testing JB. See
+ANIMATION_GAMEPLAY_PORT.md for evidence, commands and remaining work.
+
 # Animation investigation and pending-PR integration
 
-Seven pending PR branches (#31–#37) are consolidated locally with their source
-changes retained; publication/merge evidence is recorded in the integration PR.
+Seven prior PR branches (#31–#37) are merged through PR #38, retaining source
+changes and ancestry. Windows/Linux CI and clean exact-head portable checks pass.
 The integration exposed one stale GUI button-label expectation, now corrected,
 and adds Legacy wrapper regressions. No prior runtime caveat is promoted to a pass.
 
@@ -1190,6 +1204,43 @@ Stock tutorial text explicitly warns that some drills depend on Default controls
 changing a preset requires checking those consumers as well. A global left/right
 axis swap is not an implementation of the requested controls.
 
+## Executable-held motion data — read-only follow-up
+
+Archive counts above are not a total gameplay-library count. The supplied CH2K8
+and NBA 2K11 decoded executables contain large pools with the observed full-body
+mask 0x001DF7DD and motion-envelope pointer layouts. A new
+`inspect-embedded-motion` command locates this family in writable PT_LOAD ranges,
+checks header/tail bounds and maps absolute dependency addresses. Unlike the IFF
+profile, these native rows already contain absolute pointers. Zero-filled runtime
+memory is reported explicitly instead of being exported as file data.
+
+Read-only supplied-copy results: CH2K8 **7,055 candidates**, NBA 2K11 **18,831
+candidates**, no rejected mask hits and no unbacked dependency starts in either.
+These are structurally validated candidates, not 7,055/18,831 independently
+identified playable clips. Header fields, aliases outside this family, stream
+lengths, runtime registration, duplicate uses and complete coverage remain
+unresolved. The scalar at +0x20 stays labeled raw; it is not declared duration.
+No observed equivalent-family match establishes an NBA 2K14 embedded profile.
+
+Focused CH Ghidra/disassembly establishes a related selection route:
+
+- Function 0x234B98 indexes an eight-byte pointer/flag table. Negative indices
+  select zero; indices above 0x457 select fallback 0x458. A zero flag returns the
+  pointer; a nonzero flag selects a pointer at group +16 times the object's +0x20
+  selection value, then +4. This does not prove what each category/variant means.
+- Function 0x234B20 recognizes index -2 as an object's explicit pointer at +0x8C
+  and otherwise returns the flagged group pointer. Local motion-header pointers
+  are present in the native table and other group structures.
+- Function 0x234A18 joins a separate hashed lookup table with 12-byte metadata
+  rows. Its presence is not evidence that every embedded clip has a known name.
+
+The inspector writes metadata only, including explicit `complete_library=false`,
+`pose_decoded=false` and `import_supported=false`. It neither decrypts SELF files
+nor exports an entire executable data segment as an alleged portable library.
+Original EBOOT remains untouched. The low-level normalized input getter has also
+been traced at CH 0x7B1F14 through bridge 0x121B0; downstream action semantics and
+preset save/default paths remain unestablished.
+
 ## Explicit remaining implementation
 
 **No donor animation is yet playable in CH2K8. No new default/control preset is
@@ -1214,6 +1265,17 @@ python -m choops_py.cli rip NBA14_JB output/rips/nba14 --file nba_animations.iff
 python -m choops_py.cli inspect-animation-links EXTRACTED_BANK.iff college-hoops-2k8 output/research/ch-links.json
 python -m choops_py.cli inspect-animation-links EXTRACTED_BANK.iff nba-2k11 output/research/nba11-links.json
 ```
+
+For an already decoded private ELF analysis copy:
+
+```
+python -m choops_py.cli inspect-embedded-motion ANALYSIS.ELF college-hoops-2k8 output/research/ch-embedded.json
+python -m choops_py.cli inspect-embedded-motion ANALYSIS.ELF nba-2k11 output/research/nba11-embedded.json
+```
+
+The embedded command accepts bounded ELF64 big-endian PowerPC executables with
+32-bit load addresses. Reports contain executable addresses and source identity;
+keep actual-game reports private. Its supported mask family is not universal.
 
 Use the matching profile. The links command rejects NBA 2K14 because its packed
 motion envelope is not established. It reports local candidates rather than
@@ -3991,6 +4053,24 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+# Executable-held motion inspection follow-up
+
+Targeted synthetic motion/envelope checks: **11 passed**. New parser fixtures
+cover absolute mapping for both profiles, source preservation, unbacked-memory
+reporting, invalid targets, machine/profile rejection and overlapping load ranges.
+Full E/F/I lint passes the new parser/tests. Source portable verification passes
+**674 passed, 10 skipped, 2 deselected**, plus compile/CLI/Qt/Ruff/mypy/handoff.
+A sandbox temporary-directory/process limitation required normal local test
+permissions and workspace-local temporary output. Exact-head isolated evidence
+is posted in the follow-up PR.
+
+Read-only supplied ELF inspection finds CH7,055/NBA11 18,831 mask-family candidates,
+zero rejected hits and zero unbacked dependency starts. Ghidra confirms CH's native
+pointer/group selector and fallback behavior. This does not validate payload
+extents, poses, complete registration, controls or gameplay portability.
+No EBOOT edits, RPCS3 or automatic/testing JB. Donor gameplay/control changes
+remain unimplemented.
 
 # Pending PR integration and native animation audit
 

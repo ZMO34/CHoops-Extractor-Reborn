@@ -13,6 +13,7 @@ COMMANDS={
     'import-uniform-iff':Command(('input','edited','output'),(),True),
     'inspect-animations':Command(('input','output')),
     'inspect-animation-links':Command(('input','profile','output')),
+    'inspect-embedded-motion':Command(('input','profile','output')),
     'export-animations':Command(('input','output')),
     'audio-catalog':Command(('source','output'),(),True),
     'export-soundtrack':Command(('source','output'),('audio-category',)),

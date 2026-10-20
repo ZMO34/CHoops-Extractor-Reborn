@@ -1,3 +1,10 @@
+## Unreleased — executable-held motion investigation
+
+- Add bounded read-only native ELF motion-header inspection for the observed
+  CH2K8/NBA 2K11 full-body family, with explicit incomplete-library/import status.
+- Document Ghidra-confirmed CH pointer/group selection and the gap between archive
+  inventories and executable-held motion. No gameplay port/control change.
+
 ## Unreleased — pending updates and native animation inspection
 
 - Consolidate pending Legacy-save, override, face, NBA reader, scorebug and

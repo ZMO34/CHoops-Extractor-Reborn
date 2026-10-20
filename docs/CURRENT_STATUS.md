@@ -1,7 +1,21 @@
+# Executable-held animation inspection
+
+Read-only indexing now covers the observed native full-body motion-header family
+inside decoded CH2K8/NBA11 executables: 7,055/18,831 structurally mapped candidates
+in supplied analysis copies. Ghidra confirms CH native pointer/group selection,
+including fallback handling. Candidate metadata is not a decoded or complete clip
+library. Added a bounded research CLI; no executable/animation writer.
+
+Owner control target remains modern right-stick default, original controls in
+preset A. Neither that change nor a donor gameplay-animation port is implemented.
+Packed pose codecs, skeleton/contact retargeting, transition graphs and gameplay
+consumers remain unresolved. No RPCS3, executable edits or testing JB. See
+ANIMATION_GAMEPLAY_PORT.md for evidence, commands and remaining work.
+
 # Animation investigation and pending-PR integration
 
-Seven pending PR branches (#31–#37) are consolidated locally with their source
-changes retained; publication/merge evidence is recorded in the integration PR.
+Seven prior PR branches (#31–#37) are merged through PR #38, retaining source
+changes and ancestry. Windows/Linux CI and clean exact-head portable checks pass.
 The integration exposed one stale GUI button-label expectation, now corrected,
 and adds Legacy wrapper regressions. No prior runtime caveat is promoted to a pass.
 

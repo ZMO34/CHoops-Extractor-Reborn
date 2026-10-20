@@ -1,5 +1,12 @@
 # Native animation investigation
 
+`inspect-embedded-motion ANALYSIS.ELF PROFILE OUTPUT.json` accepts
+`college-hoops-2k8` or `nba-2k11` on an already decoded private ELF analysis copy.
+It bounds-checks the observed full-body header family and absolute dependency
+starts, distinguishing file-backed and zero-filled memory. It writes metadata,
+not clips; no SELF decryption, executable writes, complete coverage or port is
+implied. Keep real-game reports private.
+
 `inspect-animation-links INPUT.iff PROFILE OUTPUT.json` accepts
 `college-hoops-2k8` or `nba-2k11`. It reports local alias candidates, unresolved
 external IDs, ambiguities and cycles, with native envelope bounds checks. It does

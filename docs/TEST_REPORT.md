@@ -1,3 +1,21 @@
+# Executable-held motion inspection follow-up
+
+Targeted synthetic motion/envelope checks: **11 passed**. New parser fixtures
+cover absolute mapping for both profiles, source preservation, unbacked-memory
+reporting, invalid targets, machine/profile rejection and overlapping load ranges.
+Full E/F/I lint passes the new parser/tests. Source portable verification passes
+**674 passed, 10 skipped, 2 deselected**, plus compile/CLI/Qt/Ruff/mypy/handoff.
+A sandbox temporary-directory/process limitation required normal local test
+permissions and workspace-local temporary output. Exact-head isolated evidence
+is posted in the follow-up PR.
+
+Read-only supplied ELF inspection finds CH7,055/NBA11 18,831 mask-family candidates,
+zero rejected hits and zero unbacked dependency starts. Ghidra confirms CH's native
+pointer/group selector and fallback behavior. This does not validate payload
+extents, poses, complete registration, controls or gameplay portability.
+No EBOOT edits, RPCS3 or automatic/testing JB. Donor gameplay/control changes
+remain unimplemented.
+
 # Pending PR integration and native animation audit
 
 Combined source portable verification: **670 passed, 10 skipped, 2 deselected**.
