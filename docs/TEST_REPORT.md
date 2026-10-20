@@ -3,7 +3,9 @@
 Four additional synthetic tests cover selected-team activation/stadium copying,
 shared-owner isolation, mismatched Team ID refusal, destination player/conference
 preservation, editor undo/redo after table movement, and saving community player
-edits to the selected overrides roster. Targeted combined suite:21 passed.
+edits to the selected overrides roster. Targeted combined suite:21 passed. Final isolated portable verification after this
+integration:728 passed,10 skipped,2 deselected; CLI/Qt,Ruff,mypy,handoff and
+diff checks passed.
 No original/community roster is overwritten; no gameplay or real JB build.
 
 # Team asset manager verification

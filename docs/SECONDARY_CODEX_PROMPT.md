@@ -99,6 +99,9 @@ and reports filenames in the GUI task log. Original assets/EBOOT are unchanged.
 Roster Editor can save a full community roster directly to overrides. Selected-team
 assignment/activation copying supports JB, overrides, editor and external roster
 sources, with a review and undoable editor destination; artwork remains separate.
+Final isolated portable checks:728 passed /10 skipped /2 deselected. Public
+tracked/history text and issue/PR/release discussion audits found no flagged
+private account paths or credential patterns. Generated inputs remain ignored.
 
 Focused Ghidra research confirms the numeric stadium selector (physical arena
 +0x12), ten-bit uniform owner/artwork fields and ordinal selection. The old stadium
@@ -4464,7 +4467,9 @@ Embedded source: docs/TEST_REPORT.md
 Four additional synthetic tests cover selected-team activation/stadium copying,
 shared-owner isolation, mismatched Team ID refusal, destination player/conference
 preservation, editor undo/redo after table movement, and saving community player
-edits to the selected overrides roster. Targeted combined suite:21 passed.
+edits to the selected overrides roster. Targeted combined suite:21 passed. Final isolated portable verification after this
+integration:728 passed,10 skipped,2 deselected; CLI/Qt,Ruff,mypy,handoff and
+diff checks passed.
 No original/community roster is overwritten; no gameplay or real JB build.
 
 # Team asset manager verification

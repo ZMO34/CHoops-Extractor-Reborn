@@ -9,6 +9,9 @@ and reports filenames in the GUI task log. Original assets/EBOOT are unchanged.
 Roster Editor can save a full community roster directly to overrides. Selected-team
 assignment/activation copying supports JB, overrides, editor and external roster
 sources, with a review and undoable editor destination; artwork remains separate.
+Final isolated portable checks:728 passed /10 skipped /2 deselected. Public
+tracked/history text and issue/PR/release discussion audits found no flagged
+private account paths or credential patterns. Generated inputs remain ignored.
 
 Focused Ghidra research confirms the numeric stadium selector (physical arena
 +0x12), ten-bit uniform owner/artwork fields and ordinal selection. The old stadium
