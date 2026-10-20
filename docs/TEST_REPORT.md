@@ -63,6 +63,58 @@ Ratings are conversion judgments, not port/runtime tests. No track poses decoded
 no direct cyberface/full-arena/HUD port, no Windows release/package requested,
 no EBOOT edits, RPCS3/gameplay or real/testing JB. Reports/artwork/audio stay local
 and excluded from Git. [Assessment and reproduction](NBA2K11_DONOR_ASSESSMENT.md).
+# Combined scorebug follow-up verification
+
+Private candidate: five SCNE reparses; 257 untouched gamedata records compare;
+two replacement IFFs prepare and pass preflight; matched English literals resolve;
+SELF payload round-trip and bounded executable diff pass. Nine synthetic wrapper
+paths cover visible/empty/transparent/opening/closing/missing-scene/wrong-layout
+conditions and preserve original callback inputs and stack/nonvolatile registers.
+No runtime appearance, game execution, physical PS3 or JB result is claimed.
+Public editor contract fixes and their portable tests are tracked in PR #32.
+This follow-up changes documentation only in PR #36.
+
+# Local executable experiment 01 — 2026-10-19
+
+Private-only prototypes generated and audited on Windows / Python 3.12.14,
+Capstone PPC64 big-endian and locally installed Keystone 0.9.2. Keystone is not
+an editor dependency. Original decoded ELF and retail SELF digests match after
+all work. Five variants pass allowlisted diff/header/branch and debug SELF payload
+round trips; the control ELF is identical. No game code is executed by these
+checks. 60,000 geometry samples cover both directions plus modern apex/corners/
+joins and old-circle equivalence; 30,000 transfer-mask cases preserve neighboring
+bits. Added instructions' register/TOC/stack/LR usage was reviewed.
+
+The companion reparses with 10 old text styles retained and two native labels
+added. Original decoded bytes and vertex data remain unchanged. Its relocated
+SCNE extends an unrelated inferred span over 44,720 abandoned original bytes;
+runtime acceptance is unverified and explicitly documented. Two-archive override
+preparation/preflight passes with zero unapplied overrides; ZIP integrity is
+checked locally. No automatic/testing JB, emulator, gameplay or physical-PS3 test.
+
+Public changes are documentation/handoff configuration only. Scoped exact-head
+handoff, Ruff, local-link and diff checks are recorded in the PR. Full runtime
+suites and packaging are not rerun and historical passes do not certify EBOOT.
+The cleanup preserves active tracked regression tests and user builds/inputs;
+broader historical package deletion remains approval-blocked.
+
+# Executable modernization research — 2026-10-19
+
+Documentation-only update on Windows / Python 3.12.14. Read-only ELF mapping,
+function-descriptor/TOC inspection and PPC64 big-endian Capstone disassembly
+followed named menu registrations. The bounded scan recorded 580 candidate
+strings / 75 TOC references; these are not an exhaustive executable analysis.
+Input digest matched before/after scanning. No game data or executable writes.
+Additional read-only assertions passed for both prior name-suppression branch
+sites, CameraMenu table/handler descriptors, Game Rules table/callback and
+non-file-backed camera state pointers; a second before/after digest matched.
+
+Scoped verification: generated handoff/check, Ruff for the changed handoff
+generator, local Markdown-link resolution and `git diff --check`. Exact committed
+head results are recorded in the PR. Runtime suites and Windows packaging were
+not rerun: no runtime/package code changed. Historical suite counts below do not
+validate the newly proposed executable candidates. No Ghidra, RPCS3/gameplay,
+executable patch, real/testing JB or release.
 
 # v1.19 Reborn Overrides V5.5 import support
 

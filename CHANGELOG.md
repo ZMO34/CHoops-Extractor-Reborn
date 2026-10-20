@@ -69,6 +69,26 @@
 
 - Add bounded experimental authored HUD geometry/UV/color/text-anchor editing and sixth-man/text inventory.
 - Document scorebug test02 corrections and runtime boundaries; derived user-test assets remain local, not distributed through Git.
+## Unreleased — combined executable experiment correction evidence
+
+- Document native property alignment and marker-identity defects in the broken
+  prototype; keep the prior multi-variant result explicitly historical.
+- Record one private combined candidate with native stats parsing, conditional
+  backing and retained arc/transfer experiments. No patching is added to the tool.
+- Record static checks and runtime acceptance limits without claiming visual QA.
+
+# Unreleased — executable modernization research
+
+- Record owner-authorized private experimental copies for modern NCAA arc/corner
+  scoring, native HUD names and new-transfer sit-out assignment; maintain immutable
+  originals and document unverified runtime/packaging limits. No editor patching.
+- Document verified generated-fixture/cache/review-checkout cleanup and the blocked
+  historical-package deletion; retain current regression source coverage.
+- Document read-only CameraMenu, Game Rules, replay, indicator and autosave routes;
+  rank practical modernization candidates and reject unsupported constant guesses.
+- Carry forward the native scorebug name-fallback evidence from separate PR #32
+  while preserving the owner's decision against executable changes.
+- No runtime/editor feature, executable patch or release added.
 
 # v1.19
 

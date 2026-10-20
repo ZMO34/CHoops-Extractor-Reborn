@@ -117,6 +117,52 @@ COLLEGE HOOPS/REBORN artwork and adjusts authored meter/message placement.
 Runtime messages/timing and dynamic tournament labels are not newly implemented.
 No executable edits, emulator runs or real/testing JB. Local user-test ZIP only;
 no game assets in Git. Current public application release remains v1.19.
+# Combined scorebug correction candidate
+
+Owner-authorized private Ghidra follow-up identifies misaligned cloned native
+text properties and reused score marker identities in the broken combined test.
+A single combined candidate now uses aligned independent city markers, native
+font width fit, original stats tag parsing and a conditional stats-only backing
+hook instead of a permanent main-bar plane. Native event popup visibility remains
+separate. Modern three-point and transfer experiments remain present.
+
+Five edited scenes, 257 untouched records, two-archive preparation/preflight,
+SELF round-trip and nine bounded wrapper paths pass. Source files are unchanged;
+only one executable plus two IFFs/docs is packaged locally. No emulator or JB.
+Appearance/PS3/gameplay compatibility are not certified. See EBOOT_EXPERIMENT_01;
+PR #32 owns the separate public native-alignment/width-fit editor guards.
+
+# Local executable experiment 01 — 2026-10-19
+
+The owner authorized separate experimental copies for modern NCAA arc/corner
+scoring, native scorebug names and removal of new-transfer sit-out assignment.
+[Experiment evidence and limits](EBOOT_EXPERIMENT_01.md) records five private
+variants, a companion scorebug package, preservation checks and manual test order.
+Original executables/game inputs are unchanged. No executable patching is added
+to the editor and no patch code, game assets or executable copies enter Git.
+Static audits, 60,000 geometry samples, 30,000 transfer-mask cases and companion
+two-archive preparation/preflight pass. Boot/gameplay/physical-PS3 compatibility,
+new text-node/span acceptance and existing-save eligibility remain unverified.
+No emulator, real/testing JB, merge or release. This narrow local authorization
+supersedes the earlier refusal only for these prototypes.
+
+Cleanup removes 1,502 generated fixture folders, 99 standalone synthetic IFFs,
+three disposable caches and two clean review worktrees. Active regression sources
+and user inputs/builds remain.
+Historical release/test package deletion was blocked by automatic approval review
+and remains pending specific owner approval; see experiment notes.
+
+# Read-only executable modernization research — 2026-10-19
+
+[Executable modernization candidates](EBOOT_MODERNIZATION_RESEARCH.md) ranks
+native scorebug names, camera customization, broadcast presentation and rules
+against actual executable evidence. Newly traced CameraMenu event handlers use
+bounded 44-byte records; Game Rules initialization takes several mode-dependent
+paths. Neither establishes a one-constant modern-rules or FOV patch. Replay,
+indicator and autosave routes are distinguished from unproven runtime semantics.
+The smallest known executable candidate is the native-name fallback investigated
+in separate PR #32; the owner declined applying it, so names remain unresolved.
+No production feature or EBOOT changed. No emulator or real/testing JB.
 
 # v1.19 rebuild compatibility follow-up
 

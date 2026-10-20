@@ -26,6 +26,12 @@ and changes requiring new runtime systems.
 [NBA 2K11 donor ratings](NBA2K11_DONOR_ASSESSMENT.md) report actual archive/asset
 inspection and distinguish useful conversion sources from unproven direct ports.
 
+[Executable modernization research](EBOOT_MODERNIZATION_RESEARCH.md) ranks small
+EBOOT candidates using named code paths, separating confirmed routes from
+unverified camera, rules, timing and save semantics. EBOOT remains read-only.
+The subsequent [local executable experiment](EBOOT_EXPERIMENT_01.md) is a narrow
+owner-authorized exception using separate copies; patching is not in the editor.
+
 ## Development and evidence
 
 [Developer guide](DEVELOPER_GUIDE.md) explains the modules and prerequisites.
