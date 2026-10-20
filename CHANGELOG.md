@@ -1,3 +1,11 @@
+## Unreleased — uniform solver shape correction
+
+- Adapt native stretch/bend distances when importing edited garment positions,
+  preserving authored prestrain, response bytes and particle bindings.
+- Modern-fit-2 corrects the previous rest-only preset and retains all necklines,
+  builds and aggregate/individual routes. Document confirmed native model routing.
+- In-game appearance still needs testing; no source JB or EBOOT is modified.
+
 ## Unreleased — adaptive animation timing/root conversion
 
 - Decode the observed NBA11 byte-delta timeline and resample pose channels to
