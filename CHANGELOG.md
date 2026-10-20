@@ -2,6 +2,10 @@
 
 - Verify PR #30 retains the v1.16-v1.19 feature history and existing regression suite.
 - Add regression coverage for numeric/named override folders, DDS priority, legacy record aliases and opaque BIN relocation without changing existing import policies.
+# Unreleased — player-face research
+
+- Document the seven dedicated College Hoops likeness slots, generated-face routing, paired texture/preset banks and cross-game conversion limits.
+- Add a read-only face inventory command with synthetic bounds/family/preservation checks; no face editor or EBOOT changes.
 
 # v1.19
 

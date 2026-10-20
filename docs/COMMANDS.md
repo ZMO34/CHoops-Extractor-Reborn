@@ -41,3 +41,11 @@ python -m choops_py.cli validate-build "<GAME_ROOT>/PS3_GAME/USRDIR" output/buil
 ```
 
 Difference packages: `export-mod-patch SOURCE MOD OUTPUT.chpatch` and `import-mod-patch SOURCE INPUT.chpatch NEW_MOD`. Builder Ctrl+C cleans the owned staging copy and returns exit 130.
+
+# Read-only player-face research
+
+With the development Python environment, run
+`python -m choops_py.research.player_faces "PATH_TO_ORIGINAL_CH2K8_JB"`.
+Add `--players` for the source roster's per-player likeness selectors.
+Prints JSON only; no face import, roster writing or executable patching.
+See [player-face evidence](PLAYER_FACE_RESEARCH.md) for supported meanings.

@@ -16,6 +16,31 @@ code are unchanged. No RPCS3, gameplay, EBOOT editing or real/testing JB copy;
 small generated archive fixture outputs only. Unknown formats remain guarded.
 
 # v1.19 Reborn Overrides V5.5 import support (original submission evidence)
+# Player-face research verification
+
+Windows / Python 3.12.14 source `tools/dev/verify.py`: **607 passed, 9 skipped,
+2 deselected**; compile, CLI/Qt smoke, Ruff, mypy, generated handoff and diff
+checks passed. Four added synthetic cases cover selector masking and unchanged
+source, independent custom flags, biased-row morph tail bounds, rejection of NBA
+or other strides, and missing-bank reporting. Final exact-head isolated results
+are recorded on the research PR; optional native DLL absence adds an isolated skip.
+
+`python -m choops_py.research.player_faces <original CH2K8 source>` reads all five
+face banks and source roster with no unresolved banks: seven dedicated albedos,
+13 normal records, 75 facial-hair textures, shared heads/presets; 5,685 players,
+15 nonzero likeness selectors matching seven names, 5,670 generated selectors,
+zero custom flags/stored morph arrays. All seven albedos pass byte-identical
+DDS/GTF/DDS conversion in memory; extracted local face artwork visually inspected.
+EBOOT function-specific TOCs, selector branches, seeded generation and morph
+encode/decode loops were inspected read-only. No executable bytes are committed.
+
+NBA 2K9 donor container/scene structure inspected. The selected NBA 2K14 sample
+ZLIB variant and supplied 2K11 SDAT version/flags remain unsupported; these are
+not successful extraction/port tests. No face writer, EBOOT change, RPCS3,
+gameplay validation or real/testing JB; no Windows package/release requested.
+See [the findings and reproduction command](PLAYER_FACE_RESEARCH.md).
+
+# v1.19 Reborn Overrides V5.5 import support
 
 Read-only discovery against the supplied V5.5 folder and vanilla College Hoops
 2K8 archive recognized 1,946 archive groups and scanned 25,428 files, including

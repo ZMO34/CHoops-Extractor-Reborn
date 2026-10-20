@@ -37,6 +37,8 @@ Format evidence: [shared PS3 archives](PS3_2K_ARCHIVES.md),
 [arena shader masks](ARENA_SHADER_MASKS.md), [conference assets](CONFERENCE_ASSETS.md),
 [texture conversion](TEXTURE_CONVERSION.md), [audio research](AUDIO_RESEARCH.md),
 [scorebug research](SCOREBUG_RESEARCH.md), [animation portability](ANIMATION_PORTABILITY.md).
+[Player-face research](PLAYER_FACE_RESEARCH.md) maps College Hoops generated faces,
+the seven dedicated likeness slots and the limits on borrowing NBA cyberfaces.
 Unknown bits, shader modes, text ceilings and animation tracks remain research
 until the evidence and preserving writer tests exist.
 

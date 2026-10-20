@@ -1,3 +1,14 @@
+# Player-face research follow-up
+
+Read-only PS3 analysis established the per-player dedicated likeness selector
+(logical +0x8C low nibble; biased editor +0x9C), its seven original-player mappings,
+paired albedo/normal banks, FRFG presets, shared high/bench heads and three stored
+morph groups. Most stock players use seeded generation. Added a read-only inventory
+command; no face writer, GUI editing, EBOOT patch or direct NBA cyberface port.
+See [player-face evidence and limits](PLAYER_FACE_RESEARCH.md). All seven extracted
+albedos round-trip DDS/GTF in memory. Later NBA donor extraction variants remain
+explicit blockers; unknown face semantics are not invented.
+
 # v1.19 rebuild compatibility follow-up
 
 Unreleased Legacy save support recognizes the observed 2K8 `USERDATA` profile and
