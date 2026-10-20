@@ -6,6 +6,10 @@
 
 - Document the seven dedicated College Hoops likeness slots, generated-face routing, paired texture/preset banks and cross-game conversion limits.
 - Add a read-only face inventory command with synthetic bounds/family/preservation checks; no face editor or EBOOT changes.
+# Unreleased — NBA 2K11 donor research
+
+- Read the observed v3 SDAT variant with version-specific key selection and retained authentication; keep SDAT output blocked.
+- Document actual NBA 2K11 asset/animation samples and donor suitability ratings; no gameplay, face or animation port implemented.
 
 # v1.19
 

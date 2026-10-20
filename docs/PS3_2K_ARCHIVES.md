@@ -39,6 +39,15 @@ formats. This is not a claim that every game/year/platform is compatible. New or
 ambiguous layouts require evidence and fixtures; do not add filename/title guesses
 or silently reinterpret an unknown format.
 
+## NBA 2K11 research access
+
+The observed NPD v3 SDAT variant (flags 0x0100003C) now selects its version-specific
+wrapping key and retains header/block authentication. The supplied 2K11 copy has
+6,974 entries, 72-byte descriptors, size64 TOC rows and mixed raw/SDAT banks.
+Extraction and bounded known inner readers are available; SDAT rebuilding remains
+blocked and no NBA 2K11 roster schema is enabled. See [donor assessment](NBA2K11_DONOR_ASSESSMENT.md)
+for verified sample reads, animation inventory, preview gaps and conversion ratings.
+
 ## NBA 2K9 supplied-copy observations
 
 Read-only inventory: 6 banks, 6,158,907,392 bytes, 5,624 entries, no overlaps.

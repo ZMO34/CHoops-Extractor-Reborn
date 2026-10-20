@@ -14,7 +14,11 @@ indirect feature reproduces part of the experience in the editor or an external
 workflow. A new engine feature requires executable/runtime logic, not just an IFF
 record with a similar name. EBOOT remains read-only; no emulator is launched.
 
-Our supplied donor evidence is PS3 NBA 2K9 and PS3 NBA 2K14. No modern Gen9 asset
+The [NBA 2K11 donor follow-up](NBA2K11_DONOR_ASSESSMENT.md) adds authenticated v3
+archive access, actual resource samples and per-category ratings. It supersedes
+the earlier 2K11 access blocker, not the requirement for conversion/consumer evidence.
+
+Our supplied donor evidence now includes PS3 NBA 2K9, 2K11 and 2K14. No modern Gen9 asset
 sample was inspected. PS3 2K14 must not be confused with PS4/Gen9 variants or taken
 as a bridge that automatically makes present-day resources compatible.
 

@@ -17,6 +17,10 @@ certifies game/runtime compatibility. Unknown variants fail explicitly.
 
 ## Shared features
 
+NBA 2K11 has additional **research-only read/extraction evidence** for the observed
+NPD v3 SDAT/72-byte descriptor copy. No 2K11 roster editor or SDAT build writer is
+enabled. [Donor evidence and limits](NBA2K11_DONOR_ASSESSMENT.md).
+
 - Explorer reads nested records and researched asset references; labels never make
   an unknown hash an established semantic identity.
 - Source and overrides are cached concurrently. Global preview selection resolves
