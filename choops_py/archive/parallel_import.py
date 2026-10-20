@@ -64,7 +64,7 @@ def code_identity():
                  'formats.cdf_backed_iff_writer','formats.compression','formats.native_codec',
                  'texture_tools.override_import','texture_tools.archive_layout','texture_tools.builtin_converter',
                  'texture_tools.dds','texture_tools.gtf','texture_tools.runtime_layout','texture_tools.legacy_cube',
-                 'modding.court_template')
+                 'modding.court_template','modding.team_assets','modding.addition_manifest','studio.services')
         for name in modules:identity.update(module_bytes('choops_py.'+name))
     else:
         for folder in ('archive','formats','texture_tools','modding'):
@@ -77,7 +77,8 @@ def _compile_one(archive,group,index,work,job,code,reuse):
     from .folder_import import compile_group
     group.pop('compiled_companion',None)
     original=archive.read(group['entry']);before=digest(original);signature=input_signature(group)
-    valid=reuse and reuse.get('code')==code and reuse.get('signature')==signature and reuse.get('source_sha256')==before
+    reference_policy=group.get('logo_templates',{})
+    valid=reuse and reuse.get('code')==code and reuse.get('signature')==signature and reuse.get('source_sha256')==before and reuse.get('reference_policy',{})==reference_policy
     if valid:
         payloads=None
         try:
@@ -110,7 +111,7 @@ def _compile_one(archive,group,index,work,job,code,reuse):
     if group.get('compiled_companion'):
         entry,name,payload=group['compiled_companion'];store(entry,name,payload,'_cdf')
         group.pop('compiled_companion',None)
-    return dict(code=code,signature=signature,source_sha256=before,imports=imports,outputs=outputs,unchanged=unchanged,cache_hit=False,root=str(work))
+    return dict(code=code,signature=signature,reference_policy=reference_policy,source_sha256=before,imports=imports,outputs=outputs,unchanged=unchanged,cache_hit=False,root=str(work))
 
 
 def _worker(source,work,tasks,results,progress,cancel,code,addition_folder=None):
