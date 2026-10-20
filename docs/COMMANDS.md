@@ -1,3 +1,12 @@
+# Native animation investigation
+
+`inspect-animation-links INPUT.iff PROFILE OUTPUT.json` accepts
+`college-hoops-2k8` or `nba-2k11`. It reports local alias candidates, unresolved
+external IDs, ambiguities and cycles, with native envelope bounds checks. It does
+not decode poses or write animation/gameplay files. See
+[the implementation ledger](ANIMATION_GAMEPLAY_PORT.md) for inventory commands,
+new archive labels, Ghidra evidence and current limits.
+
 # Native rebuild additions
 
 v1.10 no longer registers add-uniform-alternate, fill-five-uniforms or

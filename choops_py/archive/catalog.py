@@ -20,7 +20,8 @@ def category(entry):
     if 'roster' in name:return 'Rosters'
     if name in ('crowd.iff', 'gumbel.iff', 'kellogg.iff', 'gameintro_cameras.iff', 'playercreate.iff'):
         return 'Animation banks'
-    if 'singlemocap' in hint or name=='motion.iff':return 'Animation banks'
+    if ('singlemocap' in hint or name=='motion.iff' or
+        name.startswith(('animgraph_','animations_','siganims_','nba_animations','online_teamup_animations','endorsementanims'))):return 'Animation banks'
     return 'Other / unresolved'
 
 

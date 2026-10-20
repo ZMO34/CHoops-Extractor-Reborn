@@ -53,6 +53,11 @@ def execute(a):
         if c == 'import-uniform-models':return uniform_mesh.import_folder(a.edited,a.output)
         from .archive.usrdir_reader import Archive
         return uniform_mesh.export_archive(Archive(a.source),a.output,modern=c=='modern-fit-uniforms')
+    if c == 'inspect-animation-links':
+        from .formats.motion_envelope import inspect_links
+        result = inspect_links(Path(a.input).read_bytes(), a.profile)
+        save_json(a.output, result, [a.input])
+        return result
     if c in ('inspect-animations', 'export-animations'):
         from .formats.animations import inspect_animations
         raw = Path(a.input).read_bytes()

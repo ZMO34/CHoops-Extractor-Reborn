@@ -1,3 +1,21 @@
+# Animation investigation and pending-PR integration
+
+Seven pending PR branches (#31–#37) are consolidated locally with their source
+changes retained; publication/merge evidence is recorded in the integration PR.
+The integration exposed one stale GUI button-label expectation, now corrected,
+and adds Legacy wrapper regressions. No prior runtime caveat is promoted to a pass.
+
+New supported work: 21 researched motion bank names/categories, corrected large
+animation-bank inventory, native CH/NBA11 envelope and NBA11/14 collection
+inspection, and local alias candidate/cycle reports. Ghidra traces native fixups,
+reference handlers and controller polling in all three games. The old 2K14 count
+was incomplete; corrected standard-IFF SingleMoCap count is 22,139.
+
+Donor gameplay animations, smoothness improvements, new right-stick default and
+original controls in preset A remain unimplemented. No guessed bank transplant
+or global analog swap is enabled. See ANIMATION_GAMEPLAY_PORT.md for exact native
+evidence and remaining dependencies. Original games are unchanged; no RPCS3/JB.
+
 # Player-face research follow-up
 
 Read-only PS3 analysis established the per-player dedicated likeness selector

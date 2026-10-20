@@ -56,7 +56,7 @@ def test_explicit_roster_sources_do_not_follow_preview_toggle(qtbot,monkeypatch)
     window.load_game_roster(True)
     assert len(jobs)==2 and 'no roster_english.iff replacement' in errors[0]
     buttons={button.text() for button in window.findChildren(QPushButton)}
-    assert {'Open USERDATA / roster IFF…','Load from JB','Load from overrides'}<=buttons
+    assert {'Open roster / Legacy save…','Load from JB','Load from overrides'}<=buttons
 
 
 @pytest.mark.gui

@@ -1,3 +1,11 @@
+# Current native port investigation
+
+See [animation/gameplay implementation ledger](ANIMATION_GAMEPLAY_PORT.md) for
+Ghidra findings, implemented inventory/link tools and explicit remaining work.
+The old NBA 2K14 count of 7,460 was incomplete: a 10,000-record inventory ceiling
+excluded nba_animations.iff. The corrected count is 22,139 SingleMoCap records.
+No bank swap, pose converter or modern control implementation is enabled.
+
 # NBA animations to College Hoops: research only
 
 No animation port, bank replacement or gameplay patch is implemented.
@@ -9,7 +17,8 @@ Read-only inventory of supplied PS3 archives finds:
 | College Hoops 2K8 | 319 | 1 |
 | NBA 2K9 | 904 | 1 |
 | NBA 2K11 | 4,705 | 0 |
-| NBA 2K14 | 7,460 | 0 |
+| NBA 2K11 | 4,705 | 0 |
+| NBA 2K14 | 22,139 | 0 |
 
 These are identifiable IFF records, not counts of all gameplay clips. Other raw
 banks remain undecoded. Zero old SKEL records does not mean NBA 2K11/2K14 lack skeletons.

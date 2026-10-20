@@ -69,3 +69,5 @@ into binary tests without removing its assertions. Remaining suites cover suppor
 behavior or explicitly optional research; age alone is not a reason to delete them.
 Local cleanup removes only identified generated caches/build intermediates, never
 source games, supplied overrides, user builds or private research evidence.
+
+Animation gameplay port scope and native evidence: [implementation ledger](ANIMATION_GAMEPLAY_PORT.md).

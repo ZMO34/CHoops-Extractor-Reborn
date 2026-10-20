@@ -1,3 +1,27 @@
+# Pending PR integration and native animation audit
+
+Combined source portable verification: **670 passed, 10 skipped, 2 deselected**.
+Compile, CLI/Qt, Ruff, mypy, generated handoff and diff checks pass. New motion
+modules/tests also pass full E/F/I lint. Source checkout omits optional native
+helpers; exact-head isolated evidence is maintained in the integration PR.
+
+Synthetic regressions cover banks above 10,000 records, malformed table/pointer
+bounds, reference IDs, distinct collection strides, sentinel event arrays, local
+alias cycles, motion names/categories, Legacy fixed-size encode/outer bytes and
+invalid Legacy layouts. A stale roster-button label expectation was corrected.
+
+Private read-only inventories: CH319 / NBA11 4,705 / NBA14 22,139 SingleMoCap;
+no standard-header traversal errors or bounded-header/sample skips. Actual CH
+crowd: 125 packed +125 alias candidates; NBA11 signature bank:333 +333. No envelope
+errors/local cycles in these two banks. Ghidra and original disassembly establish
+native animation fixups, reference handlers, collection stride and pad imports.
+These are structural findings, not bone/pose/event semantics or gameplay tests.
+
+No animation converter, donor gameplay bank, right-stick default or preset-A
+change is enabled. Runtime smoothness, engine compatibility and PS3 behavior are
+unverified. RPCS3 NOT RUN; automatic/testing JB NOT BUILT. All game inputs remain
+unchanged. See ANIMATION_GAMEPLAY_PORT.md for native evidence and remaining work.
+
 # PR #30 merged compatibility audit
 
 Reviewed merge `fd9eae5d43f0dec436411661dcf99c52f326e562` in an isolated

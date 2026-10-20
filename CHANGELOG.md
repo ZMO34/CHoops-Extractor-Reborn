@@ -1,3 +1,13 @@
+## Unreleased — pending updates and native animation inspection
+
+- Consolidate pending Legacy-save, override, face, NBA reader, scorebug and
+  uniform-editing updates, preserving their limitations and branch ancestry.
+- Resolve 21 native animation bank names and classify them in Explorer.
+- Fix inventory skipping banks above 10,000 records; include 2K14's main bank.
+- Add bounded native motion-envelope/collection and local alias-link inspection.
+- Document Ghidra input/animation routes. No donor gameplay port or new controls
+  are represented as implemented or runtime tested.
+
 # Unreleased — merged override compatibility audit
 
 - Verify PR #30 retains the v1.16-v1.19 feature history and existing regression suite.
