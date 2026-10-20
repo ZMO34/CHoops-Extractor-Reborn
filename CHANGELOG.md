@@ -1,5 +1,8 @@
 ## v1.20
 
+- Save edited community rosters to overrides; copy selected-team activation/asset assignments between roster sources with review and editor undo.
+- Place Team Assets above Research/Diagnostics; audit public paths/credentials and remove unreferenced legacy artwork.
+
 - Add searchable team assignment matrix, visible IDs and per-category expansion checks.
 - Apply independent stadiums, five uniform banks/SELU pairs and menu logos to overrides and normal JB builds.
 - Clone missing enabled alternates from Home during build preflight and log each fallback.

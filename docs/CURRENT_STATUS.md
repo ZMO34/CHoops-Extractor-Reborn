@@ -6,6 +6,9 @@ plans fork shared arenas/owners, preserve unrelated assignments, create editable
 folders and apply to normal override previews/builds. Uniform-only expansion can
 reuse unique owners. Build preflight clones missing linked alternates from Home
 and reports filenames in the GUI task log. Original assets/EBOOT are unchanged.
+Roster Editor can save a full community roster directly to overrides. Selected-team
+assignment/activation copying supports JB, overrides, editor and external roster
+sources, with a review and undoable editor destination; artwork remains separate.
 
 Focused Ghidra research confirms the numeric stadium selector (physical arena
 +0x12), ten-bit uniform owner/artwork fields and ordinal selection. The old stadium

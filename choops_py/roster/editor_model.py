@@ -60,6 +60,7 @@ class EditorModel:
             self.issues.append({'kind':'invalid_table_pointer','field_offset':field,'target':target,'table':table,'expected_bias':bias});return None
         return None if empty_player and index==0 else index
     def reload(self):
+        if getattr(self,'_asset_table_moves',False):self.tables=dict(detect_tables(self.data))
         if "uniforms" in self.tables and len(self.data)>=0x78:
             b=Binary(self.data)
             self.tables["uniforms"]=(b.relative(0x74),b.u32(0x70),8)

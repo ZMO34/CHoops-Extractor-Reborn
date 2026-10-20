@@ -275,6 +275,28 @@ def export_folder(plan, output, source):
     return output
 
 
+def roster_plan(archive, payload):
+    original,_=roster_model(archive)
+    base=getattr(archive,'base',archive)
+    return dict(additions={},replacements={'roster_english.iff':encode_roster_iff(original,bytes(payload))},teams=[],
+                logo_templates=dict(getattr(archive,'logo_templates',{})),fallbacks=list(getattr(archive,'alternate_fallbacks',[])),
+                source_roster_sha256=digest(read_named(base,'roster_english.iff')))
+
+
+def apply_plan(source,plan,archive,folder,workspace,job=None):
+    """Preserve the currently selected complete overrides before normal preparation."""
+    plan={**plan,'additions':dict(plan['additions']),'replacements':dict(plan['replacements'])}
+    if hasattr(archive,'replacements'):
+        for entry in archive.entries:
+            if entry['index'] in archive.replacements:
+                name=entry.get('name') or f"hash_{entry['hash']:08x}.iff"
+                target=plan['additions'] if entry['index']>=len(archive.base.entries) else plan['replacements']
+                target.setdefault(name,archive.read(entry))
+    export_folder(plan,folder,source)
+    from ..studio.services import stage_folder
+    return stage_folder(source,folder,workspace,job)
+
+
 class AdditionInputs:
     """Bounded virtual source entries for explicitly planned loose additions."""
     def __init__(self, base, folder):

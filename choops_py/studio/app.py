@@ -319,9 +319,9 @@ class Window(QMainWindow):
             "Audio",
             "Models / Courts",
             "Mod Builder",
+            "Team Assets",
             "Research",
             "Diagnostics",
-            "Team Assets",
         ):
             self.navigation.addTopLevelItem(QTreeWidgetItem([name]))
 
@@ -407,12 +407,11 @@ class Window(QMainWindow):
 
         self.create_builder()
 
-        self.create_research()
-
-        self.create_diagnostics()
         from .team_assets import TeamAssetsPanel
         self.team_assets_panel = TeamAssetsPanel(self)
         self.pages.addWidget(self.team_assets_panel)
+        self.create_research()
+        self.create_diagnostics()
 
         self.navigation.setCurrentItem(self.navigation.topLevelItem(0))
 
@@ -1420,8 +1419,14 @@ class Window(QMainWindow):
         export_menu.addAction('Roster CSV…',lambda:export_csv(self))
         export_button.setMenu(export_menu);extra.addWidget(export_button);extra.addStretch()
         assets_button=QPushButton("Team assets…")
-        assets_button.clicked.connect(lambda:self.navigation.setCurrentItem(self.navigation.topLevelItem(self.navigation.topLevelItemCount()-1)))
+        assets_button.clicked.connect(lambda:self.navigation.setCurrentItem(self.navigation.findItems('Team Assets',Qt.MatchFlag.MatchExactly)[0]))
         extra.addWidget(assets_button)
+        save_overrides=QPushButton('Save roster to overrides')
+        def save_current_overrides():
+            if not self.roster or self.active:return
+            from .team_assets import save_payload_to_overrides
+            save_payload_to_overrides(self,bytes(self.roster.data))
+        save_overrides.clicked.connect(save_current_overrides);extra.addWidget(save_overrides)
         import_button=QPushButton('Import / compare…');import_menu=QMenu(import_button)
         import_menu.addAction('Edited CSV…',lambda:import_csv(self))
         import_menu.addAction('Compare another roster…',lambda:compare_roster(self))

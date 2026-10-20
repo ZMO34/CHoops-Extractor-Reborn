@@ -2,7 +2,9 @@
 
 Use **Team Assets** for the searchable assignment list and checked S/Home/Away/
 X/Y/Z/Menu-logo creation. Review changes, apply a separate overrides folder, then
-use the normal JB builder. Classic shared stadiums can be forked independently.
+use the normal JB builder. **Save roster to overrides** preserves your full edited
+community roster; selected-team copy buttons move activation/asset assignments
+between roster sources. Classic shared stadiums can be forked independently.
 Missing linked alternate assets use Home with explicit log notices. See
 [Team asset guide](TEAM_ASSETS.md) for the full workflow and native limits.
 

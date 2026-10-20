@@ -4,7 +4,8 @@ import uuid
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
-    QLineEdit, QTableWidget, QTableWidgetItem, QAbstractItemView, QCheckBox, QPlainTextEdit, QSplitter)
+    QLineEdit, QTableWidget, QTableWidgetItem, QAbstractItemView, QCheckBox, QPlainTextEdit, QSplitter,
+    QMenu, QFileDialog, QDialog, QDialogButtonBox)
 
 from ..archive.manifests import OUTPUT
 from ..modding import team_assets as backend
@@ -24,6 +25,13 @@ class TeamAssetsPanel(QWidget):
         self.use_roster = QCheckBox('Include roster editor changes'); self.use_roster.setChecked(True); toolbar.addWidget(self.use_roster)
         self.search = QLineEdit(); self.search.setPlaceholderText('Search teams, IDs, filenames or Active / Inactive / Missing')
         toolbar.addWidget(self.search, 1); self.search.textChanged.connect(self.filter)
+        copy_bar=QHBoxLayout();layout.addLayout(copy_bar)
+        for direction,title,choices in [('from','Copy assignments from…',('Roster editor','Source JB','Selected overrides','External roster / save…')),
+                                        ('to','Copy assignments to…',('Roster editor','Selected overrides','Overrides using JB roster','External roster / save copy…'))]:
+            button=QPushButton(title);menu=QMenu(button)
+            for choice in choices:menu.addAction(choice,lambda checked=False,d=direction,c=choice:self.copy_assignments(d,c))
+            button.setMenu(menu);copy_bar.addWidget(button)
+        copy_bar.addWidget(QLabel('Copies selected teams only; art files are separate.'))
         controls = QHBoxLayout(); layout.addLayout(controls)
         for text, callback in [('Check all types for selected teams', lambda:self.check_selected(True)),
                                ('Clear selected checks', lambda:self.check_selected(False)),
@@ -156,23 +164,79 @@ class TeamAssetsPanel(QWidget):
         if self.plan is None:return
         try:self.unchanged_context()
         except ValueError as error:return self.owner.show_error(str(error))
-        from .services import stage_folder
         source = self.owner.source; plan = self.plan
         folder = OUTPUT / 'overrides' / ('team_assets_' + uuid.uuid4().hex[:10])
         workspace = OUTPUT / 'builds' / ('team_assets_' + uuid.uuid4().hex[:10])
         archive = self.asset_archive
         def apply(job):
-            # Carry existing selected overrides forward so expansion cannot drop them.
-            if hasattr(archive, 'replacements'):
-                for entry in archive.entries:
-                    if entry['index'] in archive.replacements or entry['index'] >= len(archive.base.entries):
-                        name = entry['name']
-                        if entry['index'] >= len(archive.base.entries):plan['additions'].setdefault(name, archive.read(entry))
-                        else:plan['replacements'].setdefault(name, archive.read(entry))
-            backend.export_folder(plan, folder, source)
-            return stage_folder(source, folder, workspace, job)
+            return backend.apply_plan(source,plan,archive,folder,workspace,job)
         def complete(result):
             self.owner.builder_completed(result, 'staging')
             self.state.setText('Applied. Editable folder: ' + str(folder) + ' · Build JB copy writes the selected assets into a new JB.')
             self.plan = None; self.apply.setEnabled(False)
         self.owner.run_job('Apply team assets to overrides', apply, complete, cancellable=True)
+
+    def copy_assignments(self,direction,choice):
+        if not self.rows:return self.owner.log('Load teams, then select team rows to copy.')
+        indices=[self.rows[i.row()]['index'] for i in self.table.selectionModel().selectedRows()]
+        if not indices:return self.owner.log('Select the team rows whose assignments should be copied.')
+        from ..roster.editor_model import EditorModel
+        from ..roster.adapters import load_bytes
+        from ..roster.asset_assignments import copy_assignments,apply_to_editor
+        other_archive=None
+        try:
+            self.unchanged_context()
+            if choice=='Roster editor':
+                if not self.owner.roster:raise ValueError('Open a roster in Roster Editor first.')
+                other=self.owner.roster
+            elif choice.startswith('External'):
+                path,_=QFileDialog.getOpenFileName(self,'Choose roster / decrypted save','','Roster / save (*.iff *.rost *.bin *.zip);;All files (*)')
+                if not path:return
+                other=EditorModel.open(path)
+                if hasattr(other,'game'):raise ValueError('Choose a College Hoops 2K8 roster')
+            else:
+                other_archive=self.owner.preview_archive(choice=='Selected overrides') if choice!='Overrides using JB roster' else self.owner.archive
+                _,other=backend.roster_model(other_archive)
+            donor=self.model if direction=='to' else other
+            target=other if direction=='to' else self.model
+            payload,changes=copy_assignments(target,donor,indices)
+        except (ValueError,OSError,KeyError) as error:return self.owner.show_error(str(error))
+        dialog=QDialog(self);dialog.setWindowTitle('Review asset assignment copy');dialog.resize(950,500)
+        layout=QVBoxLayout(dialog);text=QPlainTextEdit();text.setReadOnly(True)
+        text.setPlainText('\n'.join(f"Team {r['team']} {r['school']} ← {r['source_school']}: owner {r['owner']}; active {r['active']}; inactive {r['inactive']}" for r in changes)+'\n\nOnly asset IDs, arena routing and uniform activation/assignments are copied. Destination names, players, ratings, classification and conferences stay intact. Asset artwork is not copied; missing alternate containers can use Home during building. Check the matrix for missing assets.')
+        layout.addWidget(text);buttons=QDialogButtonBox(QDialogButtonBox.StandardButton.Ok|QDialogButtonBox.StandardButton.Cancel)
+        buttons.accepted.connect(dialog.accept);buttons.rejected.connect(dialog.reject);layout.addWidget(buttons)
+        if dialog.exec()!=QDialog.DialogCode.Accepted:return
+        if direction=='from':
+            self.model=EditorModel(load_bytes(payload))
+            self.loaded((self.asset_archive,self.model,backend.inventory(self.asset_archive,self.model),backend.available_ids(self.asset_archive,self.model)))
+            self.details.setPlainText('Copied selected assignments into the matrix. Review/check expansions, or use Copy assignments to → Selected overrides to save them.')
+        elif choice=='Roster editor':
+            apply_to_editor(other,payload);self.owner.display_roster(other)
+            self.loaded_payload=bytes(other.data) if self.use_roster.isChecked() else None
+            self.invalidate();self.state.setText('Copied asset assignments to Roster Editor as one undoable edit.')
+        elif choice.startswith('External'):
+            output,_=QFileDialog.getSaveFileName(self,'Save a separate roster / save copy',str(OUTPUT/'rosters'/'asset_assignments.iff'),'All files (*)')
+            if output:
+                from ..archive.manifests import write_bytes
+                try:write_bytes(output,other.source.encode(payload),[other.source.source_path])
+                except (ValueError,OSError) as error:return self.owner.show_error(str(error))
+                self.state.setText('Saved assignment copy: '+output)
+        else:
+            selected=self.owner.preview_archive(True) if (Path(self.owner.mod_path.text())/'overrides.json').is_file() else self.owner.archive
+            save_payload_to_overrides(self.owner,payload,selected)
+
+
+def save_payload_to_overrides(owner,payload,archive=None):
+    if not owner.source or not owner.archive:return owner.log('Open a College Hoops 2K8 JB first.')
+    try:
+        if archive is None:
+            archive=owner.preview_archive(True) if (Path(owner.mod_path.text())/'overrides.json').is_file() else owner.archive
+        plan=backend.roster_plan(archive,payload)
+    except (ValueError,OSError) as error:return owner.show_error(str(error))
+    token=uuid.uuid4().hex[:10]
+    folder=OUTPUT/'overrides'/('roster_'+token);workspace=OUTPUT/'builds'/('roster_'+token)
+    def complete(result):
+        owner.builder_completed(result,'staging')
+        owner.log('Saved edited roster to overrides: '+str(folder))
+    owner.run_job('Save edited roster to overrides',lambda job:backend.apply_plan(owner.source,plan,archive,folder,workspace,job),complete,cancellable=True)

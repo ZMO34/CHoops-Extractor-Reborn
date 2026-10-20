@@ -1,3 +1,11 @@
+# Community roster assignment integration
+
+Four additional synthetic tests cover selected-team activation/stadium copying,
+shared-owner isolation, mismatched Team ID refusal, destination player/conference
+preservation, editor undo/redo after table movement, and saving community player
+edits to the selected overrides roster. Targeted combined suite:21 passed.
+No original/community roster is overwritten; no gameplay or real JB build.
+
 # Team asset manager verification
 
 Targeted synthetic suite:17 passed on Windows/Python3.12.14, including shared-owner

@@ -96,6 +96,9 @@ plans fork shared arenas/owners, preserve unrelated assignments, create editable
 folders and apply to normal override previews/builds. Uniform-only expansion can
 reuse unique owners. Build preflight clones missing linked alternates from Home
 and reports filenames in the GUI task log. Original assets/EBOOT are unchanged.
+Roster Editor can save a full community roster directly to overrides. Selected-team
+assignment/activation copying supports JB, overrides, editor and external roster
+sources, with a review and undoable editor destination; artwork remains separate.
 
 Focused Ghidra research confirms the numeric stadium selector (physical arena
 +0x12), ten-bit uniform owner/artwork fields and ordinal selection. The old stadium
@@ -2726,9 +2729,38 @@ new archive identities discoverable and binds the plan to the source roster. The
 prepared workspace holds checksums and additions.json separately from replacement
 rows. Tampering or selecting another source is rejected. XOR patch packages cannot
 represent additions and explicitly refuse them; share the editable folder instead.
-Save/export from Roster Editor remains separate: the applied expanded roster lives
-in Selected overrides and can be loaded there for subsequent edits. Refresh team
-assignments after roster/source changes; stale reviewed plans cannot be applied.
+**Save roster to overrides** in Roster Editor saves the entire edited community
+roster (including realignment, players and ratings) into a new selected override
+snapshot while retaining existing selected asset replacements/additions. The
+original community file and JB stay unchanged. Team Assets starts from that same
+editor payload when Include roster editor changes is checked. Its apply action
+also saves the entire edited/expanded roster. Load from overrides brings that
+applied roster back into the editor. Refresh assignments after source/editor
+changes; stale reviewed plans cannot be applied.
+
+## Copy activation and assignments between roster sources
+
+Select team rows, then use **Copy assignments from…** or **Copy assignments to…**.
+Sources include the open roster editor, Source JB, Selected overrides and an
+external roster/decrypted save. Copying to a JB-based destination always creates
+new overrides; it never edits the source JB. External destinations are saved as
+separate copies under output/. Fixed-size Legacy saves cannot accommodate growth;
+use a roster IFF/overrides for expanded records.
+
+The review identifies teams, uniform owners and active/inactive banks. Only asset
+IDs, arena routing and counted/dormant uniform records are copied. Destination
+names, players, ratings, palettes, classification and conference membership stay
+intact. Match uses roster Team ID checks with equal team counts, not an assumed
+name search. A shared owner is forked when necessary to protect unselected teams.
+Copying to Roster Editor is one undoable edit, including moved table directories.
+Art files are separate: copy their overrides too, inspect Missing states, or use
+normal expansion/Home fallback. The entire roster-save action is distinct from
+these selected-team assignment-only copy actions.
+
+For a community roster: open it in Roster Editor, realign/edit, save to overrides,
+then load Team Assets with editor changes included. Check desired new categories,
+review/apply, customize the generated folders and build from Selected overrides.
+Team Assets appears above Research and Diagnostics in navigation.
 
 ## Classic teams and unique stadiums
 
@@ -4426,6 +4458,14 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+# Community roster assignment integration
+
+Four additional synthetic tests cover selected-team activation/stadium copying,
+shared-owner isolation, mismatched Team ID refusal, destination player/conference
+preservation, editor undo/redo after table movement, and saving community player
+edits to the selected overrides roster. Targeted combined suite:21 passed.
+No original/community roster is overwritten; no gameplay or real JB build.
 
 # Team asset manager verification
 
