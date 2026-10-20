@@ -2,7 +2,7 @@
 
 Only the observed embedded float-position cloth layout is writable. OBJ is an
 edit cage: faces, UVs, ordering and seam positions must survive the DCC roundtrip.
-Native cloth constraints remain opaque; these are manual-test experiments.
+Observed SPU distance constraints are adapted; runtime fit still needs testing.
 """
 
 from __future__ import annotations
@@ -23,8 +23,8 @@ from ..formats.standard_iff_writer import record_blocks, replace_records
 
 SCHEMA = "choops-uniform-mesh-1"
 WARNING = (
-    "Experimental rest-shape edit. Packed cloth constraints and runtime "
-    "body collision are not retargeted; packed normal/tangent attributes are "
+    "Experimental garment edit with adapted stretch/bend distances. Runtime "
+    "body collision is unchanged; packed normal/tangent attributes are "
     "preserved. Animation, fit and lighting need manual game testing."
 )
 GARMENT = re.compile(
@@ -314,7 +314,7 @@ def import_iff(source, edited, output):
     ]
     if manifest.get("models") != expected:
         raise ValueError("Model manifest identities/counts changed")
-    changes, changed_vertices = {}, 0
+    changes, changed_vertices, changed_constraints = {}, 0, 0
     for r, c, sb, cb, layout, start, mapping in pairs:
         obj = edited / (r["name"] + ".obj")
         if obj.is_symlink():
@@ -335,6 +335,10 @@ def import_iff(source, edited, output):
                 struct.pack_into(">3f", new_s, layout["position_start"] + i * 24, *new)
                 new_c[start + particle * 16 : start + particle * 16 + 12] = packed
                 changed_vertices += 1
+        from .cloth_constraints import retarget_distances
+
+        new_c, adapted = retarget_distances(cb, bytes(new_c))
+        changed_constraints += adapted
         # Validate structural layout and exact SCNE/Clth agreement after edits.
         check = _layout(bytes(new_s))
         _cloth(bytes(new_c), check["positions"])
@@ -383,6 +387,7 @@ def import_iff(source, edited, output):
     return {
         "models": len(pairs),
         "changed_vertices": changed_vertices,
+        "changed_constraints": changed_constraints,
         "warning": WARNING,
     }
 
@@ -488,7 +493,7 @@ def export_archive(archive, output, modern=False, job=None):
         rows.append({"archive": name, **report})
     result = {
         "schema": SCHEMA,
-        "preset": "modern-fit-1" if modern else None,
+        "preset": "modern-fit-2" if modern else None,
         "archives": rows,
         "warning": WARNING,
     }
@@ -511,7 +516,8 @@ def export_archive(archive, output, modern=False, job=None):
         "retriangulate, reorder triangles or alter UVs. Export selected garment\n"
         "alone back to its original OBJ path. Import validates the original IFF\n"
         "hash, UV identity, topology, seams, finite coordinates and triangle flips.\n"
-        "It writes positions in both SCNE and matching Clth rest particles.\n\n"
+        "It writes positions in SCNE/Clth and adapts native stretch/bend lengths\n"
+        "while preserving their authored slack/prestrain ratios.\n\n"
         "Reimport through Models / Courts > Uniform meshes > Reimport edited\n"
         "uniform models, choosing this collection root; or use:\n\n"
         "    python -m choops_py.cli import-uniform-models "

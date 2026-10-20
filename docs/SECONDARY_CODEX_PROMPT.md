@@ -96,6 +96,16 @@ updates use a draw-pass heartbeat; priority is independent of provider count.
 Localization templates use mixed tokens, so literal-only insertion is not a
 validated dynamic formatter. No executable writes or new in-game layout claims.
 See SCOREBUG_RESEARCH.md.
+# Uniform runtime distance correction
+
+The modern uniform importer now adapts both native SPU stretch/bend distance
+batches in addition to SCNE/Clth rest positions. It preserves authored length
+ratios, response bytes, indices, self-edge padding and all other logical bytes.
+Read-only native tracing confirms the five neckline archive selectors and paired
+SCNE/Clth record-name CRCs, with thin/regular/fat build aliases. The earlier package
+left these distances unchanged and was incomplete. See UNIFORM_MESH_EDITING.md.
+No source asset/EBOOT edits, RPCS3 or testing JB. External gameplay result remains
+unverified; replacement hashes allow checking that the actual built JB contains edits.
 
 # Adaptive pose/root translation follow-up
 
@@ -2529,7 +2539,7 @@ Read-only inventory of the supplied College Hoops 2K8 PS3 source found:
   routes are represented. These are 18 distinct garment/build combinations;
   the duplicated routes are not additional jersey styles or new team alternates.
 
-`modern-fit-1` raises the shorts hem by 20% of that mesh's original vertical
+`modern-fit-2` raises the shorts hem by 20% of that mesh's original vertical
 extent, fading to zero displacement at 65% of its height so the waist and upper
 hips remain fixed. The deformation is monotonic in height; no rows are cut off.
 Jersey torso X/Z are reduced by up to 7%, with smooth fades at the bottom and
@@ -2558,10 +2568,12 @@ been certified by this change.
 Choose **Reimport edited uniform models…**, selecting the collection root.
 The importer checks the original IFF hash, manifest identities, ordered triangles,
 vertex count, UV identity, sewn particle agreement, finite coordinates, a maximum
-20-unit displacement and collapsed/flipped triangles. It updates only XYZ in
-SCNE vertices and their exact matching Clth rest particles. Unknown attributes,
-UVs, skinning-associated stream bytes, indices, constraints and helper particles
-are retained. Unsupported declarations and ambiguous matches fail explicitly.
+20-unit displacement and collapsed/flipped triangles. It updates XYZ in
+SCNE vertices and their exact matching Clth rest particles, plus the observed
+packed stretch/bend distance fields. Unknown attributes,
+UVs, skinning-associated stream bytes, indices and helper particles are retained.
+The observed stretch/bend distance fields are scaled by the ratio between edited
+and original particle separation, preserving authored prestrain and slack. Unsupported declarations and ambiguous matches fail explicitly.
 Collection operations are cancellable; a failed/cancelled collection may contain
 completed files but has no final success report. Choose a new empty destination
 for retry. Each individual IFF is fully validated before writing.
@@ -2597,13 +2609,51 @@ can grow; the existing archive relocation workflow handles a larger replacement.
 Every written IFF is reparsed; all changed and unchanged record slices are
 compared against the expected bytes. No-op OBJ roundtrips are byte-identical.
 
-**This is experimental.** Packed solver constraints, collision geometry, cloth
-simulation and normal/tangent regeneration have not been retargeted. Existing
-constraints may pull edited vertices toward their previous fit; animation may
-show stretching, body clipping or shading differences. Rest-pose comparisons and
+**This is experimental.** Stretch/bend rest distances are adapted; collision
+geometry, other solver parameters and normal/tangent regeneration are unchanged.
+Animation may still show body clipping or shading differences. Rest-pose comparisons and
 successful import/preflight cannot establish the animated result. Do not call
 this a finished cloth-simulation port. No RPCS3/gameplay or real JB build is run.
 NBA garment layouts and arbitrary new topology remain unsupported.
+
+
+## Runtime correction: cloth distances and resource routing
+
+The earlier rest-only package left both native distance tables unchanged. That
+was an incomplete shape edit: the solver still enforced the original distances.
+This is a confirmed omission, not proof of what was installed on an external PC.
+
+Read-only native analysis establishes the following CH2K8 PS3 routes:
+
+- Native `0x57F4B4` selects the five archive names at `0x934148`:
+  cloth_u, cloth_v, cloth_vtri, cloth_tri and cloth_wishbone, all `.iff`.
+  `0x57F4D4` reads the player's neckline and falls back to U outside the valid range.
+  Requests at `0x57FEE4`/`0x57FFA0` use that selector for the two teams.
+- `0x4DB324` resolves paired SCNE/Clth resource IDs. The jersey record table at
+  `0x10016554` is five necklines by five body selector slots; slots 0/1 map to
+  thin, 2/3 to regular, and 4 to fat. The shorts table at `0x100165B8` uses the
+  same build aliasing. Each ID equals the case-sensitive CRC32 of the corresponding
+  `jersey_<neck>_<build>` or `shorts<build>` record name. This establishes the
+  shared garment resources used by the model loader, rather than team DDS artwork.
+- Aggregate and individual build IFF routes both remain in the collection.
+  The 18 distinct garment shapes cover 45 jersey-build/shorts-build pairings.
+  A combination package changes its named shapes; it does not force roster selectors.
+- The executable's cloth SPU image descriptor is at `0x12502A00`; its code source
+  is `0x124FF600`, length `0x33B0`, local address `0x80`. This is read-only evidence.
+  SPU routines `0x1260` and `0x1568` consume tables at Clth `0xD4`/`0xD8`.
+  Counts are the big-endian uint16 fields at +4/+6 shifted right three.
+- Each 48-byte batch has eight packed edge words and sixteen response bytes.
+  A = word >> 20; B = A + (word & 1023). Distance = ((word >> 10) & 1023) / 32.
+  Aligned vector loads discard the low four address bits occupied by distance.
+  The response bytes, particle indices and self-edge padding remain unchanged.
+  Replacing bend distances with geometric distance would discard authored prestrain;
+  the writer instead scales each existing distance by new separation / old separation.
+
+The importer adapts these fields for arbitrary supported OBJ edits as well as the
+modern preset, rejects malformed tables and unrepresentable distances, reparses the
+IFF and checks every untouched logical byte. An unchanged OBJ remains byte-identical.
+No EBOOT patch is needed or produced. Native routing and offline consistency do not
+certify animated appearance; the tester must verify the rebuilt JB and test in game.
 
 ---
 
@@ -4253,8 +4303,8 @@ Updated 2026-10-11. CURRENT_STATUS.md and TEST_REPORT.md are the living evidence
 ## Experimental uniform mesh edits
 
 Known College Hoops garment OBJ reimport edits both visible and cloth rest XYZ.
-Packed solver constraints, collision and normal/tangent regeneration remain
-unchanged. A static modern-fit preview is not an animated fit certification;
+Observed stretch/bend distances are adapted; collision, other solver parameters
+and normal/tangent regeneration remain unchanged. A static modern-fit preview is not an animated fit certification;
 see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA writer.
 
 ---
@@ -4267,6 +4317,25 @@ Synthetic ELF tests cover table bounds, OPD alignment, executable mappings, TOC
 validation, priority independent of provider count and CLI source protection.
 Targeted suite: 11 passed. Supplied decoded executable: 83 types /119 providers.
 No RPCS3, executable writes or JB builds. Full release verification follows.
+# Uniform runtime distance correction
+
+Targeted synthetic verification: 22 cases pass across uniform OBJ/IFF reimport
+and packed cloth distances, including an end-to-end solver-distance regression,
+authored bend prestrain, self-edge padding, no-op byte identity, out-of-bounds
+indices, overlapping/truncated tables and unrepresentable edited distances.
+Private supplied-source checks cover all 21 replacement archives /33 paired
+SCNE-Clth records. Native record-name CRCs match the model selector tables.
+GUI override preparation and build preflight pass all21 archives, including ten
+larger compressed replacements using the existing bank relocation path. No JB
+was built. In-game fit and the remote developer's installed files are unverified.
+Full source portable verification passes: **696 passed,10 skipped,2 deselected**,
+plus compile/CLI/Qt/Ruff/mypy/handoff/diff checks. Focused E/F/I lint passes.
+Private package checks validate79,005 changed distance words across33 record
+pairs;45 selective packages retain unrelated records. All21 build-preflight
+payload fingerprints match their replacements. The installed-bank verifier also
+correctly identifies all21 unchanged source archives as ORIGINAL, tolerating
+allocation padding without confusing it with a changed garment payload.
+Exact-head isolated verification is posted in the PR.
 
 # Native packed-pose translation
 

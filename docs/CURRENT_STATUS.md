@@ -6,6 +6,16 @@ updates use a draw-pass heartbeat; priority is independent of provider count.
 Localization templates use mixed tokens, so literal-only insertion is not a
 validated dynamic formatter. No executable writes or new in-game layout claims.
 See SCOREBUG_RESEARCH.md.
+# Uniform runtime distance correction
+
+The modern uniform importer now adapts both native SPU stretch/bend distance
+batches in addition to SCNE/Clth rest positions. It preserves authored length
+ratios, response bytes, indices, self-edge padding and all other logical bytes.
+Read-only native tracing confirms the five neckline archive selectors and paired
+SCNE/Clth record-name CRCs, with thin/regular/fat build aliases. The earlier package
+left these distances unchanged and was incomplete. See UNIFORM_MESH_EDITING.md.
+No source asset/EBOOT edits, RPCS3 or testing JB. External gameplay result remains
+unverified; replacement hashes allow checking that the actual built JB contains edits.
 
 # Adaptive pose/root translation follow-up
 
