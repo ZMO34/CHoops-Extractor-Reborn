@@ -12,7 +12,7 @@ from choops_py.modding import uniform_mesh as mesh
 pytestmark = pytest.mark.unit
 
 
-def garment_fixture():
+def garment_fixture(constraints=False):
     raw = bytearray(4096)
 
     def u(p, v):
@@ -77,6 +77,13 @@ def garment_fixture():
     for i, v in enumerate([(1.0, 2.0, 3.0), *positions]):
         struct.pack_into(">4f", cloth, 1024 + i * 16, *v, 1.0)
     cloth[1200:1208] = b"SOLVER!!"
+    if constraints:
+        struct.pack_into(">HH", cloth, 4, 8, 8)
+        struct.pack_into(">II", cloth, 0xD4, 1232, 1280)
+        for table, length in ((1232, 640), (1280, 512)):
+            for i in range(8):
+                struct.pack_into(">I", cloth, table + i * 4,
+                                 (1 << 20) | (length << 10) | 1)
     names = [
         {"name": "jersey_u_reg", "type": "SCNE"},
         {"name": "jersey_u_reg", "type": "Clth"},
@@ -131,6 +138,26 @@ def test_rest_edit_preserves_every_other_byte_and_unknown_record(workspace):
     assert all(a == b or i in allowed_c for i, (a, b) in enumerate(zip(cb, after_c)))
     assert record_blocks(changed, changed.records[2])[0][3] == b"UNCHANGED"
     assert source.read_bytes() == garment_fixture()
+
+
+def test_import_adapts_solver_distances_as_well_as_rest_mesh(workspace):
+    source, root = workspace
+    source.write_bytes(garment_fixture(constraints=True))
+    mesh.export_iff(source, root / "export")
+    pairs = mesh._pairs(StandardIFF(source.read_bytes()))
+    layout = pairs[0][4]
+    positions = [(x * 0.5, y, z) for x, y, z in layout["positions"]]
+    mesh.write_obj(root / "export/jersey_u_reg.obj",
+                   positions, layout["uvs"], layout["faces"])
+    report = mesh.import_iff(source, root / "export", root / "new.iff")
+    assert report["changed_constraints"] == 16
+    result = StandardIFF((root / "new.iff").read_bytes())
+    cloth = record_blocks(result, result.records[1])[0][3]
+    for table, length in ((1232, 320), (1280, 256)):
+        for i in range(8):
+            assert struct.unpack_from(">I", cloth, table + i * 4)[0] == (
+                (1 << 20) | (length << 10) | 1)
+    assert cloth[1200:1208] == b"SOLVER!!"
 
 
 @pytest.mark.parametrize("change", ["faces", "uvs", "count", "nan", "far", "inverted"])

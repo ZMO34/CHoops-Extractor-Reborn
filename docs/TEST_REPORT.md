@@ -15,6 +15,25 @@ Synthetic ELF tests cover table bounds, OPD alignment, executable mappings, TOC
 validation, priority independent of provider count and CLI source protection.
 Targeted suite: 11 passed. Supplied decoded executable: 83 types /119 providers.
 No RPCS3, executable writes or JB builds. Full release verification follows.
+# Uniform runtime distance correction
+
+Targeted synthetic verification: 22 cases pass across uniform OBJ/IFF reimport
+and packed cloth distances, including an end-to-end solver-distance regression,
+authored bend prestrain, self-edge padding, no-op byte identity, out-of-bounds
+indices, overlapping/truncated tables and unrepresentable edited distances.
+Private supplied-source checks cover all 21 replacement archives /33 paired
+SCNE-Clth records. Native record-name CRCs match the model selector tables.
+GUI override preparation and build preflight pass all21 archives, including ten
+larger compressed replacements using the existing bank relocation path. No JB
+was built. In-game fit and the remote developer's installed files are unverified.
+Full source portable verification passes: **696 passed,10 skipped,2 deselected**,
+plus compile/CLI/Qt/Ruff/mypy/handoff/diff checks. Focused E/F/I lint passes.
+Private package checks validate79,005 changed distance words across33 record
+pairs;45 selective packages retain unrelated records. All21 build-preflight
+payload fingerprints match their replacements. The installed-bank verifier also
+correctly identifies all21 unchanged source archives as ORIGINAL, tolerating
+allocation padding without confusing it with a changed garment payload.
+Exact-head isolated verification is posted in the PR.
 
 # Native packed-pose translation
 
