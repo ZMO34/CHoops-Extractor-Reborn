@@ -88,10 +88,53 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# Adaptive pose/root translation follow-up
+
+NBA11's variable keyframe timeline is now established and converted to fixed CH
+samples, with original keys preserved exactly, interpolated/quantized inserted
+poses and optional6/8-byte root tracks. All9,574 inspected distinct timelines
+match rate/time-scale/duration. Broad channel checks pass13,301 distinct streams
+across CH/NBA11,589,196 frames;32 donor pose/33 root resampling checks pass.
+
+All112 stock shot styles are cataloged through224 motion references. The additive
+native table/registration change, complete event/auxiliary conversions, donor bind
+mapping, gameplay consumers and modern-control defaults remain unfinished. No new
+shot choice is exposed and no original is replaced. No installable donor bank or
+EBOOT patch is produced. See ANIMATION_GAMEPLAY_PORT.md; no RPCS3/testing JB.
+
+# Packed-pose conversion and additive shot research
+
+Implemented lossless translation of the observed CH2K8/NBA11 packed quaternion
+selector convention, preserving all remaining components, translations, padding
+and frame order. Private checks on32 streams per game preserve decoded channels
+and reverse byte identity. This is a packed-channel converter; no playable donor
+clip, new jump-shot option, full animation system or control preset is installed.
+
+Native research locates the112-entry jump-shot playback table, its40-byte stride,
+paired motion pointers, shared readers and UI option maximum. New choices must
+append records and extend registration, retaining existing IDs. Simply enabling
+ID112 would read an adjacent unrelated structure. No table/EBOOT patch is applied.
+Skeleton/contact/event/auxiliary-track mappings, allocation and complete playback
+semantics remain unresolved. See ANIMATION_GAMEPLAY_PORT.md. No RPCS3/testing JB.
+
+# Executable-held animation inspection
+
+Read-only indexing now covers the observed native full-body motion-header family
+inside decoded CH2K8/NBA11 executables: 7,055/18,831 structurally mapped candidates
+in supplied analysis copies. Ghidra confirms CH native pointer/group selection,
+including fallback handling. Candidate metadata is not a decoded or complete clip
+library. Added a bounded research CLI; no executable/animation writer.
+
+Owner control target remains modern right-stick default, original controls in
+preset A. Neither that change nor a donor gameplay-animation port is implemented.
+Packed pose codecs, skeleton/contact retargeting, transition graphs and gameplay
+consumers remain unresolved. No RPCS3, executable edits or testing JB. See
+ANIMATION_GAMEPLAY_PORT.md for evidence, commands and remaining work.
+
 # Animation investigation and pending-PR integration
 
-Seven pending PR branches (#31–#37) are consolidated locally with their source
-changes retained; publication/merge evidence is recorded in the integration PR.
+Seven prior PR branches (#31–#37) are merged through PR #38, retaining source
+changes and ancestry. Windows/Linux CI and clean exact-head portable checks pass.
 The integration exposed one stale GUI button-label expectation, now corrected,
 and adds Legacy wrapper regressions. No prior runtime caveat is promoted to a pass.
 
@@ -1052,7 +1095,9 @@ See [animation/gameplay implementation ledger](ANIMATION_GAMEPLAY_PORT.md) for
 Ghidra findings, implemented inventory/link tools and explicit remaining work.
 The old NBA 2K14 count of 7,460 was incomplete: a 10,000-record inventory ceiling
 excluded nba_animations.iff. The corrected count is 22,139 SingleMoCap records.
-No bank swap, pose converter or modern control implementation is enabled.
+The observed CH/NBA11 packed pose/timing/root converter is now available as an
+offline research command. No complete bank swap or modern control implementation
+is enabled; see the ledger for its exact bounds.
 
 # NBA animations to College Hoops: research only
 
@@ -1064,7 +1109,6 @@ Read-only inventory of supplied PS3 archives finds:
 |---|---:|---:|
 | College Hoops 2K8 | 319 | 1 |
 | NBA 2K9 | 904 | 1 |
-| NBA 2K11 | 4,705 | 0 |
 | NBA 2K11 | 4,705 | 0 |
 | NBA 2K14 | 22,139 | 0 |
 
@@ -1190,13 +1234,166 @@ Stock tutorial text explicitly warns that some drills depend on Default controls
 changing a preset requires checking those consumers as well. A global left/right
 axis swap is not an implementation of the requested controls.
 
+## Executable-held motion data — read-only follow-up
+
+Archive counts above are not a total gameplay-library count. The supplied CH2K8
+and NBA 2K11 decoded executables contain large pools with the observed full-body
+mask 0x001DF7DD and motion-envelope pointer layouts. A new
+`inspect-embedded-motion` command locates this family in writable PT_LOAD ranges,
+checks header/tail bounds and maps absolute dependency addresses. Unlike the IFF
+profile, these native rows already contain absolute pointers. Zero-filled runtime
+memory is reported explicitly instead of being exported as file data.
+
+Read-only supplied-copy results: CH2K8 **7,055 candidates**, NBA 2K11 **18,831
+candidates**, no rejected mask hits and no unbacked dependency starts in either.
+These are structurally validated candidates, not 7,055/18,831 independently
+identified playable clips. Header fields, aliases outside this family, stream
+lengths, runtime registration, duplicate uses and complete coverage remain
+unresolved. The generic header inspector retains its raw +0x20 label. The newer full-body
+timeline check below establishes duration for that bounded NBA11 profile.
+No observed equivalent-family match establishes an NBA 2K14 embedded profile.
+
+Focused CH Ghidra/disassembly establishes a related selection route:
+
+- Function 0x234B98 indexes an eight-byte pointer/flag table. Negative indices
+  select zero; indices above 0x457 select fallback 0x458. A zero flag returns the
+  pointer; a nonzero flag selects a pointer at group +16 times the object's +0x20
+  selection value, then +4. This does not prove what each category/variant means.
+- Function 0x234B20 recognizes index -2 as an object's explicit pointer at +0x8C
+  and otherwise returns the flagged group pointer. Local motion-header pointers
+  are present in the native table and other group structures.
+- Function 0x234A18 joins a separate hashed lookup table with 12-byte metadata
+  rows. Its presence is not evidence that every embedded clip has a known name.
+
+The inspector writes metadata only, including explicit `complete_library=false`,
+`pose_decoded=false` and `import_supported=false`. It neither decrypts SELF files
+nor exports an entire executable data segment as an alleged portable library.
+Original EBOOT remains untouched. The low-level normalized input getter has also
+been traced at CH 0x7B1F14 through bridge 0x121B0; downstream action semantics and
+preset save/default paths remain unestablished.
+
+## Packed pose translation — 2K11 to CH2K8
+
+A bounded packed-channel converter is implemented in `formats/motion_frames.py`.
+This is the first actual stream translation, not a complete animation-bank port.
+It handles the observed four-channel XYZ SoA layout: each group occupies 24 bytes;
+rotation/translation counts are six-bit fields at +0x10, and each frame occupies
+24 times ceil((rotation count + translation count)/4). Packed rotations precede
+packed translations; partial groups retain their padding.
+
+Native CH routines 0x204FC/0x20AF0 and NBA11 0x16464/0x16DAC establish the shared
+smallest-three quaternion representation. Each component is signed 15-bit scaled
+by 23/(32*16384); the omitted positive component is reconstructed from the unit
+sphere. The first two words' high bits select its component permutation. CH uses
+selector times four in LVSL/VPERM, while NBA11 uses 12 minus selector times four.
+Changing conventions therefore toggles only those two selector bits. Packed
+components, signed translations (1/128), frame order and unused bytes remain exact.
+Native quaternion order is WXYZ: both frame decoders initialize absent rotations
+to (1,0,0,0). Native mirror signs and skeleton/bone routing are separate from
+these channels.
+
+The scalar offline decoder uses mathematical square root, whereas native VMX uses
+an estimate/refinement. It is not advertised as bit-exact floating-point emulation.
+The stream transcoder preserves encoded values and does not re-quantize them.
+Unknown layouts/profiles, mismatched extents, invalid quaternion values and counts
+outside the native fields are rejected. Source-overwrite guards apply to the CLI.
+
+Read-only/private-copy checks across 32 observed streams per game: CH1,106 frames /
+18,802 quaternion channels /159,264 bytes; NBA11 644 frames /10,948 quaternion
+channels /92,736 bytes. All decoded pose-channel values agree across conversion;
+reverse conversion reproduces every original byte. These are channel-level checks,
+not native runtime, retargeting, contacts, jump-shot timing or bank registration.
+First converted stream samples remain private; no game assets are committed.
+
+The supplied PS3 Ghidra scripts explicitly warn that Cell LVLX/LVRX are unsupported.
+Local backed-up language additions now decode those loads using aligned 16-byte
+reads and byte-offset shifts; this removes the former sampler decompilation
+truncation. Semantics were checked against the public
+[RPCS3 instruction reference](https://github.com/RPCS3/rpcs3/blob/master/rpcs3/Emu/Cell/PPUInterpreter.cpp).
+No emulator was launched. Raw disassembly remains the check on decompiler output:
+for example, Ghidra's existing LVSL pseudocode can incorrectly suggest r0 supplies
+an address when its RA field means zero.
+
+## Adaptive timing and root translation
+
+NBA11 native sampler 0x1B764 reads a byte timing table through header +0x24.
+Its low15-bit keyframe count is in +0x14; each interval is the corresponding byte
+plus one. The final byte is not an interval. The native sampler accumulates those
+ticks, finds bracketing keyframes, computes their blend fraction and reads poses
+through +0x28. CH native 0x226B4 instead uses fixed-rate frame indexing.
+
+All9,574 distinct inspected NBA11 full-body timelines satisfy cumulative ticks =
+recorded duration (+0x20) times rate (high byte +0x10) times time-scale (+0x1C),
+within float precision. This establishes duration for this observed profile;
+ignoring the time-scale produced misleading mismatches. No alternate +0x14 bit15
+packing was found in this inspected family; that native branch is not implemented.
+
+`resample_nba11_frames` expands the irregular ticks into fixed samples at the same
+tick rate. Retain the donor rate/time-scale when a future container adapter writes
+headers; a stock15-Hz assumption changes playback speed. Existing keyframes retain
+their exact packed bytes after selector conversion. Inserted rotations use shortest
+arc mathematical SLERP and bounded quantization; positions use linear interpolation.
+This is an offline geometric approximation, not bit-exact reproduction of the native
+VMX interpolation polynomials. Synthetic quantization checks bound quaternion
+angular error below0.0002 radians on the seeded fixture.
+
+Native root sampler 0x17BF4 reads +0x2C using the same timeline. CH 0x2027C uses
+fixed ticks through +0x34. Both use signed-halfword XYZ at1/8 scale; +0x14 bit31
+selects a six-byte root row, otherwise an eight-byte row includes heading. The
+heading word participates in native angle conversion. The root converter linearly
+interpolates authored signed words as those samplers do, retaining mirror flags
+for the eventual header adapter; it does not invent angle-wrap correction.
+
+Private checks:32 donor pose streams expand644 keys to4,642 fixed frames, retaining
+every source key byte. Root checks cover33 streams /4,757 fixed samples, including
+10 without heading; all source key samples are exact. Earlier broad packed-channel
+audit passes3,727 distinct CH streams /247,373 frames /35,621,712 bytes and9,574 NBA11
+streams /341,823 frames /49,278,288 bytes, with exact reverse-byte preservation.
+These results cover the identified header/mask family, not every game animation.
+
+The destination executable also contains an explicit21-entry index/name map at
+0x933F40 (root, hips/femurs/knees/ankles, thorax, clavicles/shoulders/arms/hands and
+head). The old global SKEL sample has21 entries in352 bytes. This does not prove
+NBA11 bind transforms, hierarchy or compatible missing translation channels.
+The CH 8-byte event records carry an integer and float; NBA11 records add an optional
+payload pointer in a12-byte row. A private endpoint-fingerprint comparison finds99
+unambiguous candidate pairs;43 also align in event count and normalized times.
+These suggest26 event-ID mappings, but one donor ID maps to multiple CH IDs and
+uses distinct payload words. Endpoint agreement is not full-motion equivalence;
+none of these candidates is installed as an event conversion table. Observed event IDs differ, so dropping the third
+word or applying a uniform ID offset is not a supported event conversion.
+
+## Adding jump-shot choices — native requirements
+
+Owner requirement is additive: retain every original shot and append donor styles.
+CH getter/setter 0x69E938/0x69E94C read/write one byte at logical player +0x73
+(editor row +0x83); the editor's current accepted range remains 0..111. Native
+initialization at 0x69D410 loads 0x6F as the existing option maximum. A byte has
+additional representational capacity, but this alone does not register a new shot.
+
+Native table 0x9DD5F0 contains 112 records with a 40-byte stride. Runtime readers
+at 0x3213D4/0x321454/0x321538/0x3247DC/0x326404/0x32BE20 use its shared TOC pointer.
+The last two words of each record are motion pointers; other fields are also read
+into playback state. Their complete timing/handedness meanings remain unresolved.
+Index112 currently reaches a different adjacent structure, so permitting that ID
+without extending the native table would be unsafe.
+
+All112 named shot styles were privately mapped to224 distinct motion headers.
+Their6,890 referenced frames pass packed-channel conversion/reverse-byte checks;
+this catalogs the existing baseline, not added styles or certified gameplay.
+
+Additive support must preserve the first112 records/IDs, append fully compatible
+motions and playback metadata, extend labels/option registration, establish safe
+runtime allocation and update every consumer. No stock record is replaced, no
+unsupported choice is exposed and no speculative executable/table patch is enabled.
+
 ## Explicit remaining implementation
 
 **No donor animation is yet playable in CH2K8. No new default/control preset is
 installed. No smoother gameplay or entire on-court system port is claimed.**
 
-Remaining dependencies are packed rotation/translation/time decoding and encoding,
-per-bone names/order/bind poses and retargeting, root motion, ball/hand/foot contacts,
+Remaining dependencies include unhandled packed/auxiliary track and time formats,
+donor per-bone names/order/bind poses and retargeting, root integration, ball/hand/foot contacts,
 paired interaction events, animation ID/variant selection, blend/transition graph
 execution, shooting/defense/AI consumers and memory limits. Players/teams BIN
 payloads remain opaque and must not be confused with an already decoded clip bank.
@@ -1214,6 +1411,38 @@ python -m choops_py.cli rip NBA14_JB output/rips/nba14 --file nba_animations.iff
 python -m choops_py.cli inspect-animation-links EXTRACTED_BANK.iff college-hoops-2k8 output/research/ch-links.json
 python -m choops_py.cli inspect-animation-links EXTRACTED_BANK.iff nba-2k11 output/research/nba11-links.json
 ```
+
+For an isolated packed-channel stream with confirmed counts (not an entire IFF):
+
+```
+python -m choops_py.cli transcode-motion-frames POSE_STREAM.bin nba-2k11 college-hoops-2k8 17 4 38 output/research/converted-pose-stream.bin
+```
+
+Counts are rotations, translations and frames. The output is a channel stream,
+not an installable IFF or executable; `gameplay_ready` remains false. Original
+bone maps, mirrors, auxiliary tracks/events and native registration are required.
+
+For an isolated NBA11 pose stream and its exact keyframe-count timing bytes:
+
+```
+python -m choops_py.cli resample-motion-frames POSE.bin TIMING.bin 17 4 output/research/fixed-pose.bin --root-track ROOT.bin --root-output output/research/fixed-root.bin
+```
+
+Add `--root-without-heading` only for the observed six-byte root mode. Both root
+options are required together; all inputs and distinct output paths are validated
+before writing. No headers, bone bindings, auxiliary tracks, events or runtime
+registries are written. The result still reports `gameplay_ready=false`.
+
+For an already decoded private ELF analysis copy:
+
+```
+python -m choops_py.cli inspect-embedded-motion ANALYSIS.ELF college-hoops-2k8 output/research/ch-embedded.json
+python -m choops_py.cli inspect-embedded-motion ANALYSIS.ELF nba-2k11 output/research/nba11-embedded.json
+```
+
+The embedded command accepts bounded ELF64 big-endian PowerPC executables with
+32-bit load addresses. Reports contain executable addresses and source identity;
+keep actual-game reports private. Its supported mask family is not universal.
 
 Use the matching profile. The links command rejects NBA 2K14 because its packed
 motion envelope is not established. It reports local candidates rather than
@@ -3991,6 +4220,46 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+# Native packed-pose translation
+
+Fifteen targeted synthetic cases pass, including adaptive timing/SLERP, quaternion
+encoding,6/8-byte roots, endpoint preservation and multi-output source guards: all four native permutation selectors,
+channel equivalence and reverse byte identity, signed translation scale, partial
+group padding, invalid profiles/counts/extents/quaternions and CLI source guards.
+Full E/F/I lint passes the new codec/tests. Full source portable verification: **689 passed,10 skipped,2 deselected**, plus
+compile/CLI/Qt/Ruff/mypy/handoff/diff checks. Exact-head isolated verification is
+posted in the active PR.
+
+Private checks:32 CH streams (1,106 frames,18,802 quaternion channels,159,264 bytes)
+and32 NBA11 streams (644 frames,10,948 quaternion channels,92,736 bytes) preserve
+decoded channels and round-trip every byte. Source analysis copies remain unchanged.
+The broad observed-family audit passes3,727 CH streams /247,373 frames and9,574
+NBA11 streams /341,823 frames with exact reverse bytes; all9,574 distinct donor
+timelines match rate/time-scale/duration. Resampling32 pose streams preserves644
+keys across4,642 fixed frames;33 root streams preserve keys across4,757 samples.
+Ghidra/native instructions establish frame layout, quaternion selector difference
+and the112-entry CH jump-shot table. No complete bank conversion, bone retargeting,
+new shot registration, control remap, native runtime or gameplay check is implied.
+RPCS3 NOT RUN; automatic/testing JB NOT BUILT. No EBOOT writes.
+
+# Executable-held motion inspection follow-up
+
+Targeted synthetic motion/envelope checks: **11 passed**. New parser fixtures
+cover absolute mapping for both profiles, source preservation, unbacked-memory
+reporting, invalid targets, machine/profile rejection and overlapping load ranges.
+Full E/F/I lint passes the new parser/tests. Source portable verification passes
+**674 passed, 10 skipped, 2 deselected**, plus compile/CLI/Qt/Ruff/mypy/handoff.
+A sandbox temporary-directory/process limitation required normal local test
+permissions and workspace-local temporary output. Exact-head isolated evidence
+is posted in the follow-up PR.
+
+Read-only supplied ELF inspection finds CH7,055/NBA11 18,831 mask-family candidates,
+zero rejected hits and zero unbacked dependency starts. Ghidra confirms CH's native
+pointer/group selector and fallback behavior. This does not validate payload
+extents, poses, complete registration, controls or gameplay portability.
+No EBOOT edits, RPCS3 or automatic/testing JB. Donor gameplay/control changes
+remain unimplemented.
 
 # Pending PR integration and native animation audit
 

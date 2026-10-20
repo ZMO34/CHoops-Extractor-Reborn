@@ -1,3 +1,27 @@
+## Unreleased — adaptive animation timing/root conversion
+
+- Decode the observed NBA11 byte-delta timeline and resample pose channels to
+  fixed CH ticks with native key preservation, SLERP and bounded quantization.
+- Translate optional6/8-byte root tracks; protect all inputs and distinct outputs.
+- Audit the broad observed motion pools and all112 original jump-shot mappings.
+  Complete banks, events/auxiliary tracks, bind retargeting and additive native
+  shot registration are not implemented or claimed gameplay compatible.
+
+## Unreleased — native packed-pose translation
+
+- Translate the observed NBA11/CH2K8 packed quaternion selector convention with
+  exact preservation of remaining stream bits, translations and padding.
+- Add a bounded packed-frame CLI, source protection and conformance regressions.
+- Trace additive jump-shot requirements: native112-record playback table and
+  UI cap. No stock replacements, new registered shot or gameplay port claimed.
+
+## Unreleased — executable-held motion investigation
+
+- Add bounded read-only native ELF motion-header inspection for the observed
+  CH2K8/NBA 2K11 full-body family, with explicit incomplete-library/import status.
+- Document Ghidra-confirmed CH pointer/group selection and the gap between archive
+  inventories and executable-held motion. No gameplay port/control change.
+
 ## Unreleased — pending updates and native animation inspection
 
 - Consolidate pending Legacy-save, override, face, NBA reader, scorebug and

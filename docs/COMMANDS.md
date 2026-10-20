@@ -1,4 +1,31 @@
+# Adaptive NBA11 motion resampling
+
+`resample-motion-frames POSE_INPUT TIMING_INPUT ROTATIONS TRANSLATIONS OUTPUT`
+expands the observed NBA11 byte-delta keyframe timeline into fixed CH pose samples.
+Optional `--root-track INPUT --root-output OUTPUT` translates the matching root
+track; add `--root-without-heading` for its confirmed six-byte mode. Original keys
+are exact; inserted samples use mathematical SLERP/linear interpolation and native
+quantization. This does not reproduce native FP bit-for-bit or write containers,
+bone maps, auxiliary tracks/events, executable tables or installable animations.
+Keep rate/time-scale in the future header adapter. `gameplay_ready` remains false.
+
+# Packed motion channel translation
+
+`transcode-motion-frames INPUT SOURCE_PROFILE TARGET_PROFILE ROTATIONS TRANSLATIONS FRAMES OUTPUT`
+accepts `nba-2k11` and `college-hoops-2k8` for the observed packed XYZ channel layout.
+It converts the quaternion permutation selector while preserving all other bits.
+Use confirmed counts and an isolated stream, not an entire IFF/ELF. It does not
+retarget skeletons, handle auxiliary tracks/events, register jump shots or make
+an installable bank. Output reports `gameplay_ready=false`. Sources are protected.
+
 # Native animation investigation
+
+`inspect-embedded-motion ANALYSIS.ELF PROFILE OUTPUT.json` accepts
+`college-hoops-2k8` or `nba-2k11` on an already decoded private ELF analysis copy.
+It bounds-checks the observed full-body header family and absolute dependency
+starts, distinguishing file-backed and zero-filled memory. It writes metadata,
+not clips; no SELF decryption, executable writes, complete coverage or port is
+implied. Keep real-game reports private.
 
 `inspect-animation-links INPUT.iff PROFILE OUTPUT.json` accepts
 `college-hoops-2k8` or `nba-2k11`. It reports local alias candidates, unresolved

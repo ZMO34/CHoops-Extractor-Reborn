@@ -1,7 +1,50 @@
+# Adaptive pose/root translation follow-up
+
+NBA11's variable keyframe timeline is now established and converted to fixed CH
+samples, with original keys preserved exactly, interpolated/quantized inserted
+poses and optional6/8-byte root tracks. All9,574 inspected distinct timelines
+match rate/time-scale/duration. Broad channel checks pass13,301 distinct streams
+across CH/NBA11,589,196 frames;32 donor pose/33 root resampling checks pass.
+
+All112 stock shot styles are cataloged through224 motion references. The additive
+native table/registration change, complete event/auxiliary conversions, donor bind
+mapping, gameplay consumers and modern-control defaults remain unfinished. No new
+shot choice is exposed and no original is replaced. No installable donor bank or
+EBOOT patch is produced. See ANIMATION_GAMEPLAY_PORT.md; no RPCS3/testing JB.
+
+# Packed-pose conversion and additive shot research
+
+Implemented lossless translation of the observed CH2K8/NBA11 packed quaternion
+selector convention, preserving all remaining components, translations, padding
+and frame order. Private checks on32 streams per game preserve decoded channels
+and reverse byte identity. This is a packed-channel converter; no playable donor
+clip, new jump-shot option, full animation system or control preset is installed.
+
+Native research locates the112-entry jump-shot playback table, its40-byte stride,
+paired motion pointers, shared readers and UI option maximum. New choices must
+append records and extend registration, retaining existing IDs. Simply enabling
+ID112 would read an adjacent unrelated structure. No table/EBOOT patch is applied.
+Skeleton/contact/event/auxiliary-track mappings, allocation and complete playback
+semantics remain unresolved. See ANIMATION_GAMEPLAY_PORT.md. No RPCS3/testing JB.
+
+# Executable-held animation inspection
+
+Read-only indexing now covers the observed native full-body motion-header family
+inside decoded CH2K8/NBA11 executables: 7,055/18,831 structurally mapped candidates
+in supplied analysis copies. Ghidra confirms CH native pointer/group selection,
+including fallback handling. Candidate metadata is not a decoded or complete clip
+library. Added a bounded research CLI; no executable/animation writer.
+
+Owner control target remains modern right-stick default, original controls in
+preset A. Neither that change nor a donor gameplay-animation port is implemented.
+Packed pose codecs, skeleton/contact retargeting, transition graphs and gameplay
+consumers remain unresolved. No RPCS3, executable edits or testing JB. See
+ANIMATION_GAMEPLAY_PORT.md for evidence, commands and remaining work.
+
 # Animation investigation and pending-PR integration
 
-Seven pending PR branches (#31–#37) are consolidated locally with their source
-changes retained; publication/merge evidence is recorded in the integration PR.
+Seven prior PR branches (#31–#37) are merged through PR #38, retaining source
+changes and ancestry. Windows/Linux CI and clean exact-head portable checks pass.
 The integration exposed one stale GUI button-label expectation, now corrected,
 and adds Legacy wrapper regressions. No prior runtime caveat is promoted to a pass.
 
