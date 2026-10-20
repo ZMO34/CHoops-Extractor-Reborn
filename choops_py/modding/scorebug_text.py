@@ -19,11 +19,13 @@ def _records(header):
     b=Binary(header);count=b.u32(0x4c)
     if count>4096:raise ValueError('SCNE text count exceeds limit')
     table=b.relative(0x50) if count else 0;b.slice(table,count*144)
+    if count and table%16:raise ValueError('SCNE text table must be 16-byte aligned')
     records={}
     for i in range(count):
         at=table+i*144;name=b.utf16(b.relative(at+64),'be')
         if name in records:raise ValueError('Ambiguous SCNE text binding')
         style=b.relative(at+80);n=b.u32(style)
+        if style%16:raise ValueError('SCNE text properties must be 16-byte aligned for native vector loads')
         if n>1024:raise ValueError('SCNE text property count exceeds limit')
         b.slice(style+16,n*32);properties={}
         for j in range(n):
@@ -62,8 +64,18 @@ def edit_styles(parts, changes):
     b,records=_records(parts[0]);out=bytearray(parts[0]);names=set(records);report=[]
     for name,change in changes.items():
         if name not in records:raise ValueError('Unknown SCNE text binding '+name)
-        if set(change)-{'font','binding','literal_id','align','alpha','color'}:raise ValueError('Unsupported SCNE text style edit')
+        if set(change)-{'font','binding','literal_id','align','alpha','color','max_width'}:raise ValueError('Unsupported SCNE text style edit')
         at,properties=records[name]
+        if 'max_width' in change:
+            width=change['max_width'];limit=properties.get(0x11fa397c);flags=properties.get(0x72b6694d)
+            if type(width) not in (int,float) or not math.isfinite(width) or not 0<width<=4096:raise ValueError('Invalid native text width')
+            if limit is None or limit[1]!=0 or flags is None or flags[1]!=0:raise ValueError('Missing native text width/flags properties')
+            if any(sum(1 for _,props in records.values() if props.get(key)==properties[key])!=1 for key in (0x11fa397c,0x72b6694d)):raise ValueError('Native text width properties are shared')
+            # Loader reads this numeric property through the generic conversion
+            # accessor. Source stores an integer; preserve its serialized type.
+            if width!=int(width):raise ValueError('Native text width must use whole authored units')
+            struct.pack_into('>I',out,limit[0],int(width))
+            struct.pack_into('>I',out,flags[0],b.u32(flags[0])|0x100)
         for option,keys,kind in [('alpha',(0xad44372a,),1),('color',COLOR,0)]:
             if option not in change:continue
             values=[change[option]] if option=='alpha' else change[option]
@@ -93,7 +105,7 @@ def edit_styles(parts, changes):
             flags=properties.get(0x72b6694d)
             if flags is None or flags[1]!=0:raise ValueError('Missing integer text flags')
             if sum(1 for _,props in records.values() if props.get(0x72b6694d)==flags)!=1:raise ValueError('Text flags are shared by another record')
-            value=b.u32(flags[0])
+            value=struct.unpack_from('>I',out,flags[0])[0]
             if 'literal_id' in change:
                 key=change['literal_id'];vector=properties.get(0x92f9b3f9)
                 if type(key) is not int or not 0<key<0xffffffff or not key&1:raise ValueError('Invalid literal text ID')

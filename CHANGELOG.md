@@ -1,3 +1,10 @@
+## Unreleased — native scorebug text contracts
+
+- Reject misaligned SCNE text/property tables that native vector loads cannot read
+  as intended, even when Python parsing succeeds.
+- Add bounded native text `max_width` edits, preserving literal/alignment flags
+  and the authored property type. Keep private executable experiments separate.
+
 ## Unreleased — scorebug test05
 
 - Remove HUD dividers and relocate obsolete depth masks away from the new layout.

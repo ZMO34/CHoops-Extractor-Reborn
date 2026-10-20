@@ -79,3 +79,31 @@ def test_popup_alpha_restoration_preserves_events_bones_and_property_tails():
         with pytest.raises(ValueError,match='alpha'):edit_styles(source,{'message':{'alpha':alpha}})
     with pytest.raises(ValueError,match='Missing typed'):edit_styles(source,{'message':{'color':[222,222,222]}})
     with pytest.raises(ValueError,match='color'):edit_styles(source,{'message':{'color':[222,222,256]}})
+
+
+def test_native_alignment_rejects_parseable_but_misaligned_properties():
+    source=fixture();h=bytearray(source[0]);style=bytes(h[1200:1408])
+    h[1204:1412]=style
+    struct.pack_into('>I',h,208,1204-208+1)
+    struct.pack_into('>I',h,1220,1500-1220+1)
+    struct.pack_into('>I',h,1252,1600-1252+1)
+    # Byte-wise parsing still finds the intended literal, but native lvx rounds
+    # the address down and consumes different bytes. Reject before editing it.
+    assert struct.unpack_from('>2f',h,1348)==(31793,59031)
+    assert h[1344:1360]!=h[1348:1364]
+    with pytest.raises(ValueError,match='16-byte aligned'):
+        inspect_styles(bytes(h))
+
+
+def test_native_width_fit_preserves_literal_and_alignment_flags():
+    source=fixture();h=bytearray(source[0]);struct.pack_into('>I',h,1200,7)
+    struct.pack_into('>II',h,1424,0,0x11fa397c)
+    source=[bytes(h),source[1]]
+    result,_=edit_styles(source,{'message':{'max_width':96,'align':'center','literal_id':0xc8b40001}})
+    assert struct.unpack_from('>I',result[0],1408)[0]==96
+    assert struct.unpack_from('>I',result[0],1312)[0]==0x30190
+    assert inspect_styles(result[0])[0]['literal_id']==0xc8b40001
+    assert result[1]==source[1]
+    for width in [0,-1,4097,1.5,float('nan')]:
+        with pytest.raises(ValueError,match='width'):
+            edit_styles(source,{'message':{'max_width':width}})

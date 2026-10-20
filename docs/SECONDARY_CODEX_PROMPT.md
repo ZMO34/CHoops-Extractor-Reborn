@@ -84,6 +84,23 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# Unreleased — native scorebug text contract guards
+
+Focused Ghidra analysis of the owner-authorized combined experiment confirms
+16-byte text/property alignment is required by native vector loads. The bounded
+scorebug text helper now rejects misaligned tables before editing them. It also
+supports `max_width` in whole authored units (1–4096), preserving the integer
+property type, enabling the native shrink-to-fit flag and retaining literal and
+alignment bits when edits are combined. Missing/shared properties fail closed.
+
+The earlier combined companion cloned misaligned property blocks and reused
+score identities/markers for city labels. These are confirmed structural defects;
+Python parsing alone did not establish native compatibility. Private experimental
+repairs continue in PR #36. Source EBOOT/game inputs remain immutable; executable
+patching is not added to the editor. Native custom stats callbacks must retain
+text-tag parsing and timing; a global replacement with the plain renderer would
+lose those effects. Runtime visual correctness is not certified.
+
 # Unreleased — scorebug test05 visual corrections
 
 User screenshots establish that native test04 still has no ordinary-game school
@@ -2007,6 +2024,33 @@ format limits.
 
 Embedded source: docs/SCOREBUG_RESEARCH.md
 
+# Native text contract findings — combined experiment correction
+
+Ghidra with PS3 OPD-derived TOC context corroborates these native contracts:
+
+- The style loader uses aligned vector loads. Text rows and property blocks must
+  begin on 16-byte boundaries. Byte-wise parsing of a misaligned literal vector
+  can produce the intended ID while the native load reads preceding bytes.
+- Property `0x11fa397c` supplies maximum width; flag `0x100` enables native
+  shrink-to-width in the complete text renderer. The helper accepts whole units
+  1–4096, retains the authored integer type and rejects shared/missing fields.
+- Marker property `0xae7e1958` determines the native text transform. A row rename
+  and row translation alone do not create a separately positioned HUD label.
+- The city providers and draw callbacks are separate. Ordinary names still need
+  the explicitly authorized private executable experiment; renaming a binding
+  in the public editor does not bypass native provider suppression.
+- Stats draw callbacks parse colored text tags and apply native timing. They
+  must not be globally replaced with the plain text renderer to obtain width fit.
+
+Example bounded style change: `{"away_score":{"max_width":39,"align":"center"}}`.
+The option affects native routes that honor this property; custom callbacks can
+apply their own sizing. This is not a universal engine text ceiling.
+
+Misaligned old experimental inputs now fail with an actionable message. Repair
+from the authored source with aligned tables; do not silently round pointers.
+The public helper never rewrites an executable. Private combined experiment
+findings and visual limitations are maintained through PR #36.
+
 # Scorebug research — authored assets, runtime routing pending
 
 Read-only stock archive inspection on 2026-10-15 identifies the following records.
@@ -2917,6 +2961,18 @@ Updated 2026-10-11. CURRENT_STATUS.md and TEST_REPORT.md are the living evidence
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+# Native scorebug contract verification
+
+Targeted style/layout/localization suite: **23 passed**. New regressions reproduce
+parseable misaligned literal vectors and verify native width-fit edits preserve
+literal IDs, alignment flags and vertex payloads. Source portable verification: **628 passed, 9 skipped, 2 deselected**; compile,
+CLI/Qt, Ruff, mypy, handoff and diff checks passed. Exact-head isolated results
+are recorded in the current PR handoff.
+
+Ghidra is read-only format evidence, not a Python bug detector or an in-game test.
+No emulator, gameplay or automatic/testing JB is used. Private combined output
+has independent native ABI/branch/scene checks; it remains a runtime candidate.
 
 # Scorebug test05 verification
 

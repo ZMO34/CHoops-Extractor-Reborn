@@ -1,3 +1,30 @@
+# Native text contract findings — combined experiment correction
+
+Ghidra with PS3 OPD-derived TOC context corroborates these native contracts:
+
+- The style loader uses aligned vector loads. Text rows and property blocks must
+  begin on 16-byte boundaries. Byte-wise parsing of a misaligned literal vector
+  can produce the intended ID while the native load reads preceding bytes.
+- Property `0x11fa397c` supplies maximum width; flag `0x100` enables native
+  shrink-to-width in the complete text renderer. The helper accepts whole units
+  1–4096, retains the authored integer type and rejects shared/missing fields.
+- Marker property `0xae7e1958` determines the native text transform. A row rename
+  and row translation alone do not create a separately positioned HUD label.
+- The city providers and draw callbacks are separate. Ordinary names still need
+  the explicitly authorized private executable experiment; renaming a binding
+  in the public editor does not bypass native provider suppression.
+- Stats draw callbacks parse colored text tags and apply native timing. They
+  must not be globally replaced with the plain text renderer to obtain width fit.
+
+Example bounded style change: `{"away_score":{"max_width":39,"align":"center"}}`.
+The option affects native routes that honor this property; custom callbacks can
+apply their own sizing. This is not a universal engine text ceiling.
+
+Misaligned old experimental inputs now fail with an actionable message. Repair
+from the authored source with aligned tables; do not silently round pointers.
+The public helper never rewrites an executable. Private combined experiment
+findings and visual limitations are maintained through PR #36.
+
 # Scorebug research — authored assets, runtime routing pending
 
 Read-only stock archive inspection on 2026-10-15 identifies the following records.

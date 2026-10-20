@@ -1,3 +1,15 @@
+# Native scorebug contract verification
+
+Targeted style/layout/localization suite: **23 passed**. New regressions reproduce
+parseable misaligned literal vectors and verify native width-fit edits preserve
+literal IDs, alignment flags and vertex payloads. Source portable verification: **628 passed, 9 skipped, 2 deselected**; compile,
+CLI/Qt, Ruff, mypy, handoff and diff checks passed. Exact-head isolated results
+are recorded in the current PR handoff.
+
+Ghidra is read-only format evidence, not a Python bug detector or an in-game test.
+No emulator, gameplay or automatic/testing JB is used. Private combined output
+has independent native ABI/branch/scene checks; it remains a runtime candidate.
+
 # Scorebug test05 verification
 
 Targeted style/layout/localization/native-font suite: **23 passed**. New regressions

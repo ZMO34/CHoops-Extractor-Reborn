@@ -1,3 +1,20 @@
+# Unreleased — native scorebug text contract guards
+
+Focused Ghidra analysis of the owner-authorized combined experiment confirms
+16-byte text/property alignment is required by native vector loads. The bounded
+scorebug text helper now rejects misaligned tables before editing them. It also
+supports `max_width` in whole authored units (1–4096), preserving the integer
+property type, enabling the native shrink-to-fit flag and retaining literal and
+alignment bits when edits are combined. Missing/shared properties fail closed.
+
+The earlier combined companion cloned misaligned property blocks and reused
+score identities/markers for city labels. These are confirmed structural defects;
+Python parsing alone did not establish native compatibility. Private experimental
+repairs continue in PR #36. Source EBOOT/game inputs remain immutable; executable
+patching is not added to the editor. Native custom stats callbacks must retain
+text-tag parsing and timing; a global replacement with the plain renderer would
+lose those effects. Runtime visual correctness is not certified.
+
 # Unreleased — scorebug test05 visual corrections
 
 User screenshots establish that native test04 still has no ordinary-game school
