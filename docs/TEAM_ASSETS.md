@@ -15,7 +15,8 @@ Full gameplay/SELU filenames are in cell tooltips. Search filters all row values
    valid Home/Away templates are skipped. Unrelated team types are never converted.
 2. Leave New ID on Auto or choose an unused 0–1023 ID. Uniform-only expansion can
    retain an already uniquely owned uniform ID. Forking other categories allocates
-   a wholly unused ID. General Asset ID is displayed but preserved because other
+   a wholly unused ID. If a missing bank filename at that owner ID already exists,
+   a separate free artwork selector is allocated so unrelated art is preserved. General Asset ID is displayed but preserved because other
    consumers use it. Team index, asset ID and uniform owner need not be identical.
 3. **Review checked changes** prepares a file/team summary without writing inputs.
    Missing earlier banks are filled so an enabled Z has H/A/X/Y before it. Existing
@@ -81,3 +82,9 @@ The native logo browser also contains a fixed stock enumeration; arbitrary new
 runtime menu/cache limits are not fully established. Added logical records and
 TOC entries pass offline validation, not console certification. No EBOOT patch,
 classification conversion, emulator test or automatic game-sized JB is produced.
+
+Bulk read-only planning on the supplied roster fills missing banks for435 teams,
+produces2,434 paired gameplay/SELU additions, and yields2,205 active rows (five
+per usable owner), with all original team owners retained. One final roster
+reparse validates the batch rather than rebuilding player dictionaries per team.
+This15.95-second local observation is not a portable performance guarantee.

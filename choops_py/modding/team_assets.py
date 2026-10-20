@@ -126,6 +126,7 @@ def prepare(archive, requests, *, roster_payload=None, job=None):
     dormant = list(source_dormant)
     all_rows = [struct.unpack_from('>II', model.data, u['row_offset']) for u in model.rows['uniforms']]
     uniforms_changed = False
+    requested_ids = {r['id'] for r in requests}
     for step, request in enumerate(requests):
         if job:
             job.check(); job.progress(step, len(requests), 'Preparing independent team assets')
@@ -167,6 +168,7 @@ def prepare(archive, requests, *, roster_payload=None, job=None):
             model.data = bytearray(payload)
         selected = {BANKS.index(k) for k in kinds if k in BANKS}
         if selected:
+            fallback_asset_id = None
             old_owner = team['uniform_owner_id']
             owned = [u for u in model.rows['uniforms'] if u['team_asset_id'] == old_owner]
             if len({u['variant_code'] for u in owned}) != len(owned) or any(u['variant_code'] > 4 for u in owned):
@@ -190,13 +192,21 @@ def prepare(archive, requests, *, roster_payload=None, job=None):
                 old = {'variant_code': word0 >> 8 & 7, 'uniform_asset_id': word0 >> 12 & 1023}
                 if variant in active and (variant in selected or variant not in {u['variant_code'] for u in owned}):
                     target = {'variant_code': variant, 'uniform_asset_id': new_id}
+                    if reuse_owner and any(hash_name(asset_name(target, selection)) in hashes and asset_name(target, selection)!=asset_name(old, selection) for selection in (False,True)):
+                        # A filename at the owner's ID can belong to another team's
+                        # artwork. Give this owner's new bank a separate free selector.
+                        if fallback_asset_id is None:
+                            fallback_asset_id=next((i for i in sorted(free) if i not in requested_ids),None)
+                            if fallback_asset_id is None:raise ValueError('No free artwork selector remains for this alternate')
+                            free.remove(fallback_asset_id)
+                        target['uniform_asset_id']=fallback_asset_id
                     for selection in (False, True):
                         old_name, new_name = asset_name(old, selection), asset_name(target, selection)
                         clone(old_name, new_name)
                         if variant >= 2 and variant not in source:
                             fallbacks.append(dict(archive=new_name, home=old_name, sha256=digest(additions[new_name]),
                                                   message=f"{new_name}: alternate missing in overrides; cloned Home slot {old_name}"))
-                    word0 = (word0 & ~(1023 << 12)) | new_id << 12
+                    word0 = (word0 & ~(1023 << 12)) | target['uniform_asset_id'] << 12
                     if old != target:word0 &= ~127
                 word0 = (word0 & ~(1023 << 22 | 7 << 8)) | new_id << 22 | variant << 8
                 (rows if variant in active else saved).append((word0, word1))

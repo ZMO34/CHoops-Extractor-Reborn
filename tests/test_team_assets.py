@@ -32,7 +32,7 @@ def logo_fixture():
     return bytes(header)+name_trailer([{'name':'logo003','type':'TXTR'}]), head+image
 
 
-def game(tmp_path, *, shared=True, logos=False):
+def game(tmp_path, *, shared=True, logos=False, collision=False):
     raw, starts = header_roster()
     for i in range(2):
         off = starts['teams'] + i * 704
@@ -51,6 +51,7 @@ def game(tmp_path, *, shared=True, logos=False):
     if logos:
         logo_iff, cdf = logo_fixture()
         payloads.update({'teamselectlogo.iff':logo_iff,'teamselectlogo.cdf':cdf})
+    if collision:payloads['ux003.iff']=iff_fixture(txtr_fixture())
     source = tmp_path / 'game'; usr = source / 'PS3_GAME' / 'USRDIR'; usr.mkdir(parents=True)
     rows = sorted(payloads, key=hash_name); cursor = 2048; body = bytearray(2048)
     for i, name in enumerate(rows):
@@ -119,6 +120,18 @@ def test_unique_owner_can_fill_missing_without_consuming_another_id(tmp_path):
     assert model.rows['teams'][0]['uniform_owner_id'] == 3
     assert len(model.rows['uniforms']) == 5
     assert set(result['additions']) == {f'{p}u{b}003.iff' for p in ('', 'sel') for b in 'xyz'}
+
+
+def test_existing_unrelated_bank_filename_gets_separate_art_selector(tmp_path):
+    from choops_py.modding.team_assets import read_named
+    archive=Archive(game(tmp_path,shared=False,collision=True))
+    before=read_named(archive,'ux003.iff')
+    result=prepare(archive,request(['x'],target=3))
+    model=EditorModel(load_bytes(result['replacements']['roster_english.iff']))
+    alternate=next(u for u in model.rows['uniforms'] if u['team_asset_id']==3 and u['variant_code']==2)
+    assert alternate['uniform_asset_id']!=3
+    assert 'ux003.iff' not in result['additions']
+    assert read_named(archive,'ux003.iff')==before
 
 
 @pytest.mark.parametrize('workers', [1, 2])
