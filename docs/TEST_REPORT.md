@@ -1,3 +1,14 @@
+# Combined scorebug follow-up verification
+
+Private candidate: five SCNE reparses; 257 untouched gamedata records compare;
+two replacement IFFs prepare and pass preflight; matched English literals resolve;
+SELF payload round-trip and bounded executable diff pass. Nine synthetic wrapper
+paths cover visible/empty/transparent/opening/closing/missing-scene/wrong-layout
+conditions and preserve original callback inputs and stack/nonvolatile registers.
+No runtime appearance, game execution, physical PS3 or JB result is claimed.
+Public editor contract fixes and their portable tests are tracked in PR #32.
+This follow-up changes documentation only in PR #36.
+
 # Local executable experiment 01 — 2026-10-19
 
 Private-only prototypes generated and audited on Windows / Python 3.12.14,

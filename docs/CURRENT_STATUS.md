@@ -1,3 +1,18 @@
+# Combined scorebug correction candidate
+
+Owner-authorized private Ghidra follow-up identifies misaligned cloned native
+text properties and reused score marker identities in the broken combined test.
+A single combined candidate now uses aligned independent city markers, native
+font width fit, original stats tag parsing and a conditional stats-only backing
+hook instead of a permanent main-bar plane. Native event popup visibility remains
+separate. Modern three-point and transfer experiments remain present.
+
+Five edited scenes, 257 untouched records, two-archive preparation/preflight,
+SELF round-trip and nine bounded wrapper paths pass. Source files are unchanged;
+only one executable plus two IFFs/docs is packaged locally. No emulator or JB.
+Appearance/PS3/gameplay compatibility are not certified. See EBOOT_EXPERIMENT_01;
+PR #32 owns the separate public native-alignment/width-fit editor guards.
+
 # Local executable experiment 01 — 2026-10-19
 
 The owner authorized separate experimental copies for modern NCAA arc/corner

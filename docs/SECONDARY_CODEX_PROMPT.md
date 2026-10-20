@@ -88,6 +88,21 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# Combined scorebug correction candidate
+
+Owner-authorized private Ghidra follow-up identifies misaligned cloned native
+text properties and reused score marker identities in the broken combined test.
+A single combined candidate now uses aligned independent city markers, native
+font width fit, original stats tag parsing and a conditional stats-only backing
+hook instead of a permanent main-bar plane. Native event popup visibility remains
+separate. Modern three-point and transfer experiments remain present.
+
+Five edited scenes, 257 untouched records, two-archive preparation/preflight,
+SELF round-trip and nine bounded wrapper paths pass. Source files are unchanged;
+only one executable plus two IFFs/docs is packaged locally. No emulator or JB.
+Appearance/PS3/gameplay compatibility are not certified. See EBOOT_EXPERIMENT_01;
+PR #32 owns the separate public native-alignment/width-fit editor guards.
+
 # Local executable experiment 01 — 2026-10-19
 
 The owner authorized separate experimental copies for modern NCAA arc/corner
@@ -1102,6 +1117,67 @@ No patch framework, hook, altered EBOOT, release or testing JB is delivered here
 ---
 
 Embedded source: docs/EBOOT_EXPERIMENT_01.md
+
+# Combined correction candidate — Ghidra follow-up
+
+The owner subsequently reported that the original combined prototype was visually
+broken and explicitly requested one corrected combined executable plus matching
+IFFs and documentation. The five-variant package described below is historical;
+it is not the current delivery format or proof of working visuals.
+
+## Confirmed defects and corrective design
+
+Ghidra with the supplied PS3 OPD/TOC method and original PowerPC disassembly
+confirms aligned vector loads in the SCNE style loader. Several old companion
+property blocks were only four-byte aligned. Their literal vectors parsed in
+Python but were read from different aligned addresses natively. The city clones
+also retained score identity/marker properties. The new private companion uses
+16-byte tables and two independent city skeleton markers with their own names,
+hashes and hierarchy links; the two score centers are retained.
+
+City draw callbacks alone use the existing complete native text renderer, which
+honors confirmed width fitting. Stats keep their custom text-tag parser/timing;
+the shot clock keeps its callback. A global plain-renderer replacement was rejected
+because it would lose those native behaviors. The main bar's permanent popup
+plane is removed. A confined private stats hook draws the native blackbar scene
+only with the existing message timing window, positive text opacity and a
+nonempty provider string, uploads its native pose and resumes the original stats
+callback. Native event popups retain their separate existing visibility checks.
+No persistent visibility flag, new asset loader or general hook system is added.
+
+Authored native fonts, title-case College Hoops / Reborn, one sixth-man literal,
+square logos, source palette material IDs, removed divider/glare geometry and two
+separate message rows follow the owner's CBS references. This describes intended
+presentation; static checks do not establish the final rendered appearance.
+
+## Verification and delivery limits
+
+The local ZIP contains ONE debug/fake SELF EBOOT.BIN, gamedata.iff, english.iff,
+README, native findings, validation and checksums. It retains the documented
+modern arc/corner scoring and new-transfer sit-out experiment. Source files stay
+unchanged. No ELF/control variants, game copy or executable generator are included.
+No assets or executable patch implementation are committed to Git.
+
+Five edited scenes reparse, all 257 other gamedata records compare exactly, both
+IFFs prepare and pass build preflight, the SELF payload round-trips, and the scoped
+executable changes retain the existing combined gameplay experiments. Nine bounded
+synthetic instruction paths verify background on/off conditions and original
+callback inputs, stack and nonvolatile-register preservation. These simulate the
+small private wrapper; they are not game execution or renderer verification.
+
+The changed blackbar inferred header span retains the old unreferenced bottombar
+header as a checked tail. Its authored arrays remain inside the replacement
+header. No blanket claim that all inferred spans are unchanged is made.
+
+PR #32 separately adds public editor guards for native text alignment and bounded
+width-fit flags. Its source verification reports 628 passed, 9 skipped and two
+deselected; the exact-head isolated handoff carries the clean-checkout result.
+This PR adds research/documentation only; no executable patching enters the editor.
+
+Runtime visuals, every popup transition, physical PS3 acceptance and gameplay
+compatibility remain unverified. Repository rules prohibit emulator launches and
+automatic/testing JB builds. The broken earlier result is not relabeled a success;
+the owner must test the matching combined set before runtime acceptance.
 
 # Owner-authorized local executable experiment 01
 
@@ -2803,6 +2879,17 @@ Updated 2026-10-11. CURRENT_STATUS.md and TEST_REPORT.md are the living evidence
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+# Combined scorebug follow-up verification
+
+Private candidate: five SCNE reparses; 257 untouched gamedata records compare;
+two replacement IFFs prepare and pass preflight; matched English literals resolve;
+SELF payload round-trip and bounded executable diff pass. Nine synthetic wrapper
+paths cover visible/empty/transparent/opening/closing/missing-scene/wrong-layout
+conditions and preserve original callback inputs and stack/nonvolatile registers.
+No runtime appearance, game execution, physical PS3 or JB result is claimed.
+Public editor contract fixes and their portable tests are tracked in PR #32.
+This follow-up changes documentation only in PR #36.
 
 # Local executable experiment 01 — 2026-10-19
 

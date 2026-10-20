@@ -1,3 +1,11 @@
+## Unreleased — combined executable experiment correction evidence
+
+- Document native property alignment and marker-identity defects in the broken
+  prototype; keep the prior multi-variant result explicitly historical.
+- Record one private combined candidate with native stats parsing, conditional
+  backing and retained arc/transfer experiments. No patching is added to the tool.
+- Record static checks and runtime acceptance limits without claiming visual QA.
+
 # Unreleased — executable modernization research
 
 - Record owner-authorized private experimental copies for modern NCAA arc/corner
