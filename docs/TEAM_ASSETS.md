@@ -45,7 +45,8 @@ roster (including realignment, players and ratings) into a new selected override
 snapshot while retaining existing selected asset replacements/additions. The
 original community file and JB stay unchanged. Team Assets starts from that same
 editor payload when Include roster editor changes is checked. Its apply action
-also saves the entire edited/expanded roster. Load from overrides brings that
+also saves the entire edited/expanded roster and synchronizes the open editor as
+one undoable change, so a later save retains the new links. Load from overrides brings that
 applied roster back into the editor. Refresh assignments after source/editor
 changes; stale reviewed plans cannot be applied.
 

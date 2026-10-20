@@ -1,3 +1,9 @@
+# Applied-roster synchronization regression
+
+Applying asset expansion also updates an open community roster as one undoable
+edit, preserving pending player changes. A regression checks that later saves
+retain the new arena/uniform routing and Undo restores the pre-expansion roster.
+
 # Community roster assignment integration
 
 Four additional synthetic tests cover selected-team activation/stadium copying,

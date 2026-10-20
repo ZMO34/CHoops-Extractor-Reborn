@@ -2,7 +2,7 @@
 from pathlib import Path
 import uuid
 
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QTimer
 from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
     QLineEdit, QTableWidget, QTableWidgetItem, QAbstractItemView, QCheckBox, QPlainTextEdit, QSplitter,
     QMenu, QFileDialog, QDialog, QDialogButtonBox)
@@ -61,6 +61,8 @@ class TeamAssetsPanel(QWidget):
         self.plan = None; self.apply.setEnabled(False)
 
     def reload(self):
+        if self.owner.active:
+            QTimer.singleShot(100,self.reload);return
         if not self.owner.archive:return self.owner.log('Open a College Hoops 2K8 JB first.')
         try:
             archive = self.owner.preview_archive()
@@ -172,8 +174,10 @@ class TeamAssetsPanel(QWidget):
             return backend.apply_plan(source,plan,archive,folder,workspace,job)
         def complete(result):
             self.owner.builder_completed(result, 'staging')
+            synchronize_editor(self.owner,plan['replacements']['roster_english.iff'])
             self.state.setText('Applied. Editable folder: ' + str(folder) + ' · Build JB copy writes the selected assets into a new JB.')
             self.plan = None; self.apply.setEnabled(False)
+            QTimer.singleShot(0,self.reload)
         self.owner.run_job('Apply team assets to overrides', apply, complete, cancellable=True)
 
     def copy_assignments(self,direction,choice):
@@ -224,10 +228,23 @@ class TeamAssetsPanel(QWidget):
                 self.state.setText('Saved assignment copy: '+output)
         else:
             selected=self.owner.preview_archive(True) if (Path(self.owner.mod_path.text())/'overrides.json').is_file() else self.owner.archive
-            save_payload_to_overrides(self.owner,payload,selected)
+            def refreshed():
+                self.use_roster.setChecked(False);self.reload()
+            save_payload_to_overrides(self.owner,payload,selected,refreshed)
 
 
-def save_payload_to_overrides(owner,payload,archive=None):
+def synchronize_editor(owner,encoded_roster):
+    from ..roster.adapters import load_bytes
+    from ..roster.editor_model import EditorModel
+    from ..roster.asset_assignments import apply_to_editor
+    model=EditorModel(load_bytes(encoded_roster))
+    if owner.roster:
+        if bytes(owner.roster.data)!=bytes(model.data):apply_to_editor(owner.roster,bytes(model.data))
+        model=owner.roster
+    owner.display_roster(model)
+
+
+def save_payload_to_overrides(owner,payload,archive=None,after=None):
     if not owner.source or not owner.archive:return owner.log('Open a College Hoops 2K8 JB first.')
     try:
         if archive is None:
@@ -239,4 +256,5 @@ def save_payload_to_overrides(owner,payload,archive=None):
     def complete(result):
         owner.builder_completed(result,'staging')
         owner.log('Saved edited roster to overrides: '+str(folder))
+        if after:after()
     owner.run_job('Save edited roster to overrides',lambda job:backend.apply_plan(owner.source,plan,archive,folder,workspace,job),complete,cancellable=True)

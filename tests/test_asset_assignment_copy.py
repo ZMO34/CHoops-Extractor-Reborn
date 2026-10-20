@@ -63,3 +63,18 @@ def test_save_community_roster_changes_to_overrides_before_build(tmp_path):
     from choops_py.studio.preview_source import PreviewArchive
     _,saved=roster_model(PreviewArchive(archive,result['mod']))
     assert saved.rows['players'][0]['jersey_number']==23
+
+
+def test_applied_expansion_syncs_open_roster_so_later_save_keeps_new_links(tmp_path):
+    from types import SimpleNamespace
+    from choops_py.studio.team_assets import synchronize_editor
+    archive=Archive(game(tmp_path));_,editor=roster_model(archive)
+    editor.edit('players',0,'jersey_number',23)
+    before=bytes(editor.data)
+    plan=prepare(archive,request(['stadium','x']),roster_payload=before)
+    seen=[];owner=SimpleNamespace(roster=editor,display_roster=seen.append)
+    synchronize_editor(owner,plan['replacements']['roster_english.iff'])
+    assert seen==[editor] and editor.rows['teams'][0]['uniform_owner_id']==900
+    assert editor.rows['players'][0]['jersey_number']==23
+    assert arena_selector(editor,editor.rows['teams'][0])==(900,0)
+    editor.undo();assert bytes(editor.data)==before
