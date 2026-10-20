@@ -113,10 +113,13 @@ def _compile_one(archive,group,index,work,job,code,reuse):
     return dict(code=code,signature=signature,source_sha256=before,imports=imports,outputs=outputs,unchanged=unchanged,cache_hit=False,root=str(work))
 
 
-def _worker(source,work,tasks,results,progress,cancel,code):
+def _worker(source,work,tasks,results,progress,cancel,code,addition_folder=None):
     from .usrdir_reader import Archive
     from ..studio.services import JobContext
     archive=Archive(source);last=[0.]
+    if addition_folder:
+        from ..modding.team_assets import AdditionInputs
+        archive=AdditionInputs(archive,addition_folder)
     def report(done,total,label):
         now=time.monotonic()
         if now-last[0]<.15:return
@@ -150,7 +153,7 @@ def compiled_groups(archive,groups,work,job,*,workers=None,reuse=None):
     costs={index:memory_cost(group) for index,group in waiting}
     try:
         for i in range(limit):
-            process=context.Process(target=_worker,args=(str(archive.path),str(work),tasks,results,progress,cancel,code),name='CHoops-DDS-'+str(i+1))
+            process=context.Process(target=_worker,args=(str(archive.path),str(work),tasks,results,progress,cancel,code,getattr(archive,'addition_folder',None)),name='CHoops-DDS-'+str(i+1))
             process.start();processes.append(process)
         while waiting or active:
             job.check()

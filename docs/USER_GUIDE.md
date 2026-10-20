@@ -1,3 +1,11 @@
+# Team assets (v1.20)
+
+Use **Team Assets** for the searchable assignment list and checked S/Home/Away/
+X/Y/Z/Menu-logo creation. Review changes, apply a separate overrides folder, then
+use the normal JB builder. Classic shared stadiums can be forked independently.
+Missing linked alternate assets use Home with explicit log notices. See
+[Team asset guide](TEAM_ASSETS.md) for the full workflow and native limits.
+
 # Native studio user guide
 
 Start with [current workflows](WORKFLOWS.md), the [support matrix](FEATURE_MATRIX.md)

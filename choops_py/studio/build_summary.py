@@ -6,6 +6,8 @@ def summary(result):
     cached=sum(bool(item.get('cache_hit')) for item in imports)
     problems=result.get('unapplied_overrides',[])
     lines=[f"Status: {result.get('status','complete')}",f"Replacements: {result.get('staged',result.get('patched_entries',0))} archives",f"Textures: {sum('width' in item for item in imports)} imported · {cached} cached · {len(resized)} resized",f"Compatibility: {len(problems)} unapplied overrides"]
+    if result.get('added_assets'):lines.append(f"New team assets: {len(result['added_assets'])} archives")
+    lines.extend('Notice: '+warning for warning in result.get('warnings',[])[:30])
     if result.get('parallel_workers'):
         lines.append(f"Override preparation: up to {result['parallel_workers']} workers · {result.get('reused_archives',0)} unchanged archives reused")
     groups=result.get('imports',[])

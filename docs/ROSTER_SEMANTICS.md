@@ -1,3 +1,11 @@
+## Native stadium routing (v1.20)
+
+Physical arena+0x12 (legacy row+0x2A) is the numeric stadium asset selector read
+by0x580A3C; physical+0x18 low two bits select the resource mode. arena_code is
+separate display text. Independent-arena copying rebases all three string pointers
+and the physical+0x0C relative team-name backlink, then assigns the cloned row to
+the selected team. See TEAM_ASSETS.md. Unknown neighboring bits remain preserved.
+
 Current NBA extension: see [NBA roster/container support](NBA_ROSTERS_AND_2K14.md) and
 [animation portability research](ANIMATION_PORTABILITY.md). Those pages define the
 newer per-game boundaries; historical College Hoops-only statements below remain

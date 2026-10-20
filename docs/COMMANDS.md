@@ -43,7 +43,7 @@ new archive labels, Ghidra evidence and current limits.
 # Native rebuild additions
 
 v1.10 no longer registers add-uniform-alternate, fill-five-uniforms or
-add-archive-assets. No alternate asset creation is included in this release.
+add-archive-assets. v1.20 restores asset creation through the guarded Team Assets GUI; those legacy CLI entry points remain removed.
 
 Experimental audio examples: [AUDIO_WORKFLOW.md](AUDIO_WORKFLOW.md). Commands:
 audio-catalog, export-soundtrack, replace-song, import-audio-folder, export-audo,

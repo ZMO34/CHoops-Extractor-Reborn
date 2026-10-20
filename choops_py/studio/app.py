@@ -284,7 +284,8 @@ class Window(QMainWindow):
 
         super().__init__()
 
-        self.setWindowTitle("CHoops Modding Studio • v1.17")
+        from .. import __version__
+        self.setWindowTitle("CHoops Modding Studio • v" + __version__)
 
         self.resize(1420, 900)
 
@@ -320,6 +321,7 @@ class Window(QMainWindow):
             "Mod Builder",
             "Research",
             "Diagnostics",
+            "Team Assets",
         ):
             self.navigation.addTopLevelItem(QTreeWidgetItem([name]))
 
@@ -408,6 +410,9 @@ class Window(QMainWindow):
         self.create_research()
 
         self.create_diagnostics()
+        from .team_assets import TeamAssetsPanel
+        self.team_assets_panel = TeamAssetsPanel(self)
+        self.pages.addWidget(self.team_assets_panel)
 
         self.navigation.setCurrentItem(self.navigation.topLevelItem(0))
 
@@ -1039,8 +1044,8 @@ class Window(QMainWindow):
         if not (root/'overrides.json').is_file():raise ValueError('Select an overrides folder before using override previews')
         try:
             fingerprints=[]
-            for name in ('overrides.json','source_preconditions.json','preview_inputs.json'):
-                if name=='preview_inputs.json' and not (root/name).exists():continue
+            for name in ('overrides.json','source_preconditions.json','preview_inputs.json','additions.json'):
+                if name in ('preview_inputs.json','additions.json') and not (root/name).exists():continue
                 info=(root/name).stat()
                 fingerprints.append((info.st_size,info.st_mtime_ns,info.st_ino))
         except OSError as error:raise ValueError('Override workspace is incomplete; select the overrides folder again') from error
@@ -1414,6 +1419,9 @@ class Window(QMainWindow):
         from .roster_bulk import export_csv,import_csv,compare_roster
         export_menu.addAction('Roster CSV…',lambda:export_csv(self))
         export_button.setMenu(export_menu);extra.addWidget(export_button);extra.addStretch()
+        assets_button=QPushButton("Team assets…")
+        assets_button.clicked.connect(lambda:self.navigation.setCurrentItem(self.navigation.topLevelItem(self.navigation.topLevelItemCount()-1)))
+        extra.addWidget(assets_button)
         import_button=QPushButton('Import / compare…');import_menu=QMenu(import_button)
         import_menu.addAction('Edited CSV…',lambda:import_csv(self))
         import_menu.addAction('Compare another roster…',lambda:compare_roster(self))
@@ -2344,6 +2352,7 @@ class Window(QMainWindow):
     def builder_completed(self, result, operation):
         from .build_summary import summary
         self.build_details.setPlainText(summary(result))
+        for warning in result.get('warnings',[]):self.log('Alternate fallback: '+warning)
         if result.get("status") == "cancelled" or operation == "preflight":
             return
         if operation == "staging":

@@ -12,6 +12,7 @@ def describe_groups(groups,folder,archive):
         index=g['entry']['index'],hash=g['entry']['hash'],name=g['name'],
         source_sha256=g.get('_preview_source_sha') or digest(archive.read(g['entry'])),
         whole=relative(g['whole']),cdf_whole=relative(g.get('cdf_whole')),
+        logo_templates=g.get('logo_templates',{}),
         records=[dict(name=name,type=kind,paths=[relative(p) for p in (value if isinstance(value,list) else [value])],multiple=isinstance(value,list)) for (name,kind),value in g['records'].items()],
         dds={name:relative(path) for name,path in g['dds'].items()},
         dds_rank=g['dds_rank'],package_records={name:relative(path) for name,path in g['package_records'].items()}) for g in groups])
@@ -34,6 +35,7 @@ class LiveOverrides:
             group=dict(entry=entry,source_sha256=row['source_sha256'],name=row['name'],whole=file(row['whole']),cdf_whole=file(row.get('cdf_whole')),
                        records={},dds={k:file(v) for k,v in row['dds'].items()},dds_rank=row['dds_rank'],
                        package_records={k:file(v) for k,v in row['package_records'].items()})
+            if row.get('logo_templates'):group['logo_templates']=row['logo_templates']
             for record in row['records']:
                 paths=[file(name) for name in record['paths']]
                 group['records'][(record['name'],record['type'])]=paths if record['multiple'] else paths[0]

@@ -1,3 +1,12 @@
+## v1.20
+
+- Add searchable team assignment matrix, visible IDs and per-category expansion checks.
+- Apply independent stadiums, five uniform banks/SELU pairs and menu logos to overrides and normal JB builds.
+- Clone missing enabled alternates from Home during build preflight and log each fallback.
+- Correct numeric stadium routing; preserve classic classification and shared original arenas.
+- Preserve existing selected overrides, support new assets in previews and reject stale/checksum-mismatched plans.
+- Remove obsolete hidden alternate writers/CLI branches; maintain native evidence and workflow docs.
+
 ## Scorebug research follow-up
 
 - Add bounded read-only native popup descriptor inspection and malformed-input tests.

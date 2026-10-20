@@ -27,7 +27,7 @@ def test_roster_anchors_and_uniform_unknown_bits():
     assert report['complete_semantic_reverse_engineering'] is False
     assert report['tables']['teams']['fields_crossing_declared_stride']
     arena=report['tables']['arenas']['logical_record_window']
-    assert arena['raw_origin_offset']==24 and arena['classified_bits_per_row']==128
+    assert arena['raw_origin_offset']==24 and arena['classified_bits_per_row']==146
     assert report['tables']['teams']['logical_record_window']['classified_bits_per_row']>report['tables']['teams']['classified_bits_per_row']
 
 

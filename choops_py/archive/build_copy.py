@@ -95,7 +95,7 @@ def preflight(source,mod,job=None,*,for_build=True):
             data,_=repair_compression(standard_iff(data,name,'replacement'))
         if len(data)>len(original) and not allow_growth:raise ToolError('archive_extent_capacity_exceeded',f'{name} needs {len(data)} bytes; allocation {len(original)}')
         if len(data)<len(original):
-            if data[:4]!=bytes.fromhex('ff3bef94') and not name.endswith('.cdf'):raise ToolError('archive_size_change_blocked',name)
+            if data[:4] not in (bytes.fromhex('ff3bef94'),bytes.fromhex('f0985030')) and not name.endswith('.cdf'):raise ToolError('archive_size_change_blocked',name)
             if data[:4]==bytes.fromhex('ff3bef94'):standard_iff(data,name,'replacement')
             data+=b'\0'*(len(original)-len(data))
         if data[:4]==bytes.fromhex('ff3bef94'):standard_iff(data,name,'replacement')
@@ -120,6 +120,13 @@ def preflight(source,mod,job=None,*,for_build=True):
             if len(matches)!=1:raise ToolError('cdf_pair_required',partner)
             header=final[partner.lower()] if partner.lower() in final else archive.read(matches[0])
             CDFPair(header,data)
+    from ..modding.addition_manifest import load as load_additions
+    additions=load_additions(mod,archive)
+    from ..modding.team_assets import build_alternates
+    additions,_=build_alternates(archive,patches,additions)
+    if additions:
+        from .add_assets import validate_plan
+        validate_plan(source,additions,{e['name']:data for e,data in patches})
     return archive,patches
 
 def patch_parts(archive,directory,entry,data):
@@ -177,16 +184,22 @@ def build(source,mod,output,overwrite=False,dry_run=False,job=None):
         reject_links(out)
     before=inventory(src)
     archive,patches=preflight(src,mod,job);plan=[{'archive':e['name'],'index':e['index'],'size':len(data),'sha256':digest(data)} for e,data in patches]
-    growing=any(len(data)>e['size'] for e,data in patches)
+    from ..modding.addition_manifest import load as load_additions
+    additions=load_additions(mod,archive)
+    from ..modding.team_assets import build_alternates
+    additions,warnings=build_alternates(archive,patches,additions)
+    fallback_file=Path(mod)/'alternate_fallbacks.json'
+    if fallback_file.is_file():warnings.extend(item['message'] for item in json.loads(fallback_file.read_text(encoding='utf8')))
+    growing=bool(additions) or any(len(data)>e['size'] for e,data in patches)
     summary=import_summary(mod)
-    if dry_run:return {'dry_run':True,'source':str(src),'output':str(out),'import_summary':summary,'patches':plan,'archive_relocation_required':growing}
+    if dry_run:return {'dry_run':True,'source':str(src),'output':str(out),'import_summary':summary,'patches':plan,'added_assets':list(additions),'warnings':warnings,'archive_relocation_required':growing}
     if growing:
         from .add_assets import build as relocated_build
         staging=safe_output(out.parent/('.jb_build_'+uuid.uuid4().hex),[src,mod]);backup=None
         try:
-            result=relocated_build(src,{},staging,{e['name']:data for e,data in patches},job)
+            result=relocated_build(src,additions,staging,{e['name']:data for e,data in patches},job)
             if inventory(src)!=before:raise ToolError('vanilla_changed_during_build','Source changed during rebuild; retry')
-            manifest={'project_kind':'choops-jb-copy','source':str(src),'mod':str(Path(mod).resolve()),'output':str(out),'import_summary':summary,'patches':plan,'archive_relocation_required':True,'validation':result}
+            manifest={'project_kind':'choops-jb-copy','source':str(src),'mod':str(Path(mod).resolve()),'output':str(out),'import_summary':summary,'patches':plan,'added_assets':list(additions),'warnings':warnings,'archive_relocation_required':True,'validation':result}
             save_build_json(staging/'build_manifest.json',manifest,[src,mod])
             if out.exists():
                 backup=safe_output(out.parent/('.jb_previous_'+uuid.uuid4().hex));out.rename(backup)

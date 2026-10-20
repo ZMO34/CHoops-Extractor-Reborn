@@ -76,6 +76,8 @@ def analyze(model):
                 packed(offset,4,shift,bits,label)
         if name=='arenas':
             mark(0x24,4,'Relative team-name-anchor reference; runtime ownership role unresolved')
+            mark(0x2a,2,'Native numeric stadium asset selector (physical arena +0x12)')
+            packed(0x30,2,0,2,'Native stadium resource mode (physical arena +0x18)')
         active = [r['index'] for r in model.rows[name] if r.get('display_name') or r.get('school_name') or r.get('arena_name') or r.get('coach_name')]
         sample = active or list(range(count))
         fields=[]

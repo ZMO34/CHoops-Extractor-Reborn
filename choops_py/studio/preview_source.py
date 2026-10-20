@@ -11,6 +11,8 @@ class PreviewArchive:
         self.toc_layout=getattr(archive,'toc_layout',None);self.game_info=getattr(archive,'game_info',{})
         self.replacements={};self.conditions={};self.live=None
         root=Path(mod).resolve();manifest=root/'overrides.json'
+        self.logo_templates=json.loads((root/'team_logo_templates.json').read_text(encoding='utf8')) if (root/'team_logo_templates.json').is_file() else {}
+        self.alternate_fallbacks=json.loads((root/'alternate_fallbacks.json').read_text(encoding='utf8')) if (root/'alternate_fallbacks.json').is_file() else []
         if not manifest.is_file():return
         conditions=root/'source_preconditions.json'
         if not conditions.is_file():raise ValueError('Override previews require source preconditions; select the overrides folder again')
@@ -30,9 +32,20 @@ class PreviewArchive:
             self.live=LiveOverrides(archive,root/'preview_inputs.json')
             for index in self.live.groups:
                 self.replacements.setdefault(index,(root/'preview_inputs.json',digest((root/'preview_inputs.json').read_bytes())))
+        from ..modding.addition_manifest import load as load_additions
+        self.additions=load_additions(root,archive)
+        for name,data in self.additions.items():
+            self.replacements[len(self.entries)]=(root,digest(data))
+            self.entries.append(dict(index=len(self.entries),hash=replacement_hash(name),name=name,size=len(data),
+                                     content_size=len(data),stored_size=len(data),offset=0,toc_flags=0,size_derived=False))
+
+    @property
+    def read_only(self):
+        return self.base.read_only
 
     def read(self,entry):
         index=entry['index']
+        if index>=len(self.base.entries):return self.additions[entry['name']]
         if index not in self.replacements:return self.base.read(self.base.entries[index])
         if self.live and self.live.owner(index) is not None:
             return self.live.read(index)
@@ -45,7 +58,7 @@ class PreviewArchive:
         return data
 
     def chunks(self,entry):
-        if entry['index'] in self.replacements:
+        if entry['index'] in self.replacements or entry['index']>=len(self.base.entries):
             data=self.read(entry)
             for offset in range(0,len(data),1024*1024):yield data[offset:offset+1024*1024]
         else:yield from self.base.chunks(self.base.entries[entry['index']])
