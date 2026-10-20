@@ -1,3 +1,32 @@
+# Adaptive pose/root translation follow-up
+
+NBA11's variable keyframe timeline is now established and converted to fixed CH
+samples, with original keys preserved exactly, interpolated/quantized inserted
+poses and optional6/8-byte root tracks. All9,574 inspected distinct timelines
+match rate/time-scale/duration. Broad channel checks pass13,301 distinct streams
+across CH/NBA11,589,196 frames;32 donor pose/33 root resampling checks pass.
+
+All112 stock shot styles are cataloged through224 motion references. The additive
+native table/registration change, complete event/auxiliary conversions, donor bind
+mapping, gameplay consumers and modern-control defaults remain unfinished. No new
+shot choice is exposed and no original is replaced. No installable donor bank or
+EBOOT patch is produced. See ANIMATION_GAMEPLAY_PORT.md; no RPCS3/testing JB.
+
+# Packed-pose conversion and additive shot research
+
+Implemented lossless translation of the observed CH2K8/NBA11 packed quaternion
+selector convention, preserving all remaining components, translations, padding
+and frame order. Private checks on32 streams per game preserve decoded channels
+and reverse byte identity. This is a packed-channel converter; no playable donor
+clip, new jump-shot option, full animation system or control preset is installed.
+
+Native research locates the112-entry jump-shot playback table, its40-byte stride,
+paired motion pointers, shared readers and UI option maximum. New choices must
+append records and extend registration, retaining existing IDs. Simply enabling
+ID112 would read an adjacent unrelated structure. No table/EBOOT patch is applied.
+Skeleton/contact/event/auxiliary-track mappings, allocation and complete playback
+semantics remain unresolved. See ANIMATION_GAMEPLAY_PORT.md. No RPCS3/testing JB.
+
 # Executable-held animation inspection
 
 Read-only indexing now covers the observed native full-body motion-header family

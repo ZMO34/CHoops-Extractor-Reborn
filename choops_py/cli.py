@@ -15,7 +15,10 @@ def parser():
         s=sub.add_parser(name)
         for field in spec.fields:s.add_argument(field)
         for group in spec.options:
-            if group=='audio-category':
+            if group=='motion-root':
+                s.add_argument('--root-track');s.add_argument('--root-output')
+                s.add_argument('--root-without-heading',action='store_true')
+            elif group=='audio-category':
                 s.add_argument('--category',choices=['soundtrack','fight-songs','all'],default='soundtrack')
             elif group=='selection':
                 s.add_argument('--index',type=int);s.add_argument('--file')
@@ -41,7 +44,7 @@ def execute(a):
     if c=='gui':
         from .studio import main as launch
         return launch([])
-    sources=[getattr(a,key) for key in ('source','input','cdf','dds_file','wav_file','image','mod','modded','edited','patch') if getattr(a,key,None)]
+    sources=[getattr(a,key) for key in ('source','input','cdf','dds_file','wav_file','image','mod','modded','edited','patch','timing','root_track') if getattr(a,key,None)]
     if hasattr(a,'output'):
         validator=build_destination if c=='build-copy' else safe_output
         a.output=validator(a.output,sources)
@@ -53,6 +56,44 @@ def execute(a):
         if c == 'import-uniform-models':return uniform_mesh.import_folder(a.edited,a.output)
         from .archive.usrdir_reader import Archive
         return uniform_mesh.export_archive(Archive(a.source),a.output,modern=c=='modern-fit-uniforms')
+    if c == 'resample-motion-frames':
+        from .formats.motion_frames import MAX_STREAM, resample_nba11_frames, resample_nba11_root
+        if Path(a.input).stat().st_size > MAX_STREAM or Path(a.timing).stat().st_size > 32767:
+            raise ValueError('Motion input exceeds resampling bounds')
+        data, result = resample_nba11_frames(Path(a.input).read_bytes(),
+                    Path(a.timing).read_bytes(), int(a.rotations), int(a.translations))
+        root_data = None
+        if bool(a.root_track) != bool(a.root_output):
+            raise ValueError('Provide both root-track and root-output')
+        if a.root_track:
+            root_output = safe_output(a.root_output, sources)
+            if root_output == a.output:
+                raise ValueError('Pose and root outputs must be different files')
+            if Path(a.root_track).stat().st_size > MAX_STREAM:
+                raise ValueError('Root track exceeds resampling bounds')
+            root_data = resample_nba11_root(Path(a.root_track).read_bytes(),
+                        Path(a.timing).read_bytes(), has_heading=not a.root_without_heading)
+        elif a.root_without_heading:
+            raise ValueError('Root heading mode requires a root track')
+        if root_data is not None:
+            write_bytes(root_output, root_data, sources)
+            result.update(root_converted=True, root_output=str(root_output))
+        write_bytes(a.output, data, sources)
+        return dict(output=str(a.output), bytes=len(data), **result)
+    if c == 'transcode-motion-frames':
+        from .formats.motion_frames import MAX_STREAM, layout, transcode_frames
+        rotations, translations, frames = map(int, (a.rotations, a.translations, a.frames))
+        stride, size = layout(rotations, translations, frames)
+        if Path(a.input).stat().st_size > MAX_STREAM:
+            raise ValueError('Packed frame stream exceeds conversion bounds')
+        data = transcode_frames(Path(a.input).read_bytes(), rotations, translations,
+                                frames, a.profile, a.target_profile)
+        write_bytes(a.output, data, sources)
+        return dict(output=str(a.output), bytes=size, frame_stride=stride,
+                    frames=frames, rotations=rotations, translations=translations,
+                    source_profile=a.profile, target_profile=a.target_profile,
+                    scope='packed-pose-channels-only', bone_retargeted=False,
+                    gameplay_ready=False)
     if c == 'inspect-embedded-motion':
         from .formats.embedded_motion import inspect_embedded
         result = inspect_embedded(Path(a.input).read_bytes(), a.profile)

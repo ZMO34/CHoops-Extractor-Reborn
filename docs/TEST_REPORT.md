@@ -1,3 +1,25 @@
+# Native packed-pose translation
+
+Fifteen targeted synthetic cases pass, including adaptive timing/SLERP, quaternion
+encoding,6/8-byte roots, endpoint preservation and multi-output source guards: all four native permutation selectors,
+channel equivalence and reverse byte identity, signed translation scale, partial
+group padding, invalid profiles/counts/extents/quaternions and CLI source guards.
+Full E/F/I lint passes the new codec/tests. Full source portable verification: **689 passed,10 skipped,2 deselected**, plus
+compile/CLI/Qt/Ruff/mypy/handoff/diff checks. Exact-head isolated verification is
+posted in the active PR.
+
+Private checks:32 CH streams (1,106 frames,18,802 quaternion channels,159,264 bytes)
+and32 NBA11 streams (644 frames,10,948 quaternion channels,92,736 bytes) preserve
+decoded channels and round-trip every byte. Source analysis copies remain unchanged.
+The broad observed-family audit passes3,727 CH streams /247,373 frames and9,574
+NBA11 streams /341,823 frames with exact reverse bytes; all9,574 distinct donor
+timelines match rate/time-scale/duration. Resampling32 pose streams preserves644
+keys across4,642 fixed frames;33 root streams preserve keys across4,757 samples.
+Ghidra/native instructions establish frame layout, quaternion selector difference
+and the112-entry CH jump-shot table. No complete bank conversion, bone retargeting,
+new shot registration, control remap, native runtime or gameplay check is implied.
+RPCS3 NOT RUN; automatic/testing JB NOT BUILT. No EBOOT writes.
+
 # Executable-held motion inspection follow-up
 
 Targeted synthetic motion/envelope checks: **11 passed**. New parser fixtures

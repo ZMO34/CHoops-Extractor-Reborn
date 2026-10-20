@@ -14,6 +14,8 @@ COMMANDS={
     'inspect-animations':Command(('input','output')),
     'inspect-animation-links':Command(('input','profile','output')),
     'inspect-embedded-motion':Command(('input','profile','output')),
+    'transcode-motion-frames':Command(('input','profile','target_profile','rotations','translations','frames','output')),
+    'resample-motion-frames':Command(('input','timing','rotations','translations','output'),('motion-root',)),
     'export-animations':Command(('input','output')),
     'audio-catalog':Command(('source','output'),(),True),
     'export-soundtrack':Command(('source','output'),('audio-category',)),
