@@ -1,3 +1,14 @@
+# Uniform runtime distance correction
+
+The modern uniform importer now adapts both native SPU stretch/bend distance
+batches in addition to SCNE/Clth rest positions. It preserves authored length
+ratios, response bytes, indices, self-edge padding and all other logical bytes.
+Read-only native tracing confirms the five neckline archive selectors and paired
+SCNE/Clth record-name CRCs, with thin/regular/fat build aliases. The earlier package
+left these distances unchanged and was incomplete. See UNIFORM_MESH_EDITING.md.
+No source asset/EBOOT edits, RPCS3 or testing JB. External gameplay result remains
+unverified; replacement hashes allow checking that the actual built JB contains edits.
+
 # Adaptive pose/root translation follow-up
 
 NBA11's variable keyframe timeline is now established and converted to fixed CH

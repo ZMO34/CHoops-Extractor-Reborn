@@ -87,6 +87,6 @@ Updated 2026-10-11. CURRENT_STATUS.md and TEST_REPORT.md are the living evidence
 ## Experimental uniform mesh edits
 
 Known College Hoops garment OBJ reimport edits both visible and cloth rest XYZ.
-Packed solver constraints, collision and normal/tangent regeneration remain
-unchanged. A static modern-fit preview is not an animated fit certification;
+Observed stretch/bend distances are adapted; collision, other solver parameters
+and normal/tangent regeneration remain unchanged. A static modern-fit preview is not an animated fit certification;
 see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA writer.
