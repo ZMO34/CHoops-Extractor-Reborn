@@ -36,7 +36,11 @@ supersede its dated observations. Treat research hypotheses as hypotheses.
    synthetic fixtures, Qt/source/packaged startup and read-only private input
    inspection. Tiny synthetic archive fixtures are okay; copied game tests are not.
 6. Keep JB source, overrides, rosters, templates and EBOOT immutable. EBOOT may be
-   read for research but never patched. If jukebox name changes need executable
+   read for research. Only an explicit owner-authorized local experiment may
+   create separate modified copies; preserve originals, document its narrow
+   scope, and do not add patching to the editor without a separate request.
+   The local experiment in EBOOT_EXPERIMENT_01.md is not blanket authorization
+   for another instance to modify executables. If jukebox name changes need executable
    edits, do not implement them. v1.10 removes D1/alternate/independent-asset public
    actions. Keep realignment, but do not restore those actions or add alternates
    without an explicit new owner request. Read PLAYER_QOL_RESEARCH.md.

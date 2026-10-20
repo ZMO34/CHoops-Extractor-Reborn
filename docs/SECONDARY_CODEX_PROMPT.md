@@ -36,7 +36,11 @@ supersede its dated observations. Treat research hypotheses as hypotheses.
    synthetic fixtures, Qt/source/packaged startup and read-only private input
    inspection. Tiny synthetic archive fixtures are okay; copied game tests are not.
 6. Keep JB source, overrides, rosters, templates and EBOOT immutable. EBOOT may be
-   read for research but never patched. If jukebox name changes need executable
+   read for research. Only an explicit owner-authorized local experiment may
+   create separate modified copies; preserve originals, document its narrow
+   scope, and do not add patching to the editor without a separate request.
+   The local experiment in EBOOT_EXPERIMENT_01.md is not blanket authorization
+   for another instance to modify executables. If jukebox name changes need executable
    edits, do not implement them. v1.10 removes D1/alternate/independent-asset public
    actions. Keep realignment, but do not restore those actions or add alternates
    without an explicit new owner request. Read PLAYER_QOL_RESEARCH.md.
@@ -84,7 +88,218 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# Animation investigation and pending-PR integration
+
+Seven pending PR branches (#31–#37) are consolidated locally with their source
+changes retained; publication/merge evidence is recorded in the integration PR.
+The integration exposed one stale GUI button-label expectation, now corrected,
+and adds Legacy wrapper regressions. No prior runtime caveat is promoted to a pass.
+
+New supported work: 21 researched motion bank names/categories, corrected large
+animation-bank inventory, native CH/NBA11 envelope and NBA11/14 collection
+inspection, and local alias candidate/cycle reports. Ghidra traces native fixups,
+reference handlers and controller polling in all three games. The old 2K14 count
+was incomplete; corrected standard-IFF SingleMoCap count is 22,139.
+
+Donor gameplay animations, smoothness improvements, new right-stick default and
+original controls in preset A remain unimplemented. No guessed bank transplant
+or global analog swap is enabled. See ANIMATION_GAMEPLAY_PORT.md for exact native
+evidence and remaining dependencies. Original games are unchanged; no RPCS3/JB.
+
+# Player-face research follow-up
+
+Read-only PS3 analysis established the per-player dedicated likeness selector
+(logical +0x8C low nibble; biased editor +0x9C), its seven original-player mappings,
+paired albedo/normal banks, FRFG presets, shared high/bench heads and three stored
+morph groups. Most stock players use seeded generation. Added a read-only inventory
+command; no face writer, GUI editing, EBOOT patch or direct NBA cyberface port.
+See [player-face evidence and limits](PLAYER_FACE_RESEARCH.md). All seven extracted
+albedos round-trip DDS/GTF in memory. Later NBA donor extraction variants remain
+explicit blockers; unknown face semantics are not invented.
+# NBA 2K11 donor research
+
+The supplied PS3 2K11 archive now opens read-only through observed NPD v3 SDAT
+authentication; v4 behavior and SDAT writer blocking remain unchanged. Inventory:
+6,974 entries, 1,040 resolved PNG names, 4,705 identifiable SingleMoCap records.
+Selected texture/arena/floor/audio blocks decode; full animation/mesh transfers
+and 2K11 roster editing remain unimplemented. See [donor ratings and evidence](NBA2K11_DONOR_ASSESSMENT.md).
+Best near-term donors are adapted artwork/audio; newer AI/physics/blending are
+not imported by copying assets. No RPCS3, EBOOT edits or real/testing JB.
+# Unreleased — native scorebug text contract guards
+
+Focused Ghidra analysis of the owner-authorized combined experiment confirms
+16-byte text/property alignment is required by native vector loads. The bounded
+scorebug text helper now rejects misaligned tables before editing them. It also
+supports `max_width` in whole authored units (1–4096), preserving the integer
+property type, enabling the native shrink-to-fit flag and retaining literal and
+alignment bits when edits are combined. Missing/shared properties fail closed.
+
+The earlier combined companion cloned misaligned property blocks and reused
+score identities/markers for city labels. These are confirmed structural defects;
+Python parsing alone did not establish native compatibility. Private experimental
+repairs continue in PR #36. Source EBOOT/game inputs remain immutable; executable
+patching is not added to the editor. Native custom stats callbacks must retain
+text-tag parsing and timing; a global replacement with the plain renderer would
+lose those effects. Runtime visual correctness is not certified.
+
+# Unreleased — scorebug test05 visual corrections
+
+User screenshots establish that native test04 still has no ordinary-game school
+names, washed-out palette panels, dividers, overlapping sixth-man lettering and
+clipped popup text. Test05 retains the enlarged body/logos/score/clock font sizes,
+removes dividers, restores authored vertex RGB 0.1 instead of 0.72, and moves both
+old text-mask meshes outside the HUD. Popup styles regain opacity and centered
+white text; their anchors/backing now cover the same right-side section.
+
+Only one native sixth-man label remains, using the existing null-callback ABL
+slot and stock localization ID. The other ABL slot displays title-case native
+College Hoops / Reborn. Duplicate topbar label loops and bitmap label are disabled.
+The 19 live meter draws remain intact; their complete span grows from 85x4 to
+125x5 world units. Both native team translations fit inside the existing header.
+
+Read-only executable analysis shows the city-name provider deliberately leaves
+ordinary-game names empty. Renaming the SCNE bindings did not enable them. The
+owner explicitly declined an optional executable patch: **keep EBOOT read-only;
+leave team names unresolved**. No name/logo texture hack or executable patch is
+included. Previous claims of completed live team names are superseded.
+
+Local test05 includes five gamedata SCNEs and the compact direct-read English IFF.
+Source inputs remain unchanged. Runtime appearance/popups still need user testing;
+static checks cannot certify in-game appearance. No emulator or new JB build.
+Continues PR #32; documentation and asset-free profiles are maintained.
+
+# Unreleased — native test04 startup-crash correction candidate
+
+User crash logs show a startup asynchronous-IFF-loader access violation at
+0x00845E14, reading 0x4D4C0002. The built English archive matches native test04;
+branding token bytes appear in the failing thread. The build also contains many
+other overrides, so a complete runtime exclusion of those inputs is not claimed.
+
+The generic growth path unnecessarily retained the original English table and
+appended a new complete table, expanding its decoded block from 1,847,762 to
+3,695,588 bytes. Localization now requires a sole complete block at offset zero,
+validates all existing entries, and writes one uncompressed table (1,847,812 bytes).
+Equal stored/logical descriptor lengths select the native direct-read branch,
+bypassing the compressed path implicated by the log. Other resource writers retain
+their existing behavior. Local test04-crashfix ZIP keeps all five scene edits.
+
+This is a targeted correction candidate, not a gameplay-certified root-cause fix:
+the exact cause of corruption inside the compressed native load is not established.
+User retesting is required. Do not use the superseded native test04 English IFF.
+No emulator launch, executable write or new JB build. Continues PR #32.
+
+# Unreleased — scorebug test04 native branding and live team names
+
+Test04 connects home_city/away_city callbacks beside the logos and selects actual
+Stratum2 25 styles for scores, period and clocks. Narrow gray separators replace
+full-panel overlays; opaque popup/header backing is restored. College Hoops / Reborn
+is now title-case **native text**, using the existing sixth-man label draw path and
+a new isolated English localization ID. Font, RGB, alpha and shadow values match the
+clock. The small left 6th Man label becomes matching native-glyph texture artwork.
+
+Two IFFs are required: five SCNEs in gamedata.iff and one added tagged literal ID in
+english.iff. All 257 other gamedata records, all 21,637 existing localization rows,
+the opaque sentinel and old token pool remain intact. Branding shares the original
+sixth-man scene's visibility; disabled-feature/mode states and popup transitions
+still require user testing. No executable/font-bank/roster edit, emulator run or
+test04 JB build. Local native test04 ZIP; code continues PR #32.
+
+# Unreleased — scorebug test03 alignment refinement
+
+Supersedes test02 artwork/layout: continuous rectangular backing, rectangular
+panel borders, clipped palette rectangles without the stock vertex gradient,
+larger square team logos and authored score text, narrower/lower body, native
+Stratum2 right-hand lettering, and black sixth-man/message backing geometry.
+Read-only executable research establishes separate home/away meter translations;
+all 19 meter draws and live palette/logo bindings remain intact. Five gamedata
+SCNEs change; 257 other records remain identical. User runtime testing is still
+required for text transforms, popup event states and meter animation. No emulator,
+executable modification or new JB build. Local test03 ZIP; code continues PR #32.
+
+# Unreleased — scorebug test02 and authored HUD editor
+
+Bounded experimental scene editing, sixth-man/text-anchor inventory and test02
+asset evidence are in SCOREBUG_RESEARCH.md. Restores the prior team RGB multiplier,
+rectifies team-logo UVs, attaches CHRB to a fixed left quad, adds fixed right-side
+COLLEGE HOOPS/REBORN artwork and adjusts authored meter/message placement.
+Runtime messages/timing and dynamic tournament labels are not newly implemented.
+No executable edits, emulator runs or real/testing JB. Local user-test ZIP only;
+no game assets in Git. Current public application release remains v1.19.
+# Combined scorebug correction candidate
+
+Owner-authorized private Ghidra follow-up identifies misaligned cloned native
+text properties and reused score marker identities in the broken combined test.
+A single combined candidate now uses aligned independent city markers, native
+font width fit, original stats tag parsing and a conditional stats-only backing
+hook instead of a permanent main-bar plane. Native event popup visibility remains
+separate. Modern three-point and transfer experiments remain present.
+
+Five edited scenes, 257 untouched records, two-archive preparation/preflight,
+SELF round-trip and nine bounded wrapper paths pass. Source files are unchanged;
+only one executable plus two IFFs/docs is packaged locally. No emulator or JB.
+Appearance/PS3/gameplay compatibility are not certified. See EBOOT_EXPERIMENT_01;
+PR #32 owns the separate public native-alignment/width-fit editor guards.
+
+# Local executable experiment 01 — 2026-10-19
+
+The owner authorized separate experimental copies for modern NCAA arc/corner
+scoring, native scorebug names and removal of new-transfer sit-out assignment.
+[Experiment evidence and limits](EBOOT_EXPERIMENT_01.md) records five private
+variants, a companion scorebug package, preservation checks and manual test order.
+Original executables/game inputs are unchanged. No executable patching is added
+to the editor and no patch code, game assets or executable copies enter Git.
+Static audits, 60,000 geometry samples, 30,000 transfer-mask cases and companion
+two-archive preparation/preflight pass. Boot/gameplay/physical-PS3 compatibility,
+new text-node/span acceptance and existing-save eligibility remain unverified.
+No emulator, real/testing JB, merge or release. This narrow local authorization
+supersedes the earlier refusal only for these prototypes.
+
+Cleanup removes 1,502 generated fixture folders, 99 standalone synthetic IFFs,
+three disposable caches and two clean review worktrees. Active regression sources
+and user inputs/builds remain.
+Historical release/test package deletion was blocked by automatic approval review
+and remains pending specific owner approval; see experiment notes.
+
+# Read-only executable modernization research — 2026-10-19
+
+[Executable modernization candidates](EBOOT_MODERNIZATION_RESEARCH.md) ranks
+native scorebug names, camera customization, broadcast presentation and rules
+against actual executable evidence. Newly traced CameraMenu event handlers use
+bounded 44-byte records; Game Rules initialization takes several mode-dependent
+paths. Neither establishes a one-constant modern-rules or FOV patch. Replay,
+indicator and autosave routes are distinguished from unproven runtime semantics.
+The smallest known executable candidate is the native-name fallback investigated
+in separate PR #32; the owner declined applying it, so names remain unresolved.
+No production feature or EBOOT changed. No emulator or real/testing JB.
+# Unreleased — editable garment meshes and modern-fit experiment
+
+Models / Courts has source-aware uniform OBJ collection export, guarded reimport
+and a conservative modern-fit preset. Actual source inventory covers 21 cloth
+IFFs / 33 SCNE–Clth pairs: all five necklines and thin/regular/fat builds, plus
+three shorts builds, including individual and aggregate container routes.
+The preset shortens shorts by 20% and tightens the jersey torso by up to 7%.
+Source assets stay immutable. Rest XYZ is updated in SCNE and matching Clth;
+topology, UVs and all other attributes/unknown data are preserved.
+
+This is an experimental rest-shape workflow. Native packed cloth constraints,
+body collision and normal/tangent regeneration remain unresolved; static output
+does not certify animation/fit. No NBA cloth writer or new topology. See
+[uniform mesh evidence and editing instructions](UNIFORM_MESH_EDITING.md).
+
 # v1.19 rebuild compatibility follow-up
+
+Unreleased Legacy save support recognizes the observed 2K8 `USERDATA` profile and
+exposes its embedded roster through the roster editor. The copy writer is fixed-
+extent and verifies every byte outside that region remains unchanged. Legacy-mode
+state after the embedded roster is still unmapped and read-only; a single save
+cannot establish the meaning of those fields.
+PR #30's merged override changes were reviewed against all v1.16-v1.19 release
+tags; their histories and features remain present. The isolated merge passes
+portable checks (602 passed, 10 skipped, 2 deselected). Nine additional synthetic
+cases verify named/numeric folder DDS priority, legacy spelling resolution,
+complete IFF discovery, invalid index/root rejection and append/repack raw BIN
+preservation. See [the compatibility review](PR30_COMPATIBILITY_REVIEW.md).
+No runtime claim or additional merged feature PR is implied by this review.
 
 Folder DDS imports now consistently support a flat image targeting an existing
 cubemap in both legacy and Python-manifest paths (standard IFF and CDF). This
@@ -172,8 +387,13 @@ certifies game/runtime compatibility. Unknown variants fail explicitly.
 | CSV / selective comparison import | Supported confirmed College Hoops fields | Not a general NBA bulk editor | Not a general NBA bulk editor |
 | Full unknown-byte semantics / engine ceilings | Incomplete; unknown bits retained | Incomplete | Incomplete |
 | Animation banks | Inventory/research | Inventory/portability research | Inventory/portability research |
+| Uniform geometry editing | Experimental source-bound OBJ/rest-position workflow; known cloth only | Unsupported | Unsupported |
 
 ## Shared features
+
+NBA 2K11 has additional **research-only read/extraction evidence** for the observed
+NPD v3 SDAT/72-byte descriptor copy. No 2K11 roster editor or SDAT build writer is
+enabled. [Donor evidence and limits](NBA2K11_DONOR_ASSESSMENT.md).
 
 - Explorer reads nested records and researched asset references; labels never make
   an unknown hash an established semantic identity.
@@ -204,6 +424,14 @@ ceilings remain unestablished. See [limitations](KNOWN_LIMITATIONS.md),
 Embedded source: docs/WORKFLOWS.md
 
 # Practical workflows
+
+## Edit uniform fit
+
+Use Models / Courts > **Uniform meshes…** to export all supported garments or
+prepare the experimental modern-fit collection. OBJ cages and originals remain
+separate from ready IFF overrides. Reimport validates topology, UVs, source hash
+and cloth seam correspondence. The [mesh workflow](UNIFORM_MESH_EDITING.md)
+documents CLI commands and unresolved runtime cloth/collision behavior.
 
 ## Select a game and overrides
 
@@ -505,6 +733,15 @@ formats. This is not a claim that every game/year/platform is compatible. New or
 ambiguous layouts require evidence and fixtures; do not add filename/title guesses
 or silently reinterpret an unknown format.
 
+## NBA 2K11 research access
+
+The observed NPD v3 SDAT variant (flags 0x0100003C) now selects its version-specific
+wrapping key and retains header/block authentication. The supplied 2K11 copy has
+6,974 entries, 72-byte descriptors, size64 TOC rows and mixed raw/SDAT banks.
+Extraction and bounded known inner readers are available; SDAT rebuilding remains
+blocked and no NBA 2K11 roster schema is enabled. See [donor assessment](NBA2K11_DONOR_ASSESSMENT.md)
+for verified sample reads, animation inventory, preview gaps and conversion ratings.
+
 ## NBA 2K9 supplied-copy observations
 
 Read-only inventory: 6 banks, 6,158,907,392 bytes, 5,624 entries, no overlaps.
@@ -711,7 +948,111 @@ uses the same payload dispatch. The source game is never modified.
 
 ---
 
+Embedded source: docs/NBA2K11_DONOR_ASSESSMENT.md
+
+# NBA 2K11 PS3 as a College Hoops 2K8 donor
+
+Read-only assessment, 2026-10-18. Scores are engineering judgments about useful
+results achievable through asset conversion, not measured gameplay improvements.
+No assets have been ported, no EBOOT changed and no RPCS3/gameplay test performed.
+
+**Overall: 8/10 for visual/audio donor material; 6/10 for animation conversion
+research; 1/10 for copying newer gameplay systems.** 2K11 offers more identified
+animation resources than the inspected 2K9 source, but is not established as a
+closer structural match. 2K9 remains the simpler first animation compatibility
+baseline; 2K11 is a valuable next comparison rather than a full-library swap.
+
+## Ratings by update
+
+| Desired update | Candidate rating | Conversion difficulty | Evidence and practical route |
+| --- | --- | --- | --- |
+| Court artwork, logos, signage | **9/10** | Low–medium | Resolved 85 floor names and 216 logo names. Floor `f030.iff` decodes two preview meshes without warnings. Eleven floor entries are 32-byte empty stubs, so names alone are not proof of useful artwork. Re-author/bake for CH UVs/materials and respect its base texture budgets. |
+| Uniform and shoe artwork | **8/10** | Medium | Resolved 138 UA + 138 UH names and nine shoe names (not a complete shoe inventory). Sample uniform DXT5 1024×512, L8 number atlas 1024×128; shoe DXT5 128×128 and DXT1 256×256. Extracted formats are readable. Keep CH cloth/neck/shorts bindings and adapt artwork/number masks; sampled uniform SCNEs are not decoded CH-style mesh replacements. No new alternate assets added. |
+| Arena detail/atmosphere | **7/10** | Medium–high | Fifty named stadium entries. Sample `s734.iff` has an arena with 22 parts / 52 textures; 21 parts decode for static preview with one unsupported UV declaration. Reuse signage and selected adapted props before attempting a whole arena. Lighting, palette/material bindings, collisions, scales and memory remain destination constraints. |
+| Faces and hair | **6/10** | High | 1,040 resolved PNG player-asset names. Sample `png0349.iff` contains two head SCNEs and five TXTRs plus unresolved records. Bench mesh decodes; high-detail mesh declaration is not supported. Sample head header +0x4C values 18/7 differ from CH 12/7. Match UVs, bones, skinning, facial motion and both LODs. CH's seven dedicated likeness slots/shared FaceGen routing still limit independent assignments. No drop-in cyberface port established. |
+| UI/scorebug artwork and presentation styling | **6/10** | High for live layouts | `gamedata.iff`, `frontend.iff`, `global.iff` and `jukebox.iff` parse; familiar SCNE/TXTR/LAYT families exist. Some UI vertex declarations are unsupported. Artwork can guide a CH redesign; score/clock/team-logo/message bindings must remain CH-specific. Do not transplant an entire HUD bank expecting its live logic to work. |
+| Sound effects and arena audio | **8/10** | Low–medium | 1,060 identifiable AUDO records; sampled global effects use the known 36-byte ATRAC3 headers at 48 kHz. One stereo sample decoded to PCM16 WAV (43,008 frames). Convert through WAV into existing CH slots; loop flags, triggers and commentary timing require their own checks. No complete 2K11 jukebox/song catalogue or PA event mapping claimed. |
+| Celebrations, intros and crowd clips | **6/10** | High | Identified SingleMoCap records include global/crowd and other banks. Prefer one low-interaction clip for a converter study. References, track masks and timing differ; events and triggers must be mapped. No new clip currently plays in CH. |
+| On-court dribbling, movement, shooting, contact animations | **6/10 research value; 2/10 direct-swap readiness** | Very high | 4,705 identifiable SingleMoCap records, versus existing inventories of CH 319 / 2K9 904 / 2K14 7,460. Samples include 56/64-byte reference-like and longer packed records. Bone mapping, rotations, root motion, ball/hand contacts, events, clip lookup and selection/blending must be decoded. More clips alone cannot supply smoother gameplay. |
+| Roster data / tendencies / playbooks | **4/10 research value** | High | `roster.iff` decodes a 2,692,320-byte ROST with marker 0x225, distinct from current 2K9 0xD1 and 2K14 0x235 profiles. No 2K11 roster writer enabled. Use already confirmed CH ratings/tendencies for curated authoring; do not reuse NBA offsets or assume NBA tactical logic fits a college roster. |
+| AI, physics, controls, animation blending engine | **1/10 as an asset donor** | New runtime implementation | Assets do not transfer the code that chooses/blends moves, coordinates contacts, interprets controls or runs AI. Under the current read-only EBOOT boundary, these are not file-copy updates. |
+
+## Actual inspection and extraction access
+
+The supplied copy has four banks, **6,974 TOC entries**, 72-byte descriptors and
+the existing size64/hash32/sector32 TOC. Banks 0A/2A use NPD **version 3**, flags
+0x0100003C; 1A/1B are ordinary banks. The existing reader previously accepted
+only v4. It now chooses the v3 wrapping key for this observed variant while
+retaining header and per-block authentication. No flag, integrity check or writer
+guard is relaxed. SDAT/extended archives remain read-only.
+
+The version-specific wrapping-key selection follows the primary format
+implementation in [RPCS3's unedat.cpp](https://github.com/RPCS3/rpcs3/blob/master/rpcs3/Crypto/unedat.cpp)
+and [key_vault.h](https://github.com/RPCS3/rpcs3/blob/master/rpcs3/Crypto/key_vault.h).
+Only source code was consulted; the emulator was not launched. The v3 branch uses
+the older wrapping key while v4 retains its previous key. Versions other than
+3/4, compression/debug flags and other unknown combinations stay rejected.
+
+Authenticated sparse reads passed at beginning/interior/end and across block
+boundaries in **both encrypted banks**. Complete header inventory found 3,511
+standard IFF signatures and 99 CDF-backed metadata signatures; no standard-IFF
+header traversal errors. Of the outer names, 1,936 currently resolve; the rest
+remain hashed rather than receiving speculative labels. The 3,120 flagged H7A
+resources were not all interpreted as IFFs or assigned gameplay semantics.
+
+Identified IFF records include **12,608 TXTR, 8,077 SCNE, 4,705 SingleMoCap,
+1,060 AUDO, 44 AUSB, 476 LAYT and one ROST**. These are structural inventories,
+not numbers of independent fully usable assets/clips. No old SKEL type was found;
+that does not mean 2K11 lacks skeletons. Unresolved record types may contain
+relevant dependencies and remain unclassified.
+
+Selected PNG/uniform/shoe/floor/stadium/global/gamedata/frontend/jukebox/roster/
+crowd and animation-bank blocks decompressed to declared lengths. The read-only
+animation inventory returns 4,705 records, five sample prefixes and unchanged
+source metadata. No track-to-pose decoder or round-trip animation writer exists.
+Native preview gaps are explicit skips/warnings, not successful full rendering.
+
+## Recommended order
+
+1. Convert a floor/signage texture and a shoe/uniform artwork sample onto existing
+   CH geometry, with a reversible asset diff. This is the best immediate payoff.
+2. Evaluate one face donor against CH's dedicated-slot/FaceGen contracts; separate
+   artwork from head mesh/skinning and account for shared CH normal maps.
+3. Convert one audio effect through WAV and an existing CH event slot.
+4. Decode one simple 2K9 clip, then the corresponding 2K11 family. Establish
+   skeleton/track/timing correspondence before allocating effort to gameplay moves.
+5. Study live HUD layouts and tactical data independently, using CH consumers.
+
+These are next-step recommendations, not implemented ports or runtime-certified
+features. Supplied inputs stayed immutable; extracted samples/reports remain local
+and excluded from Git. No game/testing JB was created.
+
+## Reproduce
+
+After preparing the existing Python environment:
+
+```powershell
+python -m choops_py.research.animation_compat "PATH_TO_NBA2K11_JB" --output output/reports/nba11-animations.json
+python -m pytest -q tests/test_sdat_2k14.py
+```
+
+The generic archive/extraction reader now accepts the observed v3 banks. This is
+not general NBA 2K11 GUI/roster/build certification. Existing 2K8/2K9/2K14 reader
+contracts and writer restrictions remain in force. Earlier face research's v3
+access blocker is superseded by this authenticated-reader evidence; its face
+conversion/assignment limits remain valid.
+
+---
+
 Embedded source: docs/ANIMATION_PORTABILITY.md
+
+# Current native port investigation
+
+See [animation/gameplay implementation ledger](ANIMATION_GAMEPLAY_PORT.md) for
+Ghidra findings, implemented inventory/link tools and explicit remaining work.
+The old NBA 2K14 count of 7,460 was incomplete: a 10,000-record inventory ceiling
+excluded nba_animations.iff. The corrected count is 22,139 SingleMoCap records.
+No bank swap, pose converter or modern control implementation is enabled.
 
 # NBA animations to College Hoops: research only
 
@@ -723,10 +1064,12 @@ Read-only inventory of supplied PS3 archives finds:
 |---|---:|---:|
 | College Hoops 2K8 | 319 | 1 |
 | NBA 2K9 | 904 | 1 |
-| NBA 2K14 | 7,460 | 0 |
+| NBA 2K11 | 4,705 | 0 |
+| NBA 2K11 | 4,705 | 0 |
+| NBA 2K14 | 22,139 | 0 |
 
 These are identifiable IFF records, not counts of all gameplay clips. Other raw
-banks remain undecoded. Zero old SKEL records does not mean NBA 2K14 has no skeleton.
+banks remain undecoded. Zero old SKEL records does not mean NBA 2K11/2K14 lack skeletons.
 NBA 2K14 motion.iff also contains three records of unresolved type 0x9D34E89E,
 with sample decoded lengths 166,408 / 15,464 / 8,128 bytes and leading version word
 0x21. Their gameplay lookup/graph semantics are unestablished. players.bin and
@@ -740,6 +1083,12 @@ matrix-like data, but names/identity metadata differ. Crowd track masks also dif
 (for example 0x003DF7DD versus 0x003B77DD). Shared type hashes or matrix bytes do not
 prove the same bone ordering, bind pose, event format or clip lookup contract.
 NBA 2K9 is the stronger candidate for a future controlled retargeting study.
+
+The [2K11 donor follow-up](NBA2K11_DONOR_ASSESSMENT.md) authenticated the observed
+v3 SDAT banks and decoded selected SingleMoCap samples: 56/64-byte reference-like
+records and longer packed records. It is a rich next donor to compare after the
+closer 2K9 baseline, not proof of a compatible full library. Track masks, skeleton
+dependencies, events and lookup/selection consumers remain unestablished.
 
 NBA 2K14 uses changed sample envelopes: 32-byte reference-like records and longer
 records with different header organization/packed data. Sharing SingleMoCap's type
@@ -767,9 +1116,123 @@ See NBA_ROSTERS_AND_2K14.md for container and primary format references.
 
 ---
 
+Embedded source: docs/ANIMATION_GAMEPLAY_PORT.md
+
+# Cross-game animation and controls implementation ledger
+
+Owner scope (2026-10-20): research and implement as much NBA 2K11/14 on-court
+animation/control behavior as evidence supports, preserve the College Hoops 2K8
+backend, keep original controls in preset A and make a modern right-stick layout
+the default. Do not open RPCS3. Original game files remain immutable; separate
+experimental local outputs are authorized. No blanket gameplay claim follows from
+an IFF parser, successful build or executable decompilation.
+
+## What is implemented in the editor
+
+- Archive discovery resolves 21 additional animation/graph bank filenames. Each
+  matches a literal filename in a supplied executable and an actual archive CRC;
+  these banks appear in Explorer's Animation banks category.
+- Animation inventory validates record counts against actual header bounds. The
+  previous arbitrary 10,000-record check silently skipped NBA 2K14's main bank.
+  Inventory now includes 22,139 SingleMoCap records across standard IFFs, including
+  14,679 in nba_animations.iff. Its 4,226 companion 0x39F61D57 records are separate.
+- Read-only motion envelope profiles follow confirmed native pointer fixups for
+  CH2K8 and NBA 2K11. Reference IDs are distinguished from payload pointers;
+  the NBA event-entry list is bounded and checked for its native sentinel.
+- The alias inspector reports local source-ID candidates, missing/external IDs,
+  ambiguities and cycles without calling them resolved gameplay dependencies.
+- Motion selection collection envelopes have distinct observed strides: NBA
+  2K11 uses 20 bytes; NBA 2K14 uses 28. Neither profile enables an import writer.
+- Seven prior PR branches (#31–#37) are consolidated with ancestry retained.
+  Legacy saves, override compatibility checks, faces, SDAT v3 reads, scorebug
+  contracts, executable research documentation and uniform editing are preserved.
+  The renamed roster-open button's GUI regression expectation is updated; added
+  synthetic Legacy tests cover layout rejection, truncation and outer-byte
+  preservation. A draft Legacy PR is not treated as gameplay-certified save use.
+
+## Native evidence from supplied Ghidra and original disassembly
+
+Focused Ghidra projects use PowerPC big-endian 64-bit/32-bit addresses, OPD-derived
+TOC contexts and the supplied PS3 script conventions. Direct disassembly verifies
+function starts and import calls; the nearest OPD alone is insufficient because
+local functions do not all have OPD entries. Game code/project exports remain
+private and are not bundled with the editor.
+
+| Revision | Confirmed native route | Consequence |
+| --- | --- | --- |
+| CH2K8 | Motion relocation at 0x1E9C0 touches +0x30/+0x34/+0x38/+0x3C and a pointer tail at +0x40 sized by +0x10 & 0x3F | The older envelope cannot be populated using NBA offsets. |
+| CH2K8 | Resource reference resolver/handler at 0x241E0/0x24478 uses +0x30 as source identity for an unresolved +0x38 | Mirror/reference rows are not standalone packed pose streams. |
+| NBA 2K11 | Relocation at 0x15F24 touches +4/+0x24/+0x28/+0x2C/+0x30/+0x34, tail +0x38, plus 12-byte entries through an INT_MIN sentinel | Added pointer/event dependencies must be converted, not copied. Event meanings are unresolved. |
+| NBA 2K11 | Reference handler at 0x1C604 uses source identity +0x28 and resolution field +0x30 | Old CH alias offsets would read the wrong source key. |
+| NBA 2K14 | Native 0x74A41C dispatch distinguishes 0x60900D71 from 0x449E4AC7 and iterates the latter with a 28-byte stride | Shared type hashes do not establish identical collection layouts. |
+| CH2K8 | Imported cellPadGetData (NID 0x8B72CDA1) reaches poller 0x7B2358 via call 0x7B26F0 | Raw analog decoding is established; gameplay action mapping remains downstream. |
+| NBA 2K11 | Same authenticated import reaches poller 0x861454 via call 0x8617C0 | This is an input-device boundary, not a portable dribble implementation. |
+| NBA 2K14 | Same import reaches poller 0xB5DAF0 via call 0xB5DC00 | Copying this poller would not supply the Pro Stick gameplay system. |
+
+The native relative-pointer helper adds signed field value minus one to the
+field address, leaving zero null. In unresolved motion records the source-ID field
+must be handled before treating that location as a pointer. Actual CH crowd
+samples yielded 125 packed records and 125 aliases with local candidates; NBA
+2K11 siganims_generic yielded 333 packed and 333 aliases. Both produced zero
+envelope errors/cycles. This does not establish compatible skeletons or poses.
+
+Native dribble graphs are separate 0x0D53D4B3 resources. The supplied 2K11 dribbler
+graph decodes to 770,144 bytes; 2K14 to 2,611,944 bytes, with different contents and
+header organization. The exact-name CRC of `animgraph` matches this type hash,
+and each executable contains ANIMGRAPHRESOURCEHANDLER metadata. Graph opcode,
+transition/blending and contact semantics are not decoded. NBA 2K14's motion.iff
+also has three unresolved 0x9D34E89E resources; these are not relabeled skeletons.
+
+Control-menu reflection was traced at CH 0x6BC12C. Its localized entries include
+Controller Setup, and a native menu descriptor names ControllerConfigMenu. This
+is menu registration rather than the downstream dribble/shooting action map.
+Stock tutorial text explicitly warns that some drills depend on Default controls;
+changing a preset requires checking those consumers as well. A global left/right
+axis swap is not an implementation of the requested controls.
+
+## Explicit remaining implementation
+
+**No donor animation is yet playable in CH2K8. No new default/control preset is
+installed. No smoother gameplay or entire on-court system port is claimed.**
+
+Remaining dependencies are packed rotation/translation/time decoding and encoding,
+per-bone names/order/bind poses and retargeting, root motion, ball/hand/foot contacts,
+paired interaction events, animation ID/variant selection, blend/transition graph
+execution, shooting/defense/AI consumers and memory limits. Players/teams BIN
+payloads remain opaque and must not be confused with an already decoded clip bank.
+
+For controls, trace the gameplay-specific dribble and shooting consumers after
+analog normalization, map preset save/load and reset/default paths, implement a
+context-aware modern layout, retain original behavior in preset A and account for
+training/post/defensive/menu consumers. No speculative executable patch is enabled.
+
+## Reproduce supported investigation
+
+```
+python -m choops_py.research.animation_compat CH_JB NBA11_JB NBA14_JB --output output/research/animation-current.json
+python -m choops_py.cli rip NBA14_JB output/rips/nba14 --file nba_animations.iff --raw-iff
+python -m choops_py.cli inspect-animation-links EXTRACTED_BANK.iff college-hoops-2k8 output/research/ch-links.json
+python -m choops_py.cli inspect-animation-links EXTRACTED_BANK.iff nba-2k11 output/research/nba11-links.json
+```
+
+Use the matching profile. The links command rejects NBA 2K14 because its packed
+motion envelope is not established. It reports local candidates rather than
+silently resolving cross-bank references. Source assets, reports and executable
+analysis copies are local, excluded from Git. No RPCS3 or testing JB is used.
+
+---
+
 Embedded source: docs/MODERN_FEATURE_BACKPORTS.md
 
 # Modern-feature backport feasibility for College Hoops 2K8
+
+Follow-up, 2026-10-19: [executable modernization research](EBOOT_MODERNIZATION_RESEARCH.md)
+adds verified menu-handler/TOC routes and ranks small executable candidates.
+Scorebug PR #32 has since traced live native name/style providers and developed
+authored layout tooling; its normal-game name suppression remains unresolved
+under the owner's read-only EBOOT decision. The older matrix below records the
+2026-10-17 baseline and must not supersede that newer, separately scoped evidence.
+No patch or new runtime feature is implemented by either assessment.
 
 Research assessment, 2026-10-17. No gameplay feature, asset port, executable patch
 or new alternate asset is implemented by this document. This targets **PS3 College
@@ -785,7 +1248,11 @@ indirect feature reproduces part of the experience in the editor or an external
 workflow. A new engine feature requires executable/runtime logic, not just an IFF
 record with a similar name. EBOOT remains read-only; no emulator is launched.
 
-Our supplied donor evidence is PS3 NBA 2K9 and PS3 NBA 2K14. No modern Gen9 asset
+The [NBA 2K11 donor follow-up](NBA2K11_DONOR_ASSESSMENT.md) adds authenticated v3
+archive access, actual resource samples and per-category ratings. It supersedes
+the earlier 2K11 access blocker, not the requirement for conversion/consumer evidence.
+
+Our supplied donor evidence now includes PS3 NBA 2K9, 2K11 and 2K14. No modern Gen9 asset
 sample was inspected. PS3 2K14 must not be confused with PS4/Gen9 variants or taken
 as a bridge that automatically makes present-day resources compatible.
 
@@ -882,6 +1349,395 @@ source-immutable decoding, destination reparse, untouched-range comparison,
 ambiguity rejection and rollback. Engine/memory behavior remains uncertified
 without user testing. This research launches no game, edits no executable,
 builds no real/testing JB and distributes no donor assets.
+
+---
+
+Embedded source: docs/EBOOT_MODERNIZATION_RESEARCH.md
+
+# College Hoops 2K8 executable modernization candidates
+
+Follow-up: the owner subsequently authorized separate local experimental copies
+for three specific changes. [Experiment 01](EBOOT_EXPERIMENT_01.md) records the
+new scoring/transfer findings, private prototypes and unverified runtime limits.
+The original executable remains unchanged and the editor has no patching feature.
+The read-only investigation below is the earlier research record.
+
+Read-only investigation, 2026-10-19. Target: the supplied **PS3 College Hoops
+2K8** executable. Addresses below are virtual addresses in this particular
+decoded ELF, not portable file offsets or a patch for other game revisions.
+No executable, source game, overrides or savedata was changed. No emulator was
+launched. This document identifies candidates; it adds no editor feature.
+
+## What is closest to a small update
+
+The best executable candidate is restoring native scorebug team-name output.
+Camera customization and broadcast transition controls are useful next targets,
+but their complete setting-to-renderer contracts still need tracing. Modern
+rules, animation blending and AI are not established as small constant patches.
+Many visual improvements can already use asset/data consumers without changing
+the executable at all.
+
+| Update | Evidence / route | Effort and confidence |
+| --- | --- | --- |
+| Native school names beside scorebug logos | Registered home/away city providers have a normal-game suppression path and an existing team-name fallback. Two branch sites are identified below. | Smallest identified executable candidate; high static confidence in the route, no runtime validation. Owner explicitly declined applying it; names remain unresolved. |
+| More readable broadcast text, title-case branding, larger scores/clocks, less intrusive framing | Existing native style/localization and authored scene paths are described in scorebug PR #32. These consumers already exist in EBOOT. | High practicality through assets; executable patch usually unnecessary. PR #32 is separate, unmerged work with remaining user-test issues. |
+| Modern broadcast branding, replay wipes and watermark artwork | Named replay scene resources reach native selection code. Replace compatible artwork first; preserve replay/event logic. | Asset changes are closer than logic changes. New timing controls require tracing the fields consumed by the update/draw routines. |
+| Additional camera presets or more useful camera adjustments | Named CameraMenu registration reaches handlers using 44-byte records, bounded selection and multiple option paths. | Promising bounded research. Not yet a verified FOV/zoom/height patch or proof that hidden camera modes are safe. |
+| Optional HUD indicator simplification | An indicator resource is referenced from native code; scorebug/meter routes are already mapped. | Candidate only. Identify individual draw/visibility consumers before disabling anything. Do not disable a whole update routine to hide artwork. |
+| Contemporary shot selection and signature assignments | Confirmed roster ratings/tendencies and existing animation selectors already have data consumers. | Practical data presets; no executable change required. They influence the old engine and do not install modern tactical AI. |
+| Shorter presentation interruptions / replay pacing | Replay selection initializes named resources and several float fields. Popup and replay paths are identified. | Medium research. A float near a replay name is not yet a proven duration in seconds; event completion and state transitions must be preserved. |
+| Contemporary rule presets | Named Game Rules menu has mode-dependent initialization paths. | Medium/high investigation, not yet a safe shot-clock, reset-clock, foul or scoring-distance patch. Trace actual simulation and saved settings consumers. |
+| Autosave convenience | Separate AutoSaveMenu and AutoSaveMenu_EndOfGame registrations plus autosave scene names exist. | Not currently an easy patch. These establish UI routes, not save scheduling or atomicity. Avoid changing save behavior from UI evidence alone. |
+| Framerate, bloom, modern lighting | Bloom/profiling/shader labels occur, but no complete adjustable render contract was established. | No proven quick patch. A frame-cap edit may affect timing; a shader name does not prove a safe global toggle. |
+| Smoother modern gameplay, motion matching, new collision/AI, entire newer animation libraries | No compatible replacement runtime is established by this executable scan. | Major engineering; not a small EBOOT modernization. Donor clips still require track, skeleton, event and consumer compatibility. |
+
+“Small” describes the size of a possible code change, not a guarantee of PS3
+compatibility or lack of side effects. No candidate in this table is gameplay
+certified. Do not quote a precise implementation time before the missing consumers
+are understood.
+
+## Confirmed executable routes
+
+### Native school-name restoration
+
+The prior scorebug investigation in [PR #32](https://github.com/ZMO34/CHoops-Extractor-Reborn/pull/32)
+identified the `home_city` and `away_city` providers at `0x4EF9A4` and `0x4EFABC`.
+Normal-game helper paths at `0x4EED80` / `0x4EEB3C` report success without filling
+the text buffer; conditional branches at `0x4EF9F0` / `0x4EFB08` then bypass the
+fallback. The existing fallback through `0x4EF92C` reads the current team's name
+at team-object offset +4. Registered score/period/clock bindings are associated
+with `0x4EF400`; the bottom-HUD dispatcher is `0x4F442C`.
+
+This provides a concrete alternative to painting names onto team logos: allow
+the existing fallback to supply live text. It is still a proposal, **not a patch
+included here**. Long names, localization, special modes, layout clipping and
+buffer contracts need review. The owner chose to keep EBOOT read-only and leave
+names unresolved. This research does not change that decision.
+
+Native style loading at `0x6A8A8` already handles font/color/alpha/shadow/literal
+properties. Scorebug PR #32 demonstrates why readability and branding should first
+reuse those authored properties. Its sixth-man meter route at `0x76A714` includes
+19 material draws; the popup/backdrop route at `0x4F1620` is a future entry point
+for conditional backing/placement research, not permission to suppress events.
+
+### Camera menu: bounded records, not a discovered FOV constant
+
+The `CameraMenu` registration points to an event table at `0x8AF198`.
+Event keys 6 and 7 resolve through function descriptors to code at `0x4C0C58`
+and `0x4C04A0`. The latter is a short forwarding handler; the former performs
+selection and option updates. Adjacent helpers use record stride `0x2C` (44
+bytes), selection checks involving `0x1D` / `0x1E`, and option indices through 6.
+These observations describe storage/control bounds; they do not establish 30
+distinct gameplay cameras or seven independently usable camera settings.
+
+The record/state pointers `0x12C75498` / `0x12C759EC` refer outside the initialized
+file-backed ranges used in this scan. Runtime initialization must be found before
+claiming their defaults are present as a writable static table. The handler at
+`0x4C11C4` loads 35.0 and subtracts it from a derived value before storing a float.
+It is in camera-menu logic: **it is not evidence for a shot-clock constant**.
+Zoom, height, FOV, UI position and camera identifiers must not be guessed from
+those numbers. Trace the initialization and `0x4A25A4` consumer before a preset
+writer or relaxed bounds is designed.
+
+### Game Rules: several mode-specific paths
+
+The `OptionsMenu_GameRulesMenu` registration is at `0x9EEEA0`, with event-table
+pointer `0x94439C`; associated callback `0x6C0B2C` dispatches across several
+conditions. It calls `0x4A0A34` and `0x4A3924`, then selects paths including
+`0x6BF5B0`, `0x6BF72C`, `0x6BFA5C` and `0x6BFE60`, or returns/delegates elsewhere.
+Mode numbers have not been assigned dynasty/exhibition names in this research.
+
+This is useful for following rule controls, but changing a menu maximum does not
+prove that the live game, reset events, simulation, overtime and saved settings
+all agree. Next trace one named rule from localization/menu control to storage,
+then from storage to live clock/scoring logic and save loading. A changed court
+texture or preview guide cannot change the scoring boundary.
+
+### Replay, indicators, saves and rendering labels
+
+| Evidence | Confirmed meaning | Remaining consumer work |
+| --- | --- | --- |
+| `0x2149E8` selects `replay_wipe_2k` / `cameraShape1`; references at `0x214A9C` / `0x214AB0` | Native replay resource selection/field initialization | Follow field reads before assigning duration/transition semantics. Preserve completion and return-to-game behavior. |
+| `0x214C6C`, reference at `0x214D7C`, names `replaywatermark_pontiac` | Watermark resource route | Locate exact destination artwork/layout and retain unrelated replay state. |
+| `0x7DB50`, reference at `0x7DD14`, names `replayoverlay` | Replay overlay resource route | Separate visual replacement from replay scheduling. |
+| `0x584EAC`, reference at `0x584F7C`, names `gameintro_cameras.iff` | Intro camera archive consumer | Does not establish gameplay-camera compatibility or a decoded camera track. |
+| `0x72532C`, reference at `0x7262C0`, names `indicator` | Indicator resource reference | Individual HUD elements and visibility conditions unresolved. |
+| AutoSaveMenu / AutoSaveMenu_EndOfGame registrations use tables `0x8A32C4` / `0x8A325C`; `0x11D5D0` references `autosave_%02d` | Save UI/scene evidence | Save serialization, completion, error handling and trigger schedule unresolved. |
+| `Ambient:Shot-Clock` referenced at `0x539438` | Named audio event | Not the shot-clock simulation setting. |
+| FrameBufferEffect_DrawBloom / bloom shader labels | Render-related names | No validated global bloom toggle, frame cap or timing patch. |
+
+## Method and reproducibility
+
+The local scan used Python 3.12.14 and Capstone PPC64 big-endian disassembly on
+the owner's decoded ELF, opened for reading only. A digest before/after the scan
+matched. No executable bytes, proprietary disassembly listing, input fingerprint
+or asset are distributed in this PR.
+
+1. Parse ELF64 program headers to translate virtual addresses through file-backed
+   PT_LOAD ranges. Reject unmapped/BSS reads; do not assume every VA is file offset
+   plus a fixed constant.
+2. Collect relevant ASCII / UTF-16BE labels, then find aligned address references
+   and descriptor registrations. The bounded vocabulary scan collected 580
+   candidate strings and 75 TOC references. These are search results, not a full
+   executable map, feature count or exhaustive reference inventory.
+3. Decode the actual OPD section from the ELF section headers: virtual range
+   `0xA082B0..0xA4CAC8`, file range `0x9F82B0..0xA3CAC8`. The earlier broad scan
+   window extended into adjacent data; the experiment follow-up tightens this
+   bound and validates TOCs instead of accepting nearby pointer-like words.
+   Select each function's actual TOC. Main game routines commonly use `0xA64A94`,
+   while another group uses `0xA54AC8`; using one TOC universally gives false
+   string/constant annotations.
+4. Follow named registrations to callback descriptors, then inspect code paths,
+   bounds, callers and consumers. PC-relative/direct references, dynamically
+   computed pointers and runtime initialization may require additional tracing.
+5. Distinguish resource labels, profiling labels, menu controls and simulation
+   state. Record hypotheses separately. A string match or nearby numeric literal
+   is not proof of gameplay semantics.
+
+This procedure can be repeated in Ghidra with the matching ELF mappings and PS3
+function descriptors/TOCs. Ghidra was not installed or run for this scan. Donor
+recompilation output is not a replacement PS3 executable and is not evidence that
+an executable modification will run on physical hardware.
+
+## Proposed next work and compatibility gates
+
+First finish asset-based broadcast fixes independently of executable research.
+If the owner later authorizes an executable prototype, the native-name fallback
+is the most narrowly identified first experiment. Camera record initialization
+and replay field consumers are the next useful read-only investigations. Rules
+research should follow one real setting end to end rather than globally replacing
+every matching integer.
+
+Any eventual patch system needs revision/digest matching, exact expected-original
+instruction checks, instruction-aligned edits, rejected mismatches, explicit
+feature scope and rollback to an immutable original. Branches must respect PPC64
+register, LR, stack and TOC contracts; hooks additionally need valid branch range,
+allocation, relocation and instruction-cache handling. A byte diff can prove the
+written scope, but not the complete runtime effect of a changed branch.
+
+Keep executable patches separate from archive/roster overrides. A PS3 ELF must
+also be packaged into a loader-compatible SELF under the user's target firmware;
+emulator acceptance alone cannot certify that. Actual PS3 behavior, saved-game
+compatibility, gameplay transitions and longer sessions remain user-run acceptance
+work. Do not claim backend isolation without tracing dependencies and testing.
+No patch framework, hook, altered EBOOT, release or testing JB is delivered here.
+
+---
+
+Embedded source: docs/EBOOT_EXPERIMENT_01.md
+
+# Combined correction candidate — Ghidra follow-up
+
+The owner subsequently reported that the original combined prototype was visually
+broken and explicitly requested one corrected combined executable plus matching
+IFFs and documentation. The five-variant package described below is historical;
+it is not the current delivery format or proof of working visuals.
+
+## Confirmed defects and corrective design
+
+Ghidra with the supplied PS3 OPD/TOC method and original PowerPC disassembly
+confirms aligned vector loads in the SCNE style loader. Several old companion
+property blocks were only four-byte aligned. Their literal vectors parsed in
+Python but were read from different aligned addresses natively. The city clones
+also retained score identity/marker properties. The new private companion uses
+16-byte tables and two independent city skeleton markers with their own names,
+hashes and hierarchy links; the two score centers are retained.
+
+City draw callbacks alone use the existing complete native text renderer, which
+honors confirmed width fitting. Stats keep their custom text-tag parser/timing;
+the shot clock keeps its callback. A global plain-renderer replacement was rejected
+because it would lose those native behaviors. The main bar's permanent popup
+plane is removed. A confined private stats hook draws the native blackbar scene
+only with the existing message timing window, positive text opacity and a
+nonempty provider string, uploads its native pose and resumes the original stats
+callback. Native event popups retain their separate existing visibility checks.
+No persistent visibility flag, new asset loader or general hook system is added.
+
+Authored native fonts, title-case College Hoops / Reborn, one sixth-man literal,
+square logos, source palette material IDs, removed divider/glare geometry and two
+separate message rows follow the owner's CBS references. This describes intended
+presentation; static checks do not establish the final rendered appearance.
+
+## Verification and delivery limits
+
+The local ZIP contains ONE debug/fake SELF EBOOT.BIN, gamedata.iff, english.iff,
+README, native findings, validation and checksums. It retains the documented
+modern arc/corner scoring and new-transfer sit-out experiment. Source files stay
+unchanged. No ELF/control variants, game copy or executable generator are included.
+No assets or executable patch implementation are committed to Git.
+
+Five edited scenes reparse, all 257 other gamedata records compare exactly, both
+IFFs prepare and pass build preflight, the SELF payload round-trips, and the scoped
+executable changes retain the existing combined gameplay experiments. Nine bounded
+synthetic instruction paths verify background on/off conditions and original
+callback inputs, stack and nonvolatile-register preservation. These simulate the
+small private wrapper; they are not game execution or renderer verification.
+
+The changed blackbar inferred header span retains the old unreferenced bottombar
+header as a checked tail. Its authored arrays remain inside the replacement
+header. No blanket claim that all inferred spans are unchanged is made.
+
+PR #32 separately adds public editor guards for native text alignment and bounded
+width-fit flags. Its source verification reports 628 passed, 9 skipped and two
+deselected; the exact-head isolated handoff carries the clean-checkout result.
+This PR adds research/documentation only; no executable patching enters the editor.
+
+Runtime visuals, every popup transition, physical PS3 acceptance and gameplay
+compatibility remain unverified. Repository rules prohibit emulator launches and
+automatic/testing JB builds. The broken earlier result is not relabeled a success;
+the owner must test the matching combined set before runtime acceptance.
+
+# Owner-authorized local executable experiment 01
+
+2026-10-19. The owner explicitly authorized separate experimental copies for
+modern NCAA three-point distance, native scorebug text and removal of transfer
+sit-out assignment. This supersedes the earlier read-only decision **only for
+these local experiments**. Originals remain immutable; no patching feature,
+dependency, CLI, hook installer or executable writer is added to the editor.
+Experimental executables, game artwork, fingerprints and local generators remain
+outside Git. No merge or release is included.
+
+## Deliverables and evidence boundary
+
+Five local executable variants were generated: unchanged-code packaging control,
+native scorebug names only, new-transfer sit-out removal only, modern three-point
+logic only, and the combined prototype. Each has an audit manifest. Local ELF
+copies remain available for inspection; the private ZIP includes five EBOOT.BIN
+variants, companion overrides, validation summaries and manual test instructions.
+
+These are debug/fake SELF envelopes, not retail-signed executables. The source's
+authority/application/version/capability metadata is retained; no signing keys
+are distributed. ELF-to-SELF payload/segment round trips pass. Acceptance by a
+particular loader or physical PS3 is **not established**. The unchanged-code
+control must be tested first to separate packaging failures from code changes.
+No emulator/game was launched and no real/testing JB was built.
+
+## Modern NCAA three-point boundary
+
+The current [NCAA court diagram](https://ncaaorg.s3.amazonaws.com/championships/sports/basketball/rules/common/PRXBB_CourtDiagram.pdf)
+specifies a 22 ft 1¾ in arc and 21 ft 7⅞ in corners, measured to the outside edge.
+The prototype uses those imperial dimensions converted to 675.005 / 660.0825 cm.
+It implements the clipped circular shape, including the straight corner segments;
+increasing a circle's radius alone would give the wrong corner region.
+
+New tracing establishes the following route in the supplied executable revision:
+
+- `0x534FCC` initializes court dimensions. The path at `0x535054` derives two
+  boundary globals at `0x12CAB9A4` / `0x12CAB9A0`, originally clamped together using
+  612.1399536132812 cm. This old value is documented as code evidence, not an
+  assumed exact correspondence to painted line dimensions.
+- `0x3CA128` tests a point against the arc/side boundary with an input margin.
+  `0x3CA344` transforms four authored sample points through player matrices and
+  requires all four to pass. That four-point sampling remains intact.
+- `0x3CB494` calls the four-point predicate; the surrounding decision selects
+  3 at `0x3CB378` or 2 at `0x3CB4A0`. This is substantially stronger evidence than
+  a matching numeric literal near a resource name.
+- `0x3CBE08` computes signed distance to the same old boundary and is used by
+  other court/gameplay paths. The prototype updates it alongside the predicate.
+
+The experimental implementation redirects three entry points to small routines
+inside verified zero file padding after the first executable LOAD. Its filesz
+and memsz expand without moving original addresses, the entry point, imports,
+TLS, other program headers or any original initialized data. Added routines use
+volatile registers, preserve the existing TOC contract and balance stack/LR around
+calls. This is static on-disk code redirection, not runtime memory injection.
+
+The updated initializer retains the small-court width clamp but assigns separate
+arc and corner limits. The distance helper evaluates the maximum of the side
+distance and the circular distance on the front side of the basket. The point
+predicate compares that signed distance to its existing margin. Basket placement,
+court length, sampling points and unrelated tuning fields remain unchanged.
+
+Painted textures, floor SCNE line geometry and editor alignment guides are **not
+redrawn**. Use matching modern artwork for a meaningful visual test. Actual foot
+contact, line-edge tolerance, scoring/statistics, simulation and special modes
+remain user-test questions; synthetic geometry does not certify those behaviors.
+
+## Native scorebug names and companion
+
+Two conditional branch sites, `0x4EF9F0` / `0x4EFB08`, now reach the existing
+team-name fallback in the experimental variants. The provider and fallback bodies
+are unchanged. This is scoped to the supplied revision; it is not a universal
+patch. Special tournament/mode behavior and localization remain untested.
+
+The private companion builds on [scorebug PR #32](https://github.com/ZMO34/CHoops-Extractor-Reborn/pull/32)
+test05 assets at `e7175a1c6a3a0a5009f06eaa3c5a9dbcb5ce68b0`. It adds two native
+home_city/away_city text records beside the logos, retaining the ten original
+text records' interpreted styles, enlarged scores/clocks, native title-case
+branding, sixth-man label/meter and existing popup configuration. No names are
+baked into logos. Only gamedata.iff and the existing companion english.iff are
+supplied as overrides; original files are unchanged.
+
+The text table, cloned styles and string references reparse, and the vertex stream
+is byte-identical. Every original decoded logical byte remains unchanged; 261
+other original record payloads remain as prefixes. **Their inferred spans are not
+all identical:** moving the enlarged SCNE makes the preceding msd65d1 span include
+44,720 abandoned original bytes. Native acceptance of that span extension and the
+two new text records remains unverified. This is explicitly experimental asset
+growth, not a certified runtime writer result. The manual sequence tests the
+unchanged-code control with and without the companion before changed EBOOT code.
+Preparation/build preflight accepts the two archives with no unapplied overrides.
+
+## Transfer sit-out assignment
+
+The transfer-finalization routine at `0x5BC250` removes players through the existing
+membership path, updates its count byte, then processes destinations. The path at
+`0x5BC314` retains scholarship assignment. After clearing the two redshirt bits
+in player-anchor +0x84 (roster row +0x94), the instruction at `0x5BC334` inserts
+Transfer code 2, followed by the normal destination-membership call.
+
+The local prototype removes only that insertion instruction. The preceding clear
+and following store remain, yielding None instead of Transfer for **new transfers
+processed by this path**. Membership, transfer count and scholarship writes are
+retained. Ordinary and medical redshirt handling elsewhere is unchanged.
+No transfer flags already stored in existing saves are cleared. This is not a
+retroactive save conversion or proof of every transfer/eligibility route. Check
+lineups, actual participation, season progression and save/reload in a disposable
+Legacy save before calling the sit-out rule removed in practice.
+
+## Verification and manual acceptance
+
+- Five variants pass diff allowlists, original-source digest checks, bounded
+  branch-target checks and debug SELF/ELF payload round trips. The control ELF is
+  identical to the original decoded ELF.
+- Only the first LOAD grows for court variants. Other program headers, entry,
+  original addresses/data and source files remain unchanged. Added routines are
+  independently disassembled; nonvolatile register/TOC/LR contracts are reviewed.
+- Synthetic geometry covers 60,000 samples across both directions, equivalence
+  with the old equal-radius circle, margins and explicit apex/corner/join cases.
+  A case inside the new circle but outside the straight corner catches the
+  incomplete radius-only approach.
+- 30,000 transfer-mask cases preserve every neighboring bit while removing code
+  2 insertion. The actual original source and output code were also inspected.
+- Companion reparse/resource preservation and two-archive preparation/preflight
+  pass. ZIP integrity and exact private output fingerprints are recorded locally.
+
+These checks do not execute game code. A byte allowlist bounds written bytes, not
+all possible runtime effects. Full editor runtime suites are not rerun for this
+documentation-only PR update; its public runtime code is unchanged. Exact-head
+documentation checks are recorded in TEST_REPORT and the PR.
+
+Manual order: unchanged-code control; control plus companion; names plus companion;
+new transfer processing alone; modern arc/corners alone at both baskets; combined
+prototype after individual cases. Keep a disposable build/save and restore its
+original executable to roll back. No installation into the source game is done
+by this work. Boot/gameplay/physical-PS3 acceptance remains entirely unverified.
+
+## Cleanup scope
+
+The local cleanup removed 1,502 generated fixture directories, 99 standalone
+synthetic IFF outputs, three disposable test/type/lint caches and two clean,
+reproducible review worktrees. Tracked active
+regression tests, original games, supplied overrides, saves, user builds, research
+evidence and the current experiment are preserved. Source tests are not obsolete
+simply because their first commit is old.
+
+Automatic approval review rejected a broader permanent deletion that included
+historical release and scorebug packages, citing potentially useful artifacts.
+Those historical packages remain pending the owner's specific approval. The
+rejection was not bypassed; the completed cleanup was narrowed to verified
+generated fixtures/caches and clean review checkouts. No GitHub release, branch,
+open feature PR or source feature is deleted by this cleanup.
 
 ---
 
@@ -1414,6 +2270,105 @@ No RPCS3, EBOOT writes or automatic testing JB is involved.
 
 ---
 
+Embedded source: docs/UNIFORM_MESH_EDITING.md
+
+# Experimental editable uniforms and modern fit
+
+Models / Courts now has **Uniform meshes…** with export-all, experimental modern
+fit and collection reimport actions. Export uses the global **Preview source**
+selection, including source-bound complete overrides. Outputs are separate
+collections under `output/uniform-models/`; imports create a new
+`output/uniform-imports/` folder. Sources and existing outputs are never replaced.
+
+## Coverage and preset
+
+Read-only inventory of the supplied College Hoops 2K8 PS3 source found:
+
+- Five necklines: U, V, V triangle, triangle and wishbone.
+- Thin, regular and fat builds for each neckline, plus three shorts builds.
+- 21 IFF containers / 33 SCNE–Clth record pairs. This includes the aggregate
+  containers and the individual build containers, so both existing resource
+  routes are represented. These are 18 distinct garment/build combinations;
+  the duplicated routes are not additional jersey styles or new team alternates.
+
+`modern-fit-1` raises the shorts hem by 20% of that mesh's original vertical
+extent, fading to zero displacement at 65% of its height so the waist and upper
+hips remain fixed. The deformation is monotonic in height; no rows are cut off.
+Jersey torso X/Z are reduced by up to 7%, with smooth fades at the bottom and
+above the mid torso. The upper 28% stays fixed, preserving the collar/upper
+armhole region. This changes existing shared meshes for all schools using them;
+it does not change team artwork, body/build selectors, roster records or EBOOT.
+
+## Editing and reimport
+
+The collection contains `originals/` IFF copies, editable `models/` OBJ cages and
+source-bound manifests. Modern-fit collections also include untouched
+`original-models/` OBJ cages and ready experimental replacements in `overrides/`.
+Select **only `overrides/`** in Explorer to prepare the edited game assets. The
+collection root includes originals and must not be used as an overrides folder.
+Do not mix complete cloth IFF replacements with a different cloth geometry mod.
+
+The OBJ preserves original vertex indices, per-vertex UVs and expanded strip
+triangles. Coordinates are unchanged native units, Y up. In a DCC editor, preserve
+vertex order and axis conversion on export. Do an untouched roundtrip before
+editing: DCC versions may reorder faces or vertices. No welding, subdivision,
+triangulation, decimation, vertex deletion or UV editing is supported. Move
+coincident seam duplicates together. OBJ normals are ignored; native packed
+normal/tangent attributes remain byte-exact. No external DCC application has
+been certified by this change.
+
+Choose **Reimport edited uniform models…**, selecting the collection root.
+The importer checks the original IFF hash, manifest identities, ordered triangles,
+vertex count, UV identity, sewn particle agreement, finite coordinates, a maximum
+20-unit displacement and collapsed/flipped triangles. It updates only XYZ in
+SCNE vertices and their exact matching Clth rest particles. Unknown attributes,
+UVs, skinning-associated stream bytes, indices, constraints and helper particles
+are retained. Unsupported declarations and ambiguous matches fail explicitly.
+Collection operations are cancellable; a failed/cancelled collection may contain
+completed files but has no final success report. Choose a new empty destination
+for retry. Each individual IFF is fully validated before writing.
+
+CLI equivalents, always writing under project `output/`:
+
+```powershell
+python -m choops_py.cli export-uniform-models SOURCE_JB output/uniform-export
+python -m choops_py.cli modern-fit-uniforms SOURCE_JB output/modern-fit
+python -m choops_py.cli import-uniform-models output/modern-fit output/edited-cloth
+python -m choops_py.cli export-uniform-iff cloth_u.iff output/u-models
+python -m choops_py.cli import-uniform-iff cloth_u.iff output/u-models output/new-cloth_u.iff
+```
+
+## Confirmed binary evidence and limits
+
+The observed embedded SCNE has one mesh/instance, three streams with strides
+4/24/4 and six exact declarations. Float32 big-endian XYZ occupies the first 12
+bytes of each 24-byte vertex in stream 1. Stream 0 holds signed-normalized UVs;
+stream 2 and the remaining vertex bytes are preserved. Existing triangle-strip
+indices and draw data stay unchanged. No general-purpose SCNE writer is enabled.
+
+In matching Clth records, the first big-endian uint16 is the rest-particle byte
+extent. Absolute offsets at `0xc0` and `0xc8` bound that table; their difference
+equals this extent. Each particle is 16 bytes: matching float32 XYZ plus 1.0.
+All 33 supplied graphic records have unambiguous exact matches to this bounded
+table. Several rendered seam vertices share a particle. Unmatched helper
+particles and zero-initialized workspace are retained. This mapping establishes
+rest-position editing, not the semantics of every Clth byte.
+
+Writers preserve logical record addresses and sizes. Physical compressed sizes
+can grow; the existing archive relocation workflow handles a larger replacement.
+Every written IFF is reparsed; all changed and unchanged record slices are
+compared against the expected bytes. No-op OBJ roundtrips are byte-identical.
+
+**This is experimental.** Packed solver constraints, collision geometry, cloth
+simulation and normal/tangent regeneration have not been retargeted. Existing
+constraints may pull edited vertices toward their previous fit; animation may
+show stretching, body clipping or shading differences. Rest-pose comparisons and
+successful import/preflight cannot establish the animated result. Do not call
+this a finished cloth-simulation port. No RPCS3/gameplay or real JB build is run.
+NBA garment layouts and arbitrary new topology remain unsupported.
+
+---
+
 Embedded source: docs/PLAYER_QOL_RESEARCH.md
 
 # Player editing and scholarship evidence (v1.10)
@@ -1467,6 +2422,167 @@ code/history is retained; no alternate assets are created or added in this updat
 
 Executable/stock inputs were inspected read-only and are not distributed. EBOOT
 is not modified. No emulator or automatic testing JB is used for this release.
+
+---
+
+Embedded source: docs/PLAYER_FACE_RESEARCH.md
+
+# College Hoops 2K8 player faces — read-only findings
+
+## Result
+
+The observed PS3 game has **generated faces and seven dedicated likeness slots**.
+The roster chooses the latter with a four-bit selector, not a general NBA-style
+cyberface file number. The original seven likenesses use the shared head/morph
+system with dedicated color/normal textures and FRFG coefficient presets. This
+is a concrete asset-editing route, but not proof that arbitrary NBA head IFFs can
+be copied into the game or independently assigned to every player.
+
+Original source archives, roster and EBOOT were read only. No RPCS3 or game build.
+No face editor/writer or automatic cross-game converter is added by this research.
+
+## Located assets
+
+| Archive | Record(s) | Observed role and format |
+| --- | --- | --- |
+| `pcaatface.iff` + `pcaatface.cdf` | `face01`–`face07` | Seven dedicated likeness albedos, 256×256 ARGB8, visibly different authored faces. |
+| `pcfacenormal.iff` + `.cdf` | `facenormal91`–`facenormal97` | Dedicated likeness normal textures, 512×512 DXT5. |
+| Same normal bank | `facenormal00`, `10`, `20`, `30`, `40`, `50` | Six other normal records, also 512×512 DXT5; the default executable path selects from a seeded lookup. Do not relabel them solely from their numeric suffix. |
+| `pcfacehair.iff` + `.cdf` | 75 `beard`, `stache`, `burns` records | Shared facial-hair artwork; names combine color/style indices. Samples: beard 256×128, moustache 64×64 ARGB8. |
+| `global.iff` | `face_01`–`face_07`, type `FRFG` | Seven 544-byte floating-point face parameter records. Preset selection and coefficient conversion are traced below. The extra bytes beyond the three traced coefficient groups remain unclassified. |
+| `global.iff` | `facegen_head`, `facegen_bench_head` | Shared high-detail/bench SCNEs, each with one `player` mesh part and no embedded textures. Distinct layouts/LODs must stay consistent. |
+| `facegen.iff` | `mean_head` SCNE | 52 embedded 256×256 ARGB8 images, zero mesh parts. This is generator data, not 52 interchangeable finished player faces. |
+
+**Normal maps are shared more widely than the dedicated albedos.** The default
+normal lookup at virtual 0x10034070 contains suffixes
+`0, 10, 20, 30, 40, 50, 91, 92, 94, 95, 96, 97`.
+Thus a generated player can use several of the same normals as dedicated
+likenesses. Replacing `facenormal91`, for example, can affect generated players
+as well as Conley-slot users. Do not promise isolated per-slot normal edits.
+
+`hNNNN.iff` is **not** a head filename convention here: inspected College Hoops
+samples contain `Highlight`/`Hilt` records. There are zero currently resolved
+`pngNNNN.iff` entries in this College Hoops source. A name-dictionary absence alone
+would not prove an unknown hashed file absent; executable routing and asset
+contents provide the stronger evidence.
+
+The face albedos and normal/hair examples were decoded and inspected locally.
+All seven albedos pass an in-memory DDS → swizzled GTF → DDS byte-identical image
+round trip using the built-in converter. This verifies extraction/conversion,
+not gameplay or a complete new-likeness import. Local artwork is excluded from Git.
+
+## Per-player routing established on the supplied original roster
+
+The editor's raw player window starts 0x10 bytes before the logical engine player
+anchor. Offsets below deliberately distinguish these origins.
+
+| Meaning | Logical engine offset | Raw editor offset | Evidence |
+| --- | --- | --- | --- |
+| Dedicated likeness selector | word +0x8C, low four bits | word +0x9C, low four bits | EBOOT selectors below plus all nonzero stock players match the seven licensed names. |
+| Custom-morph flag used by generation gate | word +0x88, bit 0 | word +0x98, bit 0 | Gate branches around procedural/preset generation when set. Other uses and authoring policy still need validation. |
+| Procedural generation seed input | word +0x0C | word +0x1C | Passed to the PRNG initializer by both generated-face and default normal selection routines. Do not replace the player's identity field to change it. |
+| Morph byte group A | +0xA6, 50 bytes | +0xB6, 50 bytes | Three-group decode/encode loops. |
+| Morph byte group B | +0xD8, 30 bytes | +0xE8, 30 bytes | Same. |
+| Morph byte group C | +0xF6, 50 bytes | +0x106, 50 bytes | Same. Final bytes cross the biased raw window, remaining within the logical row. |
+
+The selector maps as follows, corroborated by **every** nonzero row in the stock
+roster, including duplicated historical/training-player rows:
+
+| Selector | Original likeness | Matching color / normal / preset |
+| --- | --- | --- |
+| 0 | Generated face | Procedural route, not `face00` |
+| 1 | Mike Conley | `face01` / `facenormal91` / `face_01` |
+| 2 | Glen Davis | `face02` / `facenormal92` / `face_02` |
+| 3 | Greg Oden | `face03` / `facenormal93` / `face_03` |
+| 4 | J.J. Redick | `face04` / `facenormal94` / `face_04` |
+| 5 | Al Thornton | `face05` / `facenormal95` / `face_05` |
+| 6 | Alando Tucker | `face06` / `facenormal96` / `face_06` |
+| 7 | Julian Wright | `face07` / `facenormal97` / `face_07` |
+
+Stock: 5,685 rows; 5,670 selector-zero, 15 rows spread across selectors 1–7.
+The custom flag is zero and all three stored morph groups are zero in every
+stock row. Thus interpreting those zero groups as active face shapes would be
+wrong: the executable generates/loads parameters when the flag is clear.
+Existing skin, hair, facial-hair, eyes and other packed appearance fields remain
+separate from this selector.
+
+## Read-only executable chain
+
+Addresses describe the inspected PS3 executable only, not other builds/platforms.
+The ELF has two relevant TOCs: 0xA54AC8 and 0xA64A94. Map load-segment virtual
+addresses to file offsets and use each function's descriptor TOC. Using one
+global TOC or treating a file offset as a virtual address yields false xrefs.
+
+- **0x74EB38:** tests player logical +0x88 bit 0. If clear, reads low nibble
+  +0x8C. Zero tail-calls procedural generation **0x74E5D0**; nonzero calls
+  **0x745604**, falling back to procedural generation if preset loading fails.
+- **0x745604:** formats `face_{0:D2}` using that nibble, requests type hash
+  **0xBE981E93** (FRFG), then calls **0x4A2164**. This is an inter-module thunk
+  to **0x68D9C**, which converts three groups of float coefficients into player
+  morph bytes. It is not a `png<player ID>.iff` loader.
+- **0x74570C:** formats `face%02d` with the same nibble for dedicated artwork.
+- **0x74ECB0:** formats `facenormal%02d`; nonzero selector adds **90**, giving
+  91–97. For zero, **0x74EE24** seeds the PRNG from logical +0x0C and uses a
+  lookup to choose the normal suffix.
+- **0x74E5D0**, including **0x74E664–0x74E670:** procedural generation uses the
+  same +0x0C seed with initializer **0x7C52BC** (LCG setup is visible). Appearance
+  words constrain later generation. Changing only one DDS is not a complete
+  replacement for this generated shape/texture process.
+- **0x66ECC:** byte groups at logical +0xA6/+0xD8/+0xF6 decode into 50/30/50
+  floats. The observed constants implement approximately `byte * 24/255 - 12`.
+  **0x68D9C** encodes/clamps floats to bytes and applies group magnitude limits.
+  Raw coefficient names and each component's facial meaning are not established;
+  the ranges alone do not justify arbitrary GUI sliders.
+- **0x4E5C5C** requests the `facegen_head` SCNE. **0x731348** includes the
+  `facegen.iff` resource request at **0x73161C**. The executable also contains
+  `FaceGen_ApplyHeadMorphsToTexture`; a string alone does not expose a usable API.
+
+## What can be changed, and what is still required
+
+1. **Seven existing likenesses:** the strongest first target. Replace the paired
+   color/normal artwork and compatible FRFG preset while retaining the College
+   Hoops mesh/UV/skin/LOD contract. The roster selector provides a demonstrated
+   data route to select those slots; runtime testing has not been performed.
+   Any players sharing a slot would share its replacement. Several normals also
+   serve generated players through the default lookup above, so replacing a
+   slot's normal map needs a broader compatibility check.
+2. **More varied generated players:** the game already stores per-player custom
+   morph bytes and uses a seed for default generation. A correct authoring path
+   can vary individual geometry without a dedicated IFF per player. Reproducing
+   the FaceGen bases, magnitude constraints, texture synthesis and the custom
+   flag's full lifecycle is needed for accurate preview/editing. Do not write
+   zero arrays as a supposedly neutral custom face.
+3. **More dedicated slots:** four bits represent 0–15, but only 1–7 are backed by
+   the observed assets. This is a storage bound, not proof that slots 8–15 work.
+   Matching color/normal/FRFG resources, resource-pack registration/capacity,
+   save/load behavior and both LODs must be established. Thousands of independently
+   textured players are not available through this selector as currently traced.
+4. **Borrowed NBA faces:** plausible as donor artwork or geometry for a conversion
+   project, not a demonstrated direct import. NBA 2K9 has 774 named PNG archives;
+   inspected `png877.iff` has two SCNEs and four TXTRs. Its scene headers differ
+   from the CH shared head (sample +0x4C values 14/7 versus CH 12/7); equal bench
+   counts would not establish equal bone identity/order or skin weights. Refit or
+   retopologize/bake to CH UVs, validate bind pose/skinning/facial animation,
+   normals/materials and bench LOD, then derive compatible CH morph parameters
+   or establish an actual per-player mesh loader before promising whole meshes.
+5. **Later donors:** NBA 2K14 has 1,289 resolved PNG names, but the inspected
+   sample's ZLIB variant was rejected by the current decoder. Supplied NBA 2K11
+   SDAT flags/version are also unsupported. Those are recorded extraction
+   blockers; no bypass or pretend decoded donor is included. 2K9 is the nearest
+   currently inspectable comparison, not certified interchangeable.
+
+## Reproduce without modifying inputs
+
+```powershell
+python -m choops_py.research.player_faces "PATH_TO_ORIGINAL_CH2K8_JB"
+python -m choops_py.research.player_faces "PATH_TO_ORIGINAL_CH2K8_JB" --players
+python -m pytest -q tests/test_player_face_research.py
+```
+
+The command reads paired textures, shared head/preset records and the source
+roster, prints JSON, and has no write/import operation. `--players` includes
+private roster names; keep derived reports/artwork local. It does not claim a
+cross-game schema detector, a full FaceGen renderer or a cyberface editor.
 
 ---
 
@@ -1931,11 +3047,39 @@ format limits.
 
 Embedded source: docs/SCOREBUG_RESEARCH.md
 
+# Native text contract findings — combined experiment correction
+
+Ghidra with PS3 OPD-derived TOC context corroborates these native contracts:
+
+- The style loader uses aligned vector loads. Text rows and property blocks must
+  begin on 16-byte boundaries. Byte-wise parsing of a misaligned literal vector
+  can produce the intended ID while the native load reads preceding bytes.
+- Property `0x11fa397c` supplies maximum width; flag `0x100` enables native
+  shrink-to-width in the complete text renderer. The helper accepts whole units
+  1–4096, retains the authored integer type and rejects shared/missing fields.
+- Marker property `0xae7e1958` determines the native text transform. A row rename
+  and row translation alone do not create a separately positioned HUD label.
+- The city providers and draw callbacks are separate. Ordinary names still need
+  the explicitly authorized private executable experiment; renaming a binding
+  in the public editor does not bypass native provider suppression.
+- Stats draw callbacks parse colored text tags and apply native timing. They
+  must not be globally replaced with the plain text renderer to obtain width fit.
+
+Example bounded style change: `{"away_score":{"max_width":39,"align":"center"}}`.
+The option affects native routes that honor this property; custom callbacks can
+apply their own sizing. This is not a universal engine text ceiling.
+
+Misaligned old experimental inputs now fail with an actionable message. Repair
+from the authored source with aligned tables; do not silently round pointers.
+The public helper never rewrites an executable. Private combined experiment
+findings and visual limitations are maintained through PR #36.
+
 # Scorebug research — authored assets, runtime routing pending
 
 Read-only stock archive inspection on 2026-10-15 identifies the following records.
 Names identify authored resources; they do not alone prove which runtime path is
-active. No executable edits or scorebug geometry writer are implemented.
+active. No executable edits are implemented. The bounded experimental authored-layout
+editor and test02 evidence below supersede the initial artwork-only scope.
 
 | Archive | Record | Type | Evidence |
 |---|---|---|---|
@@ -1988,6 +3132,415 @@ nodes, trace team-color/logo bindings and animation/visibility states in read-on
 EBOOT consumers, distinguish broadcast modes and console variants, then prove
 which layout/material parameters can change without executable edits. Moving or
 removing scorebug nodes is deferred until these dynamic bindings are understood.
+
+## Test02 — authored layout, sixth man, messages and fixed right label
+
+The user-tested test01 showed the network logo inside the first team panel,
+distorted team logos, bright team plates and an unadjusted sixth-man widget.
+This update adds a bounded `choops_py.modding.scorebug_layout` editor and a local
+asset package. It is an experimental asset revision, not runtime certification.
+
+### Concrete corrections and edit boundaries
+
+- Test01 replaced original vertex RGB 0.1 with 1.0 on color_1/color_2. Restore the
+  authored 0.1 values rather than changing team roster palettes. Dynamic material
+  IDs and external uniform-logo bindings remain unchanged.
+- The original team-logo quads are sheared. Rectify both positions and half2 UVs
+  to square rectangles, retaining the live logo materials rather than baking team
+  logos into the background. Changing positions without their UVs can distort art.
+- CHRB2K is now on the fixed left background `polySurface17`, not the old
+  `g_2K_circle_logo` object. The latter's vertex alpha is zero; runtime movement of
+  that named object cannot move the newly embedded logo. The exact transform that
+  displaced test01 is not established by the user's screenshot alone.
+- The background consists of seven independent restart strips with gaps/overlap;
+  blindly mapping one logo across all strips creates seams. The editor verifies
+  the exact u16 restart topology, uses its first complete quad, and makes remaining
+  vertices transparent. Index values/counts, materials and resource IDs stay intact.
+- Existing `ncaa2k8` geometry/texture slot 3 supplies fixed two-line **COLLEGE HOOPS /
+  REBORN** artwork in the right panel. Only this static material's declared
+  DiffuseColor alpha is raised from 0.6 to 1.0. No dynamic tournament round, region,
+  seed, team name or foul widget is fabricated. The static text is raster artwork.
+
+### Separate sixth-man resources
+
+All four edited records are SCNEs inside **gamedata.iff**:
+
+| Record | Authored change |
+| --- | --- |
+| scorebug_bottombar | Main plates/logos, fixed branding/right label and message anchors |
+| 6th_man_meter | Existing 19 meter draws retained; local rectangle x60..145, y−2..2; RGB ×0.7 |
+| 6th_topbar | Header rectangle x−300..−150, y−155..−142; th_man anchor (−298,−150) |
+| scorebug_topbar | Alternate two-anchor header; lt_6th_man (−298,−150), rt_6th_man (−68,−150) |
+
+The meter is a separate local-coordinate scene: its original vertices span roughly
+x62.52..129.76 and y−4.43..4.44. The header text's original anchor is near
+(−185.05,−156.66). Their different coordinate spaces matter; drawing the meter
+at absolute bottom-bar bounds would be incorrect. Runtime fill/value/material
+selection is retained. Exact placement in every away/home activation state still
+needs user testing. No meter threshold/gameplay logic is changed.
+
+### Message and text placement
+
+SCNE header +0x4C is the text-record count and +0x50 a relative table pointer.
+Observed records are 144 bytes: name pointer +64, two authored translations at
++48 and +96. Each selected text also has a uniquely named independent marker
+containing two matching translation copies. The editor changes all four X/Y copies
+and preserves Z, rotations, name/ID/font data and unrelated bytes. It refuses
+missing or ambiguous markers rather than guessing a new text object.
+
+| Bottom-bar name | Original X/Y | Test02 X/Y |
+| --- | --- | --- |
+| player_info | 44.30 / −175.54 | 274 / −147 |
+| bottombar_textNode_1 | 13 / −175.54 | 274 / −147 |
+| bottombar_textNode_2 | 13 / −203.30 | 274 / −132 |
+
+These move authored candidate event/info positions above the right label. They do
+not create messages, change event timing, resize runtime font boxes or prove that
+all three nodes are used in every mode. `scorebug_blackbar` separately contains
+an `info` anchor at local (0,−4); it is deliberately unchanged because a runtime
+parent positions that scene. Other popup/overlay banks are not globally shifted.
+
+Read-only executable data contains UTF-16 registrations for `home_score`,
+`away_score`, `gameclock`, `shotclock`, `quarter`, `home_ABL`, `away_ABL`,
+`bottombar_textNode_1` and `bottombar_textNode_2`. On the inspected image, file-offset
+pointer slots 0xA4DDB8 and 0xA4DDC4 reference the latter two strings. `player_info`
+exists in the SCNE but was not found as an exact UTF-16 executable string; that
+absence does not prove it is unused. Dynamic text contents remain runtime-owned.
+Full event dispatch, font/style selection, visibility and animation tracks are
+not established. Do not infer new tournament text support from an empty panel.
+
+### Reusable tool and verification
+
+```powershell
+python -m choops_py.formats.scorebug YOUR_JB
+python -m choops_py.modding.scorebug_layout input.scne layout.json output/edited.scne
+```
+
+The inventory includes sixth-man scenes and named authored text anchors. The [test02 geometry profiles](examples/scorebug-test02-layout.json) contain only
+configuration, with no game assets. Select the profile object for one named scene.
+A layout
+profile has `parts` keyed by exact part name and `text` keyed by exact anchor name.
+Part options: bounds [left,bottom,right,top], rectify_uv, single_quad, rgb_scale,
+z_offset, hide. Only observed split float3/float4, half2 UV/restart-strip layouts
+are writable; others fail. This is a developer CLI, not a new GUI panel.
+
+Synthetic tests cover UV/aspect rectification, interleaved unknown words, alpha,
+paired text translations, restart indices and rejection. Actual preparation checks
+verify unchanged block sizes and all 258 unedited IFF records, material identities,
+valid texture layouts and source immutability. Static inspection images omit live
+text and team logos and are not screenshots of game behavior. RPCS3/gameplay NOT
+RUN; EBOOT NOT EDITED; real/testing JB NOT BUILT. The local test ZIP contains
+user-owned derived game assets and is not committed or uploaded to the repository.
+
+Next user checks: left CHRB placement during intro/score transitions; both logos'
+aspect; team-color accuracy; sixth-man empty/filled states for home and away;
+message length/clipping during fouls, substitutions and timeouts; collision with
+clocks and right artwork. Further runtime bindings need evidence from those states.
+
+
+## Test03: continuous panels and native lettering
+
+Test03 supersedes test02 geometry/artwork. Runtime reference images revealed
+cutout corners, strip gaps, a detached sixth-man fill, a strong panel gradient
+and undersized non-native static lettering. The game resources, not the runtime
+screenshots alone, establish the following changes:
+
+- `polySurface16` consists of seven separate restart strips with spaces between
+  them. One validated independent quad now covers the whole backing; the other
+  strips are transparent. Index buffers and resource identities stay unchanged.
+- The shared frame atlas contains slanted transparent corners. Straight rectangular
+  artwork and rectified UVs replace them. Team colors stop inside the panel edges;
+  a continuous opaque backing covers joins. This addresses spill for all schools,
+  rather than special-casing Florida.
+- Team plates used vertex RGB ranging from 0.1 to 1.0. Test03 uses a uniform 0.72
+  multiplier; palette material bindings remain live. This removes the authored
+  gradient, but is not a claim of colorimetric equivalence to a television feed.
+- The body spans X −360..360, Y −208.5..−168.5; shadow reaches −211.5. Compared
+  with test02, width decreases from 760 to 720 world units and the body moves down
+  13.5 units. Team logos are square 38-unit quads. Scores use a 1.25 authored basis
+  scale. Font resources, score strings and callbacks remain unchanged; runtime
+  interpretation of the authored scale still needs user verification.
+- Read-only meter rendering code indexes two X translations, −185 and −337, then
+  subtracts 153 from Y. Its existing 19 material/draw bindings are preserved.
+  Local X60..145 and Y−15.5..−11.5 place the meters at X−125..−40 or −277..−192,
+  Y−168.5..−164.5. Both fit inside the black header X−340..−35,
+  Y−168.5..−152.5. Labels sit before each respective meter; the small slanted black
+  decoration is hidden independently of the rectangular background.
+- A fifth scene, `scorebug_blackbar`, receives a right-side backing rectangle
+  X55..360, Y−168.5..−138.5. Only its four visible background vertices move;
+  the unrelated three-vertex dummy draw remains byte-identical. Its `info` text
+  has a translated parent marker: the confirmed marker offset is preserved, not
+  flattened into the text's local position. Bottom-bar candidate popup anchors
+  move above the same region. This changes authored placement, not message event
+  dispatch or visibility. All foul/rebound/points states need manual confirmation.
+
+### Actual game font, not a platform font substitute
+
+The bottom-bar author properties explicitly name **Stratum2 22 32** for score,
+clock and period nodes, **Stratum2 18 26** for info/team text, and **Stratum2 12**
+for sixth-man labels. `fonts.iff` contains the corresponding FONT resources.
+Test03's static COLLEGE HOOPS / REBORN artwork uses the **STRATUM2_22_32** atlas.
+No font bank or executable is modified.
+
+Observed FONT structure: first/last codepoint are big-endian U16 at +0/+2;
+space advance is U32 +12; +8 is a relative map pointer. The map repeats the
+codepoint range and points from +4 to a contiguous 96-byte glyph table. Each glyph
+has U32 advance at +0, four float4 corner records at +16, and UV rectangle at +80.
+An embedded TXTR begins at FONT header +32, with a separate image block. The green
+channel contains coverage; taking DXT1 alpha instead would produce solid boxes.
+`native_font_art.render_line` composes those glyphs with recorded advances and
+bearings. It rejects missing characters and invalid/out-of-bounds metrics.
+Kerning tables remain undecoded: this uses native artwork and advances, not a
+claim of identical runtime kerning. The artwork keeps the 22-pixel cap height in
+an inferred half-scale HUD canvas (11 world units); actual runtime sizing must
+be checked against the user's next screenshot.
+
+### Updated developer profile options
+
+[Test03 profiles](examples/scorebug-test03-layout.json) retain only asset-free
+geometry configuration. Select one named scene object for the CLI. A part may
+contain one operation or a list applied in order. Additional bounded options:
+`straighten` removes shear without changing UVs; `vertex_range` is a half-open
+[first,last] range within one existing stream; `rgb` sets a uniform RGB value
+without replacing material palette bindings. Bounds are recomputed over the
+whole stream so an untouched dummy draw is not excluded by a partial edit.
+Text accepts either [x,y] or an object with `position`, optional `scale`, and a
+confirmed `marker_offset`. The latter is checked against source world/local
+copies before writing and retained afterward. A scale changes the authored 3x3
+basis, preserving resource pointers, translation Z and marker offsets.
+
+The local test03 ZIP contains five SCNE overrides with their matching DDS files,
+plus a separate complete stock-based gamedata IFF alternative. Use one route only.
+The scene route preserves unrelated custom gamedata edits. Replacing just SCNEs
+while retaining test02 DDS would restore the old atlas through DDS priority.
+257 other stock records, all original inputs, block sizes, live logo/palette IDs,
+all 19 meter draws and unrelated dummy vertices are checked for preservation.
+Static inspection and import/build preflight are not gameplay certification.
+No RPCS3, EBOOT writes or new real/testing JB. Derived assets remain local.
+
+
+## Test04 interim texture prototype (superseded by native revision below)
+
+The user's test03 screenshot establishes that the team names are absent, the
+horizontal panel overlays remain intrusive, and texture lettering differs from
+live HUD text. Test04 changes the following:
+
+- The bottom-bar dispatcher registers `home_city` and `away_city`, in addition to
+  scores/clocks. Those names are absent from the original bottom scene. The existing
+  home_ABL/away_ABL text **record names** now bind to those two callbacks. Their
+  `Score_bug` parent and ABL bone names remain unchanged. The callbacks select the
+  current game teams and their text IDs; names are not baked for one matchup or
+  copied from a particular private roster. Special game modes can select alternate
+  team-label paths. Exact display/clipping still needs user testing.
+- Scores, half/period, game clock and shot clock use the actual `Stratum2 25` font
+  alias. Test03 only scaled the authored text-record basis. The runtime style loader
+  reconstructs its matrix from the named parent/bone, so that basis edit is not a
+  dependable font-size control. Test04 does not rely on it.
+- Gray section separators are narrow vertical geometry, with gray top/bottom edges.
+  The shared atlas is solid gray, so no full-panel transparent frame silhouette
+  crosses the colored name panels. Former frame8_glare is a black popup backing
+  using the existing untextured black material, above the right side of the body.
+  It is always visible; it is not newly wired to popup event visibility.
+- Right popup candidate anchors move 25 world units left from test03. This corrects
+  the displacement observed in the supplied screenshot while retaining the native
+  message callbacks. The separate parented blackbar stays in the test03 layout;
+  it was not sufficient to back all bottom-bar popup callback states on its own.
+- The sixth-man header's visible draws use its existing untextured black material,
+  avoiding the partial texture-backed enclosure. All 19 live meter draws remain.
+- Branding is **College Hoops / Reborn**, not all caps. Its texture uses native
+  STRATUM2_25 glyphs at the same chosen font size, RGB 222/222/222 and shadow
+  10/10/10 with the native negative-X/positive-Y shadow direction. The right box is
+  widened to 132 world units so title-case text fits without squeezing its width.
+  Clock and shot-clock centers/separators are adjusted accordingly. The branding
+  material copies the known white left plate's sampler/state, retaining its own
+  texture resource. It is still textured geometry, not a new native text callback.
+  Identical runtime shader/filtering cannot be claimed. A native constant-text
+  registration/localization route remains unresolved; executable editing is barred.
+
+### Corrected serialized text-property layout
+
+The text record's +80 relative pointer leads to a property object with count at
++0. Its entries start at +16, each 32 bytes: **16-byte value, U32 type, U32 key,
+8 reserved bytes**. Reading a value after the key misassociates it with the next
+property. This corrects the earlier informal test03 property-offset investigation.
+The font-atlas identity was correct, but some claimed scalar associations were not.
+
+Confirmed style keys from the read-only loader:
+
+| Key | Purpose / observed value |
+| --- | --- |
+| 0x7714781F | Default localized text key, not font alias |
+| 0xBF045BDB | Font alias, e.g. Stratum2 22 32 |
+| 0x6109EA5A / 0x97DE0310 / 0x6814845A | Main RGB components, 222 each |
+| 0x53C67207 / 0x661F09B0 / 0x7DFC668B | Shadow RGB components, 10 each |
+| 0x4884F64A / 0x3F83C6DC | Shadow X/Y offsets, −0.75 / +0.5 |
+| 0xE27EC83B / 0xAE7E1958 | Parent scene instance / bone names |
+
+`scorebug_text.inspect_styles` reads bounded tables. `edit_styles` appends new
+UTF-16 strings and changes only selected font/name pointers. It preserves original
+strings, bone bindings, property types/keys, text counts and vertex buffers; duplicate
+bindings and invalid properties are rejected. Header growth is explicit and handled
+by the existing expanding IFF writer. Native bindings and font styles are asset-free
+[configuration](examples/scorebug-test04-text-styles.json); separate
+[geometry profiles](examples/scorebug-test04-layout.json) omit the generator's
+explicit draw-material reassignment and texture artwork. These are developer APIs,
+not a new scorebug GUI mode or a claim that geometry JSON alone recreates the ZIP.
+
+Read-only English localization inspection found a tagged string table and literal
+character tokens. No localization writer, new translation IDs or fallback guesses
+are enabled. Native constant branding and exact live-font rendering remain open.
+No EBOOT/font bank/roster/uniform archive is changed. All five edited records reparse,
+all other 257 stock gamedata records remain identical, and scene-only overrides pass
+preparation/build preflight. No test04 JB, RPCS3 or gameplay test is run automatically.
+
+
+## Test04 native revision: the same live text renderer for branding
+
+The texture prototype above is superseded. The final native test04 package changes
+**gamedata.iff and english.iff**. It does not add executable callbacks or edit EBOOT.
+
+The existing `6th_topbar` dispatcher loops its text records, builds the style and
+calls the native default-text renderer. The `th_man` style has flag bit 0x10 set:
+its property **0x92F9B3F9** stores a tagged localization ID in two floats. The loader
+converts X to the low U16, Y to the high U16, packs them and sets bit zero. Stock
+values X31793/Y59031 reconstruct **0xE6977C31**, which points to the actual encoded
+`6th Man` translation in English. Existing newline translations use 0x010A tokens.
+These are numeric tagged string IDs, not archive CRCs.
+
+The native revision adds isolated literal ID **0xC8B40001** with tokens for
+`College Hoops\nReborn`. Its `th_man` style selects that ID, Stratum2 25 and the same
+center-alignment bits used by the score text. Its existing bone moves to the right
+panel at (294,−183); the native renderer handles the two lines, lowercase glyphs,
+coverage, shading and shadow. Direct resource checks show font alias, RGB 222 each,
+alpha 1, shadow RGB 10 each and shadow offsets −0.75/+0.5 match the clock. The old
+right-hand textured branding is removed. The former branding quad now supplies a
+small left `6th Man` label using native font-12 glyph artwork, inside the black
+header. There is no extra text record, new skeleton bone or new native callback.
+
+Branding inherits the original sixth-man scene visibility. The mode/option where
+that whole scene is disabled may also hide the branding; no separate always-on
+render hook is claimed. Runtime multi-line placement, long school names, popup
+transitions and all visibility options still require user screenshots. The popup
+backing remains always visible as documented for the interim prototype.
+
+### Bounded English localization extension
+
+Stock NAME metadata and read-only resource loading identify type **0xA423B39E** as
+`TXT loc system`. The observed English table starts with the English name CRC
+0xE33E3B9C, U32 row count at +4 and relative row-table pointer at +8 (table at32).
+Each row has U32 tagged ID and a relative token-stream pointer. IDs are strictly
+sorted odd values. The final 0xFFFFFFFF row has an even **opaque word**, not a
+relative pointer interpreted by this reader. Its meaning remains unestablished;
+its bytes are preserved exactly. The earlier claim that the native fixup skips
+even words was incorrect: the inspected generic fixup is unconditional.
+
+`loc_system.add_literal` supports one isolated ASCII/newline entry in this observed
+English layout. Literal tokens are 0x01 followed by an ASCII byte; NUL terminates
+the stream. It inserts a sorted row, shifts the old pool by eight bytes, recomputes
+old relative pointers, and appends only the new literal. All old IDs/token bytes
+and sentinel remain intact. Other encodings, duplicate/reserved/even IDs, bad
+pointers, missing terminators and unknown layouts are rejected.
+
+The expanding standard-IFF writer routes this known type through a dedicated
+writer requiring one complete block at offset zero and a validated extension:
+existing header metadata, ID mappings, token pool and sentinel remain unchanged. A general translation rewrite is not enabled
+by this growth exception. Existing strict behavior for unrelated types is retained.
+Synthetic tests exercise the IFF round trip and reject changed existing text.
+
+Installation requires **both** supplied archives. The scene_override route contains
+five gamedata SCNEs with DDSes, plus a complete English IFF containing the isolated
+entry. A stock-based English replacement will replace unrelated custom English
+changes; apply the documented Python extension to a custom English source to retain
+those instead. The alternative replacement_iff route contains both complete IFFs.
+Use one installation route and fully restart the game after rebuilding so it reloads
+localization. No EBOOT or font-bank changes, and no emulator test is performed here.
+
+### User-reported native test04 startup failure
+
+The supplied user log reports native asynchronous IFF loading at PC 0x00845E14
+with an unmapped read at 0x4D4C0002. New branding token bytes occur in the faulting
+thread; the English IFF extracted from the built JB matches the native test04
+package. This establishes a startup resource-load failure, not a HUD draw failure.
+The full build contains many additional mod archives. No new emulator run or
+controlled one-archive gameplay test has been performed.
+
+The old generic growth writer preserved the original 1,847,762-byte block and
+appended the complete enlarged table, yielding 3,695,588 decoded bytes. That
+unnecessary representation is withdrawn. The dedicated localization writer now
+writes a single 1,847,812-byte table at offset zero and stores it uncompressed,
+with equal stored/logical sizes. Read-only executable inspection of the native
+IFF loader confirms that equal lengths select direct reading, bypassing compressed
+loading. Old translations, title-case branding, outer metadata and NAME trailer
+remain intact; the gamedata revision does not change.
+
+This correction removes the implicated compressed representation and redundant
+heap. It does not prove the precise native corruption mechanism or certify that
+all remaining overrides boot. Runtime confirmation is required. Use the corrected
+local test04-crashfix package, replacing the previous English override; keep both
+supplied archive replacements, select the new overrides again, and rebuild.
+Do not layer old/new English IFFs. No EBOOT or font-bank changes.
+
+## Test05 — screenshot-driven corrections and team-name limitation
+
+The user's native-test04 screenshots show enlarged score/clock text but no team
+names, overlapping sixth-man text, short meter fills, gray dividers and truncated
+popup prefixes. The built game's scene styles match the supplied revision, so
+this is not stale override selection.
+
+### Why renaming to city callbacks did not show names
+
+Read-only initialization registers home_city and away_city with update providers
+at 0x4EF9A4 and 0x4EFABC. Those call the mode gate at 0x4EED80/0x4EEB3C. During an
+ordinary game that path returns success without filling the string; the nonzero
+branch skips the existing fallback formatter at 0x4EF92C, which otherwise reads
+the current team's name. Therefore SCNE renaming alone does not enable live names.
+The prior inference that registering the city callback completed the feature was
+incorrect. It is not merely a font, spelling or clipping issue.
+
+A possible two-branch executable change was identified but **not applied**. The
+owner explicitly selected "Keep EBOOT read-only; leave names unresolved." Do not
+introduce that patch or replace uniform logos with baked names as an implicit
+workaround. This revision preserves the asset-only scope and source executable.
+
+### Asset corrections
+
+- Body width/height, 38-unit logos and Stratum2 25 score/period/clock aliases remain.
+  Gray frame/top/bottom dividers are hidden. Palette material IDs and runtime logo
+  references stay intact. Color-panel vertex RGB returns to the stock authored
+  0.1, replacing test03/04's flat 0.72. No global roster color edit is made and no
+  unverified fragment-shader formula is claimed.
+- Both bottom-bar and topbar text_nodeMask meshes are moved outside the HUD.
+  Their old coordinates/depths still intersect the relocated popup/branding area;
+  alpha-only hiding can leave a depth-writing mask active. Unknown index buffers,
+  draw records, material states and skeleton data stay intact.
+- Bottom-bar away_ABL/home_ABL have existing null callbacks and fall back to the
+  native default-text renderer. Use those existing bindings for the stock 6th Man
+  literal (Stratum2 12) and isolated College Hoops / Reborn literal (Stratum2 25).
+  The sixth-man header font baseline is -159; branding's first baseline is -193.
+  Native RGB/shadow styling is retained. No new text record/bone/callback is added.
+  Both separate topbar native-label counts become zero without deleting their
+  serialized records or bones. The bitmap label is hidden to prevent duplication.
+- The meter remains 19 distinct live draws/material bindings. Authored meter bounds
+  become [20,-13.5,145,-8.5], a 125x5 span. Existing native X offsets -337/-185 and
+  Y offset -153 produce spans [-317,-192] and [-165,-40], Y[-166.5,-161.5], inside
+  the unchanged header [-340,-35] by [-168.5,-152.5]. Actual green fill still comes
+  from game state; no artificial full-meter or changed threshold is introduced.
+- Popup player_info and textNode_1 had authored alpha zero. Restore typed alpha to
+  one; use white RGB222 and center alignment. Anchors are centered at X207.5 over
+  the right-side backing [55,360]. Popup lines use baselines -160/-151; the separate
+  blackbar info anchor maps to baseline -160 through its preserved parent offset.
+  Runtime selection/timing remains native, and its backing remains always present.
+
+Asset-free test05 layout/style JSONs describe the edits. `disable_text` modifies
+only the checked text count after authored edits; records/properties/geometry are
+retained. Typed alpha/color edits reject malformed values, missing properties and
+shared storage. The compact uncompressed English resource from the startup
+correction remains. All 257 other gamedata records remain byte-identical.
+
+These are asset corrections checked by parsing, preservation and source-bound
+preparation/preflight. In-game popup transitions, masks, palette appearance and
+native branding placement still require user screenshots. No emulator was run,
+new JB built or executable patched.
 
 ---
 
@@ -2073,7 +3626,7 @@ editable through declared masks. The older restricted-field paragraph below is
 historical; ROSTER_EDITOR.md and projects/ define current scope. Six palette words
 remain unresolved; long string rebuilding and unknown fields remain blocked.
 
-Roster adapters support standard IFF ROST, raw ROST, type-21 wrapper, decrypted USERDATA with 4-byte prefix, and one-USERDATA decrypted ZIP. No encrypted-save decryption is provided. Known tables: players 0x0271AC/5685/308, arenas 0x1D5C84/379/28, teams 0x1D85E0/443/704, coaches 0x23F78C/1373/44.
+Roster adapters support standard IFF ROST, raw ROST, type-21 wrapper, length-prefixed decrypted USERDATA, one-USERDATA decrypted ZIP, and the observed CH2K8 Legacy-mode USERDATA profile. In that profile, a validated ROST-shaped payload begins at save offset 0x438 and has the standard 0x003DF800-byte extent; the remaining mode data is preserved, not interpreted. The writer allows only fixed-size edits to this embedded roster and checks bytes before/after it remain unchanged. No encrypted-save decryption is provided. Known ROST tables: players 0x0271AC/5685/308, arenas 0x1D5C84/379/28, teams 0x1D85E0/443/704, coaches 0x23F78C/1373/44.
 
 ROST runtime string pointers are field + signed delta - 1, consumed as UTF-16BE (77FB1C / 7C5818). Stored reference anchors retain the documented +1 biases. Player last/first pointers +0x10/+0x14 target aligned big-endian text; do not use the shifted ASCII-only LE interpretation. Jersey number is byte +0x1B (preserve adjacent flags and player ID +0x18), height +0x3A, position +0x3B. Team roster references +0x6C, 18 slots, point to player row +0x11. Team arena +0x44 targets arena row +0x19, coaches +0x60/+0x64/+0x68 target coach row +0x15, rivals +0x4C/+0x50/+0x54 target team row +0x31. Asset IDs are high u16 at +0x18C/+0x190/+0x194; preserve low words and require consistent existing IDs. Conference record fields +0x0A..+0x22 are exposed with their source labels and original u16/RGB widths, based on the public CH2k8 roster parser and cross-checked against supplied USERDATA record values. The source labels identify founded year, championship-order values, Final Fours, prior-year bids, rank, tournament settings, and color; gameplay effects are not independently verified. Prestige and unknown appearance fields remain read-only. Names use copy-on-write UTF-16 growth with preserved aliases and fixed table locations; keyboard limits are advisory. Conference +0x1A is now confirmed as a tournament index and protected pending a backlink writer; logo routing uses 900 + conference index. See CONFERENCE_ASSETS.md.
 
@@ -2428,9 +3981,190 @@ Updated 2026-10-11. CURRENT_STATUS.md and TEST_REPORT.md are the living evidence
 - Outputs are constrained to output/. Game assets, exported music/art, private
   paths, logs, fixtures and EBOOT are not supplied publicly.
 
+## Experimental uniform mesh edits
+
+Known College Hoops garment OBJ reimport edits both visible and cloth rest XYZ.
+Packed solver constraints, collision and normal/tangent regeneration remain
+unchanged. A static modern-fit preview is not an animated fit certification;
+see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA writer.
+
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+# Pending PR integration and native animation audit
+
+Combined source portable verification: **670 passed, 10 skipped, 2 deselected**.
+Compile, CLI/Qt, Ruff, mypy, generated handoff and diff checks pass. New motion
+modules/tests also pass full E/F/I lint. Source checkout omits optional native
+helpers; exact-head isolated evidence is maintained in the integration PR.
+
+Synthetic regressions cover banks above 10,000 records, malformed table/pointer
+bounds, reference IDs, distinct collection strides, sentinel event arrays, local
+alias cycles, motion names/categories, Legacy fixed-size encode/outer bytes and
+invalid Legacy layouts. A stale roster-button label expectation was corrected.
+
+Private read-only inventories: CH319 / NBA11 4,705 / NBA14 22,139 SingleMoCap;
+no standard-header traversal errors or bounded-header/sample skips. Actual CH
+crowd: 125 packed +125 alias candidates; NBA11 signature bank:333 +333. No envelope
+errors/local cycles in these two banks. Ghidra and original disassembly establish
+native animation fixups, reference handlers, collection stride and pad imports.
+These are structural findings, not bone/pose/event semantics or gameplay tests.
+
+No animation converter, donor gameplay bank, right-stick default or preset-A
+change is enabled. Runtime smoothness, engine compatibility and PS3 behavior are
+unverified. RPCS3 NOT RUN; automatic/testing JB NOT BUILT. All game inputs remain
+unchanged. See ANIMATION_GAMEPLAY_PORT.md for native evidence and remaining work.
+
+# PR #30 merged compatibility audit
+
+Reviewed merge `fd9eae5d43f0dec436411661dcf99c52f326e562` in an isolated
+checkout with `tools/dev/verify.py --python <prepared Python 3.12 interpreter>`:
+**602 passed, 10 skipped, 2 deselected**. Compile, CLI/Qt smoke, Ruff, mypy,
+handoff and diff checks passed. Offscreen OpenGL and the absent optional native
+converter are skipped. Each of v1.16, v1.17, v1.18 and v1.19 is an ancestor.
+
+Nine added synthetic regressions pass. Full follow-up source verification with
+`python tools/dev/verify.py`: **612 passed, 9 skipped, 2 deselected**, all other
+portable checks passed. Final exact-head isolated results are posted on the
+follow-up PR. No production parser behavior changed in this audit.
+See [scope and retained feature coverage](PR30_COMPATIBILITY_REVIEW.md).
+No Windows package was rebuilt because dependencies, packaging and application
+code are unchanged. No RPCS3, gameplay, EBOOT editing or real/testing JB copy;
+small generated archive fixture outputs only. Unknown formats remain guarded.
+
+# v1.19 Reborn Overrides V5.5 import support (original submission evidence)
+# Player-face research verification
+
+Windows / Python 3.12.14 source `tools/dev/verify.py`: **607 passed, 9 skipped,
+2 deselected**; compile, CLI/Qt smoke, Ruff, mypy, generated handoff and diff
+checks passed. Four added synthetic cases cover selector masking and unchanged
+source, independent custom flags, biased-row morph tail bounds, rejection of NBA
+or other strides, and missing-bank reporting. Final exact-head isolated results
+are recorded on the research PR; optional native DLL absence adds an isolated skip.
+
+`python -m choops_py.research.player_faces <original CH2K8 source>` reads all five
+face banks and source roster with no unresolved banks: seven dedicated albedos,
+13 normal records, 75 facial-hair textures, shared heads/presets; 5,685 players,
+15 nonzero likeness selectors matching seven names, 5,670 generated selectors,
+zero custom flags/stored morph arrays. All seven albedos pass byte-identical
+DDS/GTF/DDS conversion in memory; extracted local face artwork visually inspected.
+EBOOT function-specific TOCs, selector branches, seeded generation and morph
+encode/decode loops were inspected read-only. No executable bytes are committed.
+
+NBA 2K9 donor container/scene structure inspected. The selected NBA 2K14 sample
+ZLIB variant and supplied 2K11 SDAT version/flags remain unsupported; these are
+not successful extraction/port tests. No face writer, EBOOT change, RPCS3,
+gameplay validation or real/testing JB; no Windows package/release requested.
+See [the findings and reproduction command](PLAYER_FACE_RESEARCH.md).
+# NBA 2K11 authenticated-reader and donor research
+
+Windows / Python 3.12.14 source `python tools/dev/verify.py`: **609 passed,
+9 skipped, 2 deselected**; compile, CLI/Qt smoke, Ruff, mypy, generated handoff
+and diff passed. `python -m pytest -q tests/test_sdat_2k14.py`: **8 passed**.
+Existing random reads/header/ciphertext/truncation tests now cover v3 and v4;
+metadata corruption, mixed encrypted/raw banks, write blocking and rejection of
+unknown versions/compressed/debug flags are covered. Six added parameter cases
+retain the original v4 checks. Final isolated exact-head results follow on the PR.
+
+Read-only supplied NBA 2K11: 6,974 archive entries, 72-byte descriptor/size64 TOC;
+both encrypted banks authenticate sparse beginning/interior/end/cross-block reads.
+Full standard-IFF header inventory has zero traversal errors. Generic animation
+inspection reports 4,705 SingleMoCap records and unchanged source metadata.
+Selected texture/SCNE/audio/roster/animation blocks decompress; floor f030 yields
+two preview meshes without warnings. Stadium s734 yields 21 supported arena parts
+and one unsupported UV part. Sample PNG high-detail vertices remain unsupported;
+bench geometry decodes. A 48-kHz stereo ATRAC3 effect exports 43,008 PCM16 WAV frames.
+ROST marker 0x225 is observed but no 2K11 roster editor enabled.
+
+Ratings are conversion judgments, not port/runtime tests. No track poses decoded,
+no direct cyberface/full-arena/HUD port, no Windows release/package requested,
+no EBOOT edits, RPCS3/gameplay or real/testing JB. Reports/artwork/audio stay local
+and excluded from Git. [Assessment and reproduction](NBA2K11_DONOR_ASSESSMENT.md).
+# Combined scorebug follow-up verification
+
+Private candidate: five SCNE reparses; 257 untouched gamedata records compare;
+two replacement IFFs prepare and pass preflight; matched English literals resolve;
+SELF payload round-trip and bounded executable diff pass. Nine synthetic wrapper
+paths cover visible/empty/transparent/opening/closing/missing-scene/wrong-layout
+conditions and preserve original callback inputs and stack/nonvolatile registers.
+No runtime appearance, game execution, physical PS3 or JB result is claimed.
+Public editor contract fixes and their portable tests are tracked in PR #32.
+This follow-up changes documentation only in PR #36.
+
+# Local executable experiment 01 — 2026-10-19
+
+Private-only prototypes generated and audited on Windows / Python 3.12.14,
+Capstone PPC64 big-endian and locally installed Keystone 0.9.2. Keystone is not
+an editor dependency. Original decoded ELF and retail SELF digests match after
+all work. Five variants pass allowlisted diff/header/branch and debug SELF payload
+round trips; the control ELF is identical. No game code is executed by these
+checks. 60,000 geometry samples cover both directions plus modern apex/corners/
+joins and old-circle equivalence; 30,000 transfer-mask cases preserve neighboring
+bits. Added instructions' register/TOC/stack/LR usage was reviewed.
+
+The companion reparses with 10 old text styles retained and two native labels
+added. Original decoded bytes and vertex data remain unchanged. Its relocated
+SCNE extends an unrelated inferred span over 44,720 abandoned original bytes;
+runtime acceptance is unverified and explicitly documented. Two-archive override
+preparation/preflight passes with zero unapplied overrides; ZIP integrity is
+checked locally. No automatic/testing JB, emulator, gameplay or physical-PS3 test.
+
+Public changes are documentation/handoff configuration only. Scoped exact-head
+handoff, Ruff, local-link and diff checks are recorded in the PR. Full runtime
+suites and packaging are not rerun and historical passes do not certify EBOOT.
+The cleanup preserves active tracked regression tests and user builds/inputs;
+broader historical package deletion remains approval-blocked.
+
+# Executable modernization research — 2026-10-19
+
+Documentation-only update on Windows / Python 3.12.14. Read-only ELF mapping,
+function-descriptor/TOC inspection and PPC64 big-endian Capstone disassembly
+followed named menu registrations. The bounded scan recorded 580 candidate
+strings / 75 TOC references; these are not an exhaustive executable analysis.
+Input digest matched before/after scanning. No game data or executable writes.
+Additional read-only assertions passed for both prior name-suppression branch
+sites, CameraMenu table/handler descriptors, Game Rules table/callback and
+non-file-backed camera state pointers; a second before/after digest matched.
+
+Scoped verification: generated handoff/check, Ruff for the changed handoff
+generator, local Markdown-link resolution and `git diff --check`. Exact committed
+head results are recorded in the PR. Runtime suites and Windows packaging were
+not rerun: no runtime/package code changed. Historical suite counts below do not
+validate the newly proposed executable candidates. No Ghidra, RPCS3/gameplay,
+executable patch, real/testing JB or release.
+# Experimental uniform mesh editing — verification
+
+Windows / Python 3.12.14. Targeted command:
+`python -m pytest tests/test_uniform_mesh.py tests/test_scene_preview.py tests/test_direct_asset_previews.py tests/test_cli.py -q`
+passed **42 tests**. The 15 new mesh/GUI cases cover byte-identical no-op import,
+position-only writes in matching SCNE/Clth, unchanged unknown records, stale
+manifests, UV/topology/count changes, nonfinite/excessive displacement, flipped
+triangles, missing/ambiguous rest matches, split seams, unsupported layouts,
+preset attachment regions and selected-source GUI dispatch.
+
+Read-only actual asset inventory and private output audit: **21 IFFs, 33 record
+pairs, 25,956 original rendered vertices**. All 21 no-op exports/reimports are
+byte-identical. Edited logical blocks differ only in intended XYZ bytes;
+unreferenced bytes, UVs, other attributes, constraints and record addresses stay
+unchanged. All **21 replacements prepare and pass build preflight**. Before/after
+rest-pose contact sheet inspected for all 18 distinct garment/build combinations.
+Source inputs unchanged. Local editable/override assets stay out of Git.
+
+Full portable verification uses `python tools/dev/verify.py --python PYTHON` and
+a temporary directory outside project output. Its first run exposed missing
+UUID imports in the new GUI methods; corrected and covered by direct selected-
+source dispatch. A run with fixtures inside output invalidated an existing
+output-safety test's premise; no production court behavior was changed for that
+test environment. Windows worker verification requires normal worker access.
+Final source portable verification passed **617 tests, 10 skips, 2 deselections**;
+compile, CLI/Qt startup, Ruff, mypy and generated handoff checks passed. New
+backend/test files also pass the full E/F/I Ruff selection. Exact-commit isolated
+verification is recorded in the PR handoff.
+
+Packed solver/collision and normal/tangent retargeting are NOT established.
+No external DCC roundtrip certification. RPCS3/gameplay: **NOT RUN**.
+Automatic/testing JB: **NOT BUILT**. No EBOOT change or release publication.
 
 # v1.19 Reborn Overrides V5.5 import support
 
@@ -2444,6 +4178,117 @@ evidence, not a game/runtime compatibility claim.
 
 `git diff --check` passed on the submitted source changes. No full test suite or
 package rebuild was run on the v1.19 branch in this update.
+# Unreleased Legacy save editor foundation
+
+Read-only inspection of the supplied 5,523,948-byte Legacy-mode save found a
+validated roster payload at offset `0x438`, length `0x003DF800`, followed by
+1,461,684 bytes of additional mode data. The embedded payload passed the current
+roster model's structural validation with 5,685 players, 379 arenas, 443 teams,
+1,373 coaches, 39 conferences and 988 uniform rows, with zero validation issues.
+The adapter's unchanged encode returned bytes identical to the input. No source
+save was edited; no saved output or JB was produced. The additional mode data's
+semantics remain unknown.
+
+`git diff --check` passed. No full test suite or package rebuild was run.
+# Native scorebug contract verification
+
+Targeted style/layout/localization suite: **23 passed**. New regressions reproduce
+parseable misaligned literal vectors and verify native width-fit edits preserve
+literal IDs, alignment flags and vertex payloads. Source portable verification: **628 passed, 9 skipped, 2 deselected**; compile,
+CLI/Qt, Ruff, mypy, handoff and diff checks passed. Exact-head isolated results
+are recorded in the current PR handoff.
+
+Ghidra is read-only format evidence, not a Python bug detector or an in-game test.
+No emulator, gameplay or automatic/testing JB is used. Private combined output
+has independent native ABI/branch/scene checks; it remains a runtime candidate.
+
+# Scorebug test05 verification
+
+Targeted style/layout/localization/native-font suite: **23 passed**. New regressions
+cover alpha restoration with unrelated properties/bones/events/payload unchanged,
+invalid alpha/RGB rejection, count-only native-label suppression and propagation
+through ordered mesh operations. Actual five-scene package prepares/preflights
+both required archives without unapplied DDS. Source portable verification: **626 passed, 9 skipped, 2 deselected**; compile,
+CLI/Qt, Ruff, mypy, handoff and diff passed. Exact-head isolated results are
+recorded in the PR handoff.
+
+Read-only built-archive analysis confirms test04 inputs were current; native code
+shows normal-game city-name suppression. Owner declined an executable patch and
+left names unresolved. Current scene/property checks do not certify gameplay or
+claim names have been fixed. No emulator launch, EBOOT write or new JB build.
+
+# Native test04 startup-crash correction candidate
+
+Read-only user log: asynchronous resource-loader PC 0x00845E14, access violation
+reading 0x4D4C0002, before HUD rendering. The failing thread contains added branding
+tokens. Built English content matches the supplied native test04 IFF. Its decoded
+block contains the old table plus an appended full replacement. Other build mods
+are present; neither universal mod compatibility nor a fully isolated gameplay
+root cause is claimed.
+
+Targeted layout/style/font/localization suite: **21 passed**. Regression checks
+require offset zero, one table, exact stored/logical-size equality and no H7A
+wrapper, plus rejection of prefix/alias/multiple-resource layouts. All old actual
+English translations remain byte-identical; new decoded size is old size +50 bytes.
+The corrected ZIP preserves gamedata bytes from native test04. Source portable verification: **624 passed, 9 skipped, 2 deselected**; compile,
+CLI/Qt, Ruff, mypy, handoff and diff passed. Corrected two-archive preparation and
+build preflight passed with zero unapplied DDS. Exact-head isolated results are
+recorded in the PR handoff.
+No emulator run, executable write or new game build; user runtime retest remains.
+
+# Test04 native branding follow-up
+
+Targeted layout/style/font/localization regressions: **20 passed**. Covers explicit
+ID low/high-float packing, preserved flags/vector tails, sorted localization insertion,
+opaque sentinel/old-pool preservation, malformed/duplicate/encoding rejection, safe
+IFF growth and rejection of changes to existing translations. Actual native-label
+style matches clock font alias, RGB, alpha and shadow values. All 21,637 existing
+localization rows and old token bytes are preserved; only one tagged literal is added.
+Two-archive override preparation/preflight passes with zero unapplied DDS.
+Source portable verification: **623 passed, 9 skipped, 2 deselected**; compile,
+CLI/Qt, Ruff, mypy, handoff and diff passed. Final exact-head isolated results
+are recorded on PR #32. No emulator, executable
+writes or native test04 JB built; runtime placement/visibility awaits user testing.
+
+# Scorebug test04 follow-up
+
+Targeted native style/layout/font checks: **15 passed**. New regressions distinguish
+value-before-type/key properties, preserve ABL bone references when callback names
+change, preserve all other original header bytes/payload, reject malformed font
+properties reject shared font-property writes and duplicate bindings, and restore an explicitly hidden draw's alpha. Actual scene-only overrides
+prepare/preflight successfully; five scenes, one archive, zero unapplied DDS.
+Source portable verification: **618 passed, 9 skipped, 2 deselected**; compile,
+CLI/Qt smoke, Ruff, mypy, handoff and diff passed. Exact-head isolated results
+are recorded on PR #32. Runtime names,
+font sizes, popup states and exact branding appearance remain for user testing.
+No RPCS3, EBOOT writes or test04 JB built.
+
+# Scorebug test03 follow-up
+
+Targeted layout/native font regressions: **11 passed**. Covers partial-draw
+preservation, gradient flattening, unchanged UVs on shear removal, text basis and
+translated-marker offsets, ordered edits, native glyph coverage/spacing and
+malformed glyph rejection. Local scene-only overrides prepare/preflight with
+one gamedata archive, five SCNEs and no unapplied DDS. All 257 other stock records
+and all scene block sizes remain identical. Source portable verification: **614 passed, 9 offscreen GL skips, 2 deselected**;
+compile/CLI/Qt/Ruff/mypy/handoff checks passed. Exact-head isolated verification
+is recorded on PR #32. An initial sandbox run could not create pytest temporary
+fixtures; rerunning with normal filesystem permissions passed. Runtime text/meter/popup behavior is not
+certified; no emulator, executable writes or new JB build.
+
+# Scorebug test02 follow-up
+
+Portable Windows/Python 3.12.14 verification: **608 passed, 9 offscreen GL skips,
+2 deselected**; compile, CLI/Qt, Ruff, mypy, handoff and diff passed.
+Scene-only overrides prepared/preflighted successfully with zero unapplied DDS.
+Final exact-head isolated review is recorded on the PR.
+
+Synthetic layout regressions cover vertex/UV/color/alpha/depth changes, preserved
+unknown interleaved data, paired text matrices/markers, invalid-target rejection,
+restart-strip topology and inventory of sixth-man text anchors. Actual static
+asset checks preserve all 258 unedited gamedata records and scene block sizes.
+No runtime placement, popup visibility or font behavior is certified. See the
+scorebug research and PR for exact final-head checks and local artifact evidence.
 
 # v1.19 compatibility verification
 

@@ -1,5 +1,9 @@
 # Native GUI
 
+Models / Courts > **Uniform meshes…** exports source-selected OBJ cages, prepares
+experimental shorter shorts/fitted jerseys, and reimports an edited collection.
+See [mesh editing and runtime limits](UNIFORM_MESH_EDITING.md).
+
 v1.11 provides side tabs for every roster category, including school palettes,
 footwear edit/preview and linked jersey preview. Player School changes assignment
 safely. Neck/shorts dropdowns in Models/Courts render top and shorts together or

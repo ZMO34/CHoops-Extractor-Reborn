@@ -1,5 +1,13 @@
 # Modern-feature backport feasibility for College Hoops 2K8
 
+Follow-up, 2026-10-19: [executable modernization research](EBOOT_MODERNIZATION_RESEARCH.md)
+adds verified menu-handler/TOC routes and ranks small executable candidates.
+Scorebug PR #32 has since traced live native name/style providers and developed
+authored layout tooling; its normal-game name suppression remains unresolved
+under the owner's read-only EBOOT decision. The older matrix below records the
+2026-10-17 baseline and must not supersede that newer, separately scoped evidence.
+No patch or new runtime feature is implemented by either assessment.
+
 Research assessment, 2026-10-17. No gameplay feature, asset port, executable patch
 or new alternate asset is implemented by this document. This targets **PS3 College
 Hoops 2K8**, not an assumed interchangeable NBA 2K8 binary. Confidence below is
@@ -14,7 +22,11 @@ indirect feature reproduces part of the experience in the editor or an external
 workflow. A new engine feature requires executable/runtime logic, not just an IFF
 record with a similar name. EBOOT remains read-only; no emulator is launched.
 
-Our supplied donor evidence is PS3 NBA 2K9 and PS3 NBA 2K14. No modern Gen9 asset
+The [NBA 2K11 donor follow-up](NBA2K11_DONOR_ASSESSMENT.md) adds authenticated v3
+archive access, actual resource samples and per-category ratings. It supersedes
+the earlier 2K11 access blocker, not the requirement for conversion/consumer evidence.
+
+Our supplied donor evidence now includes PS3 NBA 2K9, 2K11 and 2K14. No modern Gen9 asset
 sample was inspected. PS3 2K14 must not be confused with PS4/Gen9 variants or taken
 as a bridge that automatically makes present-day resources compatible.
 

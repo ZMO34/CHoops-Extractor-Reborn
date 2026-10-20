@@ -1,4 +1,4 @@
-"""Authenticated, bounded read-only NPD v4 SDAT stream (observed flags 0x0100003c).
+"""Authenticated, bounded read-only NPD v3/v4 SDAT (observed flags 0x0100003c).
 
 Format reference: RPCS3 Crypto/unedat.cpp and key_vault.h. No emulator is used.
 Unsupported compression/debug/other flag combinations are rejected.
@@ -11,6 +11,7 @@ from collections import OrderedDict
 
 SDAT_KEY = bytes.fromhex('0d655ef8e674a98ab8505cfa7d012933')
 WRAP_KEY = bytes.fromhex('4ca9c14b01c95309969bec68aa0bc081')
+WRAP_KEY_V3 = bytes.fromhex('be959ca8308defa2e5e180c63712a9ae')
 
 
 class SDATReader(io.RawIOBase):
@@ -25,8 +26,9 @@ class SDATReader(io.RawIOBase):
                 raise ValueError('Invalid SDAT header')
             version = struct.unpack_from('>I', header, 4)[0]
             flags, self.block_size, self.size = struct.unpack_from('>IIQ', header, 128)
-            if version != 4 or flags != 0x0100003c:
+            if version not in (3,4) or flags != 0x0100003c:
                 raise ValueError('Unsupported SDAT version/flags; compressed/debug EDAT is not supported')
+            self.wrap_key = WRAP_KEY_V3 if version == 3 else WRAP_KEY
             if not 16 <= self.block_size <= 1024*1024 or self.block_size % 16 or not self.size:
                 raise ValueError('Invalid SDAT block size/length')
             self.blocks = (self.size+self.block_size-1)//self.block_size
@@ -37,7 +39,7 @@ class SDATReader(io.RawIOBase):
             self.key = bytes(a ^ b for a, b in zip(header[96:112], SDAT_KEY))
             self.dev = header[96:108]
             self.iv = header[64:80]
-            header_key = AES.new(WRAP_KEY, AES.MODE_CBC, bytes(16)).decrypt(self.key)
+            header_key = AES.new(self.wrap_key, AES.MODE_CBC, bytes(16)).decrypt(self.key)
             check = CMAC.new(header_key, ciphermod=AES)
             check.update(header[:160])
             if not hmac.compare_digest(check.digest(), header[160:176]):
@@ -78,8 +80,8 @@ class SDATReader(io.RawIOBase):
         cipher = AES.new(self.key, AES.MODE_ECB)
         key = cipher.encrypt(self.dev+struct.pack('>I', index))
         hashed = cipher.encrypt(key)
-        key = AES.new(WRAP_KEY, AES.MODE_CBC, bytes(16)).decrypt(key)
-        hashed = AES.new(WRAP_KEY, AES.MODE_CBC, bytes(16)).decrypt(hashed)
+        key = AES.new(self.wrap_key, AES.MODE_CBC, bytes(16)).decrypt(key)
+        hashed = AES.new(self.wrap_key, AES.MODE_CBC, bytes(16)).decrypt(hashed)
         expected = bytes(a ^ b for a, b in zip(metadata[:16], metadata[16:]))+metadata[16:20]
         if not hmac.compare_digest(hmac.new(hashed+bytes(4), data, hashlib.sha1).digest(), expected):
             raise ValueError('SDAT block authentication failed at '+str(index))

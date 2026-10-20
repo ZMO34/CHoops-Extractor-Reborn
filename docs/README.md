@@ -23,6 +23,14 @@ historical claims that all related games behave identically.
 [Modern-feature backport feasibility](MODERN_FEATURE_BACKPORTS.md) separates
 existing asset/data routes, animation conversion research, companion workflows
 and changes requiring new runtime systems.
+[NBA 2K11 donor ratings](NBA2K11_DONOR_ASSESSMENT.md) report actual archive/asset
+inspection and distinguish useful conversion sources from unproven direct ports.
+
+[Executable modernization research](EBOOT_MODERNIZATION_RESEARCH.md) ranks small
+EBOOT candidates using named code paths, separating confirmed routes from
+unverified camera, rules, timing and save semantics. EBOOT remains read-only.
+The subsequent [local executable experiment](EBOOT_EXPERIMENT_01.md) is a narrow
+owner-authorized exception using separate copies; patching is not in the editor.
 
 ## Development and evidence
 
@@ -37,6 +45,8 @@ Format evidence: [shared PS3 archives](PS3_2K_ARCHIVES.md),
 [arena shader masks](ARENA_SHADER_MASKS.md), [conference assets](CONFERENCE_ASSETS.md),
 [texture conversion](TEXTURE_CONVERSION.md), [audio research](AUDIO_RESEARCH.md),
 [scorebug research](SCOREBUG_RESEARCH.md), [animation portability](ANIMATION_PORTABILITY.md).
+[Player-face research](PLAYER_FACE_RESEARCH.md) maps College Hoops generated faces,
+the seven dedicated likeness slots and the limits on borrowing NBA cyberfaces.
 Unknown bits, shader modes, text ceilings and animation tracks remain research
 until the evidence and preserving writer tests exist.
 
@@ -59,3 +69,5 @@ into binary tests without removing its assertions. Remaining suites cover suppor
 behavior or explicitly optional research; age alone is not a reason to delete them.
 Local cleanup removes only identified generated caches/build intermediates, never
 source games, supplied overrides, user builds or private research evidence.
+
+Animation gameplay port scope and native evidence: [implementation ledger](ANIMATION_GAMEPLAY_PORT.md).

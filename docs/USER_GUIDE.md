@@ -212,6 +212,12 @@ original wrapper, including other members of a loaded save ZIP. USERDATA export
 does not create encryption, PARAM files, or a complete console save package.
 All writers validate and reparse the result and protect the original input.
 
+The observed Legacy-mode `USERDATA` save can also be opened in Roster / Legacy
+save editor. The first supported view edits confirmed fields in its embedded
+roster. Save copy preserves the complete file and all surrounding Legacy-mode
+bytes; size-changing text edits are blocked. Mode-specific season, recruiting,
+and progression fields remain read-only until their storage is mapped.
+
 ## Resizable 3D preview
 
 Models / Courts reserves more height for the full-width preview. Drag the wide

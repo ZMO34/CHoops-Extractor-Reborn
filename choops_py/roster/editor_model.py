@@ -145,6 +145,8 @@ class EditorModel:
             rel=STRING_FIELDS[table][field];pos=off+rel;delta=struct.unpack_from('>i',self.data,pos)[0]
             target=pos+delta-1
             encoded=str(value).encode('utf-16-be');old=str(old_value).encode('utf-16-be')
+            if self.source.kind=='legacy-save' and len(encoded)!=len(old):
+                raise ToolError('legacy_save_text_growth_blocked','Legacy save edits must keep this roster string at its current UTF-16 length')
             from .text_limits import TEXT_DESCRIPTOR_MAX
             if len(encoded)//2 > TEXT_DESCRIPTOR_MAX:
                 raise ToolError('roster_text_descriptor_overflow', f'Shared game formatter represents at most {TEXT_DESCRIPTOR_MAX:,} UTF-16 units')

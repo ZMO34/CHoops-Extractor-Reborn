@@ -45,6 +45,19 @@ def execute(a):
     if hasattr(a,'output'):
         validator=build_destination if c=='build-copy' else safe_output
         a.output=validator(a.output,sources)
+    if c in ('export-uniform-models','modern-fit-uniforms','import-uniform-models',
+             'export-uniform-iff','import-uniform-iff'):
+        from .modding import uniform_mesh
+        if c == 'export-uniform-iff':return uniform_mesh.export_iff(a.input,a.output)
+        if c == 'import-uniform-iff':return uniform_mesh.import_iff(a.input,a.edited,a.output)
+        if c == 'import-uniform-models':return uniform_mesh.import_folder(a.edited,a.output)
+        from .archive.usrdir_reader import Archive
+        return uniform_mesh.export_archive(Archive(a.source),a.output,modern=c=='modern-fit-uniforms')
+    if c == 'inspect-animation-links':
+        from .formats.motion_envelope import inspect_links
+        result = inspect_links(Path(a.input).read_bytes(), a.profile)
+        save_json(a.output, result, [a.input])
+        return result
     if c in ('inspect-animations', 'export-animations'):
         from .formats.animations import inspect_animations
         raw = Path(a.input).read_bytes()

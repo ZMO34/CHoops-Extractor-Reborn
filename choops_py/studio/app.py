@@ -1385,14 +1385,14 @@ class Window(QMainWindow):
     def create_roster(self):
 
         layout = self.page(
-            "Roster editor",
-            "Edit supported roster and conference records. Save a copy, reopen it, then select it as an override for a separate JB build.",
+            "Roster / Legacy save editor",
+            "Edit confirmed roster fields in roster files or the embedded roster in a Legacy-mode USERDATA save. Save a copy; unsupported Legacy-mode state is preserved.",
         )
 
         self.buttons(
             layout,
             [
-                ("Open USERDATA / roster IFF…", self.choose_roster),
+                ("Open roster / Legacy save…", self.choose_roster),
                 ("Load from JB", self.load_game_roster),
                 ("Load from overrides", lambda: self.load_game_roster(True)),
                 ("Undo", self.undo_roster),
@@ -1482,7 +1482,7 @@ class Window(QMainWindow):
     def choose_roster(self):
 
         path, _ = QFileDialog.getOpenFileName(
-            self, "Open decrypted USERDATA / USRDATA or roster IFF", "", "Roster and save files (*.iff *.rost *.zip);;All files (*)"
+            self, "Open roster or Legacy-mode save", "", "Roster and save files (*.iff *.rost *.zip USERDATA* *USERDATA*);;All files (*)"
         )
 
         if path:
@@ -1588,6 +1588,7 @@ class Window(QMainWindow):
         self.roster_state.setText(
             f"{len(model.rows['players']):,} players • {len(model.edits)} unsaved edits"
             +(f' • {warnings} unchanged source string warnings' if warnings else '')
+            +(' • Legacy save: only the embedded roster is editable; other mode data is preserved' if model.source.kind=='legacy-save' else '')
         )
 
     def pick_rgba(self, value, parent):
@@ -1728,7 +1729,7 @@ class Window(QMainWindow):
         if not self.roster:
             return
 
-        filename={'save-zip':'roster_edited.zip','userdata':'USERDATA','raw-rost':'roster_edited.rost','tool-wrapper':'roster_edited.rost'}.get(self.roster.source.kind,'roster_english.iff')
+        filename={'save-zip':'roster_edited.zip','userdata':'USERDATA','legacy-save':'USERDATA_legacy_edited','raw-rost':'roster_edited.rost','tool-wrapper':'roster_edited.rost'}.get(self.roster.source.kind,'roster_english.iff')
         output, _ = QFileDialog.getSaveFileName(
             self,
             "Save roster copy under output/",
@@ -1781,6 +1782,14 @@ class Window(QMainWindow):
         self.scene_splitter.setStretchFactor(1,1)
         page_layout.addWidget(self.scene_splitter,1)
         self.buttons(layout, [("Preview selected SCNE", self.inspect_scene), ("Prepare single-texture court…", self.prepare_court_template)])
+        from PySide6.QtWidgets import QMenu
+        uniform_mesh_button=QPushButton('Uniform meshes…')
+        uniform_mesh_menu=QMenu(uniform_mesh_button)
+        uniform_mesh_menu.addAction('Export all editable uniform models',lambda:self.uniform_mesh_export(False))
+        uniform_mesh_menu.addAction('Prepare experimental modern fit',lambda:self.uniform_mesh_export(True))
+        uniform_mesh_menu.addAction('Reimport edited uniform models…',self.uniform_mesh_import)
+        uniform_mesh_button.setMenu(uniform_mesh_menu)
+        layout.addWidget(uniform_mesh_button)
         self.scene_school=QComboBox();self.scene_school.addItem('Automatic school association',None)
         self.scene_school.currentIndexChanged.connect(lambda _:self.select_scene_part() if getattr(self,'scene_meshes',None) else None)
         layout.addWidget(self.scene_school)
@@ -1985,6 +1994,30 @@ class Window(QMainWindow):
             self.scene_parts.clear();self.scene_textures.clear()
             self.show_scene_preview(result,source)
         self.run_job('Preview shoe geometry and artwork',lambda job:inspect_shoe_preview(archive,entry,job),display,cancellable=True)
+
+    def uniform_mesh_export(self, modern=False):
+        if self.active or not self.archive:return
+        import uuid
+        from ..modding.uniform_mesh import export_archive
+        try:archive=self.preview_archive()
+        except ValueError as error:return self.show_error(str(error))
+        output=OUTPUT/'uniform-models'/uuid.uuid4().hex[:10]
+        def display(result):
+            self.model_details.setPlainText(str(output)+'\n'+result['warning'])
+            QMessageBox.information(self,'Uniform models exported',str(output)+'\n\n'+result['warning'])
+        self.run_job('Prepare uniform mesh collection',lambda job:export_archive(archive,output,modern,job),display,cancellable=True)
+
+    def uniform_mesh_import(self):
+        if self.active:return
+        import uuid
+        folder=QFileDialog.getExistingDirectory(self,'Select exported collection containing originals and models')
+        if not folder:return
+        from ..modding.uniform_mesh import import_folder
+        output=OUTPUT/'uniform-imports'/uuid.uuid4().hex[:10]
+        def display(result):
+            self.model_details.setPlainText(str(output)+'\n'+result['warning'])
+            QMessageBox.information(self,'Uniform overrides prepared',str(output)+'\n\n'+result['warning'])
+        self.run_job('Reimport edited uniform models',lambda job:import_folder(folder,output,job),display,cancellable=True)
 
     def refresh_uniform_list(self):
         import re

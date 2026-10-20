@@ -14,8 +14,13 @@ certifies game/runtime compatibility. Unknown variants fail explicitly.
 | CSV / selective comparison import | Supported confirmed College Hoops fields | Not a general NBA bulk editor | Not a general NBA bulk editor |
 | Full unknown-byte semantics / engine ceilings | Incomplete; unknown bits retained | Incomplete | Incomplete |
 | Animation banks | Inventory/research | Inventory/portability research | Inventory/portability research |
+| Uniform geometry editing | Experimental source-bound OBJ/rest-position workflow; known cloth only | Unsupported | Unsupported |
 
 ## Shared features
+
+NBA 2K11 has additional **research-only read/extraction evidence** for the observed
+NPD v3 SDAT/72-byte descriptor copy. No 2K11 roster editor or SDAT build writer is
+enabled. [Donor evidence and limits](NBA2K11_DONOR_ASSESSMENT.md).
 
 - Explorer reads nested records and researched asset references; labels never make
   an unknown hash an established semantic identity.

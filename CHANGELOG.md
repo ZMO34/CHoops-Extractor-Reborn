@@ -1,3 +1,110 @@
+## Unreleased — pending updates and native animation inspection
+
+- Consolidate pending Legacy-save, override, face, NBA reader, scorebug and
+  uniform-editing updates, preserving their limitations and branch ancestry.
+- Resolve 21 native animation bank names and classify them in Explorer.
+- Fix inventory skipping banks above 10,000 records; include 2K14's main bank.
+- Add bounded native motion-envelope/collection and local alias-link inspection.
+- Document Ghidra input/animation routes. No donor gameplay port or new controls
+  are represented as implemented or runtime tested.
+
+# Unreleased — merged override compatibility audit
+
+- Verify PR #30 retains the v1.16-v1.19 feature history and existing regression suite.
+- Add regression coverage for numeric/named override folders, DDS priority, legacy record aliases and opaque BIN relocation without changing existing import policies.
+# Unreleased — player-face research
+
+- Document the seven dedicated College Hoops likeness slots, generated-face routing, paired texture/preset banks and cross-game conversion limits.
+- Add a read-only face inventory command with synthetic bounds/family/preservation checks; no face editor or EBOOT changes.
+# Unreleased — NBA 2K11 donor research
+
+- Read the observed v3 SDAT variant with version-specific key selection and retained authentication; keep SDAT output blocked.
+- Document actual NBA 2K11 asset/animation samples and donor suitability ratings; no gameplay, face or animation port implemented.
+## Unreleased — native scorebug text contracts
+
+- Reject misaligned SCNE text/property tables that native vector loads cannot read
+  as intended, even when Python parsing succeeds.
+- Add bounded native text `max_width` edits, preserving literal/alignment flags
+  and the authored property type. Keep private executable experiments separate.
+
+## Unreleased — scorebug test05
+
+- Remove HUD dividers and relocate obsolete depth masks away from the new layout.
+- Restore authored palette vertex values; retain enlarged logos and clock/score
+  sizes. Center popup text, restore its alpha and align its black backing.
+- Use one native sixth-man label; move native title-case branding to the bottom
+  bar's default-text route. Enlarge all 19 live meter segments within the header.
+- Add bounded native text alpha/RGB editing and count-only label-loop suppression.
+- Correct earlier live-team-name claims: native normal-game callbacks suppress
+  names. Owner chose to retain read-only EBOOT and leave names unresolved.
+
+## Unreleased — native test04 startup correction
+
+- Replace the experimental duplicated compressed English heap with a single
+  uncompressed localization resource at offset zero. Preserve old translations,
+  resource metadata, NAME trailer and native title-case branding ID.
+- Reject localization compaction when unknown prefix bytes or other resources
+  could be moved. Add regressions for the native direct-read descriptor contract.
+- Record user-provided startup crash evidence and the remaining runtime uncertainty.
+
+## Unreleased — test04 native branding follow-up
+
+- Route title-case College Hoops / Reborn through the existing native label renderer
+  using an isolated tagged English literal ID and matching clock font/style values.
+- Guarded English loc-system extension preserves every existing token/ID/sentinel;
+  recognize the researched TXT loc-system type and validate independent IFF growth.
+- Preserve the native sixth-man visibility contract; the small left label now uses
+  native-glyph artwork. No executable/font-bank hook or gameplay certification.
+
+## Unreleased — scorebug test04
+
+- Bounded native SCNE font-style inspection and edits, with independent live text
+  callback names and preserved scene/bone references.
+- Local test layout connects live school names, selects larger native font styles,
+  uses narrow gray separators and opaque popup/header backing, and changes branding
+  to title case with native glyph/color/shadow artwork. Exact live-font rendering
+  remains unresolved; no new runtime/executable hook is implemented.
+
+## Unreleased — scorebug test03
+
+- Bounded HUD part ranges, ordered edits, shear removal, uniform vertex RGB and
+  authored text basis scaling with translated-marker preservation.
+- Native FONT glyph artwork composition using recorded bearings/advances and
+  coverage, without installing substitute fonts or modifying the font bank.
+- Documented local test03 layout: continuous backing/panel joins, adjusted logos,
+  palettes, sixth-man enclosure, message backing and native static lettering.
+  Runtime placement remains for user testing; no new application release.
+
+# Unreleased
+
+- Add bounded experimental authored HUD geometry/UV/color/text-anchor editing and sixth-man/text inventory.
+- Document scorebug test02 corrections and runtime boundaries; derived user-test assets remain local, not distributed through Git.
+## Unreleased — combined executable experiment correction evidence
+
+- Document native property alignment and marker-identity defects in the broken
+  prototype; keep the prior multi-variant result explicitly historical.
+- Record one private combined candidate with native stats parsing, conditional
+  backing and retained arc/transfer experiments. No patching is added to the tool.
+- Record static checks and runtime acceptance limits without claiming visual QA.
+
+# Unreleased — executable modernization research
+
+- Record owner-authorized private experimental copies for modern NCAA arc/corner
+  scoring, native HUD names and new-transfer sit-out assignment; maintain immutable
+  originals and document unverified runtime/packaging limits. No editor patching.
+- Document verified generated-fixture/cache/review-checkout cleanup and the blocked
+  historical-package deletion; retain current regression source coverage.
+- Document read-only CameraMenu, Game Rules, replay, indicator and autosave routes;
+  rank practical modernization candidates and reject unsupported constant guesses.
+- Carry forward the native scorebug name-fallback evidence from separate PR #32
+  while preserving the owner's decision against executable changes.
+- No runtime/editor feature, executable patch or release added.
+## Unreleased — experimental uniform mesh editing
+
+- Add source-aware editable OBJ uniform collections, guarded reimport and a modern-fit rest-shape preset in Models / Courts and CLI.
+- Cover five necklines, three body builds and three shorts shapes across all 21 supplied cloth archives / 33 records.
+- Preserve topology, UVs, unknown streams and native constraints; update matching SCNE/Clth rest positions only. Runtime fit remains experimental.
+
 # v1.19
 
 - Apply folder single-face cubemap compatibility consistently to Python manifests and paired CDF imports; preserve five base faces and report +X updates.
