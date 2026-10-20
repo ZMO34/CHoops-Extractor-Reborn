@@ -10,6 +10,33 @@ from ..formats.standard_iff_writer import record,record_blocks,replace_records_e
 from ..formats.tool_wrapper import unwrap,wrap
 from ..archive.manifests import digest
 from ..core.errors import ToolError
+
+LEGACY_SAVE_SIGNATURE=bytes.fromhex('00000006000000040000000100000001')
+LEGACY_SAVE_ROSTER_OFFSET=0x438
+LEGACY_SAVE_ROSTER_SIZE=0x003df800
+LEGACY_SAVE_TABLES={
+    'players':(5685,308),'arenas':(379,28),'teams':(443,704),
+    'coaches':(1373,44),'conferences':(39,2964),'uniforms':(988,8),
+}
+
+
+def _legacy_save_roster(data):
+    """Return the confirmed embedded roster slice for the observed Legacy save."""
+    if not data.startswith(LEGACY_SAVE_SIGNATURE):return None
+    end=LEGACY_SAVE_ROSTER_OFFSET+LEGACY_SAVE_ROSTER_SIZE
+    if len(data)<end:raise ToolError('truncated_legacy_save','Legacy save ends before its embedded roster region')
+    payload=data[LEGACY_SAVE_ROSTER_OFFSET:end]
+    try:
+        from .schema import detect_tables
+        tables=detect_tables(payload)
+    except (ValueError,IndexError) as error:
+        raise ToolError('invalid_legacy_save_roster','Embedded roster table directory is invalid') from error
+    actual={name:(count,stride) for name,(_,count,stride) in tables.items()}
+    if actual!=LEGACY_SAVE_TABLES:
+        raise ToolError('unsupported_legacy_save_layout','Embedded roster table profile differs from the observed Legacy save')
+    return payload
+
+
 @dataclass
 class RosterSource:
     kind: str
@@ -21,7 +48,13 @@ class RosterSource:
     wrapper_type: int | None = None
     zip_member: str | None = None
     inner: object = None
+    legacy_save_offset: int | None = None
     def encode(self,payload):
+        if self.kind=='legacy-save':
+            if len(payload)!=len(self.payload):
+                raise ToolError('legacy_save_size_change_blocked','Legacy save edits must keep the embedded roster size unchanged')
+            start=self.legacy_save_offset
+            return self.original[:start]+payload+self.original[start+len(self.payload):]
         if len(payload)!=len(self.payload):
             if self.kind=='standard-iff':
                 from .uniforms import encode_roster_iff
@@ -54,6 +87,9 @@ class RosterSource:
 
 def load_bytes(data,path=''):
     if len(data)>64*1024*1024:raise ToolError('roster_too_large','Roster adapter caps input at 64 MiB')
+    embedded=_legacy_save_roster(data)
+    if embedded is not None:
+        return RosterSource('legacy-save',data,embedded,path,legacy_save_offset=LEGACY_SAVE_ROSTER_OFFSET)
     if data[:4]==bytes.fromhex('ff3bef94'):
         iff=StandardIFF(data);rec=next((r for r in iff.records if r['type']=='ROST'),None)
         if not rec:raise ToolError('roster_not_found','IFF contains no ROST record')

@@ -21,6 +21,12 @@ attributes buttons are removed. [Research evidence](PLAYER_QOL_RESEARCH.md).
 
 Open the GUI Roster Editor and choose roster_english.iff, raw ROST, decrypted USERDATA, a type-21 tool wrapper, or a decrypted ZIP containing exactly one USERDATA. Encrypted saves are not decrypted by this tool.
 
+Roster / Legacy save editor also recognizes the observed Legacy-mode USERDATA
+layout. It edits the validated roster region in place and preserves the mode
+header and trailing state bytes. The full Legacy-mode state is not yet decoded;
+unknown fields remain unchanged. Text edits must keep their current UTF-16 byte
+length so the outer save layout cannot shift.
+
 Players, teams, schools, arenas, coaches, conferences and uniforms have searchable
 views. Long operations run off the Qt GUI thread. Confirmed ratings, appearance/
 equipment, RGB palette choices and shoes are editable with undo/redo. Save copies

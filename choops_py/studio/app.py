@@ -1385,14 +1385,14 @@ class Window(QMainWindow):
     def create_roster(self):
 
         layout = self.page(
-            "Roster editor",
-            "Edit supported roster and conference records. Save a copy, reopen it, then select it as an override for a separate JB build.",
+            "Roster / Legacy save editor",
+            "Edit confirmed roster fields in roster files or the embedded roster in a Legacy-mode USERDATA save. Save a copy; unsupported Legacy-mode state is preserved.",
         )
 
         self.buttons(
             layout,
             [
-                ("Open USERDATA / roster IFF…", self.choose_roster),
+                ("Open roster / Legacy save…", self.choose_roster),
                 ("Load from JB", self.load_game_roster),
                 ("Load from overrides", lambda: self.load_game_roster(True)),
                 ("Undo", self.undo_roster),
@@ -1482,7 +1482,7 @@ class Window(QMainWindow):
     def choose_roster(self):
 
         path, _ = QFileDialog.getOpenFileName(
-            self, "Open decrypted USERDATA / USRDATA or roster IFF", "", "Roster and save files (*.iff *.rost *.zip);;All files (*)"
+            self, "Open roster or Legacy-mode save", "", "Roster and save files (*.iff *.rost *.zip USERDATA* *USERDATA*);;All files (*)"
         )
 
         if path:
@@ -1588,6 +1588,7 @@ class Window(QMainWindow):
         self.roster_state.setText(
             f"{len(model.rows['players']):,} players • {len(model.edits)} unsaved edits"
             +(f' • {warnings} unchanged source string warnings' if warnings else '')
+            +(' • Legacy save: only the embedded roster is editable; other mode data is preserved' if model.source.kind=='legacy-save' else '')
         )
 
     def pick_rgba(self, value, parent):
@@ -1728,7 +1729,7 @@ class Window(QMainWindow):
         if not self.roster:
             return
 
-        filename={'save-zip':'roster_edited.zip','userdata':'USERDATA','raw-rost':'roster_edited.rost','tool-wrapper':'roster_edited.rost'}.get(self.roster.source.kind,'roster_english.iff')
+        filename={'save-zip':'roster_edited.zip','userdata':'USERDATA','legacy-save':'USERDATA_legacy_edited','raw-rost':'roster_edited.rost','tool-wrapper':'roster_edited.rost'}.get(self.roster.source.kind,'roster_english.iff')
         output, _ = QFileDialog.getSaveFileName(
             self,
             "Save roster copy under output/",

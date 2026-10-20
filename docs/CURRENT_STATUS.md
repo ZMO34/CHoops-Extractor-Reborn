@@ -1,5 +1,11 @@
 # v1.19 rebuild compatibility follow-up
 
+Unreleased Legacy save support recognizes the observed 2K8 `USERDATA` profile and
+exposes its embedded roster through the roster editor. The copy writer is fixed-
+extent and verifies every byte outside that region remains unchanged. Legacy-mode
+state after the embedded roster is still unmapped and read-only; a single save
+cannot establish the meaning of those fields.
+
 Folder DDS imports now consistently support a flat image targeting an existing
 cubemap in both legacy and Python-manifest paths (standard IFF and CDF). This
 updates +X and preserves the other five base faces; complete cubes still replace
