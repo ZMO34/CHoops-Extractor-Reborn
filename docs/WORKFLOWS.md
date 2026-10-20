@@ -1,5 +1,13 @@
 # Practical workflows
 
+## Edit uniform fit
+
+Use Models / Courts > **Uniform meshes…** to export all supported garments or
+prepare the experimental modern-fit collection. OBJ cages and originals remain
+separate from ready IFF overrides. Reimport validates topology, UVs, source hash
+and cloth seam correspondence. The [mesh workflow](UNIFORM_MESH_EDITING.md)
+documents CLI commands and unresolved runtime cloth/collision behavior.
+
 ## Select a game and overrides
 
 Open the source JB, PS3_GAME or USRDIR in Explorer. Detection is based on verified

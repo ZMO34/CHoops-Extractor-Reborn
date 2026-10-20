@@ -1782,6 +1782,14 @@ class Window(QMainWindow):
         self.scene_splitter.setStretchFactor(1,1)
         page_layout.addWidget(self.scene_splitter,1)
         self.buttons(layout, [("Preview selected SCNE", self.inspect_scene), ("Prepare single-texture court…", self.prepare_court_template)])
+        from PySide6.QtWidgets import QMenu
+        uniform_mesh_button=QPushButton('Uniform meshes…')
+        uniform_mesh_menu=QMenu(uniform_mesh_button)
+        uniform_mesh_menu.addAction('Export all editable uniform models',lambda:self.uniform_mesh_export(False))
+        uniform_mesh_menu.addAction('Prepare experimental modern fit',lambda:self.uniform_mesh_export(True))
+        uniform_mesh_menu.addAction('Reimport edited uniform models…',self.uniform_mesh_import)
+        uniform_mesh_button.setMenu(uniform_mesh_menu)
+        layout.addWidget(uniform_mesh_button)
         self.scene_school=QComboBox();self.scene_school.addItem('Automatic school association',None)
         self.scene_school.currentIndexChanged.connect(lambda _:self.select_scene_part() if getattr(self,'scene_meshes',None) else None)
         layout.addWidget(self.scene_school)
@@ -1986,6 +1994,30 @@ class Window(QMainWindow):
             self.scene_parts.clear();self.scene_textures.clear()
             self.show_scene_preview(result,source)
         self.run_job('Preview shoe geometry and artwork',lambda job:inspect_shoe_preview(archive,entry,job),display,cancellable=True)
+
+    def uniform_mesh_export(self, modern=False):
+        if self.active or not self.archive:return
+        import uuid
+        from ..modding.uniform_mesh import export_archive
+        try:archive=self.preview_archive()
+        except ValueError as error:return self.show_error(str(error))
+        output=OUTPUT/'uniform-models'/uuid.uuid4().hex[:10]
+        def display(result):
+            self.model_details.setPlainText(str(output)+'\n'+result['warning'])
+            QMessageBox.information(self,'Uniform models exported',str(output)+'\n\n'+result['warning'])
+        self.run_job('Prepare uniform mesh collection',lambda job:export_archive(archive,output,modern,job),display,cancellable=True)
+
+    def uniform_mesh_import(self):
+        if self.active:return
+        import uuid
+        folder=QFileDialog.getExistingDirectory(self,'Select exported collection containing originals and models')
+        if not folder:return
+        from ..modding.uniform_mesh import import_folder
+        output=OUTPUT/'uniform-imports'/uuid.uuid4().hex[:10]
+        def display(result):
+            self.model_details.setPlainText(str(output)+'\n'+result['warning'])
+            QMessageBox.information(self,'Uniform overrides prepared',str(output)+'\n\n'+result['warning'])
+        self.run_job('Reimport edited uniform models',lambda job:import_folder(folder,output,job),display,cancellable=True)
 
     def refresh_uniform_list(self):
         import re

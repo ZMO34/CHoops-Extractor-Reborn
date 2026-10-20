@@ -89,6 +89,11 @@
 - Carry forward the native scorebug name-fallback evidence from separate PR #32
   while preserving the owner's decision against executable changes.
 - No runtime/editor feature, executable patch or release added.
+## Unreleased — experimental uniform mesh editing
+
+- Add source-aware editable OBJ uniform collections, guarded reimport and a modern-fit rest-shape preset in Models / Courts and CLI.
+- Cover five necklines, three body builds and three shorts shapes across all 21 supplied cloth archives / 33 records.
+- Preserve topology, UVs, unknown streams and native constraints; update matching SCNE/Clth rest positions only. Runtime fit remains experimental.
 
 # v1.19
 
