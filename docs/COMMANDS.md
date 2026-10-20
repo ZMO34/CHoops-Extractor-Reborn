@@ -1,3 +1,9 @@
+# Scorebug native table inspection
+
+`inspect-scorebug-runtime DECODED_ELF OUTPUT_JSON` validates the observed CH2K8
+popup descriptors and executable code/TOC mappings. It is read-only, revision
+bounded, and does not observe live queue state or patch executables.
+
 # Adaptive NBA11 motion resampling
 
 `resample-motion-frames POSE_INPUT TIMING_INPUT ROTATIONS TRANSLATIONS OUTPUT`

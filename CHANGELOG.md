@@ -1,3 +1,8 @@
+## Scorebug research follow-up
+
+- Add bounded read-only native popup descriptor inspection and malformed-input tests.
+- Document queue priority, update heartbeat and formatter limitations.
+
 ## Unreleased — adaptive animation timing/root conversion
 
 - Decode the observed NBA11 byte-delta timeline and resample pose channels to

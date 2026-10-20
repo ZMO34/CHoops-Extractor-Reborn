@@ -1,3 +1,10 @@
+# Scorebug popup inspection
+
+Synthetic ELF tests cover table bounds, OPD alignment, executable mappings, TOC
+validation, priority independent of provider count and CLI source protection.
+Targeted suite: 11 passed. Supplied decoded executable: 83 types /119 providers.
+No RPCS3, executable writes or JB builds. Full release verification follows.
+
 # Native packed-pose translation
 
 Fifteen targeted synthetic cases pass, including adaptive timing/SLERP, quaternion
