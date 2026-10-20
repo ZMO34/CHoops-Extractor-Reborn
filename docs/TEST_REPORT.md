@@ -1,3 +1,36 @@
+# Experimental uniform mesh editing — verification
+
+Windows / Python 3.12.14. Targeted command:
+`python -m pytest tests/test_uniform_mesh.py tests/test_scene_preview.py tests/test_direct_asset_previews.py tests/test_cli.py -q`
+passed **42 tests**. The 15 new mesh/GUI cases cover byte-identical no-op import,
+position-only writes in matching SCNE/Clth, unchanged unknown records, stale
+manifests, UV/topology/count changes, nonfinite/excessive displacement, flipped
+triangles, missing/ambiguous rest matches, split seams, unsupported layouts,
+preset attachment regions and selected-source GUI dispatch.
+
+Read-only actual asset inventory and private output audit: **21 IFFs, 33 record
+pairs, 25,956 original rendered vertices**. All 21 no-op exports/reimports are
+byte-identical. Edited logical blocks differ only in intended XYZ bytes;
+unreferenced bytes, UVs, other attributes, constraints and record addresses stay
+unchanged. All **21 replacements prepare and pass build preflight**. Before/after
+rest-pose contact sheet inspected for all 18 distinct garment/build combinations.
+Source inputs unchanged. Local editable/override assets stay out of Git.
+
+Full portable verification uses `python tools/dev/verify.py --python PYTHON` and
+a temporary directory outside project output. Its first run exposed missing
+UUID imports in the new GUI methods; corrected and covered by direct selected-
+source dispatch. A run with fixtures inside output invalidated an existing
+output-safety test's premise; no production court behavior was changed for that
+test environment. Windows worker verification requires normal worker access.
+Final source portable verification passed **617 tests, 10 skips, 2 deselections**;
+compile, CLI/Qt startup, Ruff, mypy and generated handoff checks passed. New
+backend/test files also pass the full E/F/I Ruff selection. Exact-commit isolated
+verification is recorded in the PR handoff.
+
+Packed solver/collision and normal/tangent retargeting are NOT established.
+No external DCC roundtrip certification. RPCS3/gameplay: **NOT RUN**.
+Automatic/testing JB: **NOT BUILT**. No EBOOT change or release publication.
+
 # v1.19 Reborn Overrides V5.5 import support
 
 Read-only discovery against the supplied V5.5 folder and vanilla College Hoops

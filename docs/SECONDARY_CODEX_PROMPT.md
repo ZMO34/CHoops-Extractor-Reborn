@@ -84,6 +84,21 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# Unreleased — editable garment meshes and modern-fit experiment
+
+Models / Courts has source-aware uniform OBJ collection export, guarded reimport
+and a conservative modern-fit preset. Actual source inventory covers 21 cloth
+IFFs / 33 SCNE–Clth pairs: all five necklines and thin/regular/fat builds, plus
+three shorts builds, including individual and aggregate container routes.
+The preset shortens shorts by 20% and tightens the jersey torso by up to 7%.
+Source assets stay immutable. Rest XYZ is updated in SCNE and matching Clth;
+topology, UVs and all other attributes/unknown data are preserved.
+
+This is an experimental rest-shape workflow. Native packed cloth constraints,
+body collision and normal/tangent regeneration remain unresolved; static output
+does not certify animation/fit. No NBA cloth writer or new topology. See
+[uniform mesh evidence and editing instructions](UNIFORM_MESH_EDITING.md).
+
 # v1.19 rebuild compatibility follow-up
 
 Folder DDS imports now consistently support a flat image targeting an existing
@@ -172,6 +187,7 @@ certifies game/runtime compatibility. Unknown variants fail explicitly.
 | CSV / selective comparison import | Supported confirmed College Hoops fields | Not a general NBA bulk editor | Not a general NBA bulk editor |
 | Full unknown-byte semantics / engine ceilings | Incomplete; unknown bits retained | Incomplete | Incomplete |
 | Animation banks | Inventory/research | Inventory/portability research | Inventory/portability research |
+| Uniform geometry editing | Experimental source-bound OBJ/rest-position workflow; known cloth only | Unsupported | Unsupported |
 
 ## Shared features
 
@@ -204,6 +220,14 @@ ceilings remain unestablished. See [limitations](KNOWN_LIMITATIONS.md),
 Embedded source: docs/WORKFLOWS.md
 
 # Practical workflows
+
+## Edit uniform fit
+
+Use Models / Courts > **Uniform meshes…** to export all supported garments or
+prepare the experimental modern-fit collection. OBJ cages and originals remain
+separate from ready IFF overrides. Reimport validates topology, UVs, source hash
+and cloth seam correspondence. The [mesh workflow](UNIFORM_MESH_EDITING.md)
+documents CLI commands and unresolved runtime cloth/collision behavior.
 
 ## Select a game and overrides
 
@@ -1414,6 +1438,105 @@ No RPCS3, EBOOT writes or automatic testing JB is involved.
 
 ---
 
+Embedded source: docs/UNIFORM_MESH_EDITING.md
+
+# Experimental editable uniforms and modern fit
+
+Models / Courts now has **Uniform meshes…** with export-all, experimental modern
+fit and collection reimport actions. Export uses the global **Preview source**
+selection, including source-bound complete overrides. Outputs are separate
+collections under `output/uniform-models/`; imports create a new
+`output/uniform-imports/` folder. Sources and existing outputs are never replaced.
+
+## Coverage and preset
+
+Read-only inventory of the supplied College Hoops 2K8 PS3 source found:
+
+- Five necklines: U, V, V triangle, triangle and wishbone.
+- Thin, regular and fat builds for each neckline, plus three shorts builds.
+- 21 IFF containers / 33 SCNE–Clth record pairs. This includes the aggregate
+  containers and the individual build containers, so both existing resource
+  routes are represented. These are 18 distinct garment/build combinations;
+  the duplicated routes are not additional jersey styles or new team alternates.
+
+`modern-fit-1` raises the shorts hem by 20% of that mesh's original vertical
+extent, fading to zero displacement at 65% of its height so the waist and upper
+hips remain fixed. The deformation is monotonic in height; no rows are cut off.
+Jersey torso X/Z are reduced by up to 7%, with smooth fades at the bottom and
+above the mid torso. The upper 28% stays fixed, preserving the collar/upper
+armhole region. This changes existing shared meshes for all schools using them;
+it does not change team artwork, body/build selectors, roster records or EBOOT.
+
+## Editing and reimport
+
+The collection contains `originals/` IFF copies, editable `models/` OBJ cages and
+source-bound manifests. Modern-fit collections also include untouched
+`original-models/` OBJ cages and ready experimental replacements in `overrides/`.
+Select **only `overrides/`** in Explorer to prepare the edited game assets. The
+collection root includes originals and must not be used as an overrides folder.
+Do not mix complete cloth IFF replacements with a different cloth geometry mod.
+
+The OBJ preserves original vertex indices, per-vertex UVs and expanded strip
+triangles. Coordinates are unchanged native units, Y up. In a DCC editor, preserve
+vertex order and axis conversion on export. Do an untouched roundtrip before
+editing: DCC versions may reorder faces or vertices. No welding, subdivision,
+triangulation, decimation, vertex deletion or UV editing is supported. Move
+coincident seam duplicates together. OBJ normals are ignored; native packed
+normal/tangent attributes remain byte-exact. No external DCC application has
+been certified by this change.
+
+Choose **Reimport edited uniform models…**, selecting the collection root.
+The importer checks the original IFF hash, manifest identities, ordered triangles,
+vertex count, UV identity, sewn particle agreement, finite coordinates, a maximum
+20-unit displacement and collapsed/flipped triangles. It updates only XYZ in
+SCNE vertices and their exact matching Clth rest particles. Unknown attributes,
+UVs, skinning-associated stream bytes, indices, constraints and helper particles
+are retained. Unsupported declarations and ambiguous matches fail explicitly.
+Collection operations are cancellable; a failed/cancelled collection may contain
+completed files but has no final success report. Choose a new empty destination
+for retry. Each individual IFF is fully validated before writing.
+
+CLI equivalents, always writing under project `output/`:
+
+```powershell
+python -m choops_py.cli export-uniform-models SOURCE_JB output/uniform-export
+python -m choops_py.cli modern-fit-uniforms SOURCE_JB output/modern-fit
+python -m choops_py.cli import-uniform-models output/modern-fit output/edited-cloth
+python -m choops_py.cli export-uniform-iff cloth_u.iff output/u-models
+python -m choops_py.cli import-uniform-iff cloth_u.iff output/u-models output/new-cloth_u.iff
+```
+
+## Confirmed binary evidence and limits
+
+The observed embedded SCNE has one mesh/instance, three streams with strides
+4/24/4 and six exact declarations. Float32 big-endian XYZ occupies the first 12
+bytes of each 24-byte vertex in stream 1. Stream 0 holds signed-normalized UVs;
+stream 2 and the remaining vertex bytes are preserved. Existing triangle-strip
+indices and draw data stay unchanged. No general-purpose SCNE writer is enabled.
+
+In matching Clth records, the first big-endian uint16 is the rest-particle byte
+extent. Absolute offsets at `0xc0` and `0xc8` bound that table; their difference
+equals this extent. Each particle is 16 bytes: matching float32 XYZ plus 1.0.
+All 33 supplied graphic records have unambiguous exact matches to this bounded
+table. Several rendered seam vertices share a particle. Unmatched helper
+particles and zero-initialized workspace are retained. This mapping establishes
+rest-position editing, not the semantics of every Clth byte.
+
+Writers preserve logical record addresses and sizes. Physical compressed sizes
+can grow; the existing archive relocation workflow handles a larger replacement.
+Every written IFF is reparsed; all changed and unchanged record slices are
+compared against the expected bytes. No-op OBJ roundtrips are byte-identical.
+
+**This is experimental.** Packed solver constraints, collision geometry, cloth
+simulation and normal/tangent regeneration have not been retargeted. Existing
+constraints may pull edited vertices toward their previous fit; animation may
+show stretching, body clipping or shading differences. Rest-pose comparisons and
+successful import/preflight cannot establish the animated result. Do not call
+this a finished cloth-simulation port. No RPCS3/gameplay or real JB build is run.
+NBA garment layouts and arbitrary new topology remain unsupported.
+
+---
+
 Embedded source: docs/PLAYER_QOL_RESEARCH.md
 
 # Player editing and scholarship evidence (v1.10)
@@ -2428,9 +2551,49 @@ Updated 2026-10-11. CURRENT_STATUS.md and TEST_REPORT.md are the living evidence
 - Outputs are constrained to output/. Game assets, exported music/art, private
   paths, logs, fixtures and EBOOT are not supplied publicly.
 
+## Experimental uniform mesh edits
+
+Known College Hoops garment OBJ reimport edits both visible and cloth rest XYZ.
+Packed solver constraints, collision and normal/tangent regeneration remain
+unchanged. A static modern-fit preview is not an animated fit certification;
+see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA writer.
+
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+# Experimental uniform mesh editing — verification
+
+Windows / Python 3.12.14. Targeted command:
+`python -m pytest tests/test_uniform_mesh.py tests/test_scene_preview.py tests/test_direct_asset_previews.py tests/test_cli.py -q`
+passed **42 tests**. The 15 new mesh/GUI cases cover byte-identical no-op import,
+position-only writes in matching SCNE/Clth, unchanged unknown records, stale
+manifests, UV/topology/count changes, nonfinite/excessive displacement, flipped
+triangles, missing/ambiguous rest matches, split seams, unsupported layouts,
+preset attachment regions and selected-source GUI dispatch.
+
+Read-only actual asset inventory and private output audit: **21 IFFs, 33 record
+pairs, 25,956 original rendered vertices**. All 21 no-op exports/reimports are
+byte-identical. Edited logical blocks differ only in intended XYZ bytes;
+unreferenced bytes, UVs, other attributes, constraints and record addresses stay
+unchanged. All **21 replacements prepare and pass build preflight**. Before/after
+rest-pose contact sheet inspected for all 18 distinct garment/build combinations.
+Source inputs unchanged. Local editable/override assets stay out of Git.
+
+Full portable verification uses `python tools/dev/verify.py --python PYTHON` and
+a temporary directory outside project output. Its first run exposed missing
+UUID imports in the new GUI methods; corrected and covered by direct selected-
+source dispatch. A run with fixtures inside output invalidated an existing
+output-safety test's premise; no production court behavior was changed for that
+test environment. Windows worker verification requires normal worker access.
+Final source portable verification passed **617 tests, 10 skips, 2 deselections**;
+compile, CLI/Qt startup, Ruff, mypy and generated handoff checks passed. New
+backend/test files also pass the full E/F/I Ruff selection. Exact-commit isolated
+verification is recorded in the PR handoff.
+
+Packed solver/collision and normal/tangent retargeting are NOT established.
+No external DCC roundtrip certification. RPCS3/gameplay: **NOT RUN**.
+Automatic/testing JB: **NOT BUILT**. No EBOOT change or release publication.
 
 # v1.19 Reborn Overrides V5.5 import support
 

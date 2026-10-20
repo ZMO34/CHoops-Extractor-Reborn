@@ -1,3 +1,18 @@
+# Unreleased — editable garment meshes and modern-fit experiment
+
+Models / Courts has source-aware uniform OBJ collection export, guarded reimport
+and a conservative modern-fit preset. Actual source inventory covers 21 cloth
+IFFs / 33 SCNE–Clth pairs: all five necklines and thin/regular/fat builds, plus
+three shorts builds, including individual and aggregate container routes.
+The preset shortens shorts by 20% and tightens the jersey torso by up to 7%.
+Source assets stay immutable. Rest XYZ is updated in SCNE and matching Clth;
+topology, UVs and all other attributes/unknown data are preserved.
+
+This is an experimental rest-shape workflow. Native packed cloth constraints,
+body collision and normal/tangent regeneration remain unresolved; static output
+does not certify animation/fit. No NBA cloth writer or new topology. See
+[uniform mesh evidence and editing instructions](UNIFORM_MESH_EDITING.md).
+
 # v1.19 rebuild compatibility follow-up
 
 Folder DDS imports now consistently support a flat image targeting an existing

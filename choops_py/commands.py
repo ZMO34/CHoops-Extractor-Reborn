@@ -6,6 +6,11 @@ class Command:
     options: tuple = ()
     output_file: bool = False
 COMMANDS={
+    'export-uniform-models':Command(('source','output')),
+    'modern-fit-uniforms':Command(('source','output')),
+    'import-uniform-models':Command(('edited','output')),
+    'export-uniform-iff':Command(('input','output')),
+    'import-uniform-iff':Command(('input','edited','output'),(),True),
     'inspect-animations':Command(('input','output')),
     'export-animations':Command(('input','output')),
     'audio-catalog':Command(('source','output'),(),True),
