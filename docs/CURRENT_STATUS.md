@@ -5,6 +5,13 @@ exposes its embedded roster through the roster editor. The copy writer is fixed-
 extent and verifies every byte outside that region remains unchanged. Legacy-mode
 state after the embedded roster is still unmapped and read-only; a single save
 cannot establish the meaning of those fields.
+PR #30's merged override changes were reviewed against all v1.16-v1.19 release
+tags; their histories and features remain present. The isolated merge passes
+portable checks (602 passed, 10 skipped, 2 deselected). Nine additional synthetic
+cases verify named/numeric folder DDS priority, legacy spelling resolution,
+complete IFF discovery, invalid index/root rejection and append/repack raw BIN
+preservation. See [the compatibility review](PR30_COMPATIBILITY_REVIEW.md).
+No runtime claim or additional merged feature PR is implied by this review.
 
 Folder DDS imports now consistently support a flat image targeting an existing
 cubemap in both legacy and Python-manifest paths (standard IFF and CDF). This

@@ -1,4 +1,21 @@
-# v1.19 Reborn Overrides V5.5 import support
+# PR #30 merged compatibility audit
+
+Reviewed merge `fd9eae5d43f0dec436411661dcf99c52f326e562` in an isolated
+checkout with `tools/dev/verify.py --python <prepared Python 3.12 interpreter>`:
+**602 passed, 10 skipped, 2 deselected**. Compile, CLI/Qt smoke, Ruff, mypy,
+handoff and diff checks passed. Offscreen OpenGL and the absent optional native
+converter are skipped. Each of v1.16, v1.17, v1.18 and v1.19 is an ancestor.
+
+Nine added synthetic regressions pass. Full follow-up source verification with
+`python tools/dev/verify.py`: **612 passed, 9 skipped, 2 deselected**, all other
+portable checks passed. Final exact-head isolated results are posted on the
+follow-up PR. No production parser behavior changed in this audit.
+See [scope and retained feature coverage](PR30_COMPATIBILITY_REVIEW.md).
+No Windows package was rebuilt because dependencies, packaging and application
+code are unchanged. No RPCS3, gameplay, EBOOT editing or real/testing JB copy;
+small generated archive fixture outputs only. Unknown formats remain guarded.
+
+# v1.19 Reborn Overrides V5.5 import support (original submission evidence)
 
 Read-only discovery against the supplied V5.5 folder and vanilla College Hoops
 2K8 archive recognized 1,946 archive groups and scanned 25,428 files, including
