@@ -48,9 +48,9 @@ table. Double-click a value to edit it; height is entered as e.g. 6 ft 3 in. Pos
 uses PG/SG/SF/PF/C. Scholarship offers Scholarship/Walk-on. Undo and Save copy work
 across these edits. Schools combines the former Teams/Edit Schools categories;
 Realign conference retains reciprocal membership. Shoes and export actions are
-grouped menus. Alternate creation, five-jersey/independent-asset builds and D1
-conversion are removed from the public editor. Older descriptions below are
-historical where they mention those actions.
+grouped menus. Team Assets now supplies alternate/independent-asset creation;
+D1 conversion remains unavailable. Older dialog/button descriptions below are
+historical; use the current side panels and Team Assets guide.
 
 Current release/limits: [CURRENT_STATUS.md](CURRENT_STATUS.md). Experimental
 audio uses the shared GUI/CLI backend described in [AUDIO_WORKFLOW.md](AUDIO_WORKFLOW.md).

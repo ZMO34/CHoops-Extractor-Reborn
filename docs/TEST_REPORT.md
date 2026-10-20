@@ -1,15 +1,16 @@
 # Team asset manager verification
 
-Targeted synthetic suite:17 tests on Windows/Python3.12.14, including shared-owner
+Targeted synthetic suite:17 passed on Windows/Python3.12.14, including shared-owner
 isolation, all-five ordering, batch arena rebasing, classic shared-stadium forks,
 invalid plans/source preservation, serial/two-worker preparation, preview/build
 insertion, CDF logo cloning/live preview, build-time Home fallback and Qt checks.
 Read-only supplied JB inspection:443 teams /553 entirely unused IDs. One full
 seven-category plan passes override and build preflight:11 new IFFs,3 replacement
 containers,6 Home fallback notices. No actual JB built and no emulator run.
-Combined portable verification:723 passed,10 skipped,2 deselected before the final
-selector-collision regression. Read-only bulk plan:435 teams /2,434 new assets /
-2,205 active uniform rows in15.95 seconds. Final isolated checks follow.
+Final combined portable and isolated exact-head verification:724 passed,10
+skipped,2 deselected each. Compile,CLI/Qt smoke,Ruff,mypy,handoff and diff checks
+passed. Read-only bulk plan:435 teams /2,434 new assets /2,205 active uniform rows
+in15.95 seconds. Windows bundle validation is recorded in the release notes.
 
 # Scorebug popup inspection
 
