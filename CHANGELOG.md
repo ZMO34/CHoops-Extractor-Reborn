@@ -10,6 +10,65 @@
 
 - Read the observed v3 SDAT variant with version-specific key selection and retained authentication; keep SDAT output blocked.
 - Document actual NBA 2K11 asset/animation samples and donor suitability ratings; no gameplay, face or animation port implemented.
+## Unreleased — native scorebug text contracts
+
+- Reject misaligned SCNE text/property tables that native vector loads cannot read
+  as intended, even when Python parsing succeeds.
+- Add bounded native text `max_width` edits, preserving literal/alignment flags
+  and the authored property type. Keep private executable experiments separate.
+
+## Unreleased — scorebug test05
+
+- Remove HUD dividers and relocate obsolete depth masks away from the new layout.
+- Restore authored palette vertex values; retain enlarged logos and clock/score
+  sizes. Center popup text, restore its alpha and align its black backing.
+- Use one native sixth-man label; move native title-case branding to the bottom
+  bar's default-text route. Enlarge all 19 live meter segments within the header.
+- Add bounded native text alpha/RGB editing and count-only label-loop suppression.
+- Correct earlier live-team-name claims: native normal-game callbacks suppress
+  names. Owner chose to retain read-only EBOOT and leave names unresolved.
+
+## Unreleased — native test04 startup correction
+
+- Replace the experimental duplicated compressed English heap with a single
+  uncompressed localization resource at offset zero. Preserve old translations,
+  resource metadata, NAME trailer and native title-case branding ID.
+- Reject localization compaction when unknown prefix bytes or other resources
+  could be moved. Add regressions for the native direct-read descriptor contract.
+- Record user-provided startup crash evidence and the remaining runtime uncertainty.
+
+## Unreleased — test04 native branding follow-up
+
+- Route title-case College Hoops / Reborn through the existing native label renderer
+  using an isolated tagged English literal ID and matching clock font/style values.
+- Guarded English loc-system extension preserves every existing token/ID/sentinel;
+  recognize the researched TXT loc-system type and validate independent IFF growth.
+- Preserve the native sixth-man visibility contract; the small left label now uses
+  native-glyph artwork. No executable/font-bank hook or gameplay certification.
+
+## Unreleased — scorebug test04
+
+- Bounded native SCNE font-style inspection and edits, with independent live text
+  callback names and preserved scene/bone references.
+- Local test layout connects live school names, selects larger native font styles,
+  uses narrow gray separators and opaque popup/header backing, and changes branding
+  to title case with native glyph/color/shadow artwork. Exact live-font rendering
+  remains unresolved; no new runtime/executable hook is implemented.
+
+## Unreleased — scorebug test03
+
+- Bounded HUD part ranges, ordered edits, shear removal, uniform vertex RGB and
+  authored text basis scaling with translated-marker preservation.
+- Native FONT glyph artwork composition using recorded bearings/advances and
+  coverage, without installing substitute fonts or modifying the font bank.
+- Documented local test03 layout: continuous backing/panel joins, adjusted logos,
+  palettes, sixth-man enclosure, message backing and native static lettering.
+  Runtime placement remains for user testing; no new application release.
+
+# Unreleased
+
+- Add bounded experimental authored HUD geometry/UV/color/text-anchor editing and sixth-man/text inventory.
+- Document scorebug test02 corrections and runtime boundaries; derived user-test assets remain local, not distributed through Git.
 
 # v1.19
 
