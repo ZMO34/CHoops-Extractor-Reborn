@@ -25,6 +25,9 @@ def sha(data: bytes) -> str:
 
 def export_patch(source: Path, mod: Path, output: Path) -> dict:
     archive, patches = preflight(source, mod)
+    from .addition_manifest import load as load_additions
+    if load_additions(mod, archive):
+        raise ValueError('XOR patch export cannot contain new assets; share the editable team overrides folder instead')
     output = safe_output(output, [source, mod])
     if output.exists():
         raise ValueError("Patch output already exists")

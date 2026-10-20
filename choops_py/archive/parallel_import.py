@@ -64,7 +64,7 @@ def code_identity():
                  'formats.cdf_backed_iff_writer','formats.compression','formats.native_codec',
                  'texture_tools.override_import','texture_tools.archive_layout','texture_tools.builtin_converter',
                  'texture_tools.dds','texture_tools.gtf','texture_tools.runtime_layout','texture_tools.legacy_cube',
-                 'modding.court_template')
+                 'modding.court_template','modding.team_assets','modding.addition_manifest','studio.services')
         for name in modules:identity.update(module_bytes('choops_py.'+name))
     else:
         for folder in ('archive','formats','texture_tools','modding'):
@@ -77,7 +77,8 @@ def _compile_one(archive,group,index,work,job,code,reuse):
     from .folder_import import compile_group
     group.pop('compiled_companion',None)
     original=archive.read(group['entry']);before=digest(original);signature=input_signature(group)
-    valid=reuse and reuse.get('code')==code and reuse.get('signature')==signature and reuse.get('source_sha256')==before
+    reference_policy=group.get('logo_templates',{})
+    valid=reuse and reuse.get('code')==code and reuse.get('signature')==signature and reuse.get('source_sha256')==before and reuse.get('reference_policy',{})==reference_policy
     if valid:
         payloads=None
         try:
@@ -110,13 +111,16 @@ def _compile_one(archive,group,index,work,job,code,reuse):
     if group.get('compiled_companion'):
         entry,name,payload=group['compiled_companion'];store(entry,name,payload,'_cdf')
         group.pop('compiled_companion',None)
-    return dict(code=code,signature=signature,source_sha256=before,imports=imports,outputs=outputs,unchanged=unchanged,cache_hit=False,root=str(work))
+    return dict(code=code,signature=signature,reference_policy=reference_policy,source_sha256=before,imports=imports,outputs=outputs,unchanged=unchanged,cache_hit=False,root=str(work))
 
 
-def _worker(source,work,tasks,results,progress,cancel,code):
+def _worker(source,work,tasks,results,progress,cancel,code,addition_folder=None):
     from .usrdir_reader import Archive
     from ..studio.services import JobContext
     archive=Archive(source);last=[0.]
+    if addition_folder:
+        from ..modding.team_assets import AdditionInputs
+        archive=AdditionInputs(archive,addition_folder)
     def report(done,total,label):
         now=time.monotonic()
         if now-last[0]<.15:return
@@ -150,7 +154,7 @@ def compiled_groups(archive,groups,work,job,*,workers=None,reuse=None):
     costs={index:memory_cost(group) for index,group in waiting}
     try:
         for i in range(limit):
-            process=context.Process(target=_worker,args=(str(archive.path),str(work),tasks,results,progress,cancel,code),name='CHoops-DDS-'+str(i+1))
+            process=context.Process(target=_worker,args=(str(archive.path),str(work),tasks,results,progress,cancel,code,getattr(archive,'addition_folder',None)),name='CHoops-DDS-'+str(i+1))
             process.start();processes.append(process)
         while waiting or active:
             job.check()

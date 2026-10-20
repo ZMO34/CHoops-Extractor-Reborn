@@ -1,3 +1,24 @@
+# Team asset expansion and v1.20
+
+Team Assets now lists all teams and their distinct IDs, stadium routes, five
+uniform banks, paired SELU availability and menu-logo records. Checked-category
+plans fork shared arenas/owners, preserve unrelated assignments, create editable
+folders and apply to normal override previews/builds. Uniform-only expansion can
+reuse unique owners. Build preflight clones missing linked alternates from Home
+and reports filenames in the GUI task log. Original assets/EBOOT are unchanged.
+Roster Editor can save a full community roster directly to overrides. Selected-team
+assignment/activation copying supports JB, overrides, editor and external roster
+sources, with a review and undoable editor destination; artwork remains separate.
+Final isolated portable checks:728 passed /10 skipped /2 deselected. Public
+tracked/history text and issue/PR/release discussion audits found no flagged
+private account paths or credential patterns. Generated inputs remain ignored.
+
+Focused Ghidra research confirms the numeric stadium selector (physical arena
++0x12), ten-bit uniform owner/artwork fields and ordinal selection. The old stadium
+helper changed only the display code; both selectors are now updated. Obsolete
+unregistered alternate writers/CLI branches were removed. See TEAM_ASSETS.md for
+native evidence, usage, stock observations and runtime/menu limits. No RPCS3/JB.
+
 # Scorebug popup runtime inspection
 
 A read-only decoded-ELF inspector validates the observed 83-type popup dispatch

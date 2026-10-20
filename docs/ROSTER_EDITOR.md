@@ -1,3 +1,11 @@
+# Team assets (v1.20)
+
+The **Team assets…** button opens the large assignment matrix. It exposes the
+separate team index, asset, uniform-owner, stadium and menu-logo identities and
+prepares checked-category additions for overrides/JB builds. See TEAM_ASSETS.md.
+This supersedes the alternate/independent-action removal notes for v1.10 below;
+D1 conversion remains unavailable. Existing roster side editors remain intact.
+
 Current continuation: text edits warn in orange beyond known game keyboard
 capacity without truncation. School References exposes the guarded Conference
 index. Conference Logo opens its exact bank record for preview/DDS replacement.

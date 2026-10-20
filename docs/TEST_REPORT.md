@@ -1,3 +1,33 @@
+# Applied-roster synchronization regression
+
+Applying asset expansion also updates an open community roster as one undoable
+edit, preserving pending player changes. A regression checks that later saves
+retain the new arena/uniform routing and Undo restores the pre-expansion roster.
+
+# Community roster assignment integration
+
+Four additional synthetic tests cover selected-team activation/stadium copying,
+shared-owner isolation, mismatched Team ID refusal, destination player/conference
+preservation, editor undo/redo after table movement, and saving community player
+edits to the selected overrides roster. Targeted combined suite:21 passed. Final isolated portable verification after this
+integration:728 passed,10 skipped,2 deselected; CLI/Qt,Ruff,mypy,handoff and
+diff checks passed.
+No original/community roster is overwritten; no gameplay or real JB build.
+
+# Team asset manager verification
+
+Targeted synthetic suite:17 passed on Windows/Python3.12.14, including shared-owner
+isolation, all-five ordering, batch arena rebasing, classic shared-stadium forks,
+invalid plans/source preservation, serial/two-worker preparation, preview/build
+insertion, CDF logo cloning/live preview, build-time Home fallback and Qt checks.
+Read-only supplied JB inspection:443 teams /553 entirely unused IDs. One full
+seven-category plan passes override and build preflight:11 new IFFs,3 replacement
+containers,6 Home fallback notices. No actual JB built and no emulator run.
+Final combined portable and isolated exact-head verification:724 passed,10
+skipped,2 deselected each. Compile,CLI/Qt smoke,Ruff,mypy,handoff and diff checks
+passed. Read-only bulk plan:435 teams /2,434 new assets /2,205 active uniform rows
+in15.95 seconds. Windows bundle validation is recorded in the release notes.
+
 # Scorebug popup inspection
 
 Synthetic ELF tests cover table bounds, OPD alignment, executable mappings, TOC

@@ -218,7 +218,7 @@ def stage_folder(source: Path, folder: Path, mod: Path, job=None, *, workers=Non
     from ..archive.folder_import import discover
     from ..archive.parallel_import import compiled_groups,prior_cache
     from ..archive.build_copy import preflight
-    from ..archive.manifests import write_bytes
+    from ..archive.manifests import write_bytes,digest
     archive=Archive(source);folder=Path(folder);mod=safe_output(mod,[source,folder])
     requested_mod = mod
     reuse=prior_cache(mod)
@@ -227,7 +227,15 @@ def stage_folder(source: Path, folder: Path, mod: Path, job=None, *, workers=Non
     while mod.exists():
         mod = safe_output(requested_mod.with_name(requested_mod.name + '_' + str(suffix)), [source, folder])
         suffix += 1
-    job=job or JobContext();discovery=discover(archive,folder,job)
+    job=job or JobContext()
+    base = archive
+    if (folder/'team_assets.json').is_file():
+        from ..modding.team_assets import AdditionInputs
+        archive = AdditionInputs(base, folder)
+    discovery=discover(archive,folder,job)
+    if getattr(archive,'logo_templates',None):
+        for group in discovery['groups']:
+            if group['name'].casefold()=='teamselectlogo.iff':group['logo_templates']=archive.logo_templates
     work=mod.parent/('.mod_'+uuid.uuid4().hex);rows: list[dict]=[];conditions=[];growth=[];unchanged=0
     details=[];unapplied: list[dict]=[]
     try:
@@ -237,25 +245,38 @@ def stage_folder(source: Path, folder: Path, mod: Path, job=None, *, workers=Non
             outcomes[i]=(group,result)
             compiled[str(group['entry']['index'])]={key:value for key,value in result.items() if key not in ('root','cache_hit')}
         reused=sum(result['cache_hit'] for _,result in outcomes.values())
+        new_rows: list[dict]=[]
         for i in sorted(outcomes):
             group,result=outcomes[i];imports=result['imports']
             unapplied.extend(dict(archive=group['name'],**item) for item in imports if item.get('status')=='unmatched')
-            if result['unchanged']:unchanged+=1;continue
+            is_new=group['entry']['index']>=len(base.entries)
+            if result['unchanged'] and not is_new:unchanged+=1;continue
             details.append(dict(archive=group['name'],binary_records=len(group['records']),dds_imports=imports,compiled_cache_hit=result['cache_hit']))
             for output in result['outputs']:
-                rows.append({**{key:output[key] for key in ('archive','path','sha256','size')},'subfile':None,'kind':'archive','original_name':output['archive']})
-                conditions.append(dict(index=output['index'],hash=output['hash'],sha256=output['source_sha256']))
+                row={**{key:output[key] for key in ('archive','path','sha256','size')},'subfile':None,'kind':'archive','original_name':output['archive']}
+                (new_rows if is_new else rows).append(row)
+                if not is_new:conditions.append(dict(index=output['index'],hash=output['hash'],sha256=output['source_sha256']))
                 if output['size']>output['source_size']:growth.append(dict(archive=output['archive'],old_bytes=output['source_size'],new_bytes=output['size']))
         save_json(work/'compiled_inputs.json',compiled,[source,folder])
         names=[row['archive'].casefold() for row in rows]
         if len(names)!=len(set(names)):raise ValueError('A paired CDF texture import conflicts with a complete CDF replacement')
-        if not rows:raise ValueError('All discovered overrides match the selected game; no changed overrides to prepare')
+        if not rows and not new_rows:raise ValueError('All discovered overrides match the selected game; no changed overrides to prepare')
         save_json(work/'overrides.json',rows,[source,folder])
+        if new_rows:save_json(work/'additions.json',dict(schema=1,entries=new_rows),[source,folder])
+        if getattr(archive,'logo_templates',None):save_json(work/'team_logo_templates.json',archive.logo_templates,[source,folder])
+        fallback_rows=[]
+        for item in getattr(archive,'alternate_fallbacks',[]):
+            group=next((g for g in discovery['groups'] if g['name']==item.get('archive')),None)
+            if group and group['whole'] and not group['dds'] and not group['records'] and not group['package_records'] and digest(group['whole'].read_bytes())==item.get('sha256'):
+                fallback_rows.append(item)
+        if fallback_rows:save_json(work/'alternate_fallbacks.json',fallback_rows,[source,folder])
+        report_warnings=[item['message'] for item in fallback_rows]
         save_json(work/'source_preconditions.json',dict(schema=1,entries=conditions),[source,folder])
         save_json(work/'import_options.json',dict(schema=1,allow_archive_growth=True,dds_priority=True,scne_priority=True),[source,folder])
         from .live_overrides import describe_groups
-        save_json(work/'preview_inputs.json',describe_groups(discovery['groups'],folder,archive),[source,folder])
-        report=dict(build_supported=not archive.read_only,parallel_workers=worker_count,reused_archives=reused,staged=len(rows),mod=str(mod),requested_mod=str(requested_mod),workspace_changed=mod != requested_mod,detected_formats=discovery['detected_formats'],scanned_files=discovery['scanned_files'],dds_files=discovery['dds_files'],binary_records=discovery['binary_records'],ignored_files=discovery['ignored_files'],shadowed_dds=discovery['shadowed_dds'],resolved_targets=discovery['resolved_targets'],unapplied_overrides=unapplied,unchanged_archives=unchanged,growing_archives=growth,dds_priority=True,scne_priority=True,imports=details)
+        save_json(work/'preview_inputs.json',describe_groups([g for g in discovery['groups'] if g['entry']['index']<len(base.entries)],folder,base),[source,folder])
+        report=dict(build_supported=not archive.read_only,added_assets=[r['archive'] for r in new_rows],parallel_workers=worker_count,reused_archives=reused,staged=len(rows),mod=str(mod),requested_mod=str(requested_mod),workspace_changed=mod != requested_mod,detected_formats=discovery['detected_formats'],scanned_files=discovery['scanned_files'],dds_files=discovery['dds_files'],binary_records=discovery['binary_records'],ignored_files=discovery['ignored_files'],shadowed_dds=discovery['shadowed_dds'],resolved_targets=discovery['resolved_targets'],unapplied_overrides=unapplied,unchanged_archives=unchanged,growing_archives=growth,dds_priority=True,scne_priority=True,imports=details)
+        report['warnings']=report_warnings
         save_json(work/'folder_import_report.json',report,[source,folder])
         job.check();job.progress(0,1,'Checking override compatibility')
         if archive.read_only:_,patches=preflight(source,work,job,for_build=False)

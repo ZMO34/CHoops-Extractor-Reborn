@@ -1,3 +1,13 @@
+# Team assets (v1.20)
+
+Use **Team Assets** for the searchable assignment list and checked S/Home/Away/
+X/Y/Z/Menu-logo creation. Review changes, apply a separate overrides folder, then
+use the normal JB builder. **Save roster to overrides** preserves your full edited
+community roster; selected-team copy buttons move activation/asset assignments
+between roster sources. Classic shared stadiums can be forked independently.
+Missing linked alternate assets use Home with explicit log notices. See
+[Team asset guide](TEAM_ASSETS.md) for the full workflow and native limits.
+
 # Native studio user guide
 
 Start with [current workflows](WORKFLOWS.md), the [support matrix](FEATURE_MATRIX.md)
@@ -40,9 +50,9 @@ table. Double-click a value to edit it; height is entered as e.g. 6 ft 3 in. Pos
 uses PG/SG/SF/PF/C. Scholarship offers Scholarship/Walk-on. Undo and Save copy work
 across these edits. Schools combines the former Teams/Edit Schools categories;
 Realign conference retains reciprocal membership. Shoes and export actions are
-grouped menus. Alternate creation, five-jersey/independent-asset builds and D1
-conversion are removed from the public editor. Older descriptions below are
-historical where they mention those actions.
+grouped menus. Team Assets now supplies alternate/independent-asset creation;
+D1 conversion remains unavailable. Older dialog/button descriptions below are
+historical; use the current side panels and Team Assets guide.
 
 Current release/limits: [CURRENT_STATUS.md](CURRENT_STATUS.md). Experimental
 audio uses the shared GUI/CLI backend described in [AUDIO_WORKFLOW.md](AUDIO_WORKFLOW.md).

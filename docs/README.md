@@ -13,6 +13,7 @@ historical claims that all related games behave identically.
 | Supported games, operations and limits | [Feature matrix](FEATURE_MATRIX.md), [current status](CURRENT_STATUS.md) |
 | Overrides, build failures, missing preview assets | [Troubleshooting](TROUBLESHOOTING.md) |
 | Detailed existing GUI controls | [User guide](USER_GUIDE.md), [GUI](GUI.md) |
+| Team asset assignments and expansion | [Team Assets](TEAM_ASSETS.md) |
 | College Hoops rosters and side editors | [Roster editor](ROSTER_EDITOR.md), [side panels](ROSTER_SIDE_PANELS.md) |
 | NBA roster editing and NBA 2K14 | [NBA evidence and limits](NBA_ROSTERS_AND_2K14.md) |
 | CSV, comparisons, text growth and previews | [Roster scale](ROSTER_SCALE_AND_PREVIEWS.md) |

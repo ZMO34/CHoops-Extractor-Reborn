@@ -394,6 +394,9 @@ def compile_cdf_group(archive,group,data,job=None):
     base_cdf=archive.read(entry);base_pair=CDFPair(archive.read(group['entry']),base_cdf) if preserve else None
     def base_parts(rec):
         matches=[r for r in base_pair.records if r['name'].casefold()==rec['name'].casefold() and r['type']=='TXTR']
+        if not matches and group.get('logo_templates') and group['name'].casefold()=='teamselectlogo.iff':
+            donor=group['logo_templates'].get(rec['name'])
+            matches=[r for r in base_pair.records if r['name']==donor and r['type']=='TXTR']
         if len(matches)!=1:raise ValueError('CDF texture has no unique base-JB reference: '+rec['name'])
         return [decode(base_cdf[matches[0][k+'_offset']:matches[0][k+'_offset']+matches[0][k+'_length']]) for k in ('header','payload')]
     def find(name):
@@ -421,9 +424,14 @@ def compile_cdf_group(archive,group,data,job=None):
             if rec['type']!='TXTR' or (rec['index'] not in changes and not group['whole'] and not group.get('cdf_whole')):continue
             reference=base_parts(rec)
             normalized,reports=normalize_record(parts(rec),reference,'TXTR',job)
-            changes[rec['index']]=normalized
+            if normalized!=parts(rec):changes[rec['index']]=normalized
             details.extend(dict(selector=rec['name'],policy='base-JB texture layout',**info) for info in reports)
     if job:job.check();job.progress(0,1,'Rebuilding paired texture bank '+group['name'])
+    if not changes:
+        from ..formats.compression import game_compatible
+        if all(game_compatible(cdf[r[k+'_offset']:r[k+'_offset']+r[k+'_length']]) for r in pair.records for k in ('header','payload')):
+            group['compiled_companion']=(entry,companion,cdf)
+            return data,details
     rebuilt,payload=replace_texture_records(data,cdf,changes)
     group['compiled_companion']=(entry,companion,payload)
     return rebuilt,details

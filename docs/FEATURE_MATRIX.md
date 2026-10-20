@@ -1,4 +1,4 @@
-# Current support matrix — v1.18
+# Current support matrix — v1.20
 
 Supported means structurally verified by parsers and automated fixtures. No row
 certifies game/runtime compatibility. Unknown variants fail explicitly.
@@ -15,6 +15,8 @@ certifies game/runtime compatibility. Unknown variants fail explicitly.
 | Full unknown-byte semantics / engine ceilings | Incomplete; unknown bits retained | Incomplete | Incomplete |
 | Animation banks | Inventory/research | Inventory/portability research | Inventory/portability research |
 | Uniform geometry editing | Experimental source-bound OBJ/rest-position workflow; known cloth only | Unsupported | Unsupported |
+
+| Team asset expansion | Checked stadium/uniform/SELU/menu plans, overrides and build integration; runtime unverified | Unsupported | Unsupported |
 
 ## Shared features
 
