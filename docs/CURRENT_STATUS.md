@@ -1,3 +1,17 @@
+# Unreleased — native-only transfer continuity and Legacy diagnostics
+
+The owner requires transfers entirely in game, preserving player statistics and
+team history; no editor/save-applied transfer workflow. Legacy Editor now exposes
+read-only recruiting diagnostics through the shared pool audit, including native
+preferences and unresolved fields. No transfer/signing controls are added.
+Native tracing establishes annual recruit regeneration, a player-to-recruit copier
+with incompatible class codes, commitment and reusable-player-pool operations.
+Unsigned portal players must avoid the old finalizer's reusable-pool route; signing
+must bypass new-player conversion and validate destination capacity before removal.
+Historical stat/team-link ownership, durable proxy binding and calendar integration
+remain unresolved. No native portal or patch is installed; originals unchanged.
+See [LEGACY_TRANSFER_PORTAL.md](LEGACY_TRANSFER_PORTAL.md).
+
 # Unreleased — native recruiting pool and saved-component audits
 
 Added read-only `inspect-recruit-pool` for the confirmed 0xD8 native recruit table,

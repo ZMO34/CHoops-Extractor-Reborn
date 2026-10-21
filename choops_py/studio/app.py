@@ -1431,6 +1431,10 @@ class Window(QMainWindow):
         import_menu.addAction('Edited CSV…',lambda:import_csv(self))
         import_menu.addAction('Compare another roster…',lambda:compare_roster(self))
         import_button.setMenu(import_menu);extra.addWidget(import_button)
+        from .legacy_recruiting import open_recruiting_diagnostics
+        recruiting_button=QPushButton('Recruiting diagnostics…')
+        recruiting_button.clicked.connect(lambda:open_recruiting_diagnostics(self))
+        extra.addWidget(recruiting_button)
         layout.addLayout(extra)
 
         self.roster_search = QLineEdit()
@@ -1527,6 +1531,8 @@ class Window(QMainWindow):
         )
 
     def display_roster(self, model):
+        diagnostics=getattr(self,'recruiting_diagnostics',None)
+        if diagnostics is not None:diagnostics.close()
         from ..roster.nba import NBARosterModel
         if isinstance(model,NBARosterModel):
             self.nba_roster=model;self.roster=None

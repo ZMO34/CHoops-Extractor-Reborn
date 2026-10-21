@@ -1,3 +1,25 @@
+# Native-only continuity and Legacy diagnostics — 2026-10-21
+
+Targeted: `python -m pytest tests/test_legacy_recruiting_gui.py
+tests/test_recruit_pool.py tests/test_transfer_portal.py tests/test_cli.py
+tests/test_legacy_save_adapter.py -q -o addopts=`: **94 passed**. Six new Qt cases
+cover immutable data/history, metadata/preferences, filtering, unknown profile and
+malformed-table handling, changed/closed-source callbacks, editor entry and view
+invalidation. No transfer/sign/save actions exist in the diagnostic view. An initial
+sandboxed run hit three temporary-directory setup permission errors (91 passed);
+the rerun with normal temporary-directory access passed all 94. Focused Ruff and
+module mypy pass.
+
+Private read-only Ghidra continuation establishes annual regeneration, native
+commitment, player-to-recruit copying/class mismatch and reusable-player-pool
+operations. Eight callsites, five tail branches and the 2,500-entry pool bound
+independently match raw PowerPC. Original ELF digest and byte equality pass.
+No executable patch, native portal, historical-stat/team-link writer or in-game
+continuity validation is claimed. RPCS3/gameplay NOT RUN; testing JB NOT BUILT.
+Full source portable verification: **847 passed, 10 optional skips, 2 deselected**;
+compile, CLI/offscreen Qt startup, Ruff, mypy, handoff and diff checks pass.
+Exact-head isolated portable results are recorded in PR46.
+
 # Native recruiting pool and persistence continuation — 2026-10-21
 
 Targeted: `python -m pytest tests/test_recruit_pool.py tests/test_transfer_portal.py

@@ -1,3 +1,9 @@
+## Unreleased — native-only transfer continuity and Legacy diagnostics
+
+- Add read-only Legacy recruiting diagnostics for confirmed recruit metadata, native preference weights and unresolved fields, using immutable background snapshots.
+- Trace annual recruit regeneration, native commitment, player-to-recruit copying and reusable-player-pool lifetime hazards.
+- Require in-game transfers to retain player statistics and historical team associations; no editor/save-applied transfer workflow or playable portal is added.
+
 ## Unreleased — native recruiting pool audits
 
 - Add read-only `inspect-recruit-pool` with native table bounds, metadata diagnostics, interest-list ownership checks and optional serialized recruiting-component inspection.
