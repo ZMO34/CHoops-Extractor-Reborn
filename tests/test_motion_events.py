@@ -6,13 +6,32 @@ import pytest
 from choops_py.formats.motion_events import (
     inspect_auxiliary_pairs,
     inspect_events,
+    inspect_payload_consumers,
+    mirrored_marker_contract,
     transcode_events,
 )
-
 
 NBA = "nba-2k11"
 CH = "college-hoops-2k8"
 END = struct.pack(">i", -0x80000000)
+
+
+@pytest.mark.parametrize("mirrored", [False, True])
+def test_verified_marker_map_commutes_with_native_mirror_selector(mirrored):
+    # Native selectors swap the first two markers; the third remains invariant.
+    nba = [22, 21, 23] if mirrored else [21, 22, 23]
+    ch = [21, 20, 22] if mirrored else [20, 21, 22]
+    raw = (
+        b"".join(
+            struct.pack(">ifI", marker, i * 0.25, 0) for i, marker in enumerate(nba)
+        )
+        + END
+    )
+    output, _ = transcode_events(inspect_events(raw, NBA), mirrored_marker_contract())
+    assert [row["id"] for row in inspect_events(output, CH)["entries"]] == ch
+    unknown = struct.pack(">ifI", 24, 0, 0) + END
+    with pytest.raises(ValueError, match="No explicit mapping"):
+        transcode_events(inspect_events(unknown, NBA), mirrored_marker_contract())
 
 
 def contract(*rules):
@@ -75,6 +94,28 @@ def test_unknown_payload_never_silently_dropped():
     assert report["entries"][0]["payload_word"] is None
     with pytest.raises(ValueError, match="Opaque payload"):
         transcode_events(report, contract((92, 39, None)))
+
+
+def test_traced_consumed_fields_do_not_establish_a_portable_payload():
+    # Event 94 has two native table indices. Inspecting both must not allow the
+    # event bridge to drop its payload or map those indices across games.
+    raw = struct.pack(">iII", 94, 0, 9) + END + struct.pack(">ii", 7, 3)
+    report = inspect_events(raw, NBA)
+    fields = inspect_payload_consumers(raw, 94, 16)
+    assert [field["value"] for field in fields["fields"]] == [7, 3]
+    assert not fields["portable_semantics"] and not fields["complete_payload"]
+    report["entries"][0]["consumed_fields"] = fields
+    with pytest.raises(ValueError, match="Opaque payload"):
+        transcode_events(report, contract((94, 93, None)))
+    with pytest.raises(ValueError):
+        inspect_payload_consumers(raw[:-1], 94, 16)
+
+
+def test_payload_inspection_preserves_nonfinite_float_bits_without_json_nan():
+    result = inspect_payload_consumers(struct.pack(">II", 1, 0x7FC01234), 92, 0)
+    field = result["fields"][1]
+    assert field["value"] is None and field["raw_bits"] == 0x7FC01234
+    json.dumps(result, allow_nan=False)
 
 
 @pytest.mark.parametrize(

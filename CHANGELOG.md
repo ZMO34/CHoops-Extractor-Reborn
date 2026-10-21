@@ -1,3 +1,10 @@
+## Unreleased — canonical animation bind and registration audits
+
+- Verify the observed CH/NBA11 21-bone bind and preserve declared channel masks during packed pose conversion.
+- Add read-only bind and shot-registration CLI audits; validate stock rows, known consumers and native label initialization.
+- Inspect additional native payload reads without enabling unproven event conversion; provide an explicit three-marker mirror-selector contract.
+- Document the separate registration-only probe and full observed-family component preparation. No playable donor port or executable patching is added to the editor.
+
 ## v1.21 — animation event bridge and team asset selection
 
 - Add bounded CH/NBA11 event-table inspection, known category-payload-word reads and NBA11 membership-pair inspection.

@@ -1,3 +1,7 @@
+> Canonical 21-bone bind correspondence and registration allocation research
+> advanced after v1.21. See [ANIMATION_BIND_REGISTRATION.md](ANIMATION_BIND_REGISTRATION.md).
+> Full event semantics and playable donor registration remain incomplete.
+
 # Cross-game animation and controls implementation ledger
 
 Owner scope (2026-10-20): research and implement as much NBA 2K11/14 on-court

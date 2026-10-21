@@ -1,3 +1,26 @@
+# Unreleased canonical bind / registration phase
+
+Targeted animation regression suite:65 passed. Source portable verification:
+781 passed,9 optional skips,2 deselected; compile,CLI/Qt smoke,Ruff,mypy,
+handoff and diff checks passed. Exact committed-head verification is recorded
+in the PR handoff. Tests cover bind mismatch rejection, mask/count agreement, all five observed
+translation counts, decoded-pose equivalence, padding/reverse-byte preservation,
+changed native consumers/ranges, TLS-safe zero-padding planning, mirror-selector
+parity and opaque-payload refusal after consumer inspection.
+
+Private read-only corpus:7,055 CH and18,831 NBA11 headers pass canonical-channel
+validation.9,574 NBA11 pose streams/341,823 keys/49,278,288 bytes pass conversion
+and exact reverse checks; no component-preparation errors. Of9,574 event tables,
+2,674 use only the verified subset (including empty tables),6,900 remain blocked.
+Traced payload reads pass for151 event90,1117 event92,71 event93,47 event94,
+1260 event173,23 event178 and187 event186 rows; no extent errors.
+
+The authorized separate registration-only decoded ELF reparses at113 entries,
+preserves112 original records, TLS and adjacent label pointers, and passes an
+exact diff allowlist. This is structural evidence only, not runtime registration.
+Source hashes are unchanged. No game assets/binaries/reports are tracked or
+published; no RPCS3, hardware or automatic/testing JB was used.
+
 # v1.21 animation event bridge
 
 Targeted animation suite:

@@ -1,3 +1,21 @@
+# Unreleased — canonical bind and registration research
+
+Confirmed byte-identical CH/NBA11 canonical 21-bone parents, rest translations and
+default routes, with matching native consumers. Added guarded pose retargeting,
+read-only bind/shot-registration CLI audits and opt-in payload-consumer inspection.
+The three-rule mirrored-selector contract remains narrow and explicit; other
+markers and opaque payloads still block conversion. Details:
+[ANIMATION_BIND_REGISTRATION.md](ANIMATION_BIND_REGISTRATION.md).
+
+A separate authorized local decoded-ELF probe preserves all112 stock shots and
+appends one stock-backed duplicate, with exact diff/TLS/adjacent-array checks.
+It is an allocation probe, not a signed EBOOT or runtime-tested donor registration.
+Private bulk preparation translated9,574 pose streams/341,823 stored keys across
+18,831 observed NBA11 headers, with exact reverse checks and unchanged sources.
+Timing/root remain source-key components;6,900 event tables remain semantically
+blocked. No full playable port, added donor styles or modern controls are installed.
+No emulator or automatic/testing JB was run. v1.21 remains the published release.
+
 # v1.21 — animation event bridge and asset-selection correction
 
 Completed the bounded offline event-table bridge phase: CH/NBA11 event inspection,

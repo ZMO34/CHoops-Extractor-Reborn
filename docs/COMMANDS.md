@@ -103,3 +103,17 @@ With the development Python environment, run
 Add `--players` for the source roster's per-player likeness selectors.
 Prints JSON only; no face import, roster writing or executable patching.
 See [player-face evidence](PLAYER_FACE_RESEARCH.md) for supported meanings.
+
+
+## Canonical motion bind / shot registration audits
+
+`inspect-motion-bind NBA11_ANALYSIS.ELF CH_ANALYSIS.ELF output/research/bind.json`
+checks the observed 21-bone parent/rest/default-route correspondence.
+`inspect-shot-registration CH_ANALYSIS.ELF output/research/registration.json`
+checks native stock preservation, table ranges, known consumers and label writes.
+Both are read-only; no executable patch application is exposed. Reports are private
+research outputs and do not certify a playable animation port.
+
+`inspect-motion-events ... --payload-consumers` optionally annotates individually
+traced NBA11 payload reads. It requires the NBA11 inspection command; opaque
+payloads remain blocked from conversion. See ANIMATION_BIND_REGISTRATION.md.
