@@ -109,6 +109,15 @@ def test_mask_count_mismatch_and_unknown_high_mask_rejected():
         canonical_channels(raw, "college-hoops-2k8")
 
 
+def test_unpacked_native_branch_is_never_read_as_packed_quaternions():
+    donor, _ = rig("nba-2k11")
+    target, _ = rig("college-hoops-2k8")
+    raw = header("nba-2k11")
+    struct.pack_into(">I", raw, 0x14, 0x8000)
+    with pytest.raises(ValueError, match="unpacked pose"):
+        retarget_canonical_frames(bytes(144), raw, 1, donor, target)
+
+
 def test_bind_cli_inspects_both_sources_and_never_overwrites_target(
     tmp_path, monkeypatch
 ):

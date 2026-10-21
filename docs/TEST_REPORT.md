@@ -1,7 +1,7 @@
 # Unreleased canonical bind / registration phase
 
-Targeted animation regression suite:65 passed. Source portable verification:
-781 passed,9 optional skips,2 deselected; compile,CLI/Qt smoke,Ruff,mypy,
+Targeted animation regression suite:66 passed. Source portable verification:
+781 passed,9 optional skips,2 deselected before the final unpacked-mode guard; compile,CLI/Qt smoke,Ruff,mypy,
 handoff and diff checks passed. Exact committed-head verification is recorded
 in the PR handoff. Tests cover bind mismatch rejection, mask/count agreement, all five observed
 translation counts, decoded-pose equivalence, padding/reverse-byte preservation,

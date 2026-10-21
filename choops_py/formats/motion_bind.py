@@ -132,6 +132,8 @@ def canonical_channels(header, profile):
 def retarget_canonical_frames(raw, header, frames, donor, target):
     proof = verify_canonical_bind(donor, target)
     channels = canonical_channels(header, "nba-2k11")
+    if struct.unpack_from(">I", header, 0x14)[0] & 0x8000:
+        raise ValueError("NBA11 unpacked pose mode needs its separate native decoder")
     output = transcode_frames(
         raw,
         channels["rotations"],

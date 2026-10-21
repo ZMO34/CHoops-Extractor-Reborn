@@ -19,6 +19,8 @@ disassembly; matching table sizes alone were not used as bind evidence.
 For this canonical motion rig, retargeting is identity in bone space plus the
 established packed-quaternion selector conversion. The backend rejects changed
 parents/routes, differing rest vectors, nonfinite values and unsupported masks.
+The NBA11 unpacked-pose decoder branch is explicitly rejected rather than read
+as packed data. None of the observed 18,831 headers uses that branch.
 It does not claim compatibility for arbitrary skins, the separate 32-bone NBA11
 SCNE deformation rig, twist bones, or muscle/cloth simulation.
 
@@ -126,7 +128,12 @@ root tracks at the original irregular keys. It is explicitly not an IFF or CH
 fixed-rate motion bank. Pose deduplication does not merge clip semantics. Only
 2,674 event tables contain exclusively the verified selector subset (including
 empty tables); **6,900 remain blocked**. This is not 2,674 certified playable clips.
-The source files retain their original hashes.
+The source files retain their original hashes. Expanding every unique stream to
+fixed-rate frames at its current rate would require 1,632,617 frames / 235,096,848
+pose bytes, before roots, events or existing CH assets. Most source key intervals
+have GCD one, so a simple lower-rate common grid does not materially reduce this
+cost. The component bundle deliberately retains source timing instead of loading
+an unchecked expanded library into the game's memory.
 
 Remaining gates before an installable port include complete event/ball/contact
 mapping, target header flags and velocity metadata, auxiliary tracks, blend and
