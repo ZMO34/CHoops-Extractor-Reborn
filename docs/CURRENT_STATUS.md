@@ -1,3 +1,13 @@
+# Unreleased — transfer recruit labels and interest-policy foundation
+
+Confirmed separate native HS/JC class formatting, five recruiting-preference
+captions and 96 initialized native preference profiles with weighted consumers. Recruit and college-player class enums differ; placeholder class entries
+are not safe transfer support. Added an offline `TR FR/SO/JR/SR (RS)` formatter,
+stable per-player/offseason three-way priority draw and validated school ordering
+for minutes gained, hometown distance or team rank. Existing game sources unchanged.
+No in-game pool insertion, native interest/forecast adapter, persistence or executable
+patch is installed. See [LEGACY_TRANSFER_PORTAL.md](LEGACY_TRANSFER_PORTAL.md).
+
 # Unreleased — Legacy transfer portal feasibility
 
 Read-only tracing identifies the outgoing candidate gate, 400-active-entry queue,

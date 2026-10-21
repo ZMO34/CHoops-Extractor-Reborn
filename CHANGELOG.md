@@ -1,3 +1,9 @@
+## Unreleased — transfer recruiting policy foundation
+
+- Add offline transfer class/redshirt labels and reproducible three-priority school ordering for playing opportunity, hometown proximity or team ranking.
+- Trace existing HS/JUCO class and recruiting-preference formatters, distinguishing recruit fields from college-player class/eligibility and team ranking from recruit ranking.
+- Preserve originals; native pool insertion, persistence and executable integration remain unfinished.
+
 ## Unreleased — Legacy transfer feasibility research
 
 - Document confirmed transfer candidate gates, ranked destinations, 400-entry active queue, existing transfer menus and serialized pointer relocation.

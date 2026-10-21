@@ -88,6 +88,16 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# Unreleased — transfer recruit labels and interest-policy foundation
+
+Confirmed separate native HS/JC class formatting, five recruiting-preference
+captions and 96 initialized native preference profiles with weighted consumers. Recruit and college-player class enums differ; placeholder class entries
+are not safe transfer support. Added an offline `TR FR/SO/JR/SR (RS)` formatter,
+stable per-player/offseason three-way priority draw and validated school ordering
+for minutes gained, hometown distance or team rank. Existing game sources unchanged.
+No in-game pool insertion, native interest/forecast adapter, persistence or executable
+patch is installed. See [LEGACY_TRANSFER_PORTAL.md](LEGACY_TRANSFER_PORTAL.md).
+
 # Unreleased — Legacy transfer portal feasibility
 
 Read-only tracing identifies the outgoing candidate gate, 400-active-entry queue,
@@ -4668,6 +4678,21 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+# Transfer recruiting policy follow-up — 2026-10-21
+
+Synthetic targeted suite: `python -m pytest tests/test_transfer_portal.py -q -o
+addopts=`: **42 passed**. Covers all college class/RS labels, rejection of HS/unknown
+classes and transfer-status-as-RS, stable/order-independent priorities, framed
+identities, rejection sampling, three distinct preference winners, capacity/source/
+eligibility filters, duplicate identities and malformed/nonfinite metrics.
+All 96 reconstructed profiles match an independent native-loop-order audit and
+source float32 weights; source digest and byte equality remain unchanged. Invalid
+uninitialized profile indices are rejected. Focused Ruff format/check and module
+mypy passed. Native read-only follow-up confirms HS/JC label
+codes, separate recruit class/preference fields, localization captions, geography,
+position-depth and recruit-rank consumers. No game execution or native record writes.
+Exact-head isolated portable results are recorded in the PR handoff.
 
 # Legacy transfer feasibility research — 2026-10-21
 

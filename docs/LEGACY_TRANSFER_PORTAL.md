@@ -11,7 +11,8 @@ emulator, gameplay test, executable patch, editor feature or JB build is supplie
 transfer portal is plausible, but is a larger Legacy-system change.** The most
 promising initial design extends the game's existing transfer list and destination
 selection while retaining existing player objects and the final membership commit.
-Routing transfers through ordinary recruiting is a second, less established route:
+The owner subsequently selected integration into the ordinary recruiting pool (see
+the follow-up below). That route remains less established:
 the recruiting record, eligibility, interest, scholarship and calendar contracts
 have not been shown compatible with existing college players.
 
@@ -135,3 +136,108 @@ frequency constants, all eight state-gate values and 401-record span arithmetic.
 This checks static interpretation, not runtime distribution or save compatibility.
 No proprietary listings, source bytes, game assets, local paths or fingerprints
 are published. The public change is documentation only.
+
+## Transfer recruits and three-priority policy — follow-up
+
+The owner clarified that transfers must appear in the **offseason recruiting
+pool**, beside existing HS and JUCO prospects, with labels such as `TR SO (RS)`.
+Each transfer receives one randomly chosen primary motivation: more playing time,
+proximity to hometown, or team ranking. Existing HS/JUCO recruiting must remain
+intact. This supersedes a separate transfer screen as the intended final product;
+a dedicated queue adapter remains a possible implementation detail.
+
+### Native HS/JUCO labels are confirmed
+
+Recruit formatter `0x7582F4` builds a nine-entry localization table:
+
+| Recruit class code | Current output |
+| --- | --- |
+| 0..3 | HS FR, HS SO, HS JR, HS SR |
+| 4..5 | JC FR, JC SO |
+| 6..8 | Placeholder text (`bogus`), not implemented transfer classes |
+
+Getter `0x75315C` extracts a four-bit field at recruit-object +0x40, shifted right
+21. This is **a different object/enum from the college player's class at anchor
++0x84**. College code 4 means Freshman; recruit code 4 means JC FR. Blindly passing
+a college player to the recruit formatter would mislabel it or read unrelated
+fields. Empty/placeholder display entries do not establish safe new recruit types:
+all class filters, allocation, progression and commitment consumers must agree.
+Four-bit storage by itself is not proof that adding class codes is sufficient.
+
+The new offline `research.transfer_portal.transfer_label()` produces `TR FR`,
+`TR SO`, `TR JR`, `TR SR`, optionally suffixed ` (RS)`, from explicit established
+college class and historical redshirt-used inputs. It writes no native enum.
+Transfer status is independent of redshirt usage and transfer sit-out code 2;
+those must not be conflated. The future adapter must supply the class appropriate
+to its season phase, avoiding a second class increment at signing or rollover.
+Graduate transfer eligibility is unresolved and is not silently invented.
+
+### Existing native motivation routes
+
+Preference formatter `0x757F04` uses five native localization choices:
+feeling wanted, being close to home, getting good coaching, playing at a big
+program, and getting playing time. Getter `0x753AB4` reads a seven-bit index at
+recruit +0x40 shifted right 7. That index selects a **20-byte preference-ranking
+row**, not a direct motivation enum. The selected row is searched for the
+requested rank before the formatter picks a caption. Writing 0/1/2 as if this
+field directly represented our three motivations would be incorrect. The backing
+table is initialized runtime data. Follow-up tracing of `0x75B6C0` establishes
+96 rows: lexicographic permutations of ranks 0..4 with the first column restricted
+to 0..3. It is not all 120 permutations. All five columns are distinct ranks, not
+five motivation IDs. Scoring consumer `0x756070` applies weights 1.0, 0.8, 0.6, 0.4
+and 0.2, with rank zero strongest; native single-precision values are retained.
+The rank-weight table is at `0x10034124` in this revision. The new read-only
+`native_preference_profile(index)` reconstructs all 96 established rows and rejects
+96..127 even though the field can physically represent those values. The complete
+term-to-native-interest and persistence contracts remain unfinished.
+
+`0x75C248` computes geometric separation using two location lookups and coordinate
+accessors `0x75BB08` / `0x75BB50`. The transfer selector passes the player's +0x22
+location identifier and the school's +0x15A identifier. This supports hometown
+proximity as a native input, but its unit conversion and missing/international
+location cases need validation before claiming distances in kilometers.
+
+`0x764050` computes five position-specific team-depth values. It begins with 4.0
+per position, subtracts full player evaluation for scholarship players and half
+for walk-ons who pass the class filter, accounts for pending recruits, then scales
+by 0.25. This is useful opportunity evidence, **not projected minutes**. New portal
+interest must evaluate the post-departure/post-graduation roster and pending
+commitments without counting the prospective transfer twice.
+
+Recruit-card setup `0x5E05B0` calls `0x753E94` (searches an 800-entry ranking list)
+and `0x753EE4` (position-relative rank). These concern recruit rankings, not proof
+of team poll ranking. Likewise, “playing at a big program” is not automatically
+the owner's requested current team ranking. Trace the actual season team-ranking
+source rather than substituting player rank or prestige without disclosure.
+
+### Implemented offline policy and remaining native integration
+
+`choops_py/research/transfer_portal.py` now supplies:
+
+- A uniform three-way pseudorandom priority draw keyed by a 32-byte plan seed,
+  season identity and stable player identity. Length-framed inputs and rejection
+  sampling avoid identity ambiguity/modulo bias. Repeating a screen, input order
+  or reload cannot change the draw **provided the integration retains those inputs**.
+- Label formatting independent of native record mutation, plus inspection of the
+  96 initialized native preference profiles and their float32 weights.
+- Explainable school ordering using one chosen priority: projected minutes gained
+  over the source school, hometown distance, or lower numeric team rank. Unranked
+  schools follow ranked schools. Equal metrics use school identity as a stable
+  tie-break. Source school, no scholarship capacity and explicit ineligibility
+  are excluded; duplicate school identities and invalid/nonfinite metrics fail.
+
+These are caller-supplied synthetic projections in explicit units. No native
+interest percentage, minutes forecast, location decoder, season rank reader,
+persistence writer, in-game TR label or recruiting-pool insertion is installed.
+School ordering does not reserve scholarships or sign players. An availability
+snapshot can become stale when another recruit commits; a future native adapter
+must revalidate and reserve at commitment. The policy does not modify the game's
+PRNG, ordinary HS/JUCO prospects, native settings or game-data CSV columns.
+
+The requested final integration must persist each transfer's identity, class,
+redshirt history, offseason priority and recruiting state; expose it through the
+existing pool/list/card/search paths; allow CPU/user recruiting; and commit through
+one validated membership path before season rollover. It must not finalize or
+delete uncommitted zero-destination queue entries while recruiting remains open.
+This work is a testable policy foundation and stronger format evidence, **not a
+playable portal**. Original EBOOT, assets, roster and saves remain unchanged.
