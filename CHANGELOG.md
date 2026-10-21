@@ -1,4 +1,4 @@
-## Unreleased â€” team asset selection correction
+## Unreleased — team asset selection correction
 
 - Check existing available team assets by default; leave missing or inactive categories unchecked.
 - Show the original team Asset ID in the target box; keep default checks out of change plans and support explicit selected-team cloning.
@@ -21,7 +21,7 @@
 
 - Add bounded read-only native popup descriptor inspection and malformed-input tests.
 - Document queue priority, update heartbeat and formatter limitations.
-## Unreleased â€” uniform solver shape correction
+## Unreleased — uniform solver shape correction
 
 - Adapt native stretch/bend distances when importing edited garment positions,
   preserving authored prestrain, response bytes and particle bindings.
@@ -29,7 +29,7 @@
   builds and aggregate/individual routes. Document confirmed native model routing.
 - In-game appearance still needs testing; no source JB or EBOOT is modified.
 
-## Unreleased â€” adaptive animation timing/root conversion
+## Unreleased — adaptive animation timing/root conversion
 
 - Decode the observed NBA11 byte-delta timeline and resample pose channels to
   fixed CH ticks with native key preservation, SLERP and bounded quantization.
@@ -38,7 +38,7 @@
   Complete banks, events/auxiliary tracks, bind retargeting and additive native
   shot registration are not implemented or claimed gameplay compatible.
 
-## Unreleased â€” native packed-pose translation
+## Unreleased — native packed-pose translation
 
 - Translate the observed NBA11/CH2K8 packed quaternion selector convention with
   exact preservation of remaining stream bits, translations and padding.
@@ -46,14 +46,14 @@
 - Trace additive jump-shot requirements: native112-record playback table and
   UI cap. No stock replacements, new registered shot or gameplay port claimed.
 
-## Unreleased â€” executable-held motion investigation
+## Unreleased — executable-held motion investigation
 
 - Add bounded read-only native ELF motion-header inspection for the observed
   CH2K8/NBA 2K11 full-body family, with explicit incomplete-library/import status.
 - Document Ghidra-confirmed CH pointer/group selection and the gap between archive
   inventories and executable-held motion. No gameplay port/control change.
 
-## Unreleased â€” pending updates and native animation inspection
+## Unreleased — pending updates and native animation inspection
 
 - Consolidate pending Legacy-save, override, face, NBA reader, scorebug and
   uniform-editing updates, preserving their limitations and branch ancestry.
@@ -63,26 +63,26 @@
 - Document Ghidra input/animation routes. No donor gameplay port or new controls
   are represented as implemented or runtime tested.
 
-# Unreleased â€” merged override compatibility audit
+# Unreleased — merged override compatibility audit
 
 - Verify PR #30 retains the v1.16-v1.19 feature history and existing regression suite.
 - Add regression coverage for numeric/named override folders, DDS priority, legacy record aliases and opaque BIN relocation without changing existing import policies.
-# Unreleased â€” player-face research
+# Unreleased — player-face research
 
 - Document the seven dedicated College Hoops likeness slots, generated-face routing, paired texture/preset banks and cross-game conversion limits.
 - Add a read-only face inventory command with synthetic bounds/family/preservation checks; no face editor or EBOOT changes.
-# Unreleased â€” NBA 2K11 donor research
+# Unreleased — NBA 2K11 donor research
 
 - Read the observed v3 SDAT variant with version-specific key selection and retained authentication; keep SDAT output blocked.
 - Document actual NBA 2K11 asset/animation samples and donor suitability ratings; no gameplay, face or animation port implemented.
-## Unreleased â€” native scorebug text contracts
+## Unreleased — native scorebug text contracts
 
 - Reject misaligned SCNE text/property tables that native vector loads cannot read
   as intended, even when Python parsing succeeds.
 - Add bounded native text `max_width` edits, preserving literal/alignment flags
   and the authored property type. Keep private executable experiments separate.
 
-## Unreleased â€” scorebug test05
+## Unreleased — scorebug test05
 
 - Remove HUD dividers and relocate obsolete depth masks away from the new layout.
 - Restore authored palette vertex values; retain enlarged logos and clock/score
@@ -93,7 +93,7 @@
 - Correct earlier live-team-name claims: native normal-game callbacks suppress
   names. Owner chose to retain read-only EBOOT and leave names unresolved.
 
-## Unreleased â€” native test04 startup correction
+## Unreleased — native test04 startup correction
 
 - Replace the experimental duplicated compressed English heap with a single
   uncompressed localization resource at offset zero. Preserve old translations,
@@ -102,7 +102,7 @@
   could be moved. Add regressions for the native direct-read descriptor contract.
 - Record user-provided startup crash evidence and the remaining runtime uncertainty.
 
-## Unreleased â€” test04 native branding follow-up
+## Unreleased — test04 native branding follow-up
 
 - Route title-case College Hoops / Reborn through the existing native label renderer
   using an isolated tagged English literal ID and matching clock font/style values.
@@ -111,7 +111,7 @@
 - Preserve the native sixth-man visibility contract; the small left label now uses
   native-glyph artwork. No executable/font-bank hook or gameplay certification.
 
-## Unreleased â€” scorebug test04
+## Unreleased — scorebug test04
 
 - Bounded native SCNE font-style inspection and edits, with independent live text
   callback names and preserved scene/bone references.
@@ -120,7 +120,7 @@
   to title case with native glyph/color/shadow artwork. Exact live-font rendering
   remains unresolved; no new runtime/executable hook is implemented.
 
-## Unreleased â€” scorebug test03
+## Unreleased — scorebug test03
 
 - Bounded HUD part ranges, ordered edits, shear removal, uniform vertex RGB and
   authored text basis scaling with translated-marker preservation.
@@ -134,7 +134,7 @@
 
 - Add bounded experimental authored HUD geometry/UV/color/text-anchor editing and sixth-man/text inventory.
 - Document scorebug test02 corrections and runtime boundaries; derived user-test assets remain local, not distributed through Git.
-## Unreleased â€” combined executable experiment correction evidence
+## Unreleased — combined executable experiment correction evidence
 
 - Document native property alignment and marker-identity defects in the broken
   prototype; keep the prior multi-variant result explicitly historical.
@@ -142,7 +142,7 @@
   backing and retained arc/transfer experiments. No patching is added to the tool.
 - Record static checks and runtime acceptance limits without claiming visual QA.
 
-# Unreleased â€” executable modernization research
+# Unreleased — executable modernization research
 
 - Record owner-authorized private experimental copies for modern NCAA arc/corner
   scoring, native HUD names and new-transfer sit-out assignment; maintain immutable
@@ -154,7 +154,7 @@
 - Carry forward the native scorebug name-fallback evidence from separate PR #32
   while preserving the owner's decision against executable changes.
 - No runtime/editor feature, executable patch or release added.
-## Unreleased â€” experimental uniform mesh editing
+## Unreleased — experimental uniform mesh editing
 
 - Add source-aware editable OBJ uniform collections, guarded reimport and a modern-fit rest-shape preset in Models / Courts and CLI.
 - Cover five necklines, three body builds and three shorts shapes across all 21 supplied cloth archives / 33 records.
@@ -175,14 +175,14 @@
 - Remove obsolete pinned Windows dependency snapshot/unpublished beta draft; consolidate wrapper assertions into binary tests without reducing coverage.
 - Include the complete documentation tree in Windows packages and maintain the generated cross-PC handoff.
 
-## Unreleased â€” split archive headers and override error fixes
+## Unreleased — split archive headers and override error fixes
 
 - Read and write header regions across source banks; support a TOC crossing 0A.
 - Name damaged banks and expected/actual sizes instead of a generic incomplete-header error.
 - Keep actionable override/build failure details and targeted repair advice in the GUI.
 - Allow NBA2K14 override preview validation without enabling its unvalidated JB writer.
 
-## Unreleased â€” NBA PS3 roster schemas and NBA 2K14 archive reading
+## Unreleased — NBA PS3 roster schemas and NBA 2K14 archive reading
 
 - Read authenticated NPD v4 SDAT blocks and extended split-bank descriptors; keep SDAT JB writing blocked.
 - Decode/re-encode strict ZLIB IFF blocks; read extended IFF pointer tables without unsafe rewriting.
@@ -191,7 +191,7 @@
 - Decode observed newer scene buffer/draw/instance variants and resolve separate court packages.
 - Add read-only cross-game animation inventory and portability evidence; no animation port.
 
-## Unreleased â€” additional court alignment guides
+## Unreleased — additional court alignment guides
 
 - Add a separate key/free-throw-circle and center-circle guide toggle using stock authored geometry, independent of 3-point/border guides.
 - Keep guides raised, thin, flat-colored and separate from actual floor rendering.
@@ -254,25 +254,25 @@
 
 # Uniform lettering continuation (PR #13)
 
-- Authored indexed font decoding, front/back numbers 0â€“99/00 and curved Reborn surnames.
+- Authored indexed font decoding, front/back numbers 0–99/00 and curved Reborn surnames.
 - Roster-linked or preview-only number selection; source/override glyph consistency.
 - Correct sampler/bool uploads and declared material DiffuseColor.
 - Confirmed palette 16/17 school-colour runtime-copy labels.
 
 # Change log
 
-## Unreleased â€” roster / preview continuation
+## Unreleased — roster / preview continuation
 
 Named SCNE source switching, worker source snapshots, comparison reference guards,
 confirmed school text capacities and jump-shot animation ID editing. Nested menu
 logo records show school ownership; stadium labels use arena references.
 
-## Unreleased â€” single-slice DDS replacements
+## Unreleased — single-slice DDS replacements
 
 Allow a 2D DDS replacement for dimension-3 TXTR descriptors whose stored depth
 is exactly one, preserving the original descriptor. Deeper volume textures stay
 blocked.
-## v1.12 â€” roster scale and preview source checkpoint
+## v1.12 — roster scale and preview source checkpoint
 
 Inline ratings, atomic multi-player ratings paste, source-bound CSV and selective
 roster comparison; school filtering, Class/Redshirt controls and growing text
@@ -281,15 +281,15 @@ conversion cache and concise GUI build summaries. This is in-progress work;
 remaining engine limits and shader/number routing are documented, not claimed
 complete. Comparison review uses a table model for large change sets.
 
-## v1.11 â€” record side panels and previews
+## v1.11 — record side panels and previews
 
 Side editors for every category; integrated palettes, footwear and jersey preview.
 Safe player school assignment and 18-slot/count-aware roster handling, including
-real player row zero. School shoe brands propagate to that schoolâ€™s roster as one
+real player row zero. School shoe brands propagate to that school’s roster as one
 undo step. Combined top/shorts preview with neck/build/cut dropdowns. Removed Edit
 selected, Team palette and shoe toolbar actions; no alternate assets added.
 
-## v1.10 â€” roster editing cleanup
+## v1.10 — roster editing cleanup
 
 Readable height/positions, visible Player/Ratings/Scholarship editor tabs, verified
 scholarship flag editing and named equipment. Schools combines duplicate views.
@@ -297,13 +297,13 @@ Removed separate properties/attributes and D1/alternate/independent-asset action
 conference realignment remains. No alternate assets added. Full Windows package
 includes the established LGPL audio codecs and corresponding source notices.
 
-## Unreleased â€” reviewed audio GUI continuation
+## Unreleased — reviewed audio GUI continuation
 
 Fix scene/shoe navigation after Audio insertion; clean-clone converter tests use
 synthetic fixtures. Batch WAV exports publish atomically and remove incomplete
 batches on cancellation/failure.
 
-## Unreleased â€” LGPL audio package
+## Unreleased — LGPL audio package
 
 Build a restricted FFmpeg CLI from pinned upstream source with GPL/nonfree
 components disabled, ship corresponding FFmpeg/AtracDEnc sources and notices,
@@ -336,8 +336,8 @@ normalization. Dynamic supported stadium sizes retained; runtime budget unknown.
 
 Native Qt studio; streaming cancelable raw extraction; precomputed IFF spans; replacement-folder staging and source preconditions; verified unpatched build bytes; roster redo; source/packaged smoke tooling. CI branch deletion/release side effects removed. Historical higher-looking version tags remain untouched. This is a new rebuild train, not a replacement of preserved releases.
 
-Override selection fix: automatically choose a fresh numbered workspace when the configured folder exists; update build and preview paths together. Rename the GUI action to Select overrides folderâ€¦ and remove staging wording from GUI messages. Preserve previous workspaces on failure.
-Continuation: optional stock-court alignment guides default off and leave floor shader/palette rendering intact. Correct ROST runtime UTF-16BE string fixup, protect the 65,535-unit descriptor count, and remove Qtâ€™s unrelated input ceiling.
+Override selection fix: automatically choose a fresh numbered workspace when the configured folder exists; update build and preview paths together. Rename the GUI action to Select overrides folder… and remove staging wording from GUI messages. Preserve previous workspaces on failure.
+Continuation: optional stock-court alignment guides default off and leave floor shader/palette rendering intact. Correct ROST runtime UTF-16BE string fixup, protect the 65,535-unit descriptor count, and remove Qt’s unrelated input ceiling.
 
 v1.14: direct jersey, shoe and stadium/floor selectors use Source JB or selected overrides without manual IFF opening. Jersey selection initializes the mesh; stadium modes choose combined, floor or arena. Source switching reloads the active direct preview.
 
@@ -356,7 +356,7 @@ workspace field, not an older cached path. The toolbar shows the loaded override
 count; an unavailable workspace is not mislabelled as JB fallback. Existing
 legacy DDS/SCNE folder names remain supported; no bulk rename is required.
 
-Explorer/workspace update: Select overrides folderâ€¦ now lives in Explorer,
+Explorer/workspace update: Select overrides folder… now lives in Explorer,
 with source-aware asset sizes and Override/JB labels. Dry run is removed from the
 GUI; Build JB copy still performs automatic validation. Roster references cover
 home/away/alternate selection menus (SELUA/H/X/Y/Z), gameplay uniform banks,
