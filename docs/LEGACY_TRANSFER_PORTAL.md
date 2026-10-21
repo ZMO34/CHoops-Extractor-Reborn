@@ -241,3 +241,115 @@ one validated membership path before season rollover. It must not finalize or
 delete uncommitted zero-destination queue entries while recruiting remains open.
 This work is a testable policy foundation and stronger format evidence, **not a
 playable portal**. Original EBOOT, assets, roster and saves remain unchanged.
+
+## Native pool, saved component and rollover — continuation
+
+### Confirmed pool structure
+
+The native accessors behind `0x4A3834` / `0x4A25E4` resolve to `0x1BC7A4` /
+`0x1BC7C4`. They read roster-header count +0x48 and base +0x4C, with an exact
+**0xD8-byte recruit stride**. The stock decoded roster reserves 2,000 records
+(432,000 bytes); all are zero before Legacy initialization in the inspected input.
+This is allocated storage, not evidence of 2,000 active prospects or permission
+to overwrite records later. Runtime allocation/reuse must still be traced.
+
+`inspect-recruit-pool` now audits that directory through existing roster adapters,
+including recognized Legacy wrappers. It reports nonzero-record class, preference,
+flags, location identifier and linked-interest head, plus record/source hashes.
+Unknown enum/profile/head values are diagnosed rather than relabeled as transfers.
+Known-table overlap and other directory targets inside the pool are rejected.
+All-zero rows are reported as blank without certifying them reusable. Unknown
+bytes remain untouched; no new editable roster table or CSV columns are added.
+
+### Linked interest nodes and ownership
+
+`0x5C3044` bounds node indices to 0..15999. `0x5C3064` initializes an eight-byte
+node with school sentinel 0x7FFF, next -1, score zero and two zero bytes. Live
+nodes contain signed school +0, signed next +2, signed score +4, raw bytes +6/+7.
+`0x5C3144` pops the free head, `0x5C31C8` returns an initialized node to that list,
+`0x5C3220` detaches a school node, and `0x5C3350` inserts by descending score.
+The two trailing bytes have consumers but are not given speculative full meanings.
+
+The native ownership auditor `0x5CA108` traverses recruit lists only when record
+flags +0x2D have bit 0x04. The new graph audit follows that filter when used through
+the CLI/component reader. It rejects cycles, shared ownership between recruits or
+the free list, duplicate schools and invalid indices/school bounds. Unowned nodes
+are counted; without established complete ownership they are **not called leaks**.
+A separately supplied raw interest block must be exactly 16,000 x 8 bytes.
+
+A second independent 16,000-node pool links school +0x260 queues to recruit
+pointers: `0x5C3580` finds a recruit in that school's list; `0x5C34F0` clears a
+node's pointer, next +4 and remaining word +6. Its ownership must be preserved as
+well as the first pool. The current reader reports relative-reference bounds but
+explicitly does not certify complete second-pool ownership or all queue semantics.
+
+### Exact native recruiting serialization component
+
+Size getter `0x5C5450` returns **0x415A4**. Serializer `0x5C5468` and loader
+`0x5C57B0` agree on these component-relative regions:
+
+| Offset | Size | Established structure |
+| --- | --- | --- |
+| +0x0 / +0x4 | 4 bytes each | First and second free-list heads |
+| +0x8 | 0x10 | Four queue counts |
+| +0x18 | 0x10 | Four additional raw counters |
+| +0x28 | 0x1F400 | First interest-node pool |
+| +0x1F428 | 0x1F400 | Second pointer-bearing node pool |
+| +0x3E828 | 0x2800 | Four 0xA00 queue blocks; active entries use 20-byte records |
+| +0x41028 | 4 | Additional raw word |
+| +0x4102C | 0x578 | Preserved tail; complete semantics unresolved |
+
+The second pool's pointer words are rebased against the roster base for saving.
+Active queue records similarly rebase three pointer fields at +4/+8/+0xC. The
+reader retains record/tail hashes and reports bounds; a pointer being inside the
+roster does not prove its referent type or authorize changing it. Each queue block
+physically holds at most 128 records; larger declared counts are rejected.
+
+The enclosing `0x595D64` / `0x595FB0` aggregate places recruiting after components
+of size 0xC9F8, zero, 0x4228 and 0x7F8: **aggregate-relative offset 0x11418**.
+That is not a certified USERDATA file offset. The outer save also serializes a
+roster length/payload and mode context, and offsets depend on that envelope.
+The owner has no offseason save available. Consequently the new reader accepts
+an **explicitly identified component** through `--recruiting-state`; it does not
+scan for magic values, guess its USERDATA location or add a Legacy-mode writer.
+The existing Legacy roster wrapper/preservation behavior remains intact.
+
+### Signing and rollover require a transfer-specific path
+
+Rollover `0x5B61D8` processes flags &0x04 recruits with class greater than 2,
+increments their recruit class through `0x752A34`, resolves the committed school,
+allocates a college-player slot with `0x744298`, calls **0x7570EC**, sets scholarship
+and adds membership through `0x764548`.
+
+Converter `0x7570EC` zeroes a 308-byte destination object while retaining its newly
+allocated identifier, then fills names, ratings, appearance and other fields from
+the recruit. It writes the advanced recruit class to player anchor +0x84 and
+clears eligibility-related bits near its tail. This is appropriate to creating a
+new freshman/JUCO player, **not preserving an existing transfer's identity/history**.
+It also shows why placeholder recruit class slots cannot simply become transfers:
+class advancement and conversion would apply the wrong semantics.
+
+The portal needs an established proxy-to-existing-player binding and a branch
+before normal class advancement/allocation/conversion. Signing must validate and
+reuse the original player, preserve career/redshirt/eligibility data, update
+reciprocal membership once, reconcile scholarships and reclaim both recruiting
+node families after the commitment is complete. The original transfer finalizer's
+zero-destination removal path must not run while a portal candidate is uncommitted.
+No such native branch, binding persistence or executable patch is installed yet.
+
+### Verification and next action
+
+Synthetic targeted pool/policy/CLI/Legacy suite: **88 passed**. Covers complete
+16,000-node free chains, alias/cycle/duplicate-school rejection, unknown metadata,
+section/queue bounds, source/dependency output protection, native flag filtering,
+legacy wrapper preservation and unchanged opaque data. Private read-only audit
+checks all 2,000 blank stock records, exact source equality, and independently folds
+native size getters to verify 0x415A4 / 0x11418. Ghidra and raw PowerPC agree on the
+serialization and rollover routes. No actual offseason save roundtrip, native
+pool insertion, executable alteration, emulator run or testing JB was performed.
+
+Next establish the recruit-slot allocation/generation and binding lifetime, then
+trace the calendar dispatcher that must hold transfers open through offseason
+recruiting. A native writer must wait for complete allocation, dual-list,
+proxy-identity and save-envelope contracts. The new audit is available now; the
+requested playable transfer portal remains unfinished.

@@ -1,3 +1,9 @@
+## Unreleased — native recruiting pool audits
+
+- Add read-only `inspect-recruit-pool` with native table bounds, metadata diagnostics, interest-list ownership checks and optional serialized recruiting-component inspection.
+- Establish native dual-list persistence layout and identify the rollover conversion that transfers must bypass to preserve player identity/history.
+- Preserve all original data. Playable pool insertion, binding persistence and native signing integration remain unfinished.
+
 ## Unreleased — transfer recruiting policy foundation
 
 - Add offline transfer class/redshirt labels and reproducible three-priority school ordering for playing opportunity, hometown proximity or team ranking.

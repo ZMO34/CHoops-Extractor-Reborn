@@ -88,6 +88,18 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# Unreleased — native recruiting pool and saved-component audits
+
+Added read-only `inspect-recruit-pool` for the confirmed 0xD8 native recruit table,
+with bounds/overlap checks, metadata diagnostics and optional linked-interest or
+0x415A4 serialized-component audits. Native traces establish dual node pools,
+free-list/queue layout and aggregate-relative placement. Stock audit finds 2,000
+reserved blank records; these are not certified reusable slots. Rollover creates
+new college players, so transfers need a separate identity-preserving signing path.
+No native insertion, binding persistence or executable patch is installed. No
+offseason save is available for roundtrip validation; originals remain unchanged.
+See [LEGACY_TRANSFER_PORTAL.md](LEGACY_TRANSFER_PORTAL.md).
+
 # Unreleased — transfer recruit labels and interest-policy foundation
 
 Confirmed separate native HS/JC class formatting, five recruiting-preference
@@ -4678,6 +4690,19 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+# Native recruiting pool and persistence continuation — 2026-10-21
+
+Targeted: `python -m pytest tests/test_recruit_pool.py tests/test_transfer_portal.py
+tests/test_cli.py tests/test_legacy_save_adapter.py -q -o addopts=`: **88 passed**.
+New module/tests pass focused Ruff/import formatting and module mypy. Source
+read-only CLI audit verifies all 2,000 reserved stock recruit records (432,000 bytes)
+are blank and explicitly does not certify slot reuse. Private source/digest checks
+pass; native constant getters independently match section size 0x415A4 and aggregate
+relative offset 0x11418. Ghidra/raw instruction traces establish list ownership,
+serializers and destructive-to-new-object recruit conversion. No original writes.
+Exact-head isolated portable results are recorded in the PR handoff. No offseason
+save supplied, save roundtrip/gameplay/emulator NOT RUN, testing JB NOT BUILT.
 
 # Transfer recruiting policy follow-up — 2026-10-21
 

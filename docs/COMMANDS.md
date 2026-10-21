@@ -103,3 +103,24 @@ With the development Python environment, run
 Add `--players` for the source roster's per-player likeness selectors.
 Prints JSON only; no face import, roster writing or executable patching.
 See [player-face evidence](PLAYER_FACE_RESEARCH.md) for supported meanings.
+
+
+## Read-only recruiting research
+
+```
+choops inspect-recruit-pool roster-or-save output/recruit-pool.json
+choops inspect-recruit-pool roster-or-save output/recruit-pool.json --interest-nodes identified-nodes.bin --free-head 0
+choops inspect-recruit-pool roster-or-save output/recruit-pool.json --recruiting-state identified-component.bin
+```
+
+The input uses existing roster adapters, including the recognized Legacy wrapper.
+Reports stay under output/ and cannot replace any input/dependency. The optional
+interest block must be a separately identified 128,000-byte native node array;
+`--free-head` is optional and applies only to that block. The alternative recruiting
+component must be exactly 0x415A4 bytes, with its own serialized free heads. The
+options are mutually exclusive. No offset within a complete Legacy save is guessed.
+
+This audits class/preferences, native flags and links. It does not add transfers,
+edit records, treat blank slots as safe to overwrite, repair unknown data or export
+research fields through game-data CSVs. The second node pool and remaining queue
+semantics are reported as incomplete. See LEGACY_TRANSFER_PORTAL.md.

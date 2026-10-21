@@ -1,3 +1,15 @@
+# Unreleased — native recruiting pool and saved-component audits
+
+Added read-only `inspect-recruit-pool` for the confirmed 0xD8 native recruit table,
+with bounds/overlap checks, metadata diagnostics and optional linked-interest or
+0x415A4 serialized-component audits. Native traces establish dual node pools,
+free-list/queue layout and aggregate-relative placement. Stock audit finds 2,000
+reserved blank records; these are not certified reusable slots. Rollover creates
+new college players, so transfers need a separate identity-preserving signing path.
+No native insertion, binding persistence or executable patch is installed. No
+offseason save is available for roundtrip validation; originals remain unchanged.
+See [LEGACY_TRANSFER_PORTAL.md](LEGACY_TRANSFER_PORTAL.md).
+
 # Unreleased — transfer recruit labels and interest-policy foundation
 
 Confirmed separate native HS/JC class formatting, five recruiting-preference

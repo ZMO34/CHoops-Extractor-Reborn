@@ -1,3 +1,16 @@
+# Native recruiting pool and persistence continuation — 2026-10-21
+
+Targeted: `python -m pytest tests/test_recruit_pool.py tests/test_transfer_portal.py
+tests/test_cli.py tests/test_legacy_save_adapter.py -q -o addopts=`: **88 passed**.
+New module/tests pass focused Ruff/import formatting and module mypy. Source
+read-only CLI audit verifies all 2,000 reserved stock recruit records (432,000 bytes)
+are blank and explicitly does not certify slot reuse. Private source/digest checks
+pass; native constant getters independently match section size 0x415A4 and aggregate
+relative offset 0x11418. Ghidra/raw instruction traces establish list ownership,
+serializers and destructive-to-new-object recruit conversion. No original writes.
+Exact-head isolated portable results are recorded in the PR handoff. No offseason
+save supplied, save roundtrip/gameplay/emulator NOT RUN, testing JB NOT BUILT.
+
 # Transfer recruiting policy follow-up — 2026-10-21
 
 Synthetic targeted suite: `python -m pytest tests/test_transfer_portal.py -q -o

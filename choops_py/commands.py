@@ -6,6 +6,7 @@ class Command:
     options: tuple = ()
     output_file: bool = False
 COMMANDS={
+    'inspect-recruit-pool':Command(('input','output'),('recruit-pool',),True),
     'export-uniform-models':Command(('source','output')),
     'modern-fit-uniforms':Command(('source','output')),
     'import-uniform-models':Command(('edited','output')),

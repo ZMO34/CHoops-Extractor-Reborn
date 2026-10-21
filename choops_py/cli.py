@@ -15,7 +15,12 @@ def parser():
         s=sub.add_parser(name)
         for field in spec.fields:s.add_argument(field)
         for group in spec.options:
-            if group=='motion-events':
+            if group=='recruit-pool':
+                dependency=s.add_mutually_exclusive_group()
+                dependency.add_argument('--interest-nodes')
+                dependency.add_argument('--recruiting-state')
+                s.add_argument('--free-head',type=lambda value:int(value,0))
+            elif group=='motion-events':
                 s.add_argument('--native-elf',action='store_true')
                 s.add_argument('--auxiliary-start')
             elif group=='motion-root':
@@ -47,10 +52,35 @@ def execute(a):
     if c=='gui':
         from .studio import main as launch
         return launch([])
-    sources=[getattr(a,key) for key in ('source','input','cdf','dds_file','wav_file','image','mod','modded','edited','patch','timing','root_track','contract') if getattr(a,key,None)]
+    sources=[getattr(a,key) for key in ('source','input','cdf','dds_file','wav_file','image','mod','modded','edited','patch','timing','root_track','contract','interest_nodes','recruiting_state') if getattr(a,key,None)]
     if hasattr(a,'output'):
         validator=build_destination if c=='build-copy' else safe_output
         a.output=validator(a.output,sources)
+    if c == 'inspect-recruit-pool':
+        from .research.recruit_pool import MAX_INPUT, INTEREST_CAPACITY, INTEREST_STRIDE, RECRUITING_STATE_SIZE, inspect_recruit_pool, inspect_interest_graph, inspect_recruiting_section
+        from .roster.adapters import load_bytes
+        if a.free_head is not None and not a.interest_nodes:
+            raise ValueError('free-head requires a separately identified interest-nodes block')
+        if Path(a.input).stat().st_size > MAX_INPUT:
+            raise ValueError('Recruit roster input exceeds inspection bounds')
+        source = load_bytes(Path(a.input).read_bytes())
+        report = inspect_recruit_pool(source.payload)
+        report['source_kind'] = source.kind
+        if a.interest_nodes:
+            node_path = Path(a.interest_nodes)
+            if node_path.stat().st_size != INTEREST_CAPACITY * INTEREST_STRIDE:
+                raise ValueError('Interest block must contain exactly 16000 eight-byte nodes')
+            report['interest_graph'] = inspect_interest_graph(
+                node_path.read_bytes(),
+                {row['slot']:row['interest_head'] for row in report['records'] if row['recruiting_filter_bit_2']},
+                school_count=report['school_count'],free_head=a.free_head)
+        elif a.recruiting_state:
+            state_path = Path(a.recruiting_state)
+            if state_path.stat().st_size != RECRUITING_STATE_SIZE:
+                raise ValueError('Recruiting state must be exactly 0x415A4 bytes')
+            report['recruiting_state'] = inspect_recruiting_section(state_path.read_bytes(),source.payload)
+        save_json(a.output,report,sources)
+        return report
     if c in ('export-uniform-models','modern-fit-uniforms','import-uniform-models',
              'export-uniform-iff','import-uniform-iff'):
         from .modding import uniform_mesh
