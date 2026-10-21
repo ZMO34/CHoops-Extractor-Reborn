@@ -88,6 +88,18 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# v1.21 — animation event bridge and asset-selection correction
+
+Completed the bounded offline event-table bridge phase: CH/NBA11 event inspection,
+known event90 payload-word inspection, NBA11 +0x34 membership pairs, and a
+contract-gated writer preserving exact time bits/order. No default semantic map is
+installed; opaque payloads or missing explicit rules block conversion. Native
+Ghidra/disassembly/corpus evidence is in ANIMATION_EVENT_BRIDGE.md. Both supplied
+ELF copies remain unchanged. Full bank/header/bind/event semantic translation,
+additive shot registration and modern controller defaults remain unfinished;
+no donor animation is yet playable. No emulator or real/testing JB was run.
+This release also includes the merged asset-selection fix from PR43.
+
 # Team asset checkbox correction
 
 Available team assets now start checked, using explicit inventory presence rather
@@ -469,7 +481,7 @@ No backport is implemented; modern runtime features remain distinct from assets.
 
 Embedded source: docs/FEATURE_MATRIX.md
 
-# Current support matrix — v1.20
+# Current support matrix — v1.21
 
 Supported means structurally verified by parsers and automated fixtures. No row
 certifies game/runtime compatibility. Unknown variants fail explicitly.
@@ -497,6 +509,12 @@ enabled. [Donor evidence and limits](NBA2K11_DONOR_ASSESSMENT.md).
 
 - Explorer reads nested records and researched asset references; labels never make
   an unknown hash an established semantic identity.
+- Team Assets checks existing available assets by default, marks shared asset
+  routes with peer team names, and starts the target box with the original ID.
+  Existing checks alone never clone the roster; independent copies are explicit.
+- Offline NBA11/CH event inspection and contract-gated event-table conversion
+  complement packed-pose/timing/root conversion. No default semantic event map
+  or playable donor bank is supplied; opaque payload schemas block conversion.
 - Source and overrides are cached concurrently. Global preview selection resolves
   geometry and artwork; DDS takes priority only within overrides, with TXTR fallback.
 - Static preview camera supports orbit, look-around, pan, WASD movement and fit.
@@ -513,7 +531,7 @@ enabled. [Donor evidence and limits](NBA2K11_DONOR_ASSESSMENT.md).
 
 ## Excluded or unresolved
 
-No alternate-asset creation, automatic D1 conversion, EBOOT editing, animation
+No automatic D1 conversion, editor EBOOT patching, complete gameplay animation
 port, encrypted-save decryption, universal NBA roster fields or full arena shader
 emulation. Unknown reflection/fake-bump/AO/runtime palettes and universal text
 ceilings remain unestablished. See [limitations](KNOWN_LIMITATIONS.md),
@@ -1422,6 +1440,15 @@ word or applying a uniform ID offset is not a supported event conversion.
 
 ## Adding jump-shot choices — native requirements
 
+The next offline phase now provides [event/payload dependency inspection and a
+guarded table bridge](ANIMATION_EVENT_BRIDGE.md). It preserves marker order and
+exact time bits, requires explicit caller-reviewed mapping evidence and blocks
+unknown payload schemas. It does not install the candidate correspondences above
+as a semantic dictionary. Native audit:3,727 CH tables/17,897 rows and9,574 NBA11
+tables/49,639 rows; zero extent errors. NBA11's +0x34 counted membership pairs are
+also bounded, with their second words left opaque. This closes the offline table
+format/writer phase, not the remaining runtime/event-semantic dependencies.
+
 Owner requirement is additive: retain every original shot and append donor styles.
 CH getter/setter 0x69E938/0x69E94C read/write one byte at logical player +0x73
 (editor row +0x83); the editor's current accepted range remains 0..111. Native
@@ -1505,6 +1532,129 @@ Use the matching profile. The links command rejects NBA 2K14 because its packed
 motion envelope is not established. It reports local candidates rather than
 silently resolving cross-bank references. Source assets, reports and executable
 analysis copies are local, excluded from Git. No RPCS3 or testing JB is used.
+
+---
+
+Embedded source: docs/ANIMATION_EVENT_BRIDGE.md
+
+# Animation event bridge phase (v1.21)
+
+The offline event-table bridge is implemented. It reads the established CH2K8 and
+NBA 2K11 event layouts, retains exact time bits/order, inspects the known NBA11
+payload-word consumer and writes a separate CH-format event table **only with an
+explicit mapping contract**. It is not a playable clip, executable patch, built-in
+semantic dictionary or completed animation-system port. No donor animation has
+yet been registered for CH gameplay; no added jump-shot choice or new controller
+default is installed.
+
+## Native findings
+
+Focused Ghidra analysis and independent PowerPC disassembly agree on these routes:
+
+| Native route | Established behavior |
+| --- | --- |
+| CH 0x217FC | First matching marker ID, eight-byte rows from motion header +0x38, INT_MIN sentinel |
+| CH 0x21DFC | First event strictly after a time; input zero is changed to -1 before comparison |
+| NBA11 0x1A828 | First matching marker ID, twelve-byte rows from header +0x30, same sentinel |
+| NBA11 0x1A7B4 | Last matching marker ID; duplicate IDs cannot be discarded |
+| NBA11 0x15F24 | Relocates each row's +8 payload pointer using signed field-relative offset minus one |
+| NBA11 call 0x460114 | Event 90 payload first word compared to category 7; selected against actor state |
+| NBA11 call 0x47F4FC | Event 90 payload first word compared to actor +0x2E4; matching row time becomes playback start |
+| CH call 0x31146C | Related selection path instead requests marker ID 89 + actor category at +0x214 |
+| NBA11 0x1A880 | Header +0x34 points to a signed count followed by eight-byte pairs; first word is a membership key |
+
+The latter pair-table value stays opaque. It is not relabeled a pointer, skeleton
+or pose channel. A nearest OPD descriptor does not always identify a local function
+start: a larger decompile rooted at 0x45FFB0 excludes the later event consumer.
+The instruction-level call and payload loads above are the evidence, rather than
+an inferred function body based on the nearest OPD.
+
+Event 90 illustrates the semantic gap: the retained-motion candidate comparisons
+associate donor payload values 0/3/4/5/7/9 with CH IDs 89/92/93/94/95/97. These are
+candidate correspondences, not a validated complete category enum. Source and
+destination category spaces differ. No `ID + constant` rule or candidate table is
+silently installed. Event 90's consumer establishes a four-byte read, not the
+meaning or total allocation size of arbitrary neighboring bytes.
+
+## Read-only supplied-copy audit
+
+The new parser was run against every distinct event-list pointer in the previously
+identified full-body embedded-header family:
+
+| Profile | Distinct event tables | Event rows | Malformed tables |
+| --- | ---: | ---: | ---: |
+| CH2K8 | 3,727 | 17,897 | 0 |
+| NBA 2K11 | 9,574 | 49,639 | 0 |
+
+All inspected tables have nondecreasing finite times. NBA11 has 7,564 payload-free
+tables. Ten marker IDs have payload pointers: 89,90,92,93,94,173,176,177,178,186.
+Of these rows, 151 use event 90's known word consumer and 2,850 carry other opaque
+payloads. Event 90 values observed are 0–5 and 7–9; the absent value 6 must not be
+invented or automatically compressed out of the category enum.
+
+The auxiliary parser also accepts 101 distinct +0x34 membership tables containing
+101 total pairs, with no extent errors. These counts cover this header family,
+not every game animation or external bank. Source hashes before/after agree.
+No game/executable bytes, generated clip data or private reports are distributed.
+
+## Use the research commands
+
+Run through `python -m choops_py.cli` or the Windows executable's `--cli` option.
+Outputs must be separate files in the configured output workspace.
+
+```
+inspect-motion-events DECODED_BLOCK nba-2k11 0xOFFSET output/events.json
+inspect-motion-events DECODED_ELF nba-2k11 0xADDRESS output/events.json --native-elf
+```
+
+For a decoded IFF block, ADDRESS is a block-relative event-table offset and payload
+fields remain signed relative pointers. With `--native-elf`, ADDRESS and payload
+pointers are absolute virtual addresses. Every requested byte must be file-backed;
+an address inside the runtime BSS is not permission to read zero-filled file data.
+`college-hoops-2k8` inspection uses its eight-byte layout. NBA14 remains unsupported.
+An optional `--auxiliary-start 0xADDRESS` inspects NBA11's +0x34 pair table using
+the same address convention. Null pointers are not table addresses.
+
+```
+transcode-motion-events DECODED_BLOCK nba-2k11 0xOFFSET REVIEWED_MAP.json output/ch-events.bin
+```
+
+This command also accepts `--native-elf`. The contract has schema 1 and a rules
+list. Each rule requires `source_id`, `target_id`, `payload_word` (null for no
+payload) and a nonempty `evidence` string. The following is a **synthetic syntax
+example**, not an actual game mapping:
+
+```json
+{"schema": 1, "rules": [
+  {"source_id": 70000, "target_id": 70001, "payload_word": null,
+   "evidence": "Synthetic fixture only; no game semantic assertion"}
+]}
+```
+
+The caller must establish and review the semantic evidence; writing an evidence
+string does not validate it. There is deliberately no default identity map.
+Event 90 rules can specify an exact consumed payload word, including zero. Other
+payload-bearing event IDs block conversion even if an ID-only rule is supplied.
+Missing mappings, duplicate rules, unsupported payload selectors, nonfinite times,
+misaligned/out-of-range pointers and unterminated lists block the entire output.
+All checks precede file writing. Input ELF/block and contract files are protected
+from overwrite. A four-byte INT_MIN terminator follows the target rows.
+
+The converter reparses its output and verifies mapped IDs and original float bits.
+It retains duplicate markers, order and negative-zero time bits. CLI results retain
+the applied rule evidence and report `gameplay_ready=false`, `complete_motion=false`.
+Do not insert this standalone table into a game archive: header relocation, bank
+registration, bind hierarchy, mirrored state and other tracks are still required.
+
+## Phase boundary and next work
+
+This phase completes bounded event/payload dependency inspection and the guarded
+offline table writer. It does **not** complete semantic conversion of every marker
+or the nine other payload schemas. Next, prove donor bone-channel/bind correspondence
+and remaining payload consumers, then assemble a complete motion-header adapter
+with all dependencies accounted for. Additive shot-table allocation, blend graphs,
+ball/contact behavior and controller defaults remain separate runtime work.
+No RPCS3 or automatic/testing game build was run.
 
 ---
 
@@ -2489,6 +2639,13 @@ standard-bank inventory. Candidate count/duration header relationships differ
 between presentation and crowd clips; mirrored entries can be only 64 bytes.
 Therefore a guessed universal frame rate or stand-alone BVH decoder is not
 exposed. Clip dependency/alias resolution must precede skeletal export.
+# v1.21 event/payload bridge follow-up
+
+[Native event evidence and commands](ANIMATION_EVENT_BRIDGE.md) now cover the
+eight/twelve-byte row difference, first/last marker lookup, exact timestamp bits,
+event90's category-word consumer and NBA11's counted membership pairs. The guarded
+offline writer requires explicit reviewed mappings and blocks opaque payloads.
+It adds no default semantic dictionary, runtime bank or new jump-shot registration.
 
 ---
 
@@ -4494,6 +4651,28 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+# v1.21 animation event bridge
+
+Targeted animation suite:
+`python -m pytest tests/test_motion_events.py tests/test_motion_envelope.py tests/test_embedded_motion.py tests/test_motion_frames.py -q`:
+49 passed. Full development portable verification:758 passed,9 optional skips,
+2 deselected; compile,CLI/Qt smoke,Ruff,mypy,handoff and diff checks passed.
+The release is also checked from its exact committed head in an isolated checkout.
+
+New regressions cover signed relative versus native absolute payloads, file-backed
+extent/BSS rejection, missing sentinel/truncation, nonfinite times, required event90
+payload, opaque payload refusal, missing/duplicate contract rules, exact float-bit
+and duplicate-order preservation, zero-valued payload categories, bounded auxiliary
+pairs, all-validation-before-write and input/contract overwrite protection.
+
+Read-only supplied-copy audit using the new parser:3,727 CH tables/17,897 events;
+9,574 NBA11 tables/49,639 events; no malformed tables. All identified tables have
+nondecreasing finite times.101 NBA11 auxiliary tables/101 pairs pass;151 event90
+payload-word reads and2,850 other opaque payload rows are distinguished. Original
+analysis-copy hashes remain unchanged. No game/executable bytes are distributed,
+no emulator ran and no real/testing JB was built. Semantic mappings are explicitly
+caller-supplied research assertions, not automatically validated gameplay behavior.
 
 # Team asset checkbox defaults
 

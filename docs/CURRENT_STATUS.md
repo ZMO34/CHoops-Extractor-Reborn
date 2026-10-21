@@ -1,3 +1,15 @@
+# v1.21 — animation event bridge and asset-selection correction
+
+Completed the bounded offline event-table bridge phase: CH/NBA11 event inspection,
+known event90 payload-word inspection, NBA11 +0x34 membership pairs, and a
+contract-gated writer preserving exact time bits/order. No default semantic map is
+installed; opaque payloads or missing explicit rules block conversion. Native
+Ghidra/disassembly/corpus evidence is in ANIMATION_EVENT_BRIDGE.md. Both supplied
+ELF copies remain unchanged. Full bank/header/bind/event semantic translation,
+additive shot registration and modern controller defaults remain unfinished;
+no donor animation is yet playable. No emulator or real/testing JB was run.
+This release also includes the merged asset-selection fix from PR43.
+
 # Team asset checkbox correction
 
 Available team assets now start checked, using explicit inventory presence rather

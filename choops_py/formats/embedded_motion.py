@@ -67,6 +67,17 @@ class NativeELF:
                 )
         raise ValueError("Motion dependency is outside native load memory")
 
+    def read(self, address, size):
+        """Read an entire file-backed range; never synthesize native BSS bytes."""
+        if type(address) is not int or type(size) is not int or size < 0:
+            raise ValueError("Invalid native dependency extent")
+        for segment in self.segments:
+            delta = address - segment['address']
+            if 0 <= delta <= segment['file_bytes'] and delta + size <= segment['file_bytes']:
+                start = segment['offset'] + delta
+                return self.raw[start:start + size]
+        raise ValueError("Native dependency extent is not fully file-backed")
+
 
 def inspect_embedded(raw, profile):
     if profile not in PROFILES:

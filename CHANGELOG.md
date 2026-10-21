@@ -1,4 +1,10 @@
-## Unreleased — team asset selection correction
+## v1.21 — animation event bridge and team asset selection
+
+- Add bounded CH/NBA11 event-table inspection, known category-payload-word reads and NBA11 membership-pair inspection.
+- Add a separate CH event-table writer requiring an explicit research mapping contract; retain exact time bits, duplicate markers and order, and block unknown payload schemas.
+- Document native marker consumers, complete identified-family event audit and remaining semantic/runtime dependencies. No playable donor animation or new controls are claimed.
+
+### Team asset selection correction
 
 - Check existing available team assets by default; leave missing or inactive categories unchecked.
 - Show the original team Asset ID in the target box; keep default checks out of change plans and support explicit selected-team cloning.

@@ -1,3 +1,15 @@
+# Motion event bridge
+
+`inspect-motion-events INPUT PROFILE ADDRESS OUTPUT.json [--native-elf]`
+reads CH2K8/NBA11 event rows and known payload-word metadata. Add
+`--auxiliary-start ADDRESS` for NBA11's counted membership pairs.
+`transcode-motion-events INPUT nba-2k11 ADDRESS CONTRACT.json OUTPUT.bin`
+writes a separate CH-format event table only with explicit per-ID/payload rules
+and evidence. Both commands use block offsets by default or absolute decoded-ELF
+addresses with `--native-elf`. Unknown payload schemas/missing rules block output;
+no built-in semantic map or installable game bank is supplied. See
+[event evidence, contract syntax and limitations](ANIMATION_EVENT_BRIDGE.md).
+
 # Scorebug native table inspection
 
 `inspect-scorebug-runtime DECODED_ELF OUTPUT_JSON` validates the observed CH2K8
