@@ -47,4 +47,3 @@ eight/twelve-byte row difference, first/last marker lookup, exact timestamp bits
 event90's category-word consumer and NBA11's counted membership pairs. The guarded
 offline writer requires explicit reviewed mappings and blocks opaque payloads.
 It adds no default semantic dictionary, runtime bank or new jump-shot registration.
-
