@@ -88,6 +88,26 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# Unreleased — bounded sampling and donor dependency registration
+
+Added an offline, byte-budgeted NBA11 sampler that reads authored keys on demand,
+validates complete track extents and canonical bind, and emits one CH packed pose.
+The supplied corpus passes 28,722 samples across 9,574 streams without errors;
+retained cache payload stays within 64 KiB. This is not a PS3 heap/RSS guarantee.
+
+Native curve-cache consumers establish four further marker correspondences.
+The explicit seven-rule contract accepts 3,616 event tables including empty lists;
+5,958 tables remain blocked. A typed registry inspector resolves all 2,478 nonempty
+references across two supplied signature banks, preserving 320 empty slots and
+unknown metadata. Group-member selection is reported separately from identity.
+
+Category zero has 147 styles; adding all to CH's 112 would require 259 IDs, beyond
+the existing byte field. No IDs are truncated and no stock styles are replaced.
+Native loader/allocator integration, group/variant translation, remaining event
+semantics and complete target header metadata remain unfinished. No playable
+port, hook, wider roster field, emulator run or testing JB is supplied. Details:
+[ANIMATION_RUNTIME_ADAPTER.md](ANIMATION_RUNTIME_ADAPTER.md).
+
 # Unreleased — canonical bind and registration research
 
 Confirmed byte-identical CH/NBA11 canonical 21-bone parents, rest translations and
@@ -102,8 +122,8 @@ appends one stock-backed duplicate, with exact diff/TLS/adjacent-array checks.
 It is an allocation probe, not a signed EBOOT or runtime-tested donor registration.
 Private bulk preparation translated9,574 pose streams/341,823 stored keys across
 18,831 observed NBA11 headers, with exact reverse checks and unchanged sources.
-Timing/root remain source-key components;6,900 event tables remain semantically
-blocked. No full playable port, added donor styles or modern controls are installed.
+Timing/root remain source-key components; the later runtime-adapter phase above
+reduces the remaining blocked event tables to 5,958. No full playable port, added donor styles or modern controls are installed.
 No emulator or automatic/testing JB was run. v1.21 remains the published release.
 
 # v1.21 — animation event bridge and asset-selection correction
@@ -1832,6 +1852,144 @@ naive root-endpoint velocity: that hypothesis fails on 3,390 of 3,727 stock stre
 No unrelated template velocities or unchecked flags were copied as a workaround.
 
 No RPCS3, hardware run, full-game build or controller remapping was performed.
+
+---
+
+Embedded source: docs/ANIMATION_RUNTIME_ADAPTER.md
+
+# Runtime adapter follow-up
+
+This is an offline reference implementation and native-format investigation.
+It does not install a PS3 sampling hook, donor registry, wider roster ID field or
+playable animation. The full port remains unfinished. The original executables,
+source archives and supplied overrides remain unchanged.
+
+## Additional event correspondence
+
+Ghidra and raw instruction checks match CH `0x3073B4` with NBA11 `0x46DE20`:
+both fill a motion-trajectory cache's timing fields at +0x20/+0x30/+0x34/+0x38,
+sample root displacement, calculate a reciprocal time interval and pass the four
+times to corresponding five-float curve normalizers. CH `0x2CBEC` and NBA11
+`0x141CC` use the same two-branch cubic expression with constants -2 and 3.
+
+| Cache field / role | NBA11 marker | CH marker |
+| --- | --- | --- |
+| +0x20 / anchor | 20 | 19 |
+| +0x30 / first curve control time | 37 | 36 |
+| +0x34 / middle curve control time | 46 | 40 |
+| +0x38 / last curve control time | 38 | 37 |
+
+These are operation-level roles, not invented anatomical/ball-contact names.
+The 46-to-40 correspondence demonstrates why a global ID decrement is incorrect.
+`curve_timing_contract()` includes these four rules and the previous three
+mirrored-selector rules. It remains explicit and opt-in; it is not a complete
+map of every downstream event listener or a default for arbitrary animations.
+
+The NBA11 marker-time wrapper `0x396F90` returns the first event time or a
+negative-FLT_MAX fallback. CH's cache uses its own missing-event fallback. The
+bridge retains actual marker presence/absence, exact time bits, duplicates and
+order; it does not insert one game's fallback value as a marker in the other.
+The internal cache state flags also differ and must not be copied between games.
+
+Private audit: the seven-rule contract converts 3,616 of 9,574 identified event
+tables, with 2,337 actual event rows. Empty lists are included in that table
+count. **5,958 tables still block** on other IDs or opaque payload schemas.
+No count here represents certified playable clips.
+
+## Native donor registry
+
+The collection type `0x449E4AC7` is consumed by NBA11 `0x6599D0`. It traverses
+20-byte entries, filters category at +4, counts entries including a separate
+zero-flag subset at +0x10, and creates a per-category array of entry pointers.
+Native `0x659730` looks entries up by their first word. The key also resolves
+through the supplied game's localization data after tagging its low bit.
+Entry +0xC provides the observed ordinal; the reader preserves its raw value.
+
+The manager initializes 31 categories (0..30). Entry +8 points to a category-
+specific payload. Its constructor dispatcher `0x65840C` resolves eight 12-byte
+reference slots for category zero, one slot for categories 2..10, and two slots
+for the remaining observed categories. The resolver `0x656B70` reads each slot's
+resource ID, chooses SingleMoCap `0x60900D71` when its kind word is zero or the
+group family `0x39F61D57` otherwise, and writes a resolved pointer into +8.
+Serialized slots in the supplied banks have zero runtime-cache words.
+
+The reader validates each payload's own bounds, retains empty slots and unknown
+tails, and resolves dependencies using **type and ID**, including related banks.
+It reports missing/duplicate identities without selecting a load-order winner.
+Group identity resolution is not group-payload or alias-graph translation.
+Native accessor `0x656AEC` selects resolved group members for kind 1..4 at runtime
+object offsets +0xC/+0x1C/+0x2C/+0x3C; kind zero uses the direct resolved pointer
+and kind five returns null. Other kind values remain unestablished in the report.
+The four supplied nonempty group references all use kind one. Category-zero
+accessor `0x657004` chooses slot six or seven from a caller flag; its handedness
+or gameplay meaning is not yet established, so neither slot is arbitrarily chosen.
+These runtime offsets must not be treated as serialized file pointer fields.
+
+```
+python -m choops_py.cli inspect-donor-registry siganims_generic.iff nba-2k11 output/research/signature-registry.json --related-bank siganims_generic_extra.iff
+```
+
+Private supplied-copy audit: 988 entries, 31 categories, 2,478 uniquely resolved
+nonempty slots and 320 explicit empty slots; no missing/ambiguous references.
+Four nonempty slots refer to the group family. Every combined category has unique
+contiguous ordinals. Category zero has 147 entries, ordinals 0..146, eight reference
+slots and an additional four-byte field whose meaning remains unresolved; other
+categories have larger unparsed tails. The parser is not an executable writer.
+
+This is materially different from CH's fixed 112-row shot table. A mechanical
+append of 147 styles would need 259 indices, exceeding the existing unsigned byte
+at player +0x73. No ID is wrapped/truncated and no original style is discarded.
+A wider-ID or indirection design, complete variant mapping and target registration
+metadata still need implementation. Native source entry lookup uses a full word;
+source keys/ordinals must not be written into the CH byte field directly.
+
+## Header and sampling reference
+
+`MotionSampler` maps decoded ELF analysis copies read-only. It verifies the
+canonical bind, validates motion masks/counts, rejects NBA11's unhandled unpacked
+pose branch, and reads source byte-delta key timing at header +0x24, poses at
++0x28 and root tracks at +0x2C. It validates the **complete** pose/root extents
+before returning even a time-zero sample, without allocating those extents.
+
+It checks positive finite rate/time-scale metadata and agreement between declared
+duration and the authored key ticks. It decodes only the two bracketing poses,
+using the existing mathematical SLERP/linear reference. Authored endpoints retain
+exact packed-selector conversion and padding. Root signed words use the matching
+key interval. Mirror/world/auxiliary transformations, root heading angle conversion,
+loop policy and event dispatch remain separate, explicitly reported stages.
+
+```
+python -m choops_py.cli sample-native-motion NBA11_ANALYSIS.ELF CH_ANALYSIS.ELF 0xHEADER_ADDRESS 0.25 output/research/sample.json --cache-bytes 65536
+```
+
+The JSON includes the one-frame CH packed pose, source key indices/fraction,
+pre-transform root words, confirmed timing fields, raw header words and cache
+statistics. Inputs cannot be overwritten. All actual-game reports stay private.
+
+This does not establish CH +0x24/+0x28/+0x2C authoring metadata from an NBA clip.
+Those offsets have different source/target meanings. Remaining header flag bits,
+auxiliary curves, desired-motion metadata and bank relocation still prevent a
+complete header writer. No unrelated template metadata is substituted.
+
+## Memory handling and verification
+
+The source pose data stays at authored keys. The offline sampler retains a byte-
+budgeted LRU rather than a 235 MB expanded pose bank or an expanded key index.
+Only one worker owns a sampler. Each cached read is bounded; eviction updates
+accounting, close releases mappings, and changed input size/mtime/inode invalidates
+the cache. These metadata checks do not certify same-metadata external edits.
+
+Synthetic tests compare every integer tick against full expansion using nontrivial
+rotations/translations/root tracks; they exercise long scrubs/eviction, endpoint
+clamping, timeline errors, stale inputs, closed readers and later-key BSS overlap.
+Private corpus: 28,722 samples across 9,574 unique streams, zero errors; first/last
+pose bytes match the converter. With a 65,536-byte budget, peak retained payload
+was exactly 65,536 bytes, with no expanded bank allocation.
+
+The cap describes retained **payload bytes**, not all Python/OS memory, mapped
+virtual address space or PS3 heap residency. A native demand loader/sampler hook,
+allocator integration and real-game memory/lifetime validation remain required.
+No native hook, emulator, hardware test or automatic/testing JB was run.
 
 ---
 
@@ -4828,6 +4986,32 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+# Unreleased runtime adapter follow-up
+
+Targeted command: `python -m pytest tests/test_motion_sampling.py
+ tests/test_donor_registry.py tests/test_motion_events.py tests/test_motion_bind.py
+ tests/test_shot_registration.py tests/test_motion_frames.py
+ tests/test_embedded_motion.py tests/test_motion_envelope.py -q -o addopts=`:
+108 passed. Full source portable verification: 817 passed, 9 optional skips,
+2 deselected; exact-head isolated verification is recorded in the PR handoff.
+
+New tests compare every integer tick of a nontrivial pose/root fixture against
+full expansion, exercise cache eviction and stale/closed input rejection, and
+reject later-key BSS overlap, inconsistent duration and unsupported unpacked mode.
+Registry fixtures cover category bounds, typed cross-bank identity, ambiguity,
+nonzero runtime pointers, unknown selection kinds and output-input protection.
+Event regression compares the four native cache timing fields and rejects a
+convenient but incorrect global ID decrement.
+
+Private read-only audit: 28,722 samples / 9,574 unique streams / zero errors;
+peak retained payload 65,536 bytes under the 65,536-byte budget. Seven explicit
+event rules accept 3,616 tables (including empty), with 2,337 actual converted
+rows; 5,958 tables remain blocked. Registry: 988 entries / 31 categories /
+2,478 uniquely resolved nonempty references / 320 empty slots, with no missing
+or ambiguous identities. This does not establish full group payload semantics.
+Source analysis ELF hashes remain unchanged. No emulator, hardware, native hook,
+full runtime memory test or automatic/testing JB was run. No playable port claimed.
 
 # Unreleased canonical bind / registration phase
 

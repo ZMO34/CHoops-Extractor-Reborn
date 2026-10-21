@@ -4,6 +4,7 @@ import struct
 import pytest
 
 from choops_py.formats.motion_events import (
+    curve_timing_contract,
     inspect_auxiliary_pairs,
     inspect_events,
     inspect_payload_consumers,
@@ -14,6 +15,31 @@ from choops_py.formats.motion_events import (
 NBA = "nba-2k11"
 CH = "college-hoops-2k8"
 END = struct.pack(">i", -0x80000000)
+
+
+def test_native_curve_cache_roles_retain_their_times_including_nonuniform_enum_shift():
+    # Native cache offsets 0x20/0x30/0x34/0x38 are anchor/start/knot/end.
+    nba_roles = {0x20: 20, 0x30: 37, 0x34: 46, 0x38: 38}
+    ch_roles = {0x20: 19, 0x30: 36, 0x34: 40, 0x38: 37}
+    times = {20: 0.5, 37: 0.1, 46: 0.4, 38: 0.9}
+    raw = (
+        b"".join(struct.pack(">ifI", key, value, 0) for key, value in times.items())
+        + END
+    )
+    source = inspect_events(raw, NBA)
+    converted, _ = transcode_events(source, curve_timing_contract())
+    target = inspect_events(converted, CH)
+    source_times = {row["id"]: row["time_bits"] for row in source["entries"]}
+    target_times = {row["id"]: row["time_bits"] for row in target["entries"]}
+    assert {field: source_times[marker] for field, marker in nba_roles.items()} == {
+        field: target_times[marker] for field, marker in ch_roles.items()
+    }
+    assert 40 in target_times and 45 not in target_times
+    with pytest.raises(ValueError, match="No explicit mapping"):
+        transcode_events(
+            inspect_events(struct.pack(">ifI", 47, 0, 0) + END, NBA),
+            curve_timing_contract(),
+        )
 
 
 @pytest.mark.parametrize("mirrored", [False, True])

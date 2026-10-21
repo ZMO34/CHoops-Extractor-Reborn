@@ -1,3 +1,17 @@
+# Offline motion sampling and donor registry
+
+`sample-native-motion DONOR_ELF TARGET_ELF HEADER_ADDRESS SECONDS OUTPUT.json
+[--cache-bytes BYTES]` samples the observed NBA11 packed motion family with a
+verified canonical CH bind. It emits a separate one-frame research JSON, uses
+bounded retained payload, rejects unsupported layouts/stale inputs, and protects
+both input files. No installable motion bank or native hook is written.
+
+`inspect-donor-registry INPUT.iff nba-2k11 OUTPUT.json
+[--related-bank OTHER.iff]` indexes the observed 31-category signature collection.
+Repeat related banks to resolve exact type/ID dependencies; duplicates stay
+ambiguous. Group member selectors are described, not translated or installed.
+See [runtime adapter evidence and remaining work](ANIMATION_RUNTIME_ADAPTER.md).
+
 # Motion event bridge
 
 `inspect-motion-events INPUT PROFILE ADDRESS OUTPUT.json [--native-elf]`

@@ -1,3 +1,10 @@
+## Unreleased — authored-key sampling and donor registry
+
+- Sample NBA11 authored motion keys on demand with canonical-bind checks, full extent validation, input invalidation and a byte-budgeted payload cache.
+- Inspect signature collections and cross-bank typed dependencies, preserving unknown metadata and reporting native group-member selectors.
+- Add four explicit trajectory-cache event correspondences; unsupported events remain blocked.
+- Document observed corpus results and remaining native registration, header, event and memory dependencies. No playable animation port is claimed.
+
 ## Unreleased — canonical animation bind and registration audits
 
 - Verify the observed CH/NBA11 21-bone bind and preserve declared channel masks during packed pose conversion.

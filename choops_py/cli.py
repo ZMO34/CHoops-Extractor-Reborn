@@ -19,6 +19,10 @@ def parser():
                 s.add_argument('--native-elf',action='store_true')
                 s.add_argument('--auxiliary-start')
                 s.add_argument('--payload-consumers',action='store_true')
+            elif group=='motion-sampler':
+                s.add_argument('--cache-bytes',type=int,default=256*1024)
+            elif group=='related-banks':
+                s.add_argument('--related-bank',action='append',default=[])
             elif group=='motion-root':
                 s.add_argument('--root-track');s.add_argument('--root-output')
                 s.add_argument('--root-without-heading',action='store_true')
@@ -49,6 +53,7 @@ def execute(a):
         from .studio import main as launch
         return launch([])
     sources=[getattr(a,key) for key in ('source','input','cdf','dds_file','wav_file','image','mod','modded','edited','patch','timing','root_track','contract','target_elf') if getattr(a,key,None)]
+    sources.extend(getattr(a,'related_bank',[]))
     if hasattr(a,'output'):
         validator=build_destination if c=='build-copy' else safe_output
         a.output=validator(a.output,sources)
@@ -60,6 +65,21 @@ def execute(a):
         if c == 'import-uniform-models':return uniform_mesh.import_folder(a.edited,a.output)
         from .archive.usrdir_reader import Archive
         return uniform_mesh.export_archive(Archive(a.source),a.output,modern=c=='modern-fit-uniforms')
+    if c == 'inspect-donor-registry':
+        from .research.donor_registry import MAX_BANK_BYTES, inspect_banks
+        paths=[Path(a.input),*(Path(p) for p in a.related_bank)]
+        if len(paths)>32 or sum(p.stat().st_size for p in paths)>MAX_BANK_BYTES:
+            raise ValueError('Donor signature banks exceed inspection bounds')
+        report=inspect_banks([(p.name,p.read_bytes()) for p in paths],a.profile)
+        save_json(a.output,report,sources)
+        return report
+    if c == 'sample-native-motion':
+        from .research.motion_sampling import MotionSampler
+        with MotionSampler(a.input,a.target_elf,cache_bytes=a.cache_bytes) as sampler:
+            pose, report = sampler.sample(int(a.address,0),float(a.seconds))
+            report.update(packed_pose_hex=pose.hex(),memory=sampler.stats())
+        save_json(a.output,report,sources)
+        return report
     if c in ('inspect-motion-bind','inspect-shot-registration'):
         from .formats.embedded_motion import MAX_ELF
         for source in sources:

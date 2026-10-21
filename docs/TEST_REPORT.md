@@ -1,3 +1,29 @@
+# Unreleased runtime adapter follow-up
+
+Targeted command: `python -m pytest tests/test_motion_sampling.py
+ tests/test_donor_registry.py tests/test_motion_events.py tests/test_motion_bind.py
+ tests/test_shot_registration.py tests/test_motion_frames.py
+ tests/test_embedded_motion.py tests/test_motion_envelope.py -q -o addopts=`:
+108 passed. Full source portable verification: 817 passed, 9 optional skips,
+2 deselected; exact-head isolated verification is recorded in the PR handoff.
+
+New tests compare every integer tick of a nontrivial pose/root fixture against
+full expansion, exercise cache eviction and stale/closed input rejection, and
+reject later-key BSS overlap, inconsistent duration and unsupported unpacked mode.
+Registry fixtures cover category bounds, typed cross-bank identity, ambiguity,
+nonzero runtime pointers, unknown selection kinds and output-input protection.
+Event regression compares the four native cache timing fields and rejects a
+convenient but incorrect global ID decrement.
+
+Private read-only audit: 28,722 samples / 9,574 unique streams / zero errors;
+peak retained payload 65,536 bytes under the 65,536-byte budget. Seven explicit
+event rules accept 3,616 tables (including empty), with 2,337 actual converted
+rows; 5,958 tables remain blocked. Registry: 988 entries / 31 categories /
+2,478 uniquely resolved nonempty references / 320 empty slots, with no missing
+or ambiguous identities. This does not establish full group payload semantics.
+Source analysis ELF hashes remain unchanged. No emulator, hardware, native hook,
+full runtime memory test or automatic/testing JB was run. No playable port claimed.
+
 # Unreleased canonical bind / registration phase
 
 Targeted animation regression suite:66 passed. Source portable verification:

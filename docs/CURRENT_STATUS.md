@@ -1,3 +1,23 @@
+# Unreleased — bounded sampling and donor dependency registration
+
+Added an offline, byte-budgeted NBA11 sampler that reads authored keys on demand,
+validates complete track extents and canonical bind, and emits one CH packed pose.
+The supplied corpus passes 28,722 samples across 9,574 streams without errors;
+retained cache payload stays within 64 KiB. This is not a PS3 heap/RSS guarantee.
+
+Native curve-cache consumers establish four further marker correspondences.
+The explicit seven-rule contract accepts 3,616 event tables including empty lists;
+5,958 tables remain blocked. A typed registry inspector resolves all 2,478 nonempty
+references across two supplied signature banks, preserving 320 empty slots and
+unknown metadata. Group-member selection is reported separately from identity.
+
+Category zero has 147 styles; adding all to CH's 112 would require 259 IDs, beyond
+the existing byte field. No IDs are truncated and no stock styles are replaced.
+Native loader/allocator integration, group/variant translation, remaining event
+semantics and complete target header metadata remain unfinished. No playable
+port, hook, wider roster field, emulator run or testing JB is supplied. Details:
+[ANIMATION_RUNTIME_ADAPTER.md](ANIMATION_RUNTIME_ADAPTER.md).
+
 # Unreleased — canonical bind and registration research
 
 Confirmed byte-identical CH/NBA11 canonical 21-bone parents, rest translations and
@@ -12,8 +32,8 @@ appends one stock-backed duplicate, with exact diff/TLS/adjacent-array checks.
 It is an allocation probe, not a signed EBOOT or runtime-tested donor registration.
 Private bulk preparation translated9,574 pose streams/341,823 stored keys across
 18,831 observed NBA11 headers, with exact reverse checks and unchanged sources.
-Timing/root remain source-key components;6,900 event tables remain semantically
-blocked. No full playable port, added donor styles or modern controls are installed.
+Timing/root remain source-key components; the later runtime-adapter phase above
+reduces the remaining blocked event tables to 5,958. No full playable port, added donor styles or modern controls are installed.
 No emulator or automatic/testing JB was run. v1.21 remains the published release.
 
 # v1.21 — animation event bridge and asset-selection correction

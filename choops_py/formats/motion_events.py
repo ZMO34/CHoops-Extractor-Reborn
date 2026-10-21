@@ -91,6 +91,26 @@ def mirrored_marker_contract():
     )
 
 
+def curve_timing_contract():
+    """Verified selector and trajectory-cache timing roles, not all events.
+
+    Native CH 0x3073B4 / NBA11 0x46DE20 fill the same four timing fields
+    and pass them to equivalent curve normalizers CH 0x2CBEC / NBA11 0x141CC.
+    NBA11 46 maps to CH 40 here: a blanket minus-one rule is incorrect.
+    """
+    result = mirrored_marker_contract()
+    result["rules"].extend(
+        dict(
+            source_id=source,
+            target_id=target,
+            payload_word=None,
+            evidence="Native trajectory cache CH 0x3073B4 / NBA11 0x46DE20; equivalent five-float curve normalizers",
+        )
+        for source, target in ((20, 19), (37, 36), (46, 40), (38, 37))
+    )
+    return result
+
+
 def inspect_events(raw, profile, start=0, *, native=False):
     """Read relative IFF-block offsets or absolute decoded-ELF addresses.
 
