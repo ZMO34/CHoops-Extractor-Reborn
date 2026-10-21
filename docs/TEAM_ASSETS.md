@@ -7,13 +7,25 @@ uniform owner, menu-logo ID, stadium filename, shared assignments and the
 Home/Away/X/Y/Z links. Active means linked; an existing unlock ID can still require
 profile progression. Inactive, saved-inactive, missing and ambiguous states differ.
 Full gameplay/SELU filenames are in cell tooltips. Search filters all row values.
+Each shared asset is marked `* (school [Team ID], ...)` in its own cell and
+tooltip. Sharing follows actual stadium selectors, uniform filenames and menu
+logo IDs, even when teams have different arena rows or uniform owners. A classic
+team using a modern team's arena is marked on S; unrelated unique assets are not.
+Existing available assets start checked, including a uniform bank only when both
+its gameplay and SELU files exist. Missing, inactive, ambiguous and uninspected
+assets start unchecked. The defaults reflect the selected source and loaded roster;
+they do not request any copies or changes by themselves.
 
 1. Select one or more team rows. Check S, UH, UA, UX, UY, UZ and/or Menu logo,
-   individually or with **Check all types for selected teams**. These checks mean
-   create/link the checked category, not remove unchecked assets. **Check missing
+   individually or with **Check all types for selected teams**. Newly checked
+   categories request additions; existing checks keep their assignments. To give
+   existing assets independent copies, select the team rows and click **Clone
+   checked assets for selected teams**, or change the Target ID (which copies
+   all checked categories for that row). Clear unwanted categories before cloning.
+   Clearing a check does not remove an existing assignment. **Check missing
    alternates for visible teams** checks X/Y/Z only where inactive; teams without
    valid Home/Away templates are skipped. Unrelated team types are never converted.
-2. Leave New ID on Auto or choose an unused 0–1023 ID. Uniform-only expansion can
+2. Leave New ID on Auto or choose an unused 0â€“1023 ID. Uniform-only expansion can
    retain an already uniquely owned uniform ID. Forking other categories allocates
    a wholly unused ID. If a missing bank filename at that owner ID already exists,
    a separate free artwork selector is allocated so unrelated art is preserved. General Asset ID is displayed but preserved because other
@@ -52,7 +64,7 @@ changes; stale reviewed plans cannot be applied.
 
 ## Copy activation and assignments between roster sources
 
-Select team rows, then use **Copy assignments from…** or **Copy assignments to…**.
+Select team rows, then use **Copy assignments fromâ€¦** or **Copy assignments toâ€¦**.
 Sources include the open roster editor, Source JB, Selected overrides and an
 external roster/decrypted save. Copying to a JB-based destination always creates
 new overrides; it never edits the source JB. External destinations are saved as
@@ -76,7 +88,9 @@ Team Assets appears above Research and Diagnostics in navigation.
 
 ## Classic teams and unique stadiums
 
-Checking S clones the team's current stadium to a new s###.iff (and its n sibling
+To separate an existing shared stadium, keep S checked, clear other categories
+you do not want copied, then use **Clone checked assets for selected teams**.
+This clones the team's current stadium to a new s###.iff (and its n sibling
 when supplied), appends a physical arena record, and rewires only that team's arena
 reference. Shared original teams keep their old arena. The arena's display code
 and native numeric stadium selector are both updated. All arena string pointers
@@ -96,8 +110,8 @@ Read-only decoded CH2K8 EBOOT analysis, confirmed with focused Ghidra decompilat
 
 | Consumer | Evidence | Consequence |
 | --- | --- | --- |
-| Uniform owner | Getter0x769CB8 extracts word0 bits22–31;0x1C244C compares owners against team anchor+0x160 (editor team row+0x190) | Owner IDs0–1023; distinct from general team Asset ID |
-| Uniform artwork | Getter0x769CF4 extracts bits12–21;0x769FD8 formats u%c%03d using haxyz table0x10036070 and variant getter0x769D74 | Artwork IDs0–1023; five supported bank codes0–4 |
+| Uniform owner | Getter0x769CB8 extracts word0 bits22â€“31;0x1C244C compares owners against team anchor+0x160 (editor team row+0x190) | Owner IDs0â€“1023; distinct from general team Asset ID |
+| Uniform artwork | Getter0x769CF4 extracts bits12â€“21;0x769FD8 formats u%c%03d using haxyz table0x10036070 and variant getter0x769D74 | Artwork IDs0â€“1023; five supported bank codes0â€“4 |
 | Uniform selection |0x1C252C counts matching owner records and returns requested matching ordinal | Preserve owner bank order; no holes before later banks |
 | Stadium |0x580A3C /0x580A9C reads physical arena+0x12; format s%03d.iff at0x124B7290; mode is physical+0x18 low2bits | Updating only arena_code text is insufficient; physical selector is unsigned16-bit |
 | Arena index |0x1BC050 indexes28-byte rows using the runtime count/table | Append/rebase arena records; editor bound8192 is a structural safety bound, not a proven engine ceiling |

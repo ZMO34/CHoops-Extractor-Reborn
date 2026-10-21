@@ -1,3 +1,14 @@
+# Team asset checkbox defaults
+
+Targeted Qt/backend suite: `python -m pytest tests/test_team_assets.py -q`:
+22 passed. Regression coverage includes per-asset peer names for different
+arena rows/uniform owners sharing the same files, original target ID defaults,
+available stadium/Home/Away/menu defaults,
+missing SELU pairs, inactive alternates, no changes for an untouched matrix,
+new-category-only plans, independent copies by button or manual ID, unselected
+team preservation and resetting pending intent on reload. Source inputs remain
+unchanged; no emulator or full JB build was run.
+
 # Applied-roster synchronization regression
 
 Applying asset expansion also updates an open community roster as one undoable
@@ -194,7 +205,7 @@ No runtime appearance, game execution, physical PS3 or JB result is claimed.
 Public editor contract fixes and their portable tests are tracked in PR #32.
 This follow-up changes documentation only in PR #36.
 
-# Local executable experiment 01 — 2026-10-19
+# Local executable experiment 01 â€” 2026-10-19
 
 Private-only prototypes generated and audited on Windows / Python 3.12.14,
 Capstone PPC64 big-endian and locally installed Keystone 0.9.2. Keystone is not
@@ -218,7 +229,7 @@ suites and packaging are not rerun and historical passes do not certify EBOOT.
 The cleanup preserves active tracked regression tests and user builds/inputs;
 broader historical package deletion remains approval-blocked.
 
-# Executable modernization research — 2026-10-19
+# Executable modernization research â€” 2026-10-19
 
 Documentation-only update on Windows / Python 3.12.14. Read-only ELF mapping,
 function-descriptor/TOC inspection and PPC64 big-endian Capstone disassembly
@@ -235,7 +246,7 @@ head results are recorded in the PR. Runtime suites and Windows packaging were
 not rerun: no runtime/package code changed. Historical suite counts below do not
 validate the newly proposed executable candidates. No Ghidra, RPCS3/gameplay,
 executable patch, real/testing JB or release.
-# Experimental uniform mesh editing — verification
+# Experimental uniform mesh editing â€” verification
 
 Windows / Python 3.12.14. Targeted command:
 `python -m pytest tests/test_uniform_mesh.py tests/test_scene_preview.py tests/test_direct_asset_previews.py tests/test_cli.py -q`
@@ -407,7 +418,7 @@ The same ZIP also passes in an isolated v1.16 checkout; its generic screenshot
 failure is not reproduced. Final portable/isolated/frozen results are recorded
 on the release PR.
 
-# Verification — v1.18
+# Verification â€” v1.18
 
 Full portable verification on Windows / Python 3.12.14: **598 passed,
 9 offscreen OpenGL skips, 2 deselected**; compile, CLI/Qt smoke, Ruff, mypy,

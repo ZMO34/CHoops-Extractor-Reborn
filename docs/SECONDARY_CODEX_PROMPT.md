@@ -88,6 +88,19 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# Team asset checkbox correction
+
+Available team assets now start checked, using explicit inventory presence rather
+than display-label matching. A uniform requires both gameplay and SELU files;
+missing/inactive/ambiguous assets remain unchecked. Existing checks alone produce
+no plan. Newly checked categories add assets; Clone checked assets or an explicit
+changed Target ID requests independent copies for that team. Target ID starts
+with the original team Asset ID. Each shared asset has an asterisk and peer team
+names/IDs in parentheses, based on actual asset routes, including mixed-ID
+classic/modern assignments. Clearing checks does not delete
+assignments. Reload clears pending copy intent. Synthetic Qt/backend regressions
+cover these states and protect against accidental whole-roster cloning.
+
 # Team asset expansion and v1.20
 
 Team Assets now lists all teams and their distinct IDs, stadium routes, five
@@ -173,7 +186,7 @@ ANIMATION_GAMEPLAY_PORT.md for evidence, commands and remaining work.
 
 # Animation investigation and pending-PR integration
 
-Seven prior PR branches (#31–#37) are merged through PR #38, retaining source
+Seven prior PR branches (#31â€“#37) are merged through PR #38, retaining source
 changes and ancestry. Windows/Linux CI and clean exact-head portable checks pass.
 The integration exposed one stale GUI button-label expectation, now corrected,
 and adds Legacy wrapper regressions. No prior runtime caveat is promoted to a pass.
@@ -208,12 +221,12 @@ Selected texture/arena/floor/audio blocks decode; full animation/mesh transfers
 and 2K11 roster editing remain unimplemented. See [donor ratings and evidence](NBA2K11_DONOR_ASSESSMENT.md).
 Best near-term donors are adapted artwork/audio; newer AI/physics/blending are
 not imported by copying assets. No RPCS3, EBOOT edits or real/testing JB.
-# Unreleased — native scorebug text contract guards
+# Unreleased â€” native scorebug text contract guards
 
 Focused Ghidra analysis of the owner-authorized combined experiment confirms
 16-byte text/property alignment is required by native vector loads. The bounded
 scorebug text helper now rejects misaligned tables before editing them. It also
-supports `max_width` in whole authored units (1–4096), preserving the integer
+supports `max_width` in whole authored units (1â€“4096), preserving the integer
 property type, enabling the native shrink-to-fit flag and retaining literal and
 alignment bits when edits are combined. Missing/shared properties fail closed.
 
@@ -225,7 +238,7 @@ patching is not added to the editor. Native custom stats callbacks must retain
 text-tag parsing and timing; a global replacement with the plain renderer would
 lose those effects. Runtime visual correctness is not certified.
 
-# Unreleased — scorebug test05 visual corrections
+# Unreleased â€” scorebug test05 visual corrections
 
 User screenshots establish that native test04 still has no ordinary-game school
 names, washed-out palette panels, dividers, overlapping sixth-man lettering and
@@ -251,7 +264,7 @@ Source inputs remain unchanged. Runtime appearance/popups still need user testin
 static checks cannot certify in-game appearance. No emulator or new JB build.
 Continues PR #32; documentation and asset-free profiles are maintained.
 
-# Unreleased — native test04 startup-crash correction candidate
+# Unreleased â€” native test04 startup-crash correction candidate
 
 User crash logs show a startup asynchronous-IFF-loader access violation at
 0x00845E14, reading 0x4D4C0002. The built English archive matches native test04;
@@ -271,7 +284,7 @@ the exact cause of corruption inside the compressed native load is not establish
 User retesting is required. Do not use the superseded native test04 English IFF.
 No emulator launch, executable write or new JB build. Continues PR #32.
 
-# Unreleased — scorebug test04 native branding and live team names
+# Unreleased â€” scorebug test04 native branding and live team names
 
 Test04 connects home_city/away_city callbacks beside the logos and selects actual
 Stratum2 25 styles for scores, period and clocks. Narrow gray separators replace
@@ -287,7 +300,7 @@ sixth-man scene's visibility; disabled-feature/mode states and popup transitions
 still require user testing. No executable/font-bank/roster edit, emulator run or
 test04 JB build. Local native test04 ZIP; code continues PR #32.
 
-# Unreleased — scorebug test03 alignment refinement
+# Unreleased â€” scorebug test03 alignment refinement
 
 Supersedes test02 artwork/layout: continuous rectangular backing, rectangular
 panel borders, clipped palette rectangles without the stock vertex gradient,
@@ -299,7 +312,7 @@ SCNEs change; 257 other records remain identical. User runtime testing is still
 required for text transforms, popup event states and meter animation. No emulator,
 executable modification or new JB build. Local test03 ZIP; code continues PR #32.
 
-# Unreleased — scorebug test02 and authored HUD editor
+# Unreleased â€” scorebug test02 and authored HUD editor
 
 Bounded experimental scene editing, sixth-man/text-anchor inventory and test02
 asset evidence are in SCOREBUG_RESEARCH.md. Restores the prior team RGB multiplier,
@@ -323,7 +336,7 @@ only one executable plus two IFFs/docs is packaged locally. No emulator or JB.
 Appearance/PS3/gameplay compatibility are not certified. See EBOOT_EXPERIMENT_01;
 PR #32 owns the separate public native-alignment/width-fit editor guards.
 
-# Local executable experiment 01 — 2026-10-19
+# Local executable experiment 01 â€” 2026-10-19
 
 The owner authorized separate experimental copies for modern NCAA arc/corner
 scoring, native scorebug names and removal of new-transfer sit-out assignment.
@@ -343,7 +356,7 @@ and user inputs/builds remain.
 Historical release/test package deletion was blocked by automatic approval review
 and remains pending specific owner approval; see experiment notes.
 
-# Read-only executable modernization research — 2026-10-19
+# Read-only executable modernization research â€” 2026-10-19
 
 [Executable modernization candidates](EBOOT_MODERNIZATION_RESEARCH.md) ranks
 native scorebug names, camera customization, broadcast presentation and rules
@@ -354,11 +367,11 @@ indicator and autosave routes are distinguished from unproven runtime semantics.
 The smallest known executable candidate is the native-name fallback investigated
 in separate PR #32; the owner declined applying it, so names remain unresolved.
 No production feature or EBOOT changed. No emulator or real/testing JB.
-# Unreleased — editable garment meshes and modern-fit experiment
+# Unreleased â€” editable garment meshes and modern-fit experiment
 
 Models / Courts has source-aware uniform OBJ collection export, guarded reimport
 and a conservative modern-fit preset. Actual source inventory covers 21 cloth
-IFFs / 33 SCNE–Clth pairs: all five necklines and thin/regular/fat builds, plus
+IFFs / 33 SCNEâ€“Clth pairs: all five necklines and thin/regular/fat builds, plus
 three shorts builds, including individual and aggregate container routes.
 The preset shortens shorts by 20% and tightens the jersey torso by up to 7%.
 Source assets stay immutable. Rest XYZ is updated in SCNE and matching Clth;
@@ -444,7 +457,7 @@ RPCS3/gameplay NOT RUN; real/testing JB NOT BUILT; EBOOT NOT EDITED.
 Both Codex instances must maintain current docs and the generated handoff on each
 update. Document evidence and unknowns; never replace uncertainty with a label.
 
-## Research follow-up — modern features
+## Research follow-up â€” modern features
 
 [Backport feasibility](MODERN_FEATURE_BACKPORTS.md) ranks practical artwork/roster
 updates, 2K9 animation conversion, broadcast bindings and indirect companion ideas.
@@ -2699,13 +2712,25 @@ uniform owner, menu-logo ID, stadium filename, shared assignments and the
 Home/Away/X/Y/Z links. Active means linked; an existing unlock ID can still require
 profile progression. Inactive, saved-inactive, missing and ambiguous states differ.
 Full gameplay/SELU filenames are in cell tooltips. Search filters all row values.
+Each shared asset is marked `* (school [Team ID], ...)` in its own cell and
+tooltip. Sharing follows actual stadium selectors, uniform filenames and menu
+logo IDs, even when teams have different arena rows or uniform owners. A classic
+team using a modern team's arena is marked on S; unrelated unique assets are not.
+Existing available assets start checked, including a uniform bank only when both
+its gameplay and SELU files exist. Missing, inactive, ambiguous and uninspected
+assets start unchecked. The defaults reflect the selected source and loaded roster;
+they do not request any copies or changes by themselves.
 
 1. Select one or more team rows. Check S, UH, UA, UX, UY, UZ and/or Menu logo,
-   individually or with **Check all types for selected teams**. These checks mean
-   create/link the checked category, not remove unchecked assets. **Check missing
+   individually or with **Check all types for selected teams**. Newly checked
+   categories request additions; existing checks keep their assignments. To give
+   existing assets independent copies, select the team rows and click **Clone
+   checked assets for selected teams**, or change the Target ID (which copies
+   all checked categories for that row). Clear unwanted categories before cloning.
+   Clearing a check does not remove an existing assignment. **Check missing
    alternates for visible teams** checks X/Y/Z only where inactive; teams without
    valid Home/Away templates are skipped. Unrelated team types are never converted.
-2. Leave New ID on Auto or choose an unused 0–1023 ID. Uniform-only expansion can
+2. Leave New ID on Auto or choose an unused 0â€“1023 ID. Uniform-only expansion can
    retain an already uniquely owned uniform ID. Forking other categories allocates
    a wholly unused ID. If a missing bank filename at that owner ID already exists,
    a separate free artwork selector is allocated so unrelated art is preserved. General Asset ID is displayed but preserved because other
@@ -2744,7 +2769,7 @@ changes; stale reviewed plans cannot be applied.
 
 ## Copy activation and assignments between roster sources
 
-Select team rows, then use **Copy assignments from…** or **Copy assignments to…**.
+Select team rows, then use **Copy assignments fromâ€¦** or **Copy assignments toâ€¦**.
 Sources include the open roster editor, Source JB, Selected overrides and an
 external roster/decrypted save. Copying to a JB-based destination always creates
 new overrides; it never edits the source JB. External destinations are saved as
@@ -2768,7 +2793,9 @@ Team Assets appears above Research and Diagnostics in navigation.
 
 ## Classic teams and unique stadiums
 
-Checking S clones the team's current stadium to a new s###.iff (and its n sibling
+To separate an existing shared stadium, keep S checked, clear other categories
+you do not want copied, then use **Clone checked assets for selected teams**.
+This clones the team's current stadium to a new s###.iff (and its n sibling
 when supplied), appends a physical arena record, and rewires only that team's arena
 reference. Shared original teams keep their old arena. The arena's display code
 and native numeric stadium selector are both updated. All arena string pointers
@@ -2788,8 +2815,8 @@ Read-only decoded CH2K8 EBOOT analysis, confirmed with focused Ghidra decompilat
 
 | Consumer | Evidence | Consequence |
 | --- | --- | --- |
-| Uniform owner | Getter0x769CB8 extracts word0 bits22–31;0x1C244C compares owners against team anchor+0x160 (editor team row+0x190) | Owner IDs0–1023; distinct from general team Asset ID |
-| Uniform artwork | Getter0x769CF4 extracts bits12–21;0x769FD8 formats u%c%03d using haxyz table0x10036070 and variant getter0x769D74 | Artwork IDs0–1023; five supported bank codes0–4 |
+| Uniform owner | Getter0x769CB8 extracts word0 bits22â€“31;0x1C244C compares owners against team anchor+0x160 (editor team row+0x190) | Owner IDs0â€“1023; distinct from general team Asset ID |
+| Uniform artwork | Getter0x769CF4 extracts bits12â€“21;0x769FD8 formats u%c%03d using haxyz table0x10036070 and variant getter0x769D74 | Artwork IDs0â€“1023; five supported bank codes0â€“4 |
 | Uniform selection |0x1C252C counts matching owner records and returns requested matching ordinal | Preserve owner bank order; no holes before later banks |
 | Stadium |0x580A3C /0x580A9C reads physical arena+0x12; format s%03d.iff at0x124B7290; mode is physical+0x18 low2bits | Updating only arena_code text is insufficient; physical selector is unsigned16-bit |
 | Arena index |0x1BC050 indexes28-byte rows using the runtime count/table | Append/rebase arena records; editor bound8192 is a structural safety bound, not a proven engine ceiling |
@@ -4463,6 +4490,17 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 
 Embedded source: docs/TEST_REPORT.md
 
+# Team asset checkbox defaults
+
+Targeted Qt/backend suite: `python -m pytest tests/test_team_assets.py -q`:
+22 passed. Regression coverage includes per-asset peer names for different
+arena rows/uniform owners sharing the same files, original target ID defaults,
+available stadium/Home/Away/menu defaults,
+missing SELU pairs, inactive alternates, no changes for an untouched matrix,
+new-category-only plans, independent copies by button or manual ID, unselected
+team preservation and resetting pending intent on reload. Source inputs remain
+unchanged; no emulator or full JB build was run.
+
 # Applied-roster synchronization regression
 
 Applying asset expansion also updates an open community roster as one undoable
@@ -4659,7 +4697,7 @@ No runtime appearance, game execution, physical PS3 or JB result is claimed.
 Public editor contract fixes and their portable tests are tracked in PR #32.
 This follow-up changes documentation only in PR #36.
 
-# Local executable experiment 01 — 2026-10-19
+# Local executable experiment 01 â€” 2026-10-19
 
 Private-only prototypes generated and audited on Windows / Python 3.12.14,
 Capstone PPC64 big-endian and locally installed Keystone 0.9.2. Keystone is not
@@ -4683,7 +4721,7 @@ suites and packaging are not rerun and historical passes do not certify EBOOT.
 The cleanup preserves active tracked regression tests and user builds/inputs;
 broader historical package deletion remains approval-blocked.
 
-# Executable modernization research — 2026-10-19
+# Executable modernization research â€” 2026-10-19
 
 Documentation-only update on Windows / Python 3.12.14. Read-only ELF mapping,
 function-descriptor/TOC inspection and PPC64 big-endian Capstone disassembly
@@ -4700,7 +4738,7 @@ head results are recorded in the PR. Runtime suites and Windows packaging were
 not rerun: no runtime/package code changed. Historical suite counts below do not
 validate the newly proposed executable candidates. No Ghidra, RPCS3/gameplay,
 executable patch, real/testing JB or release.
-# Experimental uniform mesh editing — verification
+# Experimental uniform mesh editing â€” verification
 
 Windows / Python 3.12.14. Targeted command:
 `python -m pytest tests/test_uniform_mesh.py tests/test_scene_preview.py tests/test_direct_asset_previews.py tests/test_cli.py -q`
@@ -4872,7 +4910,7 @@ The same ZIP also passes in an isolated v1.16 checkout; its generic screenshot
 failure is not reproduced. Final portable/isolated/frozen results are recorded
 on the release PR.
 
-# Verification — v1.18
+# Verification â€” v1.18
 
 Full portable verification on Windows / Python 3.12.14: **598 passed,
 9 offscreen OpenGL skips, 2 deselected**; compile, CLI/Qt smoke, Ruff, mypy,
