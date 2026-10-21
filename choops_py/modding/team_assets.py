@@ -1,5 +1,5 @@
 """Roster-linked team asset plans. Originals are read-only; output is explicit."""
-from collections import Counter
+from collections import Counter, defaultdict
 from pathlib import Path
 import json
 import struct
@@ -56,11 +56,28 @@ def inventory(archive, model, *, inspect_logos=True):
     if inspect_logos and hash_name('teamselectlogo.iff') in hashes and hash_name('teamselectlogo.cdf') in hashes:
         from ..formats.cdf_backed_iff import CDFPair
         logos = {r['name'] for r in CDFPair(read_named(archive, 'teamselectlogo.iff'), read_named(archive, 'teamselectlogo.cdf')).records}
+    # Sharing follows the actual asset route, even when roster owner/arena rows
+    # differ (for example a classic team pointing at a modern team's stadium).
+    routes, users = {}, defaultdict(list)
+    for team in model.rows['teams']:
+        keys = {'menu_logo': ('menu_logo', team['menu_logo_id'])}
+        selector, _ = arena_selector(model, team)
+        if selector is not None:
+            keys['stadium'] = ('stadium', selector)
+        owned = [u for u in model.rows['uniforms'] if u['team_asset_id'] == team['uniform_owner_id']]
+        for variant, bank in enumerate(BANKS):
+            matches = [u for u in owned if u['variant_code'] == variant]
+            if len(matches) == 1:
+                keys[bank] = ('uniform', asset_name(matches[0], False))
+        routes[team['index']] = keys
+        for key in keys.values():
+            users[key].append(team)
     result = []
     for team in model.rows['teams']:
         selector, mode = arena_selector(model, team)
         filename = f's{selector:03d}.iff' if selector is not None else ''
         banks = {}
+        present = []
         owned = [u for u in model.rows['uniforms'] if u['team_asset_id'] == team['uniform_owner_id']]
         for variant, bank in enumerate(BANKS):
             matches = [u for u in owned if u['variant_code'] == variant]
@@ -73,12 +90,22 @@ def inventory(archive, model, *, inspect_logos=True):
                 uniform = matches[0]
                 names = [asset_name(uniform, selection) for selection in (False, True)]
                 missing = [n for n in names if hash_name(n) not in hashes]
+                if not missing:
+                    present.append(bank)
                 state = 'Missing: ' + ', '.join(missing) if missing else 'Active'
                 if uniform['unlock_id']:
                     state += f"; unlock {uniform['unlock_id']}"
                 banks[bank] = f"{names[0]} / {names[1]} — {state}"
         label = f"logo{team['menu_logo_id']:03d}"
+        if filename and hash_name(filename) in hashes:
+            present.append('stadium')
+        if logos is not None and label in logos:
+            present.append('menu_logo')
         result.append(dict(index=team['index'], school=team.get('school_name') or f"Team {team['index']}",
+                           present_assets=present,
+                           shared_assets={kind: [f"{other.get('school_name') or 'Team'} [Team {other['index']}]"
+                                                for other in users[key] if other['index'] != team['index']]
+                                          for kind, key in routes[team['index']].items()},
                            asset_id=team['asset_id'], owner_id=team['uniform_owner_id'], menu_id=team['menu_logo_id'],
                            stadium=(filename + (' — Present' if hash_name(filename) in hashes else ' — Missing')) if filename else 'Unassigned',
                            stadium_mode=mode, menu_logo=label + (' — Present' if logos is not None and label in logos else ' — Missing' if logos is not None else ' — Not inspected'),

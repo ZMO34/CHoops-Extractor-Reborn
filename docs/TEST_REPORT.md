@@ -1,3 +1,18 @@
+# Team asset checkbox defaults
+
+Targeted Qt/backend suite: `python -m pytest tests/test_team_assets.py -q`:
+22 passed. Regression coverage includes per-asset peer names for different
+arena rows/uniform owners sharing the same files, original target ID defaults,
+available stadium/Home/Away/menu defaults,
+missing SELU pairs, inactive alternates, no changes for an untouched matrix,
+new-category-only plans, independent copies by button or manual ID, unselected
+team preservation and resetting pending intent on reload. Source inputs remain
+unchanged; no emulator or full JB build was run.
+Full portable verification:735 passed,9 optional skips,2 deselected. Compile,
+CLI/Qt smoke, Ruff, mypy, generated handoff and diff checks passed.
+The sandbox-limited first full run was interrupted; the complete run with
+required temporary-file/Qt settings access passed.
+
 # Applied-roster synchronization regression
 
 Applying asset expansion also updates an open community roster as one undoable

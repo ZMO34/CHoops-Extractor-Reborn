@@ -13,11 +13,11 @@ from ..modding import team_assets as backend
 
 class TeamAssetsPanel(QWidget):
     def __init__(self, owner):
-        super().__init__(); self.owner = owner; self.plan = None; self.rows = []
+        super().__init__(); self.owner = owner; self.plan = None; self.rows = []; self.clone_rows = set()
         layout = QVBoxLayout(self)
         heading = QLabel('Team assets'); heading.setStyleSheet('font-size:24px;font-weight:600')
         layout.addWidget(heading)
-        explanation = QLabel('Load the assignment list from the top Preview source selector. Check categories to clone and link; gameplay and SELU menu files are paired automatically. Unchecked categories keep their assignments.')
+        explanation = QLabel('Existing assets start checked. * (team names) marks a shared asset. Check missing categories to add them. To separate shared assets, select teams and use Clone checked assets, or change the target ID. Clearing a check does not remove an existing assignment.')
         explanation.setWordWrap(True); layout.addWidget(explanation)
         toolbar = QHBoxLayout(); layout.addLayout(toolbar)
         self.refresh = QPushButton('Load / refresh teams'); toolbar.addWidget(self.refresh)
@@ -37,9 +37,10 @@ class TeamAssetsPanel(QWidget):
                                ('Clear selected checks', lambda:self.check_selected(False)),
                                ('Check missing alternates for visible teams', self.check_missing)]:
             button = QPushButton(text); controls.addWidget(button); button.clicked.connect(callback)
+        self.clone = QPushButton('Clone checked assets for selected teams'); controls.addWidget(self.clone); self.clone.clicked.connect(self.clone_selected)
         self.table = QTableWidget(0, 13)
         self.table.setHorizontalHeaderLabels(['Team ID / school', 'Asset ID', 'Uniform owner', 'Menu ID', 'Shared by teams',
-                                             'S / stadium', 'UH / home', 'UA / away', 'UX', 'UY', 'UZ', 'Menu logo', 'New ID'])
+                                             'S / stadium', 'UH / home', 'UA / away', 'UX', 'UY', 'UZ', 'Menu logo', 'Target ID'])
         self.table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self.table.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
         self.table.setAlternatingRowColors(True)
@@ -79,6 +80,7 @@ class TeamAssetsPanel(QWidget):
 
     def loaded(self, result):
         self.asset_archive, self.model, self.rows, self.free = result
+        self.clone_rows.clear()
         self.source_key = (id(self.owner.archive), self.owner.mod_path.text(), self.owner.preview_overrides.isChecked())
         self.loaded_payload = bytes(self.owner.roster.data) if self.use_roster.isChecked() and self.owner.roster else None
         self.table.blockSignals(True); self.table.setRowCount(len(self.rows))
@@ -91,10 +93,12 @@ class TeamAssetsPanel(QWidget):
                 value = data[key]
                 if kind in 'haxyz' and ' — ' in value:
                     value = value.split(' / ',1)[0] + ' · ' + value.split(' — ',1)[1]
-                item = QTableWidgetItem(value); item.setToolTip(data[key] + '\nCheck to give this team its own linked copy. Missing prior alternate banks are also filled in order.')
+                peers = data['shared_assets'].get(kind, [])
+                sharing = ' * (' + ', '.join(peers) + ')' if peers else ''
+                item = QTableWidgetItem(value + sharing); item.setToolTip(data[key] + sharing + '\nExisting assets start checked; newly checked categories are added. Use Clone checked assets or change the Target ID for independent copies. Missing prior alternate banks are filled in order.')
                 item.setFlags((item.flags() | Qt.ItemFlag.ItemIsUserCheckable) & ~Qt.ItemFlag.ItemIsEditable)
-                item.setCheckState(Qt.CheckState.Unchecked); self.table.setItem(row, column, item)
-            item = QTableWidgetItem('Auto'); item.setToolTip('Auto allocates an unused ID; type 0–1023 to choose one. A uniquely owned uniform ID can be retained when expanding only uniforms.')
+                item.setCheckState(Qt.CheckState.Checked if kind in data['present_assets'] else Qt.CheckState.Unchecked); self.table.setItem(row, column, item)
+            item = QTableWidgetItem(str(data['asset_id'])); item.setToolTip('Starts with the original team Asset ID. Existing assignments stay unchanged. New categories reuse a unique uniform owner when possible; shared routes allocate a free ID during review. Enter a different unused ID (0–1023) to copy all checked categories there. Per-asset cells show actual mixed/shared routes.')
             self.table.setItem(row, 12, item)
         self.table.blockSignals(False); self.invalidate(); self.filter(self.search.text())
         self.state.setText(f'{len(self.rows)} teams · {len(self.free)} entirely unused IDs · Active = linked, unlock conditions may still apply')
@@ -116,12 +120,21 @@ class TeamAssetsPanel(QWidget):
                     if data[bank].startswith('Inactive'):
                         self.table.item(row, column).setCheckState(Qt.CheckState.Checked)
 
+    def clone_selected(self):
+        self.clone_rows.update(index.row() for index in self.table.selectionModel().selectedRows())
+        self.invalidate()
+        self.state.setText(f'{len(self.clone_rows)} teams marked for independent copies · Review checked changes to inspect the plan')
+
     def requests(self):
         free = iter(self.free); reserved = set(); result = []
         checked = []
         for row, data in enumerate(self.rows):
             kinds = [k for column, k in enumerate(backend.KINDS, 5) if self.table.item(row, column).checkState() == Qt.CheckState.Checked]
-            if kinds:checked.append((row, data, kinds, self.table.item(row, 12).text().strip()))
+            text = self.table.item(row, 12).text().strip()
+            if text == str(data['asset_id']):text = 'auto'
+            if row not in self.clone_rows and text.casefold() == 'auto':
+                kinds = [k for k in kinds if k not in data['present_assets']]
+            if kinds:checked.append((row, data, kinds, text))
         # Reserve explicitly chosen IDs before allocating Auto values.
         for _, _, _, text in checked:
             if text.casefold() != 'auto':
@@ -152,6 +165,9 @@ class TeamAssetsPanel(QWidget):
             self.unchanged_context(); requests = self.requests()
         except (ValueError, AttributeError) as error:return self.owner.show_error(str(error))
         self.invalidate()
+        if not requests:
+            self.details.setPlainText('No asset changes requested. Existing checked assets keep their assignments. Check a missing category to add it, or select teams and use Clone checked assets for independent copies.')
+            return
         def complete(plan):
             self.plan = plan; self.apply.setEnabled(True)
             lines = [f"{len(plan['teams'])} teams · {len(plan['additions'])} new IFFs · {len(plan['replacements'])} updated containers"]

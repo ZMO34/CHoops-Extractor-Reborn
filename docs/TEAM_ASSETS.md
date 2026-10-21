@@ -7,13 +7,28 @@ uniform owner, menu-logo ID, stadium filename, shared assignments and the
 Home/Away/X/Y/Z links. Active means linked; an existing unlock ID can still require
 profile progression. Inactive, saved-inactive, missing and ambiguous states differ.
 Full gameplay/SELU filenames are in cell tooltips. Search filters all row values.
+Each shared asset is marked `* (school [Team ID], ...)` in its own cell and
+tooltip. Sharing follows actual stadium selectors, uniform filenames and menu
+logo IDs, even when teams have different arena rows or uniform owners. A classic
+team using a modern team's arena is marked on S; unrelated unique assets are not.
+Existing available assets start checked, including a uniform bank only when both
+its gameplay and SELU files exist. Missing, inactive, ambiguous and uninspected
+assets start unchecked. The defaults reflect the selected source and loaded roster;
+they do not request any copies or changes by themselves.
 
 1. Select one or more team rows. Check S, UH, UA, UX, UY, UZ and/or Menu logo,
-   individually or with **Check all types for selected teams**. These checks mean
-   create/link the checked category, not remove unchecked assets. **Check missing
+   individually or with **Check all types for selected teams**. Newly checked
+   categories request additions; existing checks keep their assignments. To give
+   existing assets independent copies, select the team rows and click **Clone
+   checked assets for selected teams**, or change the Target ID (which copies
+   all checked categories for that row). Clear unwanted categories before cloning.
+   Clearing a check does not remove an existing assignment. **Check missing
    alternates for visible teams** checks X/Y/Z only where inactive; teams without
    valid Home/Away templates are skipped. Unrelated team types are never converted.
-2. Leave New ID on Auto or choose an unused 0–1023 ID. Uniform-only expansion can
+2. Target ID starts with the team's original Asset ID. Leaving it unchanged keeps
+   current assignments; additions reuse a unique uniform owner or allocate an
+   unused ID for shared routes during review. Change it to a different unused
+   0–1023 ID to copy all checked categories there. Uniform-only expansion can
    retain an already uniquely owned uniform ID. Forking other categories allocates
    a wholly unused ID. If a missing bank filename at that owner ID already exists,
    a separate free artwork selector is allocated so unrelated art is preserved. General Asset ID is displayed but preserved because other
@@ -76,7 +91,9 @@ Team Assets appears above Research and Diagnostics in navigation.
 
 ## Classic teams and unique stadiums
 
-Checking S clones the team's current stadium to a new s###.iff (and its n sibling
+To separate an existing shared stadium, keep S checked, clear other categories
+you do not want copied, then use **Clone checked assets for selected teams**.
+This clones the team's current stadium to a new s###.iff (and its n sibling
 when supplied), appends a physical arena record, and rewires only that team's arena
 reference. Shared original teams keep their old arena. The arena's display code
 and native numeric stadium selector are both updated. All arena string pointers

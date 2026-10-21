@@ -1,3 +1,18 @@
+# Team asset checkbox correction
+
+Available team assets now start checked, using explicit inventory presence rather
+than display-label matching. A uniform requires both gameplay and SELU files;
+missing/inactive/ambiguous assets remain unchecked. Existing checks alone produce
+no plan. Newly checked categories add assets; Clone checked assets or an explicit
+changed Target ID requests independent copies for that team. Target ID starts
+with the original team Asset ID. Each shared asset has an asterisk and peer team
+names/IDs in parentheses, based on actual asset routes, including mixed-ID
+classic/modern assignments. Clearing checks does not delete
+assignments. Reload clears pending copy intent. Synthetic Qt/backend regressions
+cover these states and protect against accidental whole-roster cloning.
+Full portable verification:735 passed,9 skipped,2 deselected, with compile,
+CLI/Qt smoke, Ruff, mypy and handoff checks passing.
+
 # Team asset expansion and v1.20
 
 Team Assets now lists all teams and their distinct IDs, stadium routes, five

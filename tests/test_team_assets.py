@@ -159,18 +159,111 @@ def test_loose_folder_applies_additions_to_normal_preview_and_build(tmp_path, wo
 
 
 def test_team_matrix_checkboxes_and_auto_id(qtbot, tmp_path):
+    from PySide6.QtCore import Qt
     from choops_py.studio.app import Window
     studio = Window(); qtbot.addWidget(studio)
     archive = Archive(game(tmp_path)); _, model = roster_model(archive)
     panel = studio.team_assets_panel
     panel.loaded((archive, model, inventory(archive, model), available_ids(archive, model)))
     assert panel.table.rowCount() == 2
+    assert panel.table.item(0, 12).text() == str(model.rows['teams'][0]['asset_id'])
+    assert ' * (' in panel.table.item(0, 5).text()
+    assert rows_name(model, 1) in panel.table.item(0, 5).text()
+    assert [panel.table.item(0, c).checkState() for c in range(5, 12)] == [
+        Qt.CheckState.Checked, Qt.CheckState.Checked, Qt.CheckState.Checked,
+        Qt.CheckState.Unchecked, Qt.CheckState.Unchecked, Qt.CheckState.Unchecked,
+        Qt.CheckState.Unchecked]
+    assert panel.requests() == []  # Existing checks must never clone every team.
     panel.check_missing()
     plans = panel.requests()
     assert len(plans) == 2 and plans[0]['id'] != plans[1]['id']
     assert plans[0]['assets'] == ['x', 'y', 'z']
     panel.search.setText('no match')
     assert panel.table.isRowHidden(0)
+
+
+def rows_name(model, index):
+    return model.rows['teams'][index].get('school_name') or 'Team'
+
+
+def test_sharing_uses_actual_routes_not_just_owner_or_arena_row(qtbot, tmp_path):
+    from choops_py.studio.app import Window
+    studio = Window(); qtbot.addWidget(studio)
+    archive = Archive(game(tmp_path, shared=False)); _, model = roster_model(archive)
+    # Different arena rows and uniform owners still resolve to the same files.
+    model.rows['teams'][1]['arena_index'] = 1
+    physical = model.row_offset('arenas', 1) + 24
+    struct.pack_into('>H', model.data, physical + 0x12, 77)
+    model.rows['uniforms'] += [dict(u, team_asset_id=4) for u in list(model.rows['uniforms'])]
+    rows = inventory(archive, model)
+    assert rows[0]['asset_id'] != rows[1]['asset_id']
+    for kind in ('stadium', 'h', 'a'):
+        assert len(rows[0]['shared_assets'][kind]) == 1
+        assert '[Team 1]' in rows[0]['shared_assets'][kind][0]
+    assert rows[0]['shared_assets']['menu_logo'] == []
+    panel = studio.team_assets_panel
+    panel.loaded((archive, model, rows, available_ids(archive, model)))
+    for column in (5, 6, 7):
+        assert ' * (' in panel.table.item(0, column).text()
+        assert '[Team 1]' in panel.table.item(0, column).toolTip()
+    assert ' * (' not in panel.table.item(0, 11).text()
+    assert panel.requests() == []
+
+
+def test_existing_logo_and_uniforms_checked_without_mass_cloning(qtbot, tmp_path):
+    from PySide6.QtCore import Qt
+    from choops_py.studio.app import Window
+    studio = Window(); qtbot.addWidget(studio)
+    archive = Archive(game(tmp_path, logos=True)); _, model = roster_model(archive)
+    rows = inventory(archive, model)
+    assert set(rows[0]['present_assets']) == {'stadium', 'h', 'a', 'menu_logo'}
+    panel = studio.team_assets_panel
+    panel.loaded((archive, model, rows, available_ids(archive, model)))
+    assert panel.table.item(0, 11).checkState() == Qt.CheckState.Checked
+    panel.table.item(0, 8).setCheckState(Qt.CheckState.Checked)
+    assert panel.requests() == [dict(team=0, id=panel.free[0], assets=['x'])]
+    # Unchecking a present asset is not a destructive deactivation request.
+    panel.table.item(0, 6).setCheckState(Qt.CheckState.Unchecked)
+    panel.table.item(0, 8).setCheckState(Qt.CheckState.Unchecked)
+    assert panel.requests() == []
+
+
+@pytest.mark.parametrize('explicit_id', [False, True])
+def test_existing_assets_can_still_be_cloned_for_one_team(qtbot, tmp_path, explicit_id):
+    from choops_py.studio.app import Window
+    studio = Window(); qtbot.addWidget(studio)
+    archive = Archive(game(tmp_path, logos=True)); _, model = roster_model(archive)
+    panel = studio.team_assets_panel
+    result = (archive, model, inventory(archive, model), available_ids(archive, model))
+    panel.loaded(result)
+    if explicit_id:
+        panel.table.item(0, 12).setText('900')
+    else:
+        panel.table.selectRow(0)
+        panel.clone.click()
+    plans = panel.requests()
+    assert len(plans) == 1 and plans[0]['team'] == 0
+    assert plans[0]['assets'] == ['stadium', 'h', 'a', 'menu_logo']
+    if explicit_id:assert plans[0]['id'] == 900
+    # Reload resets pending copy intent as well as the baseline checks.
+    panel.loaded(result)
+    assert panel.requests() == []
+
+
+def test_missing_paired_asset_does_not_start_checked(qtbot, tmp_path):
+    from PySide6.QtCore import Qt
+    from choops_py.studio.app import Window
+    studio = Window(); qtbot.addWidget(studio)
+    archive = Archive(game(tmp_path)); _, model = roster_model(archive)
+    archive.entries = [e for e in archive.entries if e['hash'] != hash_name('selua077.iff')]
+    rows = inventory(archive, model)
+    assert 'a' not in rows[0]['present_assets'] and 'Missing' in rows[0]['a']
+    panel = studio.team_assets_panel
+    panel.loaded((archive, model, rows, available_ids(archive, model)))
+    assert panel.table.item(0, 7).checkState() == Qt.CheckState.Unchecked
+    assert panel.requests() == []
+    panel.table.item(0, 7).setCheckState(Qt.CheckState.Checked)
+    assert panel.requests()[0]['assets'] == ['a']
 
 
 def test_menu_logo_clones_and_stages_with_template_layout_and_live_preview(tmp_path):

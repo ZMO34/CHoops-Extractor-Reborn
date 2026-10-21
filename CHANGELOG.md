@@ -1,3 +1,10 @@
+## Unreleased — team asset selection correction
+
+- Check existing available team assets by default; leave missing or inactive categories unchecked.
+- Show the original team Asset ID in the target box; keep default checks out of change plans and support explicit selected-team cloning.
+- Mark shared stadiums, uniforms and menu logos with an asterisk and peer team names, including mixed classic/modern asset routes.
+- Preserve existing assignments when clearing checks and reset pending clone intent on refresh.
+
 ## v1.20
 
 - Save edited community rosters to overrides; copy selected-team activation/asset assignments between roster sources with review and editor undo.
@@ -302,7 +309,7 @@ Build a restricted FFmpeg CLI from pinned upstream source with GPL/nonfree
 components disabled, ship corresponding FFmpeg/AtracDEnc sources and notices,
 and include both audio helpers in the standalone Windows GUI. Windows CI run 54
 built the package and passed the frozen synthetic WAV round trip on the current
-PR head. ATRAC PCM input now accepts finite samples through ±4.0, matching the
+PR head. ATRAC PCM input now accepts finite samples through Â±4.0, matching the
 encoder's 1/4 input scaling and avoiding rejection of over-range floating WAVs.
 Song replacements are trimmed or silence-padded to the selected track's original
 sample length.
