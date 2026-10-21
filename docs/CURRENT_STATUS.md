@@ -1,3 +1,25 @@
+# Unreleased — donor component construction and allocator ABI
+
+Added contract-gated NBA11 decoded-ELF to CH component construction: target header
+layout, fixed-rate poses/root, mapped events, owned relative pointers and full
+relocation validation. Unknown authoring/state fields require explicit per-header
+research assertions bound to both complete inputs; there is no default contract
+or automatic real-game metadata proof. Signature-IFF sources/auxiliary semantics
+still block actual signature-shot translation.
+
+Traced the concrete CH heap wrapper and matching release ABI. Four bounded Ghidra
+instruction-harness cases pass with synthetic heap callbacks. Added an offline
+resident ownership model covering allocation/readback/publication, reader leases,
+retirement/shutdown, rollback and quarantine. Its registry is Python-local; a native
+reader/publication/lifetime hook is not installed.
+
+Actual signature banks resolve all 918 nonempty category-zero slots (458 aliases),
+911 headers and 456 payloads. Known-component projection: about 12.3 MB before
+auxiliary data/heap overhead; this is not a certified PS3 budget. All 806 bounded
+300-Hz selector curves pass new read-only inspection; selector meanings remain
+unresolved. Source files unchanged, no RPCS3/gameplay/JB run. Full donor port remains
+unfinished. Details: [ANIMATION_RUNTIME_ADAPTER.md](ANIMATION_RUNTIME_ADAPTER.md).
+
 # Unreleased — target header residency and registration extents
 
 Added complete known target track-extent audits and CH-backed resident-image

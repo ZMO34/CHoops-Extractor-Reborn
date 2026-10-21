@@ -1,3 +1,20 @@
+# Donor translation research APIs
+
+`choops_py.research.donor_header.translate_donor_motion` accepts decoded donor/target
+ELF bytes, a donor header address and separate explicit metadata/event contracts.
+It returns a relative CH component and provenance manifest; it writes no files.
+Metadata contracts require full source/target and header fingerprints plus explicit
+mode/state/planar assertions and evidence. No automatic/default metadata contract,
+signature-IFF source adapter, executable installation or GUI action is supplied.
+`ResidentLoaderModel` is an offline callback/lease protocol with a Python-local
+registry. See [evidence, contract fields and native integration limits](ANIMATION_RUNTIME_ADAPTER.md#contract-gated-donor-header-construction).
+
+The optional Ghidra `tools/research/AllocatorABITrace.java` script takes a **new**
+output JSON path. It requires the observed decoded CH analysis project, checks
+allocator descriptor revision, and exercises bounded wrapper instructions against
+synthetic heap callbacks. It does not run the game, modify EBOOT or invoke the
+real heap implementation.
+
 # Deep native shot dependencies
 
 `inspect-shot-registration CH_ANALYSIS.ELF OUTPUT.json --motion-extents` adds

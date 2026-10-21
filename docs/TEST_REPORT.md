@@ -1,3 +1,28 @@
+# Unreleased donor header / allocation protocol follow-up
+
+Twelve-file targeted animation suite: 160 passed. New synthetic cases cover target
+header layout, exact resampled component data, preserved timing bits, fingerprint-
+bound authoring assertions, missing/opaque metadata/events/auxiliary dependencies,
+budget rejection before expansion, huge-input/float-conversion guards, exact aligned
+budget acceptance, relocation
+roundtrip, allocation failure, write/readback rollback, concurrent reader retirement,
+shutdown, overlap quarantine, uncertain-free no-retry, callback reentry, and heap
+generation/rebinding fences during allocation, readback, leasing and release.
+
+The shareable revision-guarded Ghidra instruction harness passes four native-wrapper
+cases: inherited/alternate heap policy, null allocation and release. It traps a
+synthetic heap callback and checks arguments plus TOC restoration; actual heap
+allocation/free, native publication/readers and gameplay are not exercised.
+
+Read-only actual signature-bank audit: 918 resolved nonempty slots including 458
+aliases, 911 referenced headers / 456 resolved payloads / zero dependency or alias
+metadata-count errors. Known component projection is 12,307,462 bytes excluding
+auxiliary/opaque payloads, alignment, registration, heap overhead and existing CH
+assets. All 806 bounded selector curves pass, totaling 35,852 bytes; their cross-
+game meanings remain unresolved. No real-game metadata contract or donor shot is
+certified. Original sources remain unchanged. RPCS3/hardware/gameplay NOT RUN;
+automatic/testing JB NOT BUILT. Full portable/exact-head results are in PR45.
+
 # Unreleased target header residency follow-up
 
 Nine-file animation regression suite: 123 passed. New cases cover complete later

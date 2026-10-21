@@ -88,6 +88,28 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# Unreleased — donor component construction and allocator ABI
+
+Added contract-gated NBA11 decoded-ELF to CH component construction: target header
+layout, fixed-rate poses/root, mapped events, owned relative pointers and full
+relocation validation. Unknown authoring/state fields require explicit per-header
+research assertions bound to both complete inputs; there is no default contract
+or automatic real-game metadata proof. Signature-IFF sources/auxiliary semantics
+still block actual signature-shot translation.
+
+Traced the concrete CH heap wrapper and matching release ABI. Four bounded Ghidra
+instruction-harness cases pass with synthetic heap callbacks. Added an offline
+resident ownership model covering allocation/readback/publication, reader leases,
+retirement/shutdown, rollback and quarantine. Its registry is Python-local; a native
+reader/publication/lifetime hook is not installed.
+
+Actual signature banks resolve all 918 nonempty category-zero slots (458 aliases),
+911 headers and 456 payloads. Known-component projection: about 12.3 MB before
+auxiliary data/heap overhead; this is not a certified PS3 budget. All 806 bounded
+300-Hz selector curves pass new read-only inspection; selector meanings remain
+unresolved. Source files unchanged, no RPCS3/gameplay/JB run. Full donor port remains
+unfinished. Details: [ANIMATION_RUNTIME_ADAPTER.md](ANIMATION_RUNTIME_ADAPTER.md).
+
 # Unreleased — target header residency and registration extents
 
 Added complete known target track-extent audits and CH-backed resident-image
@@ -1987,7 +2009,8 @@ statistics. Inputs cannot be overwritten. All actual-game reports stay private.
 This does not establish CH +0x24/+0x28/+0x2C authoring metadata from an NBA clip.
 Those offsets have different source/target meanings. Remaining header flag bits,
 auxiliary curves, desired-motion metadata and bank relocation still prevent a
-complete header writer. No unrelated template metadata is substituted.
+automatic complete header writer. The contract-gated component builder below
+does not establish those missing semantics. No unrelated template metadata is substituted.
 
 ## Memory handling and verification
 
@@ -2103,6 +2126,152 @@ No emulator, hardware or automatic/testing JB was run.
   streaming path for the donor library. This static probe does not provide it.
 - Validate native runtime behavior separately. Structural checks cannot certify
   frame-time memory use, asynchronous load ordering, lifetime or gameplay.
+
+
+## Contract-gated donor header construction
+
+`research.donor_header.translate_donor_motion` now assembles a relative CH motion
+component from the observed NBA11 **decoded-ELF** packed family, with verified
+canonical binds and separately supplied metadata/event contracts. This goes beyond
+retaining an existing CH header, but it does not automatically discover the missing
+metadata or install the component in a native bank. The signature-IFF records and
+aliases discussed below still need their own source adapter.
+
+The builder places the source low rotation/translation masks into CH's mask words,
+retains native channel counts and rate, expands authored key deltas to fixed frames,
+retains exact source time-scale/duration float bits, converts packed quaternion
+selectors, resamples the root with its six/eight-byte mode, and writes mapped CH
+events. Every mandatory pointer targets the owned component; full target extents
+and relative/native/inverse byte equality are checked before returning it. Exact
+aligned output size is budgeted before expanded tracks are allocated. Payload
+budget is not a total Python/PS3 process-memory claim.
+
+The mandatory metadata contract contains these fields:
+
+| Field | Required assertion |
+| --- | --- |
+| `schema` | 1 |
+| `source_sha256`, `target_sha256` | Complete decoded input fingerprints |
+| `source_header_address`, `source_header_sha256` | Exact 56-byte donor header |
+| `target_mode_high16` | Explicit target upper mode word |
+| `target_state_bits` | Explicit target +0x18 word |
+| `authored_planar` | Explicit finite `[speed, X, Z]` for +0x24/+0x28/+0x2C |
+| `evidence` | Bounded nonempty `mode`, `state`, `planar` research explanations |
+
+These are **caller research assertions**, not facts proved by an evidence string.
+No default contract or unrelated CH template is supplied. Fingerprints prevent
+stale stream/revision assertions from being reused with changed inputs. The
+manifest retains the assertions and labels automatic metadata establishment false.
+Current conversion verification uses synthetic assertions only; this update does
+not claim a verified real-game metadata contract or playable donor shot.
+
+Missing event rules, opaque payloads, unsupported packing, null dependencies,
+header +4 references, counted auxiliary tracks and +0x34 membership dependencies
+still block output. They are not replaced with empty data. The root-stride, mirror
+and cyclic-phase bit positions must remain consistent with the donor. Other mode
+and state semantics remain explicit assertions rather than copied opaque defaults.
+No executable writer or automatic installation is added to the editor.
+
+## Native allocator wrapper and ownership model
+
+RTTI identifies `VCRESOURCEGLOBAL_HEAP_ALLOCATOR`, whose observed vtable is at
+`0x12773AF8`. The allocation entry is CH `0x843404`, release is `0x8434B8`, both
+using TOC `0xA64A94`. Allocation takes its heap object from wrapper +0x14 and
+forwards size/alignment into heap vtable slot +0x4C. Wrapper +0x10 selects heap
+policy word 3 when nonzero or the heap's +0x18 word otherwise; the remaining two
+arguments are forwarded unchanged. Release invokes the **same bound heap** at
+vtable +8 with the pointer and two zero arguments, then returns 1. The release
+wrapper's return is not an independent proof of heap success.
+
+The observed `VCHEAP2` vtable at `0x12773580` resolves +0x4C to `0x8258C0` and +8
+to `0x8248A8`. The allocation implementation rounds using the requested alignment
+and includes heap bookkeeping; component bytes alone are not a measured heap cost.
+These type/descriptor links and wrapper instructions were checked in Ghidra and
+original disassembly. Resource getter `0x841810` looks up via `0x841690`, then
+calls the selected provider's +0x18 method. Resource attachment `0x8418C4` first
+invokes provider +0xC and links it only after success. This is a concrete native
+route, but the provider's complete file/bank ownership protocol remains unfinished.
+
+The asset-free Ghidra script `tools/research/AllocatorABITrace.java` supplies a
+bounded revision-guarded instruction harness. On a separate decoded analysis
+project it runs the actual wrapper instructions with synthetic heap objects,
+traps the synthetic heap callback, checks arguments/TOC and resumes through return.
+Four cases pass: default policy, alternate policy, null allocation and release.
+The harness does **not execute the actual heap allocator/free implementation**, run
+a match or patch an executable. It writes a new JSON only and refuses existing
+outputs. Ghidra's `/C:/...` Windows source spelling is normalized for source checks.
+
+`research.resident_loader.ResidentLoaderModel` implements an offline ownership
+protocol around synchronous bound allocation/free/read/write callbacks:
+
+1. Validate the entire relative image before allocation; enforce a resident
+   payload budget and at most 4,096 tracked live/quarantined allocations.
+2. Allocate with 16-byte alignment, relocate at the returned address, write and
+   read back all bytes before publishing to the **local Python registry**.
+3. Acquire explicit reader leases. Retirement stops new leases; release waits
+   until the last existing reader leaves, including shutdown/concurrent retirement.
+4. Roll back an unpublished write/readback failure through the same allocator.
+   An uncertain free is quarantined with its budget retained and is not retried.
+5. Invalid/overlapping allocator results are quarantined; every overlapping older
+   bank also stops accepting leases. Released records are removed so repeated
+   load/release cycles do not retain a growing history. Callback reentry is refused.
+6. Require an immutable heap-address/generation identity callback. Check it before
+   allocation, after allocation/readback, before issuing a reader lease and before
+   release. A rebound/reused heap quarantines all affected banks; the model never
+   substitutes the wrapper's current heap for an allocation's captured owner.
+
+This model is **not native loader installation**. It provides tested ordering,
+rollback and lifetime rules for the future bridge. No game pointers are published,
+and native aliases/cached readers do not automatically acquire these Python leases.
+Every relevant native reader/publication/retirement boundary must be connected
+before this protocol can safely authorize real-game frees. Identity checks detect
+reported rebinding; they do not stop external heap destruction or close a check/use
+race. A native binding still needs heap-lifetime synchronization and real generation
+tracking, beyond this model's local lock. The callback arguments
+carry the observed ABI shape, not newly invented meanings for its policy/tag words.
+
+## Signature banks, auxiliary curves and memory scope
+
+The signature bank resources are distinct from the embedded ELF motion pool.
+The category-zero lookup IDs do not resolve to that pool, so its 235 MB full-family
+expansion is not the right way to size a signature-shot subset. Read-only inspection
+of the two actual IFF banks resolves all 918 nonempty category-zero references,
+including 458 alias slots. There are 911 distinct referenced headers and 456 distinct
+resolved payloads; alias metadata/count compatibility passes before estimating size.
+
+At fixed donor rate, the known pose/root/header components plus one eight-byte CH
+event row per source marker project to 12,307,462 bytes after exact-source extent
+deduplication. Per-style projections range from 32,758 to 151,272 bytes. These
+figures exclude auxiliary/opaque event payloads, alignment, registration, heap
+bookkeeping and existing CH assets; they are **not a certified resident budget**.
+The 259-ID versus byte-field limit also remains. No stock style is removed to fit.
+
+Native CH `0x203AC` and the auxiliary branch in NBA11 `0x1B764` use four-byte
+selector knots: upper byte selector, low **signed 24-bit tick**, at a fixed 300 Hz
+multiplied by header time-scale. The samplers find bracketing knots and construct
+selector/weight results; these are not ordinary fixed-rate pose/root rows. The
+new read-only `research.motion_auxiliary.inspect_selector_curve` accepts a caller-
+established complete region, retains words/selectors/ticks, checks monotonicity
+and declared-duration bracketing, and reports equal-time knots without certifying
+playback. It does not infer a terminator or turn unknown padding into knots.
+
+Private signature-bank audit: all 806 bounded curves in the 456 resolved payloads
+pass inspection, totaling 35,852 curve bytes. Selector identities/target routing
+remain unresolved; byte-compatible knot layout does not authorize copying their
+meaning across games. The current donor writer therefore continues to reject these
+auxiliary dependencies. This preserves the remaining gate instead of discarding
+required data to manufacture an apparently successful shot conversion.
+
+Mode consumers CH `0x235BC` and NBA11 `0x12C10` share the cyclic-phase gate at bit
+28, selector nibble at bits 24..27 and threshold byte at bits 16..23, with mirror
+participating in phase selection. Their input-state layouts and final clamping
+behavior differ. This establishes field use/positions, not identical complete
+phase algorithms or the remaining mode/state semantics.
+
+Original executables and source banks remain unchanged. Ghidra's bounded instruction
+harness was run; RPCS3, hardware/gameplay and automatic/testing JB were not run.
+The full native donor loader, automatic metadata derivation, signature-bank source
+adapter/auxiliary selector mapping and playable additive shot remain unfinished.
 
 ---
 
@@ -5099,6 +5268,31 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+# Unreleased donor header / allocation protocol follow-up
+
+Twelve-file targeted animation suite: 160 passed. New synthetic cases cover target
+header layout, exact resampled component data, preserved timing bits, fingerprint-
+bound authoring assertions, missing/opaque metadata/events/auxiliary dependencies,
+budget rejection before expansion, huge-input/float-conversion guards, exact aligned
+budget acceptance, relocation
+roundtrip, allocation failure, write/readback rollback, concurrent reader retirement,
+shutdown, overlap quarantine, uncertain-free no-retry, callback reentry, and heap
+generation/rebinding fences during allocation, readback, leasing and release.
+
+The shareable revision-guarded Ghidra instruction harness passes four native-wrapper
+cases: inherited/alternate heap policy, null allocation and release. It traps a
+synthetic heap callback and checks arguments plus TOC restoration; actual heap
+allocation/free, native publication/readers and gameplay are not exercised.
+
+Read-only actual signature-bank audit: 918 resolved nonempty slots including 458
+aliases, 911 referenced headers / 456 resolved payloads / zero dependency or alias
+metadata-count errors. Known component projection is 12,307,462 bytes excluding
+auxiliary/opaque payloads, alignment, registration, heap overhead and existing CH
+assets. All 806 bounded selector curves pass, totaling 35,852 bytes; their cross-
+game meanings remain unresolved. No real-game metadata contract or donor shot is
+certified. Original sources remain unchanged. RPCS3/hardware/gameplay NOT RUN;
+automatic/testing JB NOT BUILT. Full portable/exact-head results are in PR45.
 
 # Unreleased target header residency follow-up
 

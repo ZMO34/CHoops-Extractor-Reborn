@@ -1,3 +1,10 @@
+## Unreleased — donor header and allocator protocol follow-up
+
+- Assemble owned CH motion components from the observed NBA11 ELF family using explicit fingerprint-bound authoring metadata and event contracts; reject unresolved dependencies.
+- Add a bounded offline resident ownership model with leases, delayed release, rollback, readback and allocation quarantine; no native hook is installed.
+- Add a revision-guarded Ghidra allocator-wrapper instruction harness and read-only 300-Hz auxiliary selector-curve inspection.
+- Document actual signature-bank dependency/footprint findings and the remaining source-adapter, metadata, auxiliary and native lifecycle work.
+
 ## Unreleased — native target residency preparation
 
 - Audit full registered CH motion track extents with `inspect-shot-registration --motion-extents`.
