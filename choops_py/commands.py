@@ -14,6 +14,8 @@ COMMANDS={
     'inspect-animations':Command(('input','output')),
     'inspect-animation-links':Command(('input','profile','output')),
     'inspect-embedded-motion':Command(('input','profile','output')),
+    'inspect-motion-events':Command(('input','profile','address','output'),('motion-events',)),
+    'transcode-motion-events':Command(('input','profile','address','contract','output'),('motion-events',)),
     'inspect-scorebug-runtime':Command(('input','output')),
     'transcode-motion-frames':Command(('input','profile','target_profile','rotations','translations','frames','output')),
     'resample-motion-frames':Command(('input','timing','rotations','translations','output'),('motion-root',)),

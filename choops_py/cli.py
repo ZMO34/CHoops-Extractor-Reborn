@@ -15,7 +15,10 @@ def parser():
         s=sub.add_parser(name)
         for field in spec.fields:s.add_argument(field)
         for group in spec.options:
-            if group=='motion-root':
+            if group=='motion-events':
+                s.add_argument('--native-elf',action='store_true')
+                s.add_argument('--auxiliary-start')
+            elif group=='motion-root':
                 s.add_argument('--root-track');s.add_argument('--root-output')
                 s.add_argument('--root-without-heading',action='store_true')
             elif group=='audio-category':
@@ -44,7 +47,7 @@ def execute(a):
     if c=='gui':
         from .studio import main as launch
         return launch([])
-    sources=[getattr(a,key) for key in ('source','input','cdf','dds_file','wav_file','image','mod','modded','edited','patch','timing','root_track') if getattr(a,key,None)]
+    sources=[getattr(a,key) for key in ('source','input','cdf','dds_file','wav_file','image','mod','modded','edited','patch','timing','root_track','contract') if getattr(a,key,None)]
     if hasattr(a,'output'):
         validator=build_destination if c=='build-copy' else safe_output
         a.output=validator(a.output,sources)
@@ -56,6 +59,24 @@ def execute(a):
         if c == 'import-uniform-models':return uniform_mesh.import_folder(a.edited,a.output)
         from .archive.usrdir_reader import Archive
         return uniform_mesh.export_archive(Archive(a.source),a.output,modern=c=='modern-fit-uniforms')
+    if c in ('inspect-motion-events','transcode-motion-events'):
+        from .formats.motion_events import MAX_INPUT, inspect_events, inspect_auxiliary_pairs, transcode_events
+        if Path(a.input).stat().st_size > MAX_INPUT:
+            raise ValueError('Motion event input exceeds inspection bounds')
+        raw = Path(a.input).read_bytes()
+        report = inspect_events(raw,a.profile,int(a.address,0),native=a.native_elf)
+        if a.auxiliary_start is not None:
+            if c != 'inspect-motion-events' or a.profile != 'nba-2k11':
+                raise ValueError('Auxiliary pair inspection requires NBA 2K11 inspection')
+            report['auxiliary_pairs'] = inspect_auxiliary_pairs(raw,int(a.auxiliary_start,0),native=a.native_elf)
+        if c == 'inspect-motion-events':
+            save_json(a.output,report,sources)
+            return report
+        if Path(a.contract).stat().st_size > 4*1024*1024:
+            raise ValueError('Event mapping contract exceeds inspection bounds')
+        data,result = transcode_events(report,json.loads(Path(a.contract).read_text(encoding='utf-8')))
+        write_bytes(a.output,data,sources)
+        return dict(output=str(a.output),bytes=len(data),**result)
     if c == 'resample-motion-frames':
         from .formats.motion_frames import MAX_STREAM, resample_nba11_frames, resample_nba11_root
         if Path(a.input).stat().st_size > MAX_STREAM or Path(a.timing).stat().st_size > 32767:

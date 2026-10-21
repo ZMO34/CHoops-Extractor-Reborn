@@ -1,4 +1,4 @@
-# Current support matrix — v1.20
+# Current support matrix — v1.21
 
 Supported means structurally verified by parsers and automated fixtures. No row
 certifies game/runtime compatibility. Unknown variants fail explicitly.
@@ -26,6 +26,12 @@ enabled. [Donor evidence and limits](NBA2K11_DONOR_ASSESSMENT.md).
 
 - Explorer reads nested records and researched asset references; labels never make
   an unknown hash an established semantic identity.
+- Team Assets checks existing available assets by default, marks shared asset
+  routes with peer team names, and starts the target box with the original ID.
+  Existing checks alone never clone the roster; independent copies are explicit.
+- Offline NBA11/CH event inspection and contract-gated event-table conversion
+  complement packed-pose/timing/root conversion. No default semantic event map
+  or playable donor bank is supplied; opaque payload schemas block conversion.
 - Source and overrides are cached concurrently. Global preview selection resolves
   geometry and artwork; DDS takes priority only within overrides, with TXTR fallback.
 - Static preview camera supports orbit, look-around, pan, WASD movement and fit.
@@ -42,7 +48,7 @@ enabled. [Donor evidence and limits](NBA2K11_DONOR_ASSESSMENT.md).
 
 ## Excluded or unresolved
 
-No alternate-asset creation, automatic D1 conversion, EBOOT editing, animation
+No automatic D1 conversion, editor EBOOT patching, complete gameplay animation
 port, encrypted-save decryption, universal NBA roster fields or full arena shader
 emulation. Unknown reflection/fake-bump/AO/runtime palettes and universal text
 ceilings remain unestablished. See [limitations](KNOWN_LIMITATIONS.md),

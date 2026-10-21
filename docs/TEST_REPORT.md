@@ -1,3 +1,25 @@
+# v1.21 animation event bridge
+
+Targeted animation suite:
+`python -m pytest tests/test_motion_events.py tests/test_motion_envelope.py tests/test_embedded_motion.py tests/test_motion_frames.py -q`:
+49 passed. Full development portable verification:758 passed,9 optional skips,
+2 deselected; compile,CLI/Qt smoke,Ruff,mypy,handoff and diff checks passed.
+The release is also checked from its exact committed head in an isolated checkout.
+
+New regressions cover signed relative versus native absolute payloads, file-backed
+extent/BSS rejection, missing sentinel/truncation, nonfinite times, required event90
+payload, opaque payload refusal, missing/duplicate contract rules, exact float-bit
+and duplicate-order preservation, zero-valued payload categories, bounded auxiliary
+pairs, all-validation-before-write and input/contract overwrite protection.
+
+Read-only supplied-copy audit using the new parser:3,727 CH tables/17,897 events;
+9,574 NBA11 tables/49,639 events; no malformed tables. All identified tables have
+nondecreasing finite times.101 NBA11 auxiliary tables/101 pairs pass;151 event90
+payload-word reads and2,850 other opaque payload rows are distinguished. Original
+analysis-copy hashes remain unchanged. No game/executable bytes are distributed,
+no emulator ran and no real/testing JB was built. Semantic mappings are explicitly
+caller-supplied research assertions, not automatically validated gameplay behavior.
+
 # Team asset checkbox defaults
 
 Targeted Qt/backend suite: `python -m pytest tests/test_team_assets.py -q`:

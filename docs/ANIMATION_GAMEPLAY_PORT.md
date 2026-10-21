@@ -201,6 +201,15 @@ word or applying a uniform ID offset is not a supported event conversion.
 
 ## Adding jump-shot choices — native requirements
 
+The next offline phase now provides [event/payload dependency inspection and a
+guarded table bridge](ANIMATION_EVENT_BRIDGE.md). It preserves marker order and
+exact time bits, requires explicit caller-reviewed mapping evidence and blocks
+unknown payload schemas. It does not install the candidate correspondences above
+as a semantic dictionary. Native audit:3,727 CH tables/17,897 rows and9,574 NBA11
+tables/49,639 rows; zero extent errors. NBA11's +0x34 counted membership pairs are
+also bounded, with their second words left opaque. This closes the offline table
+format/writer phase, not the remaining runtime/event-semantic dependencies.
+
 Owner requirement is additive: retain every original shot and append donor styles.
 CH getter/setter 0x69E938/0x69E94C read/write one byte at logical player +0x73
 (editor row +0x83); the editor's current accepted range remains 0..111. Native

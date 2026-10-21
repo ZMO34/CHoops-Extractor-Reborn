@@ -40,3 +40,10 @@ standard-bank inventory. Candidate count/duration header relationships differ
 between presentation and crowd clips; mirrored entries can be only 64 bytes.
 Therefore a guessed universal frame rate or stand-alone BVH decoder is not
 exposed. Clip dependency/alias resolution must precede skeletal export.
+# v1.21 event/payload bridge follow-up
+
+[Native event evidence and commands](ANIMATION_EVENT_BRIDGE.md) now cover the
+eight/twelve-byte row difference, first/last marker lookup, exact timestamp bits,
+event90's category-word consumer and NBA11's counted membership pairs. The guarded
+offline writer requires explicit reviewed mappings and blocks opaque payloads.
+It adds no default semantic dictionary, runtime bank or new jump-shot registration.
