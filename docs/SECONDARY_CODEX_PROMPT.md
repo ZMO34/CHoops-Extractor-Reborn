@@ -88,6 +88,16 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# Unreleased — Legacy transfer portal feasibility
+
+Read-only tracing identifies the outgoing candidate gate, 400-active-entry queue,
+ranked destination selection, source/destination menus, finalization and queue
+save/load relocation. Increased transfer frequency has specific native controls;
+a recruitable portal is plausible but requires calendar, recruiting, eligibility,
+scholarship and save contracts. Neither feature nor an executable patch is installed.
+Original files unchanged; no emulator/gameplay/JB run. See
+[LEGACY_TRANSFER_PORTAL.md](LEGACY_TRANSFER_PORTAL.md).
+
 # v1.21 — animation event bridge and asset-selection correction
 
 Completed the bounded offline event-table bridge phase: CH/NBA11 event inspection,
@@ -1785,6 +1795,13 @@ source-immutable decoding, destination reparse, untouched-range comparison,
 ambiguity rejection and rollback. Engine/memory behavior remains uncertified
 without user testing. This research launches no game, edits no executable,
 builds no real/testing JB and distributes no donor assets.
+
+## Transfer follow-up
+
+[Legacy transfer feasibility](LEGACY_TRANSFER_PORTAL.md) now traces native candidate
+frequency gates, ranked destinations, transfer menus and serialized queue relocation.
+These improve the evidence behind a possible portal; recruiting integration and
+higher rates remain unimplemented and gameplay-unverified.
 
 ---
 
@@ -4651,6 +4668,16 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+# Legacy transfer feasibility research — 2026-10-21
+
+Documentation-only update. Read-only Ghidra generated 17 focused function reports;
+PowerPC instructions and constants independently checked. Private audit passes
+source digest/byte equality, the chance subtraction instruction, 3.0/0.66 constants,
+eight state-gate cases and 0x12CC = 401 x 12 arithmetic. Static evidence only:
+no game execution, measured transfer distribution, save roundtrip, modified EBOOT
+or JB. No editor runtime behavior changes, so runtime suites are not rerun.
+Documentation/handoff/diff validation is recorded in the PR handoff.
 
 # v1.21 animation event bridge
 

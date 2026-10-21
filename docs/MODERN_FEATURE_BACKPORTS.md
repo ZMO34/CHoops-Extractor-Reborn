@@ -123,3 +123,10 @@ source-immutable decoding, destination reparse, untouched-range comparison,
 ambiguity rejection and rollback. Engine/memory behavior remains uncertified
 without user testing. This research launches no game, edits no executable,
 builds no real/testing JB and distributes no donor assets.
+
+## Transfer follow-up
+
+[Legacy transfer feasibility](LEGACY_TRANSFER_PORTAL.md) now traces native candidate
+frequency gates, ranked destinations, transfer menus and serialized queue relocation.
+These improve the evidence behind a possible portal; recruiting integration and
+higher rates remain unimplemented and gameplay-unverified.

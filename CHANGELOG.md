@@ -1,3 +1,8 @@
+## Unreleased — Legacy transfer feasibility research
+
+- Document confirmed transfer candidate gates, ranked destinations, 400-entry active queue, existing transfer menus and serialized pointer relocation.
+- Assess scoped frequency tuning and a recruitable portal while identifying unresolved calendar, scholarship, recruiting and save contracts. No executable or editor behavior changes.
+
 ## v1.21 — animation event bridge and team asset selection
 
 - Add bounded CH/NBA11 event-table inspection, known category-payload-word reads and NBA11 membership-pair inspection.
