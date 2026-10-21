@@ -131,3 +131,98 @@ The cap describes retained **payload bytes**, not all Python/OS memory, mapped
 virtual address space or PS3 heap residency. A native demand loader/sampler hook,
 allocator integration and real-game memory/lifetime validation remain required.
 No native hook, emulator, hardware test or automatic/testing JB was run.
+
+
+## Target header ownership and native relocation follow-up
+
+The new `research.target_motion` backend validates existing CH headers and builds
+self-contained **CH-backed** resident images. It does not derive the unresolved
+CH authoring fields from NBA, install a native demand-loader, or finish the donor
+port. Every nonpointer byte of a supplied CH header is preserved; the builder
+never substitutes metadata from an unrelated style into a donor header.
+
+Focused Ghidra and original-instruction checks establish these boundaries:
+
+| Native route | Confirmed operation |
+| --- | --- |
+| CH `0x1E9C0` | Fix up +0x30/+0x34/+0x38/+0x3C, then +0x40 tail sized by +0x10 low six bits |
+| CH `0x1EAA0` | Inverse fixup of the same fields |
+| CH `0x77FB1C` through `0x11650` | Null stays null; signed relative word becomes field address + word - 1 |
+| CH `0x77FAF4` through `0x15200` | Null stays null; pointer becomes pointer - field address + 1 |
+| CH `0x23D58` | Alias resolution copies those four pointers and the counted pointer tail; it does not copy scalar/mask metadata |
+| CH `0x23B6C` / `0x23C60` | Group pointer fixup/unfixup surrounds the corresponding motion fixup/unfixup |
+
+Consequently, resolving an alias is not ownership transfer or a deep copy. A
+cache may not evict backing tracks while registered headers or their aliases
+still reference them. These routines do not establish a heap pin/refcount API.
+The raw relocation oracle requires the caller to declare its pointer state;
+state cannot be inferred reliably from arbitrary words. A future native loader
+must own that state and call each transition once, not guess from pointer values.
+
+`inspect_target_motion` checks canonical channels, count/rate, finite time and
+movement metadata, complete header/tail extent, full poses/root tracks and a
+bounded event list through its sentinel. It reports load-segment ownership and
+unknown dependency extents. CH root rows use six or eight bytes according to the
+confirmed high mode bit. Unknown flag meanings remain raw and explicitly incomplete.
+It does not equate a successful extent check with validated contacts or playback.
+
+`prepare_target_image` accepts 1..4096 distinct existing CH headers and a 64-byte
+to 16-MiB payload budget. It materializes complete known dependencies, deduplicates
+identical source extents, aligns stored extents to 16 bytes, and emits relative
+pointers. Header overlaps, unresolved aliases, auxiliary tracks and nonnull +0x3C
+unknown extents block preparation. `relocate_target_image` checks the complete
+native view before returning a result, including later pose/root frames, events,
+32-bit address overflow and header storage collisions. No file is modified.
+The budget covers resident-image payload, not temporary preparation memory or RSS.
+
+The shot-registration CLI gains the opt-in deep check:
+
+```
+python -m choops_py.cli inspect-shot-registration CH_ANALYSIS.ELF output/research/deep-registration.json --motion-extents
+```
+
+It deduplicates the registered motion audits and retains the shallow compatibility
+check as the default. On the supplied stock executable, 112 styles reference 224
+distinct headers; all 224 pass full dependency extents. Fifty-six fit the current
+self-contained subset without unknown auxiliary extents. Across the identified
+full-body family, all 7,055 headers pass inspection, and all 2,522 supported
+headers pass owned-image preparation and exact relative/native/inverse roundtrip.
+The largest individual image is 126,996 bytes. Other headers remain inspectable,
+but are not silently copied with guessed auxiliary lengths.
+
+### Separate resident registration experiment
+
+The private, authorized decoded-ELF experiment extends the earlier table-only
+probe. It copies the two headers of stock row eight plus complete pose/root/event
+tracks into one 4,656-byte owned image. The headers share track storage where the
+originals share the same source extent. Both appended row pointers address the
+new image; no motion pointer borrows original or donor storage. The first 112
+playback rows remain byte-identical and the appended row retains its source's
+other playback metadata. Its display name is the existing Generic 1 tagged key,
+an explicit placeholder, not a claimed donor label.
+
+The plan reserves table, names and image after the entire TLS template. It uses
+9,648 bytes of 14,848 available verified-zero file padding, extends only the
+existing writable segment's file/memory sizes, and now checks both physical file
+padding and collisions with every other virtual load range. All segment offsets,
+TLS, neighboring label arrays and unrelated bytes remain unchanged. Reparse,
+full registered-track extents, image roundtrip and exact byte-diff allowlist pass.
+Original source hashes remain unchanged.
+
+This is a **stock-backed static residency/registration structure probe**. It adds
+no heap allocations and relies on normal executable-segment lifetime; it does
+not implement the donor loader's allocation, eviction, synchronization or shutdown
+protocol. It is a decoded analysis ELF, not a signed/hardware-certified EBOOT.
+No executable writer is exposed in the tool, and no probe assets are published.
+No emulator, hardware or automatic/testing JB was run.
+
+### Still required for the requested donor integration
+
+- Establish donor-to-CH authoring metadata, remaining flags and auxiliary extents;
+  do not advertise retained CH metadata as a completed cross-game translator.
+- Finish donor event/variant and graph dependencies before registering a playable
+  style. An idle clip in a shot slot would not prove a working donor shot.
+- Implement native resource lifetime/allocator or an appropriately bounded native
+  streaming path for the donor library. This static probe does not provide it.
+- Validate native runtime behavior separately. Structural checks cannot certify
+  frame-time memory use, asynchronous load ordering, lifetime or gameplay.

@@ -1,3 +1,21 @@
+# Unreleased — target header residency and registration extents
+
+Added complete known target track-extent audits and CH-backed resident-image
+preparation with exact metadata retention, bounded payloads, dependency deduplication,
+native/inverse relocation checks and explicit refusal of unknown auxiliary lengths.
+`inspect-shot-registration --motion-extents` validates registered dependencies.
+Allocation planning now reserves optional motion-image bytes and rejects virtual
+load collisions as well as occupied file padding.
+
+Private corpus: all 7,055 identified CH headers pass; all 2,522 supported headers
+roundtrip as owned images. A separate 113-entry stock-backed probe places an entire
+motion pair and its tracks in verified writable-segment padding, preserves all 112
+stock records/TLS and passes reparse/diff/extent checks with no heap allocation.
+This is not donor metadata translation, a native donor loader, playable port or
+runtime certification. Those requested pieces remain unfinished; originals are
+unchanged, no emulator/testing JB was used, and PR45 remains draft. Evidence and
+precise limits: [ANIMATION_RUNTIME_ADAPTER.md](ANIMATION_RUNTIME_ADAPTER.md).
+
 # Unreleased — bounded sampling and donor dependency registration
 
 Added an offline, byte-budgeted NBA11 sampler that reads authored keys on demand,

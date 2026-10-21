@@ -109,3 +109,38 @@ def test_padding_never_overwrites_nonzero_data():
     raw[plan["file_start"]] = 1
     with pytest.raises(ValueError, match="nonpadding"):
         registration_padding(raw, 113)
+
+
+def test_owned_motion_image_plan_reserves_bytes_after_names_and_tls():
+    raw, _ = registration_fixture()
+    empty = registration_padding(raw, 113)
+    plan = registration_padding(raw, 113, motion_bytes=512)
+    assert plan["motion_image"] == empty["end"]
+    assert plan["bytes_required"] == empty["bytes_required"] + 512
+    assert plan["end"] == empty["end"] + 512
+    for size in (-1, 16 * 1024 * 1024 + 1, True):
+        with pytest.raises(ValueError, match="bounded allocation"):
+            registration_padding(raw, 113, motion_bytes=size)
+    with pytest.raises(ValueError, match="nonpadding"):
+        registration_padding(raw, 113, motion_bytes=16 * 1024 * 1024)
+
+
+def test_deep_registration_checks_reject_a_header_with_missing_tracks():
+    raw, _ = registration_fixture()
+    # Shallow registration checks masks only; deep validation reaches timing/tracks.
+    assert inspect_registration(raw)["motion_extents_validated"] is False
+    with pytest.raises(ValueError, match="count/rate"):
+        inspect_registration(raw, motion_extents=True)
+
+
+def test_padding_plan_rejects_virtual_collision_even_when_file_padding_is_free():
+    raw, _ = registration_fixture()
+    plan = registration_padding(raw, 113, motion_bytes=512)
+    count = struct.unpack_from(">H", raw, 56)[0]
+    struct.pack_into(">H", raw, 56, count + 1)
+    address = plan["end"] - 16
+    struct.pack_into(
+        ">II6Q", raw, 64 + count * 56, 1, 4, 0x315000, address, address, 16, 16, 16
+    )
+    with pytest.raises(ValueError, match="overlaps native load memory"):
+        registration_padding(raw, 113, motion_bytes=512)

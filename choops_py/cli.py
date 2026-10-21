@@ -23,6 +23,8 @@ def parser():
                 s.add_argument('--cache-bytes',type=int,default=256*1024)
             elif group=='related-banks':
                 s.add_argument('--related-bank',action='append',default=[])
+            elif group=='motion-extents':
+                s.add_argument('--motion-extents',action='store_true')
             elif group=='motion-root':
                 s.add_argument('--root-track');s.add_argument('--root-output')
                 s.add_argument('--root-without-heading',action='store_true')
@@ -91,7 +93,7 @@ def execute(a):
             report = verify_canonical_bind(raw,Path(a.target_elf).read_bytes())
         else:
             from .research.shot_registration import inspect_registration
-            report = inspect_registration(raw)
+            report = inspect_registration(raw,motion_extents=a.motion_extents)
         save_json(a.output,report,sources)
         return report
     if c in ('inspect-motion-events','transcode-motion-events'):

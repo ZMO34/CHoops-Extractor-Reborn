@@ -14,7 +14,7 @@ READERS = (0x3213D4, 0x321454, 0x321538, 0x3247DC, 0x326404, 0x32BE20)
 READ_REGISTERS = (11, 11, 9, 8, 10, 10)
 
 
-def inspect_registration(raw):
+def inspect_registration(raw, *, motion_extents=False):
     elf = NativeELF(raw)
 
     def word(address):
@@ -52,12 +52,17 @@ def inspect_registration(raw):
         elf.target(start)
         elf.target(end - 1)
     rows = []
+    motions = {}
     for index in range(count):
         pointers = struct.unpack_from(">II", records, index * 40 + 32)
         for pointer in pointers:
             if pointer % 4:
                 raise ValueError("Unaligned registered motion pointer")
             canonical_channels(elf.read(pointer, 64), "college-hoops-2k8")
+            if motion_extents and pointer not in motions:
+                from .target_motion import inspect_target_motion
+
+                motions[pointer] = inspect_target_motion(elf, pointer)
         rows.append(dict(index=index, motions=list(pointers)))
     # The name initializer is unrolled. It writes exactly the original 112 cells
     # via R9; a separately initialized appended tagged name is not overwritten.
@@ -83,20 +88,25 @@ def inspect_registration(raw):
         original_records_preserved=True,
         original_name_initializer_cells=112,
         entries=rows,
+        motion_extents_validated=motion_extents,
+        motions=list(motions.values()),
         gameplay_ready=False,
         runtime_tested=False,
         note="Validates observed registration structures; does not install donor motions or certify gameplay.",
     )
 
 
-def registration_padding(raw, count):
+def registration_padding(raw, count, *, motion_bytes=0):
     """Plan a bounded data allocation without changing bytes or consuming TLS.
 
-    This reports space for a table and name array, not permission to place a
-    complete motion library there. The original section/segment offsets stay put.
+    This reserves table, names and optional resident-image payload bytes within
+    proven padding. It does not place a motion library or grant a native heap
+    budget. Original section/segment offsets stay put.
     """
     if type(count) is not int or not 113 <= count <= 256:
         raise ValueError("Choose a total shot count from 113 to 256")
+    if type(motion_bytes) is not int or not 0 <= motion_bytes <= 16 * 1024 * 1024:
+        raise ValueError("Motion image size exceeds the bounded allocation plan")
     elf = NativeELF(raw)
     candidates = [
         s for s in elf.segments if s["address"] == 0x8A0000 and s["flags"] == 6
@@ -119,14 +129,24 @@ def registration_padding(raw, count):
             tls_end = max(tls_end, address + memory)
     table = (tls_end + 15) & ~15
     labels = (table + count * 40 + 15) & ~15
-    end = (labels + count * 4 + 15) & ~15
+    motion_image = (labels + count * 4 + 15) & ~15
+    end = (motion_image + motion_bytes + 15) & ~15
     file_start = segment["offset"] + table - segment["address"]
     file_end = segment["offset"] + end - segment["address"]
+    if any(
+        s is not segment
+        and segment["address"] < s["address"] + s["memory_bytes"]
+        and s["address"] < end
+        for s in elf.segments
+    ):
+        raise ValueError("Registration allocation overlaps native load memory")
     if file_start < old_end or file_end > limit or any(raw[old_end:file_end]):
         raise ValueError("Registration allocation would overwrite nonpadding data")
     return dict(
         table=table,
         labels=labels,
+        motion_image=motion_image if motion_bytes else None,
+        motion_bytes=motion_bytes,
         end=end,
         file_start=file_start,
         file_end=file_end,

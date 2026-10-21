@@ -1,3 +1,12 @@
+# Deep native shot dependencies
+
+`inspect-shot-registration CH_ANALYSIS.ELF OUTPUT.json --motion-extents` adds
+full registered target header, pose/root and event-sentinel extent checks and
+reports load-segment ownership. Unknown auxiliary extents stay explicit. This
+is read-only; neither this option nor the resident-image research backend installs
+an EBOOT patch or translates unresolved NBA authoring metadata. See
+[native residency evidence](ANIMATION_RUNTIME_ADAPTER.md#target-header-ownership-and-native-relocation-follow-up).
+
 # Offline motion sampling and donor registry
 
 `sample-native-motion DONOR_ELF TARGET_ELF HEADER_ADDRESS SECONDS OUTPUT.json

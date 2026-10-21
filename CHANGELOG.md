@@ -1,3 +1,10 @@
+## Unreleased — native target residency preparation
+
+- Audit full registered CH motion track extents with `inspect-shot-registration --motion-extents`.
+- Prepare bounded CH-backed resident images retaining authored metadata and validating native pointer relocation and inverse relocation.
+- Reserve resident-image space in registration allocation plans; reject virtual load-memory collisions in addition to occupied file padding.
+- Document the separate stock-backed resident registration probe and remaining donor metadata/loader/runtime work. No donor installation or executable patching feature is added.
+
 ## Unreleased — authored-key sampling and donor registry
 
 - Sample NBA11 authored motion keys on demand with canonical-bind checks, full extent validation, input invalidation and a byte-budgeted payload cache.

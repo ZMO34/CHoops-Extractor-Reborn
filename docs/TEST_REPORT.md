@@ -1,3 +1,26 @@
+# Unreleased target header residency follow-up
+
+Nine-file animation regression suite: 123 passed. New cases cover complete later
+track extents/BSS rejection, metadata retention, shared dependency storage, source
+immutability, exact relocation/inverse at different bases, wrong declared pointer
+state, malformed metadata, missing sentinel, output budget, unknown auxiliary
+extents and header overlap. Allocation tests cover image reservation after TLS,
+physical padding and a virtual collision despite free file padding. Deep
+registration checks reject a header that passes shallow mask checks but lacks
+valid counts/tracks. Source portable verification: 832 passed, 9 optional skips, 2 deselected; compile,
+CLI/offscreen Qt startup, Ruff, mypy, handoff and diff checks pass. Exact-head
+isolated results are recorded in PR45.
+
+Private read-only corpus: 7,055 inspected target headers, zero errors; all 2,522
+supported headers pass owned-image preparation/relocation/inverse byte equality.
+Largest image: 126,996 bytes. All 224 distinct headers from 112 stock shot rows
+pass full dependency extents. Separate stock-backed resident probe: 113 rows,
+112 original rows preserved, 4,656-byte image, 9,648-byte total allocation within
+14,848 available padding bytes, no borrowed motion pointers, exact diff allowlist
+and reparse pass. Original source hashes unchanged. No donor header is derived,
+no native heap/demand loader is installed, and no gameplay compatibility is claimed.
+No emulator, hardware, automatic/testing JB or release build was run.
+
 # Unreleased runtime adapter follow-up
 
 Targeted command: `python -m pytest tests/test_motion_sampling.py
