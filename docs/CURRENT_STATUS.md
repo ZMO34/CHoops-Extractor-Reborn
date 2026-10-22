@@ -75,6 +75,51 @@ Private bulk preparation translated9,574 pose streams/341,823 stored keys across
 Timing/root remain source-key components; the later runtime-adapter phase above
 reduces the remaining blocked event tables to 5,958. No full playable port, added donor styles or modern controls are installed.
 No emulator or automatic/testing JB was run. v1.21 remains the published release.
+# Unreleased — native-only transfer continuity and Legacy diagnostics
+
+The owner requires transfers entirely in game, preserving player statistics and
+team history; no editor/save-applied transfer workflow. Legacy Editor now exposes
+read-only recruiting diagnostics through the shared pool audit, including native
+preferences and unresolved fields. No transfer/signing controls are added.
+Native tracing establishes annual recruit regeneration, a player-to-recruit copier
+with incompatible class codes, commitment and reusable-player-pool operations.
+Unsigned portal players must avoid the old finalizer's reusable-pool route; signing
+must bypass new-player conversion and validate destination capacity before removal.
+Historical stat/team-link ownership, durable proxy binding and calendar integration
+remain unresolved. No native portal or patch is installed; originals unchanged.
+See [LEGACY_TRANSFER_PORTAL.md](LEGACY_TRANSFER_PORTAL.md).
+
+# Unreleased — native recruiting pool and saved-component audits
+
+Added read-only `inspect-recruit-pool` for the confirmed 0xD8 native recruit table,
+with bounds/overlap checks, metadata diagnostics and optional linked-interest or
+0x415A4 serialized-component audits. Native traces establish dual node pools,
+free-list/queue layout and aggregate-relative placement. Stock audit finds 2,000
+reserved blank records; these are not certified reusable slots. Rollover creates
+new college players, so transfers need a separate identity-preserving signing path.
+No native insertion, binding persistence or executable patch is installed. No
+offseason save is available for roundtrip validation; originals remain unchanged.
+See [LEGACY_TRANSFER_PORTAL.md](LEGACY_TRANSFER_PORTAL.md).
+
+# Unreleased — transfer recruit labels and interest-policy foundation
+
+Confirmed separate native HS/JC class formatting, five recruiting-preference
+captions and 96 initialized native preference profiles with weighted consumers. Recruit and college-player class enums differ; placeholder class entries
+are not safe transfer support. Added an offline `TR FR/SO/JR/SR (RS)` formatter,
+stable per-player/offseason three-way priority draw and validated school ordering
+for minutes gained, hometown distance or team rank. Existing game sources unchanged.
+No in-game pool insertion, native interest/forecast adapter, persistence or executable
+patch is installed. See [LEGACY_TRANSFER_PORTAL.md](LEGACY_TRANSFER_PORTAL.md).
+
+# Unreleased — Legacy transfer portal feasibility
+
+Read-only tracing identifies the outgoing candidate gate, 400-active-entry queue,
+ranked destination selection, source/destination menus, finalization and queue
+save/load relocation. Increased transfer frequency has specific native controls;
+a recruitable portal is plausible but requires calendar, recruiting, eligibility,
+scholarship and save contracts. Neither feature nor an executable patch is installed.
+Original files unchanged; no emulator/gameplay/JB run. See
+[LEGACY_TRANSFER_PORTAL.md](LEGACY_TRANSFER_PORTAL.md).
 
 # v1.21 — animation event bridge and asset-selection correction
 

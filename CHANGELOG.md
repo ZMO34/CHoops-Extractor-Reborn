@@ -25,6 +25,28 @@
 - Add read-only bind and shot-registration CLI audits; validate stock rows, known consumers and native label initialization.
 - Inspect additional native payload reads without enabling unproven event conversion; provide an explicit three-marker mirror-selector contract.
 - Document the separate registration-only probe and full observed-family component preparation. No playable donor port or executable patching is added to the editor.
+## Unreleased — native-only transfer continuity and Legacy diagnostics
+
+- Add read-only Legacy recruiting diagnostics for confirmed recruit metadata, native preference weights and unresolved fields, using immutable background snapshots.
+- Trace annual recruit regeneration, native commitment, player-to-recruit copying and reusable-player-pool lifetime hazards.
+- Require in-game transfers to retain player statistics and historical team associations; no editor/save-applied transfer workflow or playable portal is added.
+
+## Unreleased — native recruiting pool audits
+
+- Add read-only `inspect-recruit-pool` with native table bounds, metadata diagnostics, interest-list ownership checks and optional serialized recruiting-component inspection.
+- Establish native dual-list persistence layout and identify the rollover conversion that transfers must bypass to preserve player identity/history.
+- Preserve all original data. Playable pool insertion, binding persistence and native signing integration remain unfinished.
+
+## Unreleased — transfer recruiting policy foundation
+
+- Add offline transfer class/redshirt labels and reproducible three-priority school ordering for playing opportunity, hometown proximity or team ranking.
+- Trace existing HS/JUCO class and recruiting-preference formatters, distinguishing recruit fields from college-player class/eligibility and team ranking from recruit ranking.
+- Preserve originals; native pool insertion, persistence and executable integration remain unfinished.
+
+## Unreleased — Legacy transfer feasibility research
+
+- Document confirmed transfer candidate gates, ranked destinations, 400-entry active queue, existing transfer menus and serialized pointer relocation.
+- Assess scoped frequency tuning and a recruitable portal while identifying unresolved calendar, scholarship, recruiting and save contracts. No executable or editor behavior changes.
 
 ## v1.21 — animation event bridge and team asset selection
 

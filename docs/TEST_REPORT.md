@@ -94,6 +94,65 @@ preserves112 original records, TLS and adjacent label pointers, and passes an
 exact diff allowlist. This is structural evidence only, not runtime registration.
 Source hashes are unchanged. No game assets/binaries/reports are tracked or
 published; no RPCS3, hardware or automatic/testing JB was used.
+# Native-only continuity and Legacy diagnostics — 2026-10-21
+
+Targeted: `python -m pytest tests/test_legacy_recruiting_gui.py
+tests/test_recruit_pool.py tests/test_transfer_portal.py tests/test_cli.py
+tests/test_legacy_save_adapter.py -q -o addopts=`: **94 passed**. Six new Qt cases
+cover immutable data/history, metadata/preferences, filtering, unknown profile and
+malformed-table handling, changed/closed-source callbacks, editor entry and view
+invalidation. No transfer/sign/save actions exist in the diagnostic view. An initial
+sandboxed run hit three temporary-directory setup permission errors (91 passed);
+the rerun with normal temporary-directory access passed all 94. Focused Ruff and
+module mypy pass.
+
+Private read-only Ghidra continuation establishes annual regeneration, native
+commitment, player-to-recruit copying/class mismatch and reusable-player-pool
+operations. Eight callsites, five tail branches and the 2,500-entry pool bound
+independently match raw PowerPC. Original ELF digest and byte equality pass.
+No executable patch, native portal, historical-stat/team-link writer or in-game
+continuity validation is claimed. RPCS3/gameplay NOT RUN; testing JB NOT BUILT.
+Full source portable verification: **847 passed, 10 optional skips, 2 deselected**;
+compile, CLI/offscreen Qt startup, Ruff, mypy, handoff and diff checks pass.
+Exact-head isolated portable results are recorded in PR46.
+
+# Native recruiting pool and persistence continuation — 2026-10-21
+
+Targeted: `python -m pytest tests/test_recruit_pool.py tests/test_transfer_portal.py
+tests/test_cli.py tests/test_legacy_save_adapter.py -q -o addopts=`: **88 passed**.
+New module/tests pass focused Ruff/import formatting and module mypy. Source
+read-only CLI audit verifies all 2,000 reserved stock recruit records (432,000 bytes)
+are blank and explicitly does not certify slot reuse. Private source/digest checks
+pass; native constant getters independently match section size 0x415A4 and aggregate
+relative offset 0x11418. Ghidra/raw instruction traces establish list ownership,
+serializers and destructive-to-new-object recruit conversion. No original writes.
+Exact-head isolated portable results are recorded in the PR handoff. No offseason
+save supplied, save roundtrip/gameplay/emulator NOT RUN, testing JB NOT BUILT.
+
+# Transfer recruiting policy follow-up — 2026-10-21
+
+Synthetic targeted suite: `python -m pytest tests/test_transfer_portal.py -q -o
+addopts=`: **42 passed**. Covers all college class/RS labels, rejection of HS/unknown
+classes and transfer-status-as-RS, stable/order-independent priorities, framed
+identities, rejection sampling, three distinct preference winners, capacity/source/
+eligibility filters, duplicate identities and malformed/nonfinite metrics.
+All 96 reconstructed profiles match an independent native-loop-order audit and
+source float32 weights; source digest and byte equality remain unchanged. Invalid
+uninitialized profile indices are rejected. Focused Ruff format/check and module
+mypy passed. Native read-only follow-up confirms HS/JC label
+codes, separate recruit class/preference fields, localization captions, geography,
+position-depth and recruit-rank consumers. No game execution or native record writes.
+Exact-head isolated portable results are recorded in the PR handoff.
+
+# Legacy transfer feasibility research — 2026-10-21
+
+Documentation-only update. Read-only Ghidra generated 17 focused function reports;
+PowerPC instructions and constants independently checked. Private audit passes
+source digest/byte equality, the chance subtraction instruction, 3.0/0.66 constants,
+eight state-gate cases and 0x12CC = 401 x 12 arithmetic. Static evidence only:
+no game execution, measured transfer distribution, save roundtrip, modified EBOOT
+or JB. No editor runtime behavior changes, so runtime suites are not rerun.
+Documentation/handoff/diff validation is recorded in the PR handoff.
 
 # v1.21 animation event bridge
 

@@ -165,6 +165,51 @@ Private bulk preparation translated9,574 pose streams/341,823 stored keys across
 Timing/root remain source-key components; the later runtime-adapter phase above
 reduces the remaining blocked event tables to 5,958. No full playable port, added donor styles or modern controls are installed.
 No emulator or automatic/testing JB was run. v1.21 remains the published release.
+# Unreleased — native-only transfer continuity and Legacy diagnostics
+
+The owner requires transfers entirely in game, preserving player statistics and
+team history; no editor/save-applied transfer workflow. Legacy Editor now exposes
+read-only recruiting diagnostics through the shared pool audit, including native
+preferences and unresolved fields. No transfer/signing controls are added.
+Native tracing establishes annual recruit regeneration, a player-to-recruit copier
+with incompatible class codes, commitment and reusable-player-pool operations.
+Unsigned portal players must avoid the old finalizer's reusable-pool route; signing
+must bypass new-player conversion and validate destination capacity before removal.
+Historical stat/team-link ownership, durable proxy binding and calendar integration
+remain unresolved. No native portal or patch is installed; originals unchanged.
+See [LEGACY_TRANSFER_PORTAL.md](LEGACY_TRANSFER_PORTAL.md).
+
+# Unreleased — native recruiting pool and saved-component audits
+
+Added read-only `inspect-recruit-pool` for the confirmed 0xD8 native recruit table,
+with bounds/overlap checks, metadata diagnostics and optional linked-interest or
+0x415A4 serialized-component audits. Native traces establish dual node pools,
+free-list/queue layout and aggregate-relative placement. Stock audit finds 2,000
+reserved blank records; these are not certified reusable slots. Rollover creates
+new college players, so transfers need a separate identity-preserving signing path.
+No native insertion, binding persistence or executable patch is installed. No
+offseason save is available for roundtrip validation; originals remain unchanged.
+See [LEGACY_TRANSFER_PORTAL.md](LEGACY_TRANSFER_PORTAL.md).
+
+# Unreleased — transfer recruit labels and interest-policy foundation
+
+Confirmed separate native HS/JC class formatting, five recruiting-preference
+captions and 96 initialized native preference profiles with weighted consumers. Recruit and college-player class enums differ; placeholder class entries
+are not safe transfer support. Added an offline `TR FR/SO/JR/SR (RS)` formatter,
+stable per-player/offseason three-way priority draw and validated school ordering
+for minutes gained, hometown distance or team rank. Existing game sources unchanged.
+No in-game pool insertion, native interest/forecast adapter, persistence or executable
+patch is installed. See [LEGACY_TRANSFER_PORTAL.md](LEGACY_TRANSFER_PORTAL.md).
+
+# Unreleased — Legacy transfer portal feasibility
+
+Read-only tracing identifies the outgoing candidate gate, 400-active-entry queue,
+ranked destination selection, source/destination menus, finalization and queue
+save/load relocation. Increased transfer frequency has specific native controls;
+a recruitable portal is plausible but requires calendar, recruiting, eligibility,
+scholarship and save contracts. Neither feature nor an executable patch is installed.
+Original files unchanged; no emulator/gameplay/JB run. See
+[LEGACY_TRANSFER_PORTAL.md](LEGACY_TRANSFER_PORTAL.md).
 
 # v1.21 — animation event bridge and asset-selection correction
 
@@ -2402,6 +2447,13 @@ source-immutable decoding, destination reparse, untouched-range comparison,
 ambiguity rejection and rollback. Engine/memory behavior remains uncertified
 without user testing. This research launches no game, edits no executable,
 builds no real/testing JB and distributes no donor assets.
+
+## Transfer follow-up
+
+[Legacy transfer feasibility](LEGACY_TRANSFER_PORTAL.md) now traces native candidate
+frequency gates, ranked destinations, transfer menus and serialized queue relocation.
+These improve the evidence behind a possible portal; recruiting integration and
+higher rates remain unimplemented and gameplay-unverified.
 
 ---
 
@@ -5365,6 +5417,65 @@ preserves112 original records, TLS and adjacent label pointers, and passes an
 exact diff allowlist. This is structural evidence only, not runtime registration.
 Source hashes are unchanged. No game assets/binaries/reports are tracked or
 published; no RPCS3, hardware or automatic/testing JB was used.
+# Native-only continuity and Legacy diagnostics — 2026-10-21
+
+Targeted: `python -m pytest tests/test_legacy_recruiting_gui.py
+tests/test_recruit_pool.py tests/test_transfer_portal.py tests/test_cli.py
+tests/test_legacy_save_adapter.py -q -o addopts=`: **94 passed**. Six new Qt cases
+cover immutable data/history, metadata/preferences, filtering, unknown profile and
+malformed-table handling, changed/closed-source callbacks, editor entry and view
+invalidation. No transfer/sign/save actions exist in the diagnostic view. An initial
+sandboxed run hit three temporary-directory setup permission errors (91 passed);
+the rerun with normal temporary-directory access passed all 94. Focused Ruff and
+module mypy pass.
+
+Private read-only Ghidra continuation establishes annual regeneration, native
+commitment, player-to-recruit copying/class mismatch and reusable-player-pool
+operations. Eight callsites, five tail branches and the 2,500-entry pool bound
+independently match raw PowerPC. Original ELF digest and byte equality pass.
+No executable patch, native portal, historical-stat/team-link writer or in-game
+continuity validation is claimed. RPCS3/gameplay NOT RUN; testing JB NOT BUILT.
+Full source portable verification: **847 passed, 10 optional skips, 2 deselected**;
+compile, CLI/offscreen Qt startup, Ruff, mypy, handoff and diff checks pass.
+Exact-head isolated portable results are recorded in PR46.
+
+# Native recruiting pool and persistence continuation — 2026-10-21
+
+Targeted: `python -m pytest tests/test_recruit_pool.py tests/test_transfer_portal.py
+tests/test_cli.py tests/test_legacy_save_adapter.py -q -o addopts=`: **88 passed**.
+New module/tests pass focused Ruff/import formatting and module mypy. Source
+read-only CLI audit verifies all 2,000 reserved stock recruit records (432,000 bytes)
+are blank and explicitly does not certify slot reuse. Private source/digest checks
+pass; native constant getters independently match section size 0x415A4 and aggregate
+relative offset 0x11418. Ghidra/raw instruction traces establish list ownership,
+serializers and destructive-to-new-object recruit conversion. No original writes.
+Exact-head isolated portable results are recorded in the PR handoff. No offseason
+save supplied, save roundtrip/gameplay/emulator NOT RUN, testing JB NOT BUILT.
+
+# Transfer recruiting policy follow-up — 2026-10-21
+
+Synthetic targeted suite: `python -m pytest tests/test_transfer_portal.py -q -o
+addopts=`: **42 passed**. Covers all college class/RS labels, rejection of HS/unknown
+classes and transfer-status-as-RS, stable/order-independent priorities, framed
+identities, rejection sampling, three distinct preference winners, capacity/source/
+eligibility filters, duplicate identities and malformed/nonfinite metrics.
+All 96 reconstructed profiles match an independent native-loop-order audit and
+source float32 weights; source digest and byte equality remain unchanged. Invalid
+uninitialized profile indices are rejected. Focused Ruff format/check and module
+mypy passed. Native read-only follow-up confirms HS/JC label
+codes, separate recruit class/preference fields, localization captions, geography,
+position-depth and recruit-rank consumers. No game execution or native record writes.
+Exact-head isolated portable results are recorded in the PR handoff.
+
+# Legacy transfer feasibility research — 2026-10-21
+
+Documentation-only update. Read-only Ghidra generated 17 focused function reports;
+PowerPC instructions and constants independently checked. Private audit passes
+source digest/byte equality, the chance subtraction instruction, 3.0/0.66 constants,
+eight state-gate cases and 0x12CC = 401 x 12 arithmetic. Static evidence only:
+no game execution, measured transfer distribution, save roundtrip, modified EBOOT
+or JB. No editor runtime behavior changes, so runtime suites are not rerun.
+Documentation/handoff/diff validation is recorded in the PR handoff.
 
 # v1.21 animation event bridge
 
