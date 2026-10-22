@@ -1,3 +1,12 @@
+# Native Legacy backend inspection
+
+`inspect-legacy-backend ROSTER_FILE NATIVE_AGGREGATE.bin OUTPUT.json` audits an
+explicitly identified 0x15D1CC aggregate against a supported College Hoops roster.
+It reports 17 component boundaries, recruiting checks, transfer references and
+a bounded unresolved reference bank. It does not accept a whole save as an
+aggregate, guess USERDATA offsets, edit inputs or install a portal. Both inputs
+are protected from output overwrites. See [LEGACY_BACKEND.md](LEGACY_BACKEND.md).
+
 # Donor translation research APIs
 
 `choops_py.research.donor_header.translate_donor_motion` accepts decoded donor/target

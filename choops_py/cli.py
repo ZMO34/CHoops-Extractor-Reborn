@@ -61,9 +61,24 @@ def execute(a):
         return launch([])
     sources=[getattr(a,key) for key in ('source','input','cdf','dds_file','wav_file','image','mod','modded','edited','patch','timing','root_track','contract','target_elf','interest_nodes','recruiting_state') if getattr(a,key,None)]
     sources.extend(getattr(a,'related_bank',[]))
+    if getattr(a, 'aggregate', None):sources.append(a.aggregate)
     if hasattr(a,'output'):
         validator=build_destination if c=='build-copy' else safe_output
         a.output=validator(a.output,sources)
+    if c == 'inspect-legacy-backend':
+        from .research.legacy_backend import AGGREGATE_SIZE, inspect_legacy_aggregate
+        from .research.recruit_pool import MAX_INPUT
+        from .roster.adapters import load_bytes
+        if Path(a.input).stat().st_size > MAX_INPUT:
+            raise ValueError('Roster input exceeds inspection bounds')
+        with Path(a.input).open('rb') as stream:
+            source = load_bytes(stream.read(MAX_INPUT + 1))
+        with Path(a.aggregate).open('rb') as stream:
+            aggregate = stream.read(AGGREGATE_SIZE + 1)
+        report = inspect_legacy_aggregate(aggregate, source.payload)
+        report['source_kind'] = source.kind
+        save_json(a.output, report, sources)
+        return report
     if c == 'inspect-recruit-pool':
         from .research.recruit_pool import MAX_INPUT, INTEREST_CAPACITY, INTEREST_STRIDE, RECRUITING_STATE_SIZE, inspect_recruit_pool, inspect_interest_graph, inspect_recruiting_section
         from .roster.adapters import load_bytes

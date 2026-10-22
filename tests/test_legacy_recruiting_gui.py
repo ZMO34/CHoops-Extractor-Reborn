@@ -97,6 +97,56 @@ def test_editor_button_inspects_without_exposing_transfer_mutations(qtbot, monke
     assert "Recruiting records unavailable" in dialog.status.text()
     assert bytes(model.data) == before and model.edits == []
     # No transfer, signing, applying or saving controls exist in the diagnostic view.
-    assert not dialog.findChildren(QPushButton)
+    assert [b.text() for b in dialog.findChildren(QPushButton)] == [
+        "Inspect native Legacy aggregate…",
+    ]
     window.display_roster(model)
     assert dialog.closed
+
+
+def test_backend_tab_is_available_without_a_save_and_component_errors_are_visible(
+    qtbot,
+):
+    from test_legacy_backend import aggregate_fixture
+    from choops_py.research.legacy_backend import inspect_legacy_aggregate
+    from PySide6.QtWidgets import QTabWidget
+
+    owner, dialog = diagnostics(qtbot)
+    assert dialog.findChild(QTabWidget).tabText(1) == "Legacy backend"
+    assert dialog.backend_view.model().rowCount() == 17
+    before = bytes(owner.roster.data)
+    dialog.display_aggregate(inspect_legacy_aggregate(aggregate_fixture(), before))
+    assert "0 component audit errors" in dialog.aggregate_status.text()
+    assert "correspondence" in dialog.aggregate_status.text()
+    dialog.backend_view.selectRow(13)
+    assert "native_portal_installed" in dialog.backend_details.toPlainText()
+    assert bytes(owner.roster.data) == before
+    owner.roster.data[-1] ^= 1
+    dialog.display_aggregate({"error": "must not replace stale results"})
+    assert "source roster changed" in dialog.aggregate_status.text()
+
+
+def test_aggregate_picker_reads_only_exact_size_and_clears_failed_prior_data(
+    qtbot, tmp_path, monkeypatch
+):
+    from PySide6.QtWidgets import QFileDialog
+    from test_legacy_backend import aggregate_fixture
+
+    owner, dialog = diagnostics(qtbot)
+    owner.active = False
+    owner.run_job = lambda _label, work, display: display(work(None))
+    path = tmp_path / "aggregate.bin"
+    path.write_bytes(aggregate_fixture())
+    monkeypatch.setattr(QFileDialog, "getOpenFileName", lambda *args: (str(path), ""))
+    before = bytes(owner.roster.data)
+    dialog.open_aggregate()
+    assert "0 component audit errors" in dialog.aggregate_status.text()
+    dialog.backend_view.selectRow(13)
+    assert "active_capacity" in dialog.backend_details.toPlainText()
+    path.write_bytes(b"wrong whole save")
+    dialog.open_aggregate()
+    assert "exactly" in dialog.aggregate_status.text()
+    assert dialog.backend_details.toPlainText() == ""
+    assert dialog.backend_view.model().rowCount() == 17
+    assert bytes(owner.roster.data) == before
+    assert path.read_bytes() == b"wrong whole save"

@@ -1,3 +1,14 @@
+# Unreleased — Legacy backend and transfer identity diagnostics
+
+Mapped all 17 native aggregate sizes/order against original size getters and paired
+save/load routines (0x15D1CC total). Added a read-only Legacy backend tab and
+`inspect-legacy-backend`: explicit aggregate only, no guessed USERDATA offset,
+per-component hashes/errors, recruiting audits, typed transfer player/school
+anchors and bounded reference-bank inspection. Unknown meanings remain named by
+native routine. History ownership, calendar interception and durable proxy binding
+remain unfinished. No portal, executable patch, emulator run or test JB in this
+update. See [LEGACY_BACKEND.md](LEGACY_BACKEND.md) for the wider subsystem map.
+
 # v1.22 — new alternate folder discovery
 
 Windows extended drive/UNC path spellings are normalized consistently, fixing the

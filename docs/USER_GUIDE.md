@@ -1,3 +1,11 @@
+# Legacy backend research view
+
+In Roster Editor, **Recruiting diagnostics… → Legacy backend** shows the confirmed
+native component map and explains the remaining transfer-portal work. An optional
+**Inspect native Legacy aggregate…** button reads a separately identified aggregate;
+it does not edit saves or install transfers. A whole USERDATA file is not an
+aggregate. See [Legacy backend evidence and limits](LEGACY_BACKEND.md).
+
 # Team assets (v1.20)
 
 Use **Team Assets** for the searchable assignment list and checked S/Home/Away/

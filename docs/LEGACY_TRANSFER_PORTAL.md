@@ -1,5 +1,9 @@
 # Legacy transfers and a recruitable portal: feasibility
 
+Continuation: [Legacy backend and aggregate diagnostics](LEGACY_BACKEND.md)
+maps all 17 native component boundaries and adds typed transfer-reference checks.
+Full field meanings, history continuity and playable integration remain unresolved.
+
 Read-only native research, 2026-10-21, on the supplied PS3 College Hoops 2K8
 revision. Addresses are revision-specific virtual addresses, not universal file
 offsets. Original executable, saves and game archives remain unchanged. No

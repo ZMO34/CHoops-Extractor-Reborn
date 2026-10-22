@@ -1,3 +1,25 @@
+# Unreleased Legacy backend diagnostics
+
+Read-only Ghidra continuation traced 46 getter/serializer/loader/provider functions.
+An independent instruction audit verified all 17 size constants and aggregate
+save/load call order; total 0x15D1CC. Original decoded executable hash remained
+unchanged. Raw reports and proprietary listings stay private. No native portal,
+executable patch, RPCS3 test or testing JB was produced for this update.
+
+Portable verification on Python 3.12/Windows: **983 passed, 10 skipped, 2
+deselected**, followed by compileall, CLI help, Qt startup smoke, configured Ruff
+checks and mypy passing. The offscreen backend tab was rendered and visually
+inspected with an explicit available font. Exact-head verification is recorded
+in the PR. Temporary fixtures must remain outside project output for the existing
+output-protection regressions; sandbox-denied hard links require an unrestricted
+test run, not changes to the production output guards.
+
+Synthetic regressions cover exact aggregate boundaries, component-local errors,
+400-active/401-stored transfer limits, typed record anchors, unsigned/duplicate
+players, reference-column bounds, input/output protection, stale GUI results and
+read-only file selection. No supplied offseason aggregate is available; real
+save correspondence and history continuity remain unverified.
+
 # v1.22 alternate discovery and PR integration
 
 Targeted: `python -m pytest tests/test_team_assets.py tests/test_folder_overrides.py

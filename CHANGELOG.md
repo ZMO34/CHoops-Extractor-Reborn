@@ -1,3 +1,8 @@
+## Unreleased — Legacy backend diagnostics
+
+- Map all 17 native Legacy save components; distinguish boundaries from unresolved field meanings.
+- Add a Legacy backend tab and read-only CLI for identified aggregates, including transfer identity and reference-bank audits. No playable portal or save-editing transfer workflow is installed.
+
 ## v1.22 — alternate discovery and combined research updates
 
 Windows extended drive/UNC path spellings are normalized consistently, fixing the
