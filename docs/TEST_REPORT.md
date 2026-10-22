@@ -1,3 +1,19 @@
+# v1.22 alternate discovery and PR integration
+
+Targeted: `python -m pytest tests/test_team_assets.py tests/test_folder_overrides.py
+tests/test_parallel_overrides.py tests/test_output_path_spelling.py -q -o addopts=`:
+**59 passed**. New regressions
+cover manifest-free roster-enabled SELU additions with raw/DDS input in serial and
+spawned workers, exact virtual metadata byte ranges, unchanged new container
+retention, build-time partner fallback, synthetic final TOC and source preservation.
+Unlinked alternate names are rejected with a corrective message. A bounded stress
+reproduction traced the prior intermittent worker failure to Windows returning a
+resolved path with a Win32 extended prefix. Normalization now retains source and
+output-root guards; drive and UNC spelling regressions pass. No original game
+or override writes, RPCS3/gameplay or testing JB. Earlier combined source verification: **963 passed, 10 optional skips, 2 deselected**;
+compile, CLI/offscreen Qt, Ruff, mypy, handoff and diff checks pass. Exact-head
+isolated, CI and packaged verification results are recorded in the release PR.
+
 # Unreleased donor header / allocation protocol follow-up
 
 Twelve-file targeted animation suite: 160 passed. New synthetic cases cover target

@@ -1,3 +1,12 @@
+## v1.22 — alternate discovery and combined research updates
+
+Windows extended drive/UNC path spellings are normalized consistently, fixing the
+intermittent parallel-worker output-root rejection without relaxing source guards.
+
+- Recognize newly enabled X/Y/Z uniform and SELU folders from the effective roster even without a team-assets manifest; compile their nested DDS/raw records using the matching Home template.
+- Respect byte ranges when reading added archive metadata and retain new archives whose artwork matches the template. Keep DDS priority and reject inactive/unlinked alternate folders with a corrective message.
+- Combine PR45's contract-gated animation tooling and PR46's transfer research/read-only Legacy diagnostics. Native donor gameplay and the in-game transfer portal remain unfinished; no executable patches or game assets are included.
+
 ## Unreleased — donor header and allocator protocol follow-up
 
 - Assemble owned CH motion components from the observed NBA11 ELF family using explicit fingerprint-bound authoring metadata and event contracts; reject unresolved dependencies.

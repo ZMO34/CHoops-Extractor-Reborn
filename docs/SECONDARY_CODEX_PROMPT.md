@@ -88,6 +88,24 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# v1.22 — new alternate folder discovery
+
+Windows extended drive/UNC path spellings are normalized consistently, fixing the
+intermittent parallel-worker output-root rejection without relaxing source guards.
+
+Fixed absent alternate/SELU folders failing before texture import. Preparation
+recognizes X/Y/Z identities explicitly linked by the JB roster or a unique full
+roster_english.iff override, creates virtual entries from the matching Home bank,
+and compiles nested DDS/raw edits into real build additions. Unknown/unlinked
+folders remain errors with an instruction to save the enabled roster to overrides.
+Virtual metadata reads honor offsets/sizes; unchanged new containers are retained.
+Missing paired assets continue through build-time Home fallback and warnings.
+
+Combines animation PR45 and Legacy/transfer PR46 without replacing their features.
+These remain research foundations: no playable donor port or in-game portal is
+installed. Originals unchanged, no RPCS3 or testing JB. Verification and Windows
+package results are recorded in the release PR.
+
 # Unreleased — donor component construction and allocator ABI
 
 Added contract-gated NBA11 decoded-ELF to CH component construction: target header
@@ -3669,6 +3687,24 @@ per usable owner), with all original team owners retained. One final roster
 reparse validates the batch rather than rebuilding player dictionaries per team.
 This15.95-second local observation is not a portable performance guarantee.
 
+
+## Loose alternate folders (v1.22)
+
+New X/Y/Z gameplay or SELU folders can be imported without `team_assets.json` when
+their exact archive identities are enabled by the source JB roster or the unique
+full `roster_english.iff` inside the selected overrides tree. Save roster changes
+with **Save roster to overrides** before selecting that tree. A missing container
+uses the same owner's Home bank as its structural template; nested DDS artwork
+still takes priority over TXTR. Preparation reports the template filename, and
+build preflight supplies a missing linked gameplay/SELU partner through the normal
+Home fallback. New archive IDs are written to the rebuilt TOC.
+
+Folders not linked by that effective roster are rejected; their names alone do
+not activate uniforms. Conflicting rosters/templates, missing Home sources, links
+and ambiguous identities remain errors. Existing explicit team-assets manifests
+retain their source-roster checks. Selecting a folder never alters its files or
+the source JB. Gameplay compatibility is not certified by structural validation.
+
 ---
 
 Embedded source: docs/PLAYER_QOL_RESEARCH.md
@@ -5320,6 +5356,22 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+# v1.22 alternate discovery and PR integration
+
+Targeted: `python -m pytest tests/test_team_assets.py tests/test_folder_overrides.py
+tests/test_parallel_overrides.py tests/test_output_path_spelling.py -q -o addopts=`:
+**59 passed**. New regressions
+cover manifest-free roster-enabled SELU additions with raw/DDS input in serial and
+spawned workers, exact virtual metadata byte ranges, unchanged new container
+retention, build-time partner fallback, synthetic final TOC and source preservation.
+Unlinked alternate names are rejected with a corrective message. A bounded stress
+reproduction traced the prior intermittent worker failure to Windows returning a
+resolved path with a Win32 extended prefix. Normalization now retains source and
+output-root guards; drive and UNC spelling regressions pass. No original game
+or override writes, RPCS3/gameplay or testing JB. Earlier combined source verification: **963 passed, 10 optional skips, 2 deselected**;
+compile, CLI/offscreen Qt, Ruff, mypy, handoff and diff checks pass. Exact-head
+isolated, CI and packaged verification results are recorded in the release PR.
 
 # Unreleased donor header / allocation protocol follow-up
 

@@ -1,3 +1,21 @@
+# v1.22 — new alternate folder discovery
+
+Windows extended drive/UNC path spellings are normalized consistently, fixing the
+intermittent parallel-worker output-root rejection without relaxing source guards.
+
+Fixed absent alternate/SELU folders failing before texture import. Preparation
+recognizes X/Y/Z identities explicitly linked by the JB roster or a unique full
+roster_english.iff override, creates virtual entries from the matching Home bank,
+and compiles nested DDS/raw edits into real build additions. Unknown/unlinked
+folders remain errors with an instruction to save the enabled roster to overrides.
+Virtual metadata reads honor offsets/sizes; unchanged new containers are retained.
+Missing paired assets continue through build-time Home fallback and warnings.
+
+Combines animation PR45 and Legacy/transfer PR46 without replacing their features.
+These remain research foundations: no playable donor port or in-game portal is
+installed. Originals unchanged, no RPCS3 or testing JB. Verification and Windows
+package results are recorded in the release PR.
+
 # Unreleased — donor component construction and allocator ABI
 
 Added contract-gated NBA11 decoded-ELF to CH component construction: target header

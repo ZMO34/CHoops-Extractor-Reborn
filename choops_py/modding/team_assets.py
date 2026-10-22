@@ -324,6 +324,64 @@ def apply_plan(source,plan,archive,folder,workspace,job=None):
     return stage_folder(source,folder,workspace,job)
 
 
+def loose_alternate_document(base, root):
+    """Recognize absent uniform archives only when linked by the effective roster."""
+    import re
+    candidates = defaultdict(list)
+    roster_files = []
+    pending = [root]
+    while pending:
+        parent = pending.pop()
+        for path in parent.iterdir():
+            if path.is_symlink() or (hasattr(path, 'is_junction') and path.is_junction()):
+                raise ValueError('Linked replacement path is blocked')
+            if path.is_dir():
+                pending.append(path)
+            if path.is_file() and path.name.casefold() == 'roster_english.iff':
+                roster_files.append(path)
+            name = path.name.casefold().removesuffix('.subfiles')
+            if path.is_dir() and not name.endswith('.iff'):name += '.iff'
+            if re.fullmatch(r'(?:sel)?u[xyz]\d{3,4}\.iff', name):
+                candidates[name].append(path)
+    hashes = {e['hash'] for e in base.entries}
+    candidates = {n: paths for n, paths in candidates.items() if hash_name(n) not in hashes}
+    if not candidates:return None
+    original, model = roster_model(base)
+    if len(roster_files) > 1:
+        raise ValueError('Multiple roster_english.iff overrides; choose one effective roster')
+    if roster_files:
+        if roster_files[0].stat().st_size > 64 * 1024 * 1024:
+            raise ValueError('Roster override exceeds 64 MiB')
+        model = EditorModel(load_bytes(roster_files[0].read_bytes()))
+        if not model.validate()['valid']:raise ValueError('Invalid roster override for alternate discovery')
+    allowed = {}
+    for row in model.rows['uniforms']:
+        if row['variant_code'] not in (2, 3, 4):continue
+        home = [u for u in model.rows['uniforms'] if u['team_asset_id'] == row['team_asset_id'] and u['variant_code'] == 0]
+        for selection in (False, True):
+            name = asset_name(row, selection)
+            if name not in candidates:continue
+            if len(home) != 1:raise ValueError(name + ': no unique Home template')
+            donor = asset_name(home[0], selection)
+            if name in allowed and allowed[name] != donor:
+                raise ValueError(name + ': conflicting Home templates')
+            allowed[name] = donor
+    unknown = sorted(set(candidates) - set(allowed))
+    if unknown:
+        raise ValueError('New alternate is not enabled in the loaded JB or overrides roster: '
+                         + ', '.join(unknown[:8]) + '. Save the enabled roster to this overrides folder first.')
+    additions = []
+    for name in sorted(allowed):
+        files = [p for p in candidates[name] if p.is_file()]
+        if len(files) > 1:raise ValueError('Duplicate new alternate archive: ' + name)
+        if files:
+            additions.append(dict(name=name, path=files[0].relative_to(root).as_posix()))
+        else:
+            additions.append(dict(name=name, template=allowed[name]))
+    return dict(schema=1, source_roster_sha256=digest(original), additions=additions,
+                inferred=True, logo_templates={}, fallbacks=[])
+
+
 class AdditionInputs:
     """Bounded virtual source entries for explicitly planned loose additions."""
     def __init__(self, base, folder):
@@ -333,7 +391,11 @@ class AdditionInputs:
         self.game_info = getattr(base, 'game_info', {})
         self.toc_layout = base.toc_layout
         root = Path(folder).resolve(); reject_links(root); self.addition_folder = str(root)
-        document = json.loads((root / 'team_assets.json').read_text(encoding='utf8'))
+        marker = root / 'team_assets.json'
+        inferred = not marker.is_file()
+        document = loose_alternate_document(base, root) if inferred else json.loads(marker.read_text(encoding='utf8'))
+        self.discovery_warnings = []
+        if document is None:return
         if document.get('schema') != 1 or not isinstance(document.get('additions'), list) or len(document['additions']) > 16384:
             raise ValueError('Invalid team asset folder manifest')
         require_college(base)
@@ -349,23 +411,36 @@ class AdditionInputs:
             name = row['name']
             if not re.fullmatch(r'(?:s\d{3,4}n?|(?:sel)?u[haxyz]\d{3,4})\.iff', name):
                 raise ValueError('Unsupported team addition filename')
-            target = (root / row['path']).resolve()
-            if not target.is_relative_to(root) or not target.is_file() or target.stat().st_size > 128 * 1024 * 1024:
-                raise ValueError('Invalid team addition file')
+            if inferred and 'template' in row:
+                matches = [e for e in base.entries if e['hash'] == hash_name(row['template'])]
+                if len(matches) != 1:raise ValueError(name + ': Home template is missing or ambiguous')
+                target = dict(matches[0])
+                size = target['size']
+                self.discovery_warnings.append(name + ': new alternate uses Home template ' + row['template'] + '; nested overrides will be applied')
+            else:
+                target = (root / row['path']).resolve()
+                if not target.is_relative_to(root) or not target.is_file() or target.stat().st_size > 128 * 1024 * 1024:
+                    raise ValueError('Invalid team addition file')
+                size = target.stat().st_size
             identity = hash_name(name)
             if identity in hashes:
                 raise ValueError('Team addition already exists in the selected JB: ' + name)
             hashes.add(identity)
-            size = target.stat().st_size
+            if size > 128 * 1024 * 1024:raise ValueError('New team asset exceeds 128 MiB')
             entry = dict(index=len(self.entries), hash=identity, name=name, name_hint=None, size=size, stored_size=size, content_size=size, offset=0, toc_flags=0, size_derived=False)
             self.entries.append(entry); self.additions[entry['index']] = (name, target)
 
     def read(self, entry):
         if entry['index'] in self.additions:
             target = self.additions[entry['index']][1]
-            if target.stat().st_size > 128 * 1024 * 1024:
-                raise ValueError('New team asset exceeds 128 MiB')
-            return target.read_bytes()
+            if isinstance(target, dict):data = self.base.read(target)
+            else:
+                if target.stat().st_size > 128 * 1024 * 1024:
+                    raise ValueError('New team asset exceeds 128 MiB')
+                data = target.read_bytes()
+            start = entry.get('offset', 0); end = start + entry['size']
+            if not 0 <= start <= end <= len(data):raise ValueError('Invalid new team asset read extent')
+            return data[start:end]
         return self.base.read(entry)
 
     def chunks(self, entry, size=1024 * 1024):
