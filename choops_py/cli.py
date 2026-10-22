@@ -15,9 +15,21 @@ def parser():
         s=sub.add_parser(name)
         for field in spec.fields:s.add_argument(field)
         for group in spec.options:
-            if group=='motion-events':
+            if group=='recruit-pool':
+                dependency=s.add_mutually_exclusive_group()
+                dependency.add_argument('--interest-nodes')
+                dependency.add_argument('--recruiting-state')
+                s.add_argument('--free-head',type=lambda value:int(value,0))
+            elif group=='motion-events':
                 s.add_argument('--native-elf',action='store_true')
                 s.add_argument('--auxiliary-start')
+                s.add_argument('--payload-consumers',action='store_true')
+            elif group=='motion-sampler':
+                s.add_argument('--cache-bytes',type=int,default=256*1024)
+            elif group=='related-banks':
+                s.add_argument('--related-bank',action='append',default=[])
+            elif group=='motion-extents':
+                s.add_argument('--motion-extents',action='store_true')
             elif group=='motion-root':
                 s.add_argument('--root-track');s.add_argument('--root-output')
                 s.add_argument('--root-without-heading',action='store_true')
@@ -47,10 +59,36 @@ def execute(a):
     if c=='gui':
         from .studio import main as launch
         return launch([])
-    sources=[getattr(a,key) for key in ('source','input','cdf','dds_file','wav_file','image','mod','modded','edited','patch','timing','root_track','contract') if getattr(a,key,None)]
+    sources=[getattr(a,key) for key in ('source','input','cdf','dds_file','wav_file','image','mod','modded','edited','patch','timing','root_track','contract','target_elf','interest_nodes','recruiting_state') if getattr(a,key,None)]
+    sources.extend(getattr(a,'related_bank',[]))
     if hasattr(a,'output'):
         validator=build_destination if c=='build-copy' else safe_output
         a.output=validator(a.output,sources)
+    if c == 'inspect-recruit-pool':
+        from .research.recruit_pool import MAX_INPUT, INTEREST_CAPACITY, INTEREST_STRIDE, RECRUITING_STATE_SIZE, inspect_recruit_pool, inspect_interest_graph, inspect_recruiting_section
+        from .roster.adapters import load_bytes
+        if a.free_head is not None and not a.interest_nodes:
+            raise ValueError('free-head requires a separately identified interest-nodes block')
+        if Path(a.input).stat().st_size > MAX_INPUT:
+            raise ValueError('Recruit roster input exceeds inspection bounds')
+        source = load_bytes(Path(a.input).read_bytes())
+        report = inspect_recruit_pool(source.payload)
+        report['source_kind'] = source.kind
+        if a.interest_nodes:
+            node_path = Path(a.interest_nodes)
+            if node_path.stat().st_size != INTEREST_CAPACITY * INTEREST_STRIDE:
+                raise ValueError('Interest block must contain exactly 16000 eight-byte nodes')
+            report['interest_graph'] = inspect_interest_graph(
+                node_path.read_bytes(),
+                {row['slot']:row['interest_head'] for row in report['records'] if row['recruiting_filter_bit_2']},
+                school_count=report['school_count'],free_head=a.free_head)
+        elif a.recruiting_state:
+            state_path = Path(a.recruiting_state)
+            if state_path.stat().st_size != RECRUITING_STATE_SIZE:
+                raise ValueError('Recruiting state must be exactly 0x415A4 bytes')
+            report['recruiting_state'] = inspect_recruiting_section(state_path.read_bytes(),source.payload)
+        save_json(a.output,report,sources)
+        return report
     if c in ('export-uniform-models','modern-fit-uniforms','import-uniform-models',
              'export-uniform-iff','import-uniform-iff'):
         from .modding import uniform_mesh
@@ -59,12 +97,48 @@ def execute(a):
         if c == 'import-uniform-models':return uniform_mesh.import_folder(a.edited,a.output)
         from .archive.usrdir_reader import Archive
         return uniform_mesh.export_archive(Archive(a.source),a.output,modern=c=='modern-fit-uniforms')
+    if c == 'inspect-donor-registry':
+        from .research.donor_registry import MAX_BANK_BYTES, inspect_banks
+        paths=[Path(a.input),*(Path(p) for p in a.related_bank)]
+        if len(paths)>32 or sum(p.stat().st_size for p in paths)>MAX_BANK_BYTES:
+            raise ValueError('Donor signature banks exceed inspection bounds')
+        report=inspect_banks([(p.name,p.read_bytes()) for p in paths],a.profile)
+        save_json(a.output,report,sources)
+        return report
+    if c == 'sample-native-motion':
+        from .research.motion_sampling import MotionSampler
+        with MotionSampler(a.input,a.target_elf,cache_bytes=a.cache_bytes) as sampler:
+            pose, report = sampler.sample(int(a.address,0),float(a.seconds))
+            report.update(packed_pose_hex=pose.hex(),memory=sampler.stats())
+        save_json(a.output,report,sources)
+        return report
+    if c in ('inspect-motion-bind','inspect-shot-registration'):
+        from .formats.embedded_motion import MAX_ELF
+        for source in sources:
+            if Path(source).stat().st_size > MAX_ELF:
+                raise ValueError('Native analysis ELF exceeds inspection bounds')
+        raw = Path(a.input).read_bytes()
+        if c == 'inspect-motion-bind':
+            from .formats.motion_bind import verify_canonical_bind
+            report = verify_canonical_bind(raw,Path(a.target_elf).read_bytes())
+        else:
+            from .research.shot_registration import inspect_registration
+            report = inspect_registration(raw,motion_extents=a.motion_extents)
+        save_json(a.output,report,sources)
+        return report
     if c in ('inspect-motion-events','transcode-motion-events'):
         from .formats.motion_events import MAX_INPUT, inspect_events, inspect_auxiliary_pairs, transcode_events
         if Path(a.input).stat().st_size > MAX_INPUT:
             raise ValueError('Motion event input exceeds inspection bounds')
         raw = Path(a.input).read_bytes()
         report = inspect_events(raw,a.profile,int(a.address,0),native=a.native_elf)
+        if a.payload_consumers:
+            if c != 'inspect-motion-events' or a.profile != 'nba-2k11':
+                raise ValueError('Payload consumers require NBA 2K11 event inspection')
+            from .formats.motion_events import inspect_payload_consumers
+            for row in report['entries']:
+                if row['payload'] is not None:
+                    row['consumed_fields'] = inspect_payload_consumers(raw,row['id'],row['payload'],native=a.native_elf)
         if a.auxiliary_start is not None:
             if c != 'inspect-motion-events' or a.profile != 'nba-2k11':
                 raise ValueError('Auxiliary pair inspection requires NBA 2K11 inspection')

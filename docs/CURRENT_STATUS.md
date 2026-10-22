@@ -1,3 +1,144 @@
+# v1.22 — new alternate folder discovery
+
+Windows extended drive/UNC path spellings are normalized consistently, fixing the
+intermittent parallel-worker output-root rejection without relaxing source guards.
+
+Fixed absent alternate/SELU folders failing before texture import. Preparation
+recognizes X/Y/Z identities explicitly linked by the JB roster or a unique full
+roster_english.iff override, creates virtual entries from the matching Home bank,
+and compiles nested DDS/raw edits into real build additions. Unknown/unlinked
+folders remain errors with an instruction to save the enabled roster to overrides.
+Virtual metadata reads honor offsets/sizes; unchanged new containers are retained.
+Missing paired assets continue through build-time Home fallback and warnings.
+
+Combines animation PR45 and Legacy/transfer PR46 without replacing their features.
+These remain research foundations: no playable donor port or in-game portal is
+installed. Originals unchanged, no RPCS3 or testing JB. Verification and Windows
+package results are recorded in the release PR.
+
+# Unreleased — donor component construction and allocator ABI
+
+Added contract-gated NBA11 decoded-ELF to CH component construction: target header
+layout, fixed-rate poses/root, mapped events, owned relative pointers and full
+relocation validation. Unknown authoring/state fields require explicit per-header
+research assertions bound to both complete inputs; there is no default contract
+or automatic real-game metadata proof. Signature-IFF sources/auxiliary semantics
+still block actual signature-shot translation.
+
+Traced the concrete CH heap wrapper and matching release ABI. Four bounded Ghidra
+instruction-harness cases pass with synthetic heap callbacks. Added an offline
+resident ownership model covering allocation/readback/publication, reader leases,
+retirement/shutdown, rollback and quarantine. Its registry is Python-local; a native
+reader/publication/lifetime hook is not installed.
+
+Actual signature banks resolve all 918 nonempty category-zero slots (458 aliases),
+911 headers and 456 payloads. Known-component projection: about 12.3 MB before
+auxiliary data/heap overhead; this is not a certified PS3 budget. All 806 bounded
+300-Hz selector curves pass new read-only inspection; selector meanings remain
+unresolved. Source files unchanged, no RPCS3/gameplay/JB run. Full donor port remains
+unfinished. Details: [ANIMATION_RUNTIME_ADAPTER.md](ANIMATION_RUNTIME_ADAPTER.md).
+
+# Unreleased — target header residency and registration extents
+
+Added complete known target track-extent audits and CH-backed resident-image
+preparation with exact metadata retention, bounded payloads, dependency deduplication,
+native/inverse relocation checks and explicit refusal of unknown auxiliary lengths.
+`inspect-shot-registration --motion-extents` validates registered dependencies.
+Allocation planning now reserves optional motion-image bytes and rejects virtual
+load collisions as well as occupied file padding.
+
+Private corpus: all 7,055 identified CH headers pass; all 2,522 supported headers
+roundtrip as owned images. A separate 113-entry stock-backed probe places an entire
+motion pair and its tracks in verified writable-segment padding, preserves all 112
+stock records/TLS and passes reparse/diff/extent checks with no heap allocation.
+This is not donor metadata translation, a native donor loader, playable port or
+runtime certification. Those requested pieces remain unfinished; originals are
+unchanged, no emulator/testing JB was used, and PR45 remains draft. Evidence and
+precise limits: [ANIMATION_RUNTIME_ADAPTER.md](ANIMATION_RUNTIME_ADAPTER.md).
+
+# Unreleased — bounded sampling and donor dependency registration
+
+Added an offline, byte-budgeted NBA11 sampler that reads authored keys on demand,
+validates complete track extents and canonical bind, and emits one CH packed pose.
+The supplied corpus passes 28,722 samples across 9,574 streams without errors;
+retained cache payload stays within 64 KiB. This is not a PS3 heap/RSS guarantee.
+
+Native curve-cache consumers establish four further marker correspondences.
+The explicit seven-rule contract accepts 3,616 event tables including empty lists;
+5,958 tables remain blocked. A typed registry inspector resolves all 2,478 nonempty
+references across two supplied signature banks, preserving 320 empty slots and
+unknown metadata. Group-member selection is reported separately from identity.
+
+Category zero has 147 styles; adding all to CH's 112 would require 259 IDs, beyond
+the existing byte field. No IDs are truncated and no stock styles are replaced.
+Native loader/allocator integration, group/variant translation, remaining event
+semantics and complete target header metadata remain unfinished. No playable
+port, hook, wider roster field, emulator run or testing JB is supplied. Details:
+[ANIMATION_RUNTIME_ADAPTER.md](ANIMATION_RUNTIME_ADAPTER.md).
+
+# Unreleased — canonical bind and registration research
+
+Confirmed byte-identical CH/NBA11 canonical 21-bone parents, rest translations and
+default routes, with matching native consumers. Added guarded pose retargeting,
+read-only bind/shot-registration CLI audits and opt-in payload-consumer inspection.
+The three-rule mirrored-selector contract remains narrow and explicit; other
+markers and opaque payloads still block conversion. Details:
+[ANIMATION_BIND_REGISTRATION.md](ANIMATION_BIND_REGISTRATION.md).
+
+A separate authorized local decoded-ELF probe preserves all112 stock shots and
+appends one stock-backed duplicate, with exact diff/TLS/adjacent-array checks.
+It is an allocation probe, not a signed EBOOT or runtime-tested donor registration.
+Private bulk preparation translated9,574 pose streams/341,823 stored keys across
+18,831 observed NBA11 headers, with exact reverse checks and unchanged sources.
+Timing/root remain source-key components; the later runtime-adapter phase above
+reduces the remaining blocked event tables to 5,958. No full playable port, added donor styles or modern controls are installed.
+No emulator or automatic/testing JB was run. v1.21 remains the published release.
+# Unreleased — native-only transfer continuity and Legacy diagnostics
+
+The owner requires transfers entirely in game, preserving player statistics and
+team history; no editor/save-applied transfer workflow. Legacy Editor now exposes
+read-only recruiting diagnostics through the shared pool audit, including native
+preferences and unresolved fields. No transfer/signing controls are added.
+Native tracing establishes annual recruit regeneration, a player-to-recruit copier
+with incompatible class codes, commitment and reusable-player-pool operations.
+Unsigned portal players must avoid the old finalizer's reusable-pool route; signing
+must bypass new-player conversion and validate destination capacity before removal.
+Historical stat/team-link ownership, durable proxy binding and calendar integration
+remain unresolved. No native portal or patch is installed; originals unchanged.
+See [LEGACY_TRANSFER_PORTAL.md](LEGACY_TRANSFER_PORTAL.md).
+
+# Unreleased — native recruiting pool and saved-component audits
+
+Added read-only `inspect-recruit-pool` for the confirmed 0xD8 native recruit table,
+with bounds/overlap checks, metadata diagnostics and optional linked-interest or
+0x415A4 serialized-component audits. Native traces establish dual node pools,
+free-list/queue layout and aggregate-relative placement. Stock audit finds 2,000
+reserved blank records; these are not certified reusable slots. Rollover creates
+new college players, so transfers need a separate identity-preserving signing path.
+No native insertion, binding persistence or executable patch is installed. No
+offseason save is available for roundtrip validation; originals remain unchanged.
+See [LEGACY_TRANSFER_PORTAL.md](LEGACY_TRANSFER_PORTAL.md).
+
+# Unreleased — transfer recruit labels and interest-policy foundation
+
+Confirmed separate native HS/JC class formatting, five recruiting-preference
+captions and 96 initialized native preference profiles with weighted consumers. Recruit and college-player class enums differ; placeholder class entries
+are not safe transfer support. Added an offline `TR FR/SO/JR/SR (RS)` formatter,
+stable per-player/offseason three-way priority draw and validated school ordering
+for minutes gained, hometown distance or team rank. Existing game sources unchanged.
+No in-game pool insertion, native interest/forecast adapter, persistence or executable
+patch is installed. See [LEGACY_TRANSFER_PORTAL.md](LEGACY_TRANSFER_PORTAL.md).
+
+# Unreleased — Legacy transfer portal feasibility
+
+Read-only tracing identifies the outgoing candidate gate, 400-active-entry queue,
+ranked destination selection, source/destination menus, finalization and queue
+save/load relocation. Increased transfer frequency has specific native controls;
+a recruitable portal is plausible but requires calendar, recruiting, eligibility,
+scholarship and save contracts. Neither feature nor an executable patch is installed.
+Original files unchanged; no emulator/gameplay/JB run. See
+[LEGACY_TRANSFER_PORTAL.md](LEGACY_TRANSFER_PORTAL.md).
+
 # v1.21 — animation event bridge and asset-selection correction
 
 Completed the bounded offline event-table bridge phase: CH/NBA11 event inspection,

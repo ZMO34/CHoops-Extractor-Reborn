@@ -1,3 +1,8 @@
+> Follow-up: the explicit mirrored-selector triplet contract and additional
+> opt-in native payload reads are documented in
+> [ANIMATION_BIND_REGISTRATION.md](ANIMATION_BIND_REGISTRATION.md).
+> They do not constitute a complete event semantic map.
+
 # Animation event bridge phase (v1.21)
 
 The offline event-table bridge is implemented. It reads the established CH2K8 and

@@ -1,3 +1,62 @@
+## v1.22 — alternate discovery and combined research updates
+
+Windows extended drive/UNC path spellings are normalized consistently, fixing the
+intermittent parallel-worker output-root rejection without relaxing source guards.
+
+- Recognize newly enabled X/Y/Z uniform and SELU folders from the effective roster even without a team-assets manifest; compile their nested DDS/raw records using the matching Home template.
+- Respect byte ranges when reading added archive metadata and retain new archives whose artwork matches the template. Keep DDS priority and reject inactive/unlinked alternate folders with a corrective message.
+- Combine PR45's contract-gated animation tooling and PR46's transfer research/read-only Legacy diagnostics. Native donor gameplay and the in-game transfer portal remain unfinished; no executable patches or game assets are included.
+
+## Unreleased — donor header and allocator protocol follow-up
+
+- Assemble owned CH motion components from the observed NBA11 ELF family using explicit fingerprint-bound authoring metadata and event contracts; reject unresolved dependencies.
+- Add a bounded offline resident ownership model with leases, delayed release, rollback, readback and allocation quarantine; no native hook is installed.
+- Add a revision-guarded Ghidra allocator-wrapper instruction harness and read-only 300-Hz auxiliary selector-curve inspection.
+- Document actual signature-bank dependency/footprint findings and the remaining source-adapter, metadata, auxiliary and native lifecycle work.
+
+## Unreleased — native target residency preparation
+
+- Audit full registered CH motion track extents with `inspect-shot-registration --motion-extents`.
+- Prepare bounded CH-backed resident images retaining authored metadata and validating native pointer relocation and inverse relocation.
+- Reserve resident-image space in registration allocation plans; reject virtual load-memory collisions in addition to occupied file padding.
+- Document the separate stock-backed resident registration probe and remaining donor metadata/loader/runtime work. No donor installation or executable patching feature is added.
+
+## Unreleased — authored-key sampling and donor registry
+
+- Sample NBA11 authored motion keys on demand with canonical-bind checks, full extent validation, input invalidation and a byte-budgeted payload cache.
+- Inspect signature collections and cross-bank typed dependencies, preserving unknown metadata and reporting native group-member selectors.
+- Add four explicit trajectory-cache event correspondences; unsupported events remain blocked.
+- Document observed corpus results and remaining native registration, header, event and memory dependencies. No playable animation port is claimed.
+
+## Unreleased — canonical animation bind and registration audits
+
+- Verify the observed CH/NBA11 21-bone bind and preserve declared channel masks during packed pose conversion.
+- Add read-only bind and shot-registration CLI audits; validate stock rows, known consumers and native label initialization.
+- Inspect additional native payload reads without enabling unproven event conversion; provide an explicit three-marker mirror-selector contract.
+- Document the separate registration-only probe and full observed-family component preparation. No playable donor port or executable patching is added to the editor.
+## Unreleased — native-only transfer continuity and Legacy diagnostics
+
+- Add read-only Legacy recruiting diagnostics for confirmed recruit metadata, native preference weights and unresolved fields, using immutable background snapshots.
+- Trace annual recruit regeneration, native commitment, player-to-recruit copying and reusable-player-pool lifetime hazards.
+- Require in-game transfers to retain player statistics and historical team associations; no editor/save-applied transfer workflow or playable portal is added.
+
+## Unreleased — native recruiting pool audits
+
+- Add read-only `inspect-recruit-pool` with native table bounds, metadata diagnostics, interest-list ownership checks and optional serialized recruiting-component inspection.
+- Establish native dual-list persistence layout and identify the rollover conversion that transfers must bypass to preserve player identity/history.
+- Preserve all original data. Playable pool insertion, binding persistence and native signing integration remain unfinished.
+
+## Unreleased — transfer recruiting policy foundation
+
+- Add offline transfer class/redshirt labels and reproducible three-priority school ordering for playing opportunity, hometown proximity or team ranking.
+- Trace existing HS/JUCO class and recruiting-preference formatters, distinguishing recruit fields from college-player class/eligibility and team ranking from recruit ranking.
+- Preserve originals; native pool insertion, persistence and executable integration remain unfinished.
+
+## Unreleased — Legacy transfer feasibility research
+
+- Document confirmed transfer candidate gates, ranked destinations, 400-entry active queue, existing transfer menus and serialized pointer relocation.
+- Assess scoped frequency tuning and a recruitable portal while identifying unresolved calendar, scholarship, recruiting and save contracts. No executable or editor behavior changes.
+
 ## v1.21 — animation event bridge and team asset selection
 
 - Add bounded CH/NBA11 event-table inspection, known category-payload-word reads and NBA11 membership-pair inspection.

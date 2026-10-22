@@ -32,7 +32,7 @@ def logo_fixture():
     return bytes(header)+name_trailer([{'name':'logo003','type':'TXTR'}]), head+image
 
 
-def game(tmp_path, *, shared=True, logos=False, collision=False):
+def game(tmp_path, *, shared=True, logos=False, collision=False, named=False):
     raw, starts = header_roster()
     for i in range(2):
         off = starts['teams'] + i * 704
@@ -48,6 +48,11 @@ def game(tmp_path, *, shared=True, logos=False, collision=False):
     payloads = {'roster_english.iff': iff_fixture([bytes(raw)], [(0xc61649b2, [0])], compressed=True),
                 's077.iff': iff_fixture(txtr_fixture()),
                 **{f'{prefix}u{bank}077.iff': iff_fixture(txtr_fixture()) for prefix in ('', 'sel') for bank in 'ha'}}
+    if named:
+        from choops_py.formats.cdf_backed_iff_writer import name_trailer
+        for name in list(payloads):
+            if name.startswith(('u','selu')):
+                payloads[name] += name_trailer([{'name':'unif','type':'TXTR'}])
     if logos:
         logo_iff, cdf = logo_fixture()
         payloads.update({'teamselectlogo.iff':logo_iff,'teamselectlogo.cdf':cdf})
@@ -315,3 +320,55 @@ def test_classic_shared_arena_forks_without_touching_classification_or_original(
     assert arena_selector(updated,updated.rows['teams'][1])==(900,0)
     assert arena_selector(updated,updated.rows['teams'][0])==(77,0)
     assert bytes(updated.data[off:off+0x44])==original[off:off+0x44]
+
+
+@pytest.mark.parametrize('workers', [1, 2])
+@pytest.mark.parametrize('artwork', [False, True])
+def test_enabled_loose_alternate_without_manifest_imports_and_builds(tmp_path, workers, artwork):
+    from choops_py.archive.build_copy import preflight
+    from choops_py.formats.standard_iff import StandardIFF
+    from choops_py.formats.standard_iff_writer import record_blocks
+    from choops_py.modding.team_assets import AdditionInputs, read_named
+    from choops_py.studio.services import stage_folder
+    from choops_py.texture_tools.dds import linear_l8
+    archive = Archive(game(tmp_path, shared=False, named=True))
+    before = (archive.path/'0A').read_bytes()
+    plan = prepare(archive, request(['x'], target=3))
+    root = OUTPUT/'temp'/('loose_alternate_'+uuid.uuid4().hex)
+    folder = root/'loose'; folder.mkdir(parents=True)
+    (folder/'roster_english.iff').write_bytes(plan['replacements']['roster_english.iff'])
+    nested = folder/'selux003'/'_unif.txtr'; nested.mkdir(parents=True)
+    raw = txtr_fixture()[0]
+    (nested.parent/'unif.txtr').write_bytes(raw)
+    if artwork:(nested/'artwork.dds').write_bytes(linear_l8(4,4,1,b'\xff'*16))
+    virtual = AdditionInputs(archive, folder)
+    entry = next(e for e in virtual.entries if e['name']=='selux003.iff')
+    template = read_named(archive,'seluh077.iff')
+    assert virtual.read({**entry,'offset':4,'size':20}) == template[4:24]
+    with pytest.raises(ValueError,match='extent'):virtual.read({**entry,'offset':len(template),'size':1})
+    result = stage_folder(archive.path,folder,root/'prepared',workers=workers)
+    assert result['added_assets']==['selux003.iff']
+    assert any('Home template' in warning for warning in result['warnings'])
+    _, patches = preflight(archive.path,Path(result['mod']))
+    additions = json.loads((Path(result['mod'])/'additions.json').read_text())['entries']
+    row = next(r for r in additions if r['archive']=='selux003.iff')
+    payload = (Path(result['mod'])/row['path']).read_bytes()
+    iff = StandardIFF(payload)
+    block = record_blocks(iff,iff.records[0])[0][3]
+    assert block[176:192] == (b'\xff'*16 if artwork else raw[176:192])
+    assert (archive.path/'0A').read_bytes()==before
+    # The missing gameplay partner must also reach the final synthetic TOC.
+    from choops_py.archive.build_copy import build
+    build(archive.path,result['mod'],root/'built')
+    rebuilt = Archive(root/'built')
+    assert hash_name('ux003.iff') in {e['hash'] for e in rebuilt.entries}
+    assert read_named(rebuilt,'selux003.iff') == payload
+
+
+def test_unlinked_loose_alternate_is_not_guessed(tmp_path):
+    from choops_py.modding.team_assets import AdditionInputs
+    archive = Archive(game(tmp_path))
+    folder = tmp_path/'loose'; (folder/'seluz052').mkdir(parents=True)
+    (folder/'seluz052/unif.txtr').write_bytes(txtr_fixture()[0])
+    with pytest.raises(ValueError,match='not enabled.*Save the enabled roster'):
+        AdditionInputs(archive,folder)

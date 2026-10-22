@@ -102,7 +102,7 @@ def _compile_one(archive,group,index,work,job,code,reuse):
     data,imports=compile_group(archive,group,job)
     if signature!=input_signature(group):raise ValueError('Override inputs changed during preparation; select the folder again')
     outputs=[]
-    unchanged=data==original and group['whole'] is None and not group.get('compiled_companion')
+    unchanged=data==original and group['whole'] is None and not group.get('compiled_companion') and group['entry']['index']<len(getattr(archive,'base',archive).entries)
     def store(entry,name,payload,suffix=''):
         target=f"assets/{group['entry']['index']:06d}{suffix}.bin";write_bytes(work/target,payload,[archive.path])
         source=original if entry['index']==group['entry']['index'] else archive.read(entry)

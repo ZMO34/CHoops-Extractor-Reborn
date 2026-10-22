@@ -88,6 +88,147 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# v1.22 — new alternate folder discovery
+
+Windows extended drive/UNC path spellings are normalized consistently, fixing the
+intermittent parallel-worker output-root rejection without relaxing source guards.
+
+Fixed absent alternate/SELU folders failing before texture import. Preparation
+recognizes X/Y/Z identities explicitly linked by the JB roster or a unique full
+roster_english.iff override, creates virtual entries from the matching Home bank,
+and compiles nested DDS/raw edits into real build additions. Unknown/unlinked
+folders remain errors with an instruction to save the enabled roster to overrides.
+Virtual metadata reads honor offsets/sizes; unchanged new containers are retained.
+Missing paired assets continue through build-time Home fallback and warnings.
+
+Combines animation PR45 and Legacy/transfer PR46 without replacing their features.
+These remain research foundations: no playable donor port or in-game portal is
+installed. Originals unchanged, no RPCS3 or testing JB. Verification and Windows
+package results are recorded in the release PR.
+
+# Unreleased — donor component construction and allocator ABI
+
+Added contract-gated NBA11 decoded-ELF to CH component construction: target header
+layout, fixed-rate poses/root, mapped events, owned relative pointers and full
+relocation validation. Unknown authoring/state fields require explicit per-header
+research assertions bound to both complete inputs; there is no default contract
+or automatic real-game metadata proof. Signature-IFF sources/auxiliary semantics
+still block actual signature-shot translation.
+
+Traced the concrete CH heap wrapper and matching release ABI. Four bounded Ghidra
+instruction-harness cases pass with synthetic heap callbacks. Added an offline
+resident ownership model covering allocation/readback/publication, reader leases,
+retirement/shutdown, rollback and quarantine. Its registry is Python-local; a native
+reader/publication/lifetime hook is not installed.
+
+Actual signature banks resolve all 918 nonempty category-zero slots (458 aliases),
+911 headers and 456 payloads. Known-component projection: about 12.3 MB before
+auxiliary data/heap overhead; this is not a certified PS3 budget. All 806 bounded
+300-Hz selector curves pass new read-only inspection; selector meanings remain
+unresolved. Source files unchanged, no RPCS3/gameplay/JB run. Full donor port remains
+unfinished. Details: [ANIMATION_RUNTIME_ADAPTER.md](ANIMATION_RUNTIME_ADAPTER.md).
+
+# Unreleased — target header residency and registration extents
+
+Added complete known target track-extent audits and CH-backed resident-image
+preparation with exact metadata retention, bounded payloads, dependency deduplication,
+native/inverse relocation checks and explicit refusal of unknown auxiliary lengths.
+`inspect-shot-registration --motion-extents` validates registered dependencies.
+Allocation planning now reserves optional motion-image bytes and rejects virtual
+load collisions as well as occupied file padding.
+
+Private corpus: all 7,055 identified CH headers pass; all 2,522 supported headers
+roundtrip as owned images. A separate 113-entry stock-backed probe places an entire
+motion pair and its tracks in verified writable-segment padding, preserves all 112
+stock records/TLS and passes reparse/diff/extent checks with no heap allocation.
+This is not donor metadata translation, a native donor loader, playable port or
+runtime certification. Those requested pieces remain unfinished; originals are
+unchanged, no emulator/testing JB was used, and PR45 remains draft. Evidence and
+precise limits: [ANIMATION_RUNTIME_ADAPTER.md](ANIMATION_RUNTIME_ADAPTER.md).
+
+# Unreleased — bounded sampling and donor dependency registration
+
+Added an offline, byte-budgeted NBA11 sampler that reads authored keys on demand,
+validates complete track extents and canonical bind, and emits one CH packed pose.
+The supplied corpus passes 28,722 samples across 9,574 streams without errors;
+retained cache payload stays within 64 KiB. This is not a PS3 heap/RSS guarantee.
+
+Native curve-cache consumers establish four further marker correspondences.
+The explicit seven-rule contract accepts 3,616 event tables including empty lists;
+5,958 tables remain blocked. A typed registry inspector resolves all 2,478 nonempty
+references across two supplied signature banks, preserving 320 empty slots and
+unknown metadata. Group-member selection is reported separately from identity.
+
+Category zero has 147 styles; adding all to CH's 112 would require 259 IDs, beyond
+the existing byte field. No IDs are truncated and no stock styles are replaced.
+Native loader/allocator integration, group/variant translation, remaining event
+semantics and complete target header metadata remain unfinished. No playable
+port, hook, wider roster field, emulator run or testing JB is supplied. Details:
+[ANIMATION_RUNTIME_ADAPTER.md](ANIMATION_RUNTIME_ADAPTER.md).
+
+# Unreleased — canonical bind and registration research
+
+Confirmed byte-identical CH/NBA11 canonical 21-bone parents, rest translations and
+default routes, with matching native consumers. Added guarded pose retargeting,
+read-only bind/shot-registration CLI audits and opt-in payload-consumer inspection.
+The three-rule mirrored-selector contract remains narrow and explicit; other
+markers and opaque payloads still block conversion. Details:
+[ANIMATION_BIND_REGISTRATION.md](ANIMATION_BIND_REGISTRATION.md).
+
+A separate authorized local decoded-ELF probe preserves all112 stock shots and
+appends one stock-backed duplicate, with exact diff/TLS/adjacent-array checks.
+It is an allocation probe, not a signed EBOOT or runtime-tested donor registration.
+Private bulk preparation translated9,574 pose streams/341,823 stored keys across
+18,831 observed NBA11 headers, with exact reverse checks and unchanged sources.
+Timing/root remain source-key components; the later runtime-adapter phase above
+reduces the remaining blocked event tables to 5,958. No full playable port, added donor styles or modern controls are installed.
+No emulator or automatic/testing JB was run. v1.21 remains the published release.
+# Unreleased — native-only transfer continuity and Legacy diagnostics
+
+The owner requires transfers entirely in game, preserving player statistics and
+team history; no editor/save-applied transfer workflow. Legacy Editor now exposes
+read-only recruiting diagnostics through the shared pool audit, including native
+preferences and unresolved fields. No transfer/signing controls are added.
+Native tracing establishes annual recruit regeneration, a player-to-recruit copier
+with incompatible class codes, commitment and reusable-player-pool operations.
+Unsigned portal players must avoid the old finalizer's reusable-pool route; signing
+must bypass new-player conversion and validate destination capacity before removal.
+Historical stat/team-link ownership, durable proxy binding and calendar integration
+remain unresolved. No native portal or patch is installed; originals unchanged.
+See [LEGACY_TRANSFER_PORTAL.md](LEGACY_TRANSFER_PORTAL.md).
+
+# Unreleased — native recruiting pool and saved-component audits
+
+Added read-only `inspect-recruit-pool` for the confirmed 0xD8 native recruit table,
+with bounds/overlap checks, metadata diagnostics and optional linked-interest or
+0x415A4 serialized-component audits. Native traces establish dual node pools,
+free-list/queue layout and aggregate-relative placement. Stock audit finds 2,000
+reserved blank records; these are not certified reusable slots. Rollover creates
+new college players, so transfers need a separate identity-preserving signing path.
+No native insertion, binding persistence or executable patch is installed. No
+offseason save is available for roundtrip validation; originals remain unchanged.
+See [LEGACY_TRANSFER_PORTAL.md](LEGACY_TRANSFER_PORTAL.md).
+
+# Unreleased — transfer recruit labels and interest-policy foundation
+
+Confirmed separate native HS/JC class formatting, five recruiting-preference
+captions and 96 initialized native preference profiles with weighted consumers. Recruit and college-player class enums differ; placeholder class entries
+are not safe transfer support. Added an offline `TR FR/SO/JR/SR (RS)` formatter,
+stable per-player/offseason three-way priority draw and validated school ordering
+for minutes gained, hometown distance or team rank. Existing game sources unchanged.
+No in-game pool insertion, native interest/forecast adapter, persistence or executable
+patch is installed. See [LEGACY_TRANSFER_PORTAL.md](LEGACY_TRANSFER_PORTAL.md).
+
+# Unreleased — Legacy transfer portal feasibility
+
+Read-only tracing identifies the outgoing candidate gate, 400-active-entry queue,
+ranked destination selection, source/destination menus, finalization and queue
+save/load relocation. Increased transfer frequency has specific native controls;
+a recruitable portal is plausible but requires calendar, recruiting, eligibility,
+scholarship and save contracts. Neither feature nor an executable patch is installed.
+Original files unchanged; no emulator/gameplay/JB run. See
+[LEGACY_TRANSFER_PORTAL.md](LEGACY_TRANSFER_PORTAL.md).
+
 # v1.21 — animation event bridge and asset-selection correction
 
 Completed the bounded offline event-table bridge phase: CH/NBA11 event inspection,
@@ -1237,6 +1378,10 @@ See NBA_ROSTERS_AND_2K14.md for container and primary format references.
 
 Embedded source: docs/ANIMATION_GAMEPLAY_PORT.md
 
+> Canonical 21-bone bind correspondence and registration allocation research
+> advanced after v1.21. See [ANIMATION_BIND_REGISTRATION.md](ANIMATION_BIND_REGISTRATION.md).
+> Full event semantics and playable donor registration remain incomplete.
+
 # Cross-game animation and controls implementation ledger
 
 Owner scope (2026-10-20): research and implement as much NBA 2K11/14 on-court
@@ -1537,6 +1682,11 @@ analysis copies are local, excluded from Git. No RPCS3 or testing JB is used.
 
 Embedded source: docs/ANIMATION_EVENT_BRIDGE.md
 
+> Follow-up: the explicit mirrored-selector triplet contract and additional
+> opt-in native payload reads are documented in
+> [ANIMATION_BIND_REGISTRATION.md](ANIMATION_BIND_REGISTRATION.md).
+> They do not constitute a complete event semantic map.
+
 # Animation event bridge phase (v1.21)
 
 The offline event-table bridge is implemented. It reads the established CH2K8 and
@@ -1655,6 +1805,536 @@ and remaining payload consumers, then assemble a complete motion-header adapter
 with all dependencies accounted for. Additive shot-table allocation, blend graphs,
 ball/contact behavior and controller defaults remain separate runtime work.
 No RPCS3 or automatic/testing game build was run.
+
+---
+
+Embedded source: docs/ANIMATION_BIND_REGISTRATION.md
+
+# Canonical bind and additive registration investigation
+
+This update proves the observed 21-bone motion-space bind correspondence, adds
+read-only audits, and begins bulk preparation of NBA11 pose components. It does
+not finish all event semantics, register a donor shot, install controls, or make
+an NBA11 animation playable. Runtime/gameplay verification has not been run.
+
+## Bind retargeting
+
+The CH parent table at `0x1000A0C0` and NBA11 table at `0xA1CBB8` have identical
+21-parent assignments. The corresponding 336-byte local rest-translation tables
+at CH `0x10009F70` and NBA11 `0xA1CC10` are byte-identical. Default channel routes
+at CH `0x10000100` and NBA11 `0x9D8D88` contain the same 21 `(0,i,i)` triples.
+Native CH `0x236254` / NBA11 `0x38919C` convert 21 local rotations, add these rest
+translations and walk the same parent hierarchy. The quaternion matrix routines
+are CH `0x21154` / NBA11 `0x16840`. These consumers were checked in Ghidra and raw
+disassembly; matching table sizes alone were not used as bind evidence.
+
+For this canonical motion rig, retargeting is identity in bone space plus the
+established packed-quaternion selector conversion. The backend rejects changed
+parents/routes, differing rest vectors, nonfinite values and unsupported masks.
+The NBA11 unpacked-pose decoder branch is explicitly rejected rather than read
+as packed data. None of the observed 18,831 headers uses that branch.
+It does not claim compatibility for arbitrary skins, the separate 32-bone NBA11
+SCNE deformation rig, twist bones, or muscle/cloth simulation.
+
+Both games use low-word rotation mask `0x1DF7DD`. CH stores it at header +4;
+NBA11 at +8. Translation masks are at +0xC in both games; CH +8 is the upper
+translation word, not the low mask. Header +0x10 declares channel counts. All
+7,055 observed CH headers have 17 rotations and six translations. The 18,831
+NBA11 headers have 17 rotations with four, five, six, seven or eight translations.
+The adapter preserves each declared mask and track count. It does not invent
+missing translation channels or replace native absent-channel behavior.
+
+```
+python -m choops_py.cli inspect-motion-bind NBA11_ANALYSIS.ELF CH_ANALYSIS.ELF output/research/bind.json
+```
+
+Inputs must be decoded ELF64 big-endian PowerPC analysis copies from the observed
+profiles. Outputs report `gameplay_ready=false`. The API
+`retarget_canonical_frames` validates both binds and the donor header before
+converting an isolated packed pose stream; it is not a complete clip writer.
+
+## Additive shot registration
+
+The existing 112 playback rows at `0x9DD5F0` have a 40-byte stride and use shared
+TOC pointer `0xA58608`. Six observed readers load it before indexing. The selected
+style remains an unsigned byte at player +0x73, read/written by `0x69E938` and
+`0x69E94C`. The editor range initializer at `0x69D410` sets maximum 111.
+
+The native property constructor uses TOC **0xA64A94**, not the main gameplay TOC
+0xA54AC8. Using the wrong TOC here produces misleading decompiler references.
+The localized-name array has its own start pointer `0xA662CC` and destructor end
+pointer `0xA661FC`. Native initialization writes exactly 112 cells through R9
+between `0x696A60` and `0x6970EC`. Destructor code around `0x694CF0`/`0x694D08`
+walks the selected range backwards through the string-reference destructor.
+Adjacent property pointers `0xA66200` and `0xA66118` must remain unchanged.
+
+The string cells use tagged references. An arbitrary UTF-16 address ORed with one
+is not a valid substitute for an existing localization key. Runtime handling at
+`0x1E0D64` skips release of tagged cells, while `0x1E0DF8` creates tagged references.
+
+```
+python -m choops_py.cli inspect-shot-registration CH_ANALYSIS.ELF output/research/shot-registration.json
+```
+
+The audit checks row count/range agreement, stock-row preservation, byte accessors,
+six observed consumers, motion header masks and the original name initializer.
+It reports structure compatibility, not exhaustive consumer coverage or runtime
+safety. No executable writer is exposed through the editor or CLI.
+
+### Local registration-only experiment
+
+With the owner's authorization for separate executable experiments, a private
+decoded ELF probe appends one **stock-backed Generic 1 duplicate**, leaving the
+first 112 records byte-identical. It relocates the playback/name arrays into
+verified zero file padding of the writable load segment, extends that segment's
+file/memory sizes, and adjusts the shared pointers and option maximum. It reserves
+the complete existing TLS template before allocating. All segment offsets and
+special PS3 headers are retained. An exact byte-diff allowlist and reparse pass.
+
+This establishes a bounded allocation experiment, not successful runtime
+registration. The output is not a signed SELF, hardware-compatible EBOOT, donor
+animation, testing JB or release artifact. Original executables remain unchanged.
+The editor does not expose style 112 for ordinary unpatched rosters.
+
+## Event consumers and semantic boundary
+
+Native mirrored-marker selectors CH `0x231BB0` and NBA11 `0x3806D4` establish a
+narrow correspondence: NBA11 21/22 swap under the same mirror flag as CH 20/21;
+NBA11 23 and CH 22 are invariant third markers. The opt-in API
+`mirrored_marker_contract()` returns only these three rules. NBA11 24 and every
+other ID are excluded. This proves selector behavior, not anatomical/contact
+names or every downstream listener's equivalence. It is not a default ID offset.
+
+Optional payload-consumer inspection exposes individually traced reads:
+
+| NBA11 event | Consumed offsets | Native operation / consumer |
+| --- | --- | --- |
+| 90 | +0 word | Actor-category comparison, `0x47F4FC` |
+| 92 | +0 int, +4 float | Nonzero dispatch selector and clamped random threshold, `0x4D1B9C` |
+| 93 | +0 int | Nonzero index forwarded into dispatch tables, `0x43903C` |
+| 94 | +0/+4 int | Dispatch/identity table indices, `0x38603C` |
+| 173 | +0 int, +0xC float | Selection-table index and event-time window, `0x3839B8` |
+| 178 | +0 int | Resource dispatch branches on 59/60/61, `0x655604` |
+| 186 | +0 int | Optional addend to a selection value, `0x42EBD8` |
+
+```
+python -m choops_py.cli inspect-motion-events NBA11_ANALYSIS.ELF nba-2k11 0xADDRESS output/research/events.json --native-elf --payload-consumers
+```
+
+These are confirmed reads, **not complete payload schemas or target enum maps**.
+Gaps and unknown bytes are not reinterpreted. Float bits are retained even for
+nonfinite payload values; their JSON numeric value is null. Inspection does not
+allow the event converter to discard or translate opaque payloads. IDs 89, 176
+and 177 still lack an established payload consumer schema in this adapter.
+
+## Bulk preparation and remaining port gates
+
+Private preparation covered all 18,831 identified NBA11 headers, retaining each
+header's identity and dependencies independently. All 9,574 distinct packed pose
+streams, totaling 341,823 stored keyframes / 49,278,288 pose bytes, converted and
+reversed byte-for-byte without errors. This coverage is the observed mask family,
+not proof that every animation in NBA11 has been found.
+
+The local component bundle stores converted poses and byte-exact source timing/
+root tracks at the original irregular keys. It is explicitly not an IFF or CH
+fixed-rate motion bank. Pose deduplication does not merge clip semantics. Only
+2,674 event tables contain exclusively the verified selector subset (including
+empty tables); **6,900 remain blocked**. This is not 2,674 certified playable clips.
+The source files retain their original hashes. Expanding every unique stream to
+fixed-rate frames at its current rate would require 1,632,617 frames / 235,096,848
+pose bytes, before roots, events or existing CH assets. Most source key intervals
+have GCD one, so a simple lower-rate common grid does not materially reduce this
+cost. The component bundle deliberately retains source timing instead of loading
+an unchecked expanded library into the game's memory.
+
+Remaining gates before an installable port include complete event/ball/contact
+mapping, target header flags and velocity metadata, auxiliary tracks, blend and
+selection graphs, appended shot playback metadata, runtime memory constraints and
+gameplay validation. CH header +0x24/+0x28/+0x2C cannot safely be filled with a
+naive root-endpoint velocity: that hypothesis fails on 3,390 of 3,727 stock streams.
+No unrelated template velocities or unchecked flags were copied as a workaround.
+
+No RPCS3, hardware run, full-game build or controller remapping was performed.
+
+---
+
+Embedded source: docs/ANIMATION_RUNTIME_ADAPTER.md
+
+# Runtime adapter follow-up
+
+This is an offline reference implementation and native-format investigation.
+It does not install a PS3 sampling hook, donor registry, wider roster ID field or
+playable animation. The full port remains unfinished. The original executables,
+source archives and supplied overrides remain unchanged.
+
+## Additional event correspondence
+
+Ghidra and raw instruction checks match CH `0x3073B4` with NBA11 `0x46DE20`:
+both fill a motion-trajectory cache's timing fields at +0x20/+0x30/+0x34/+0x38,
+sample root displacement, calculate a reciprocal time interval and pass the four
+times to corresponding five-float curve normalizers. CH `0x2CBEC` and NBA11
+`0x141CC` use the same two-branch cubic expression with constants -2 and 3.
+
+| Cache field / role | NBA11 marker | CH marker |
+| --- | --- | --- |
+| +0x20 / anchor | 20 | 19 |
+| +0x30 / first curve control time | 37 | 36 |
+| +0x34 / middle curve control time | 46 | 40 |
+| +0x38 / last curve control time | 38 | 37 |
+
+These are operation-level roles, not invented anatomical/ball-contact names.
+The 46-to-40 correspondence demonstrates why a global ID decrement is incorrect.
+`curve_timing_contract()` includes these four rules and the previous three
+mirrored-selector rules. It remains explicit and opt-in; it is not a complete
+map of every downstream event listener or a default for arbitrary animations.
+
+The NBA11 marker-time wrapper `0x396F90` returns the first event time or a
+negative-FLT_MAX fallback. CH's cache uses its own missing-event fallback. The
+bridge retains actual marker presence/absence, exact time bits, duplicates and
+order; it does not insert one game's fallback value as a marker in the other.
+The internal cache state flags also differ and must not be copied between games.
+
+Private audit: the seven-rule contract converts 3,616 of 9,574 identified event
+tables, with 2,337 actual event rows. Empty lists are included in that table
+count. **5,958 tables still block** on other IDs or opaque payload schemas.
+No count here represents certified playable clips.
+
+## Native donor registry
+
+The collection type `0x449E4AC7` is consumed by NBA11 `0x6599D0`. It traverses
+20-byte entries, filters category at +4, counts entries including a separate
+zero-flag subset at +0x10, and creates a per-category array of entry pointers.
+Native `0x659730` looks entries up by their first word. The key also resolves
+through the supplied game's localization data after tagging its low bit.
+Entry +0xC provides the observed ordinal; the reader preserves its raw value.
+
+The manager initializes 31 categories (0..30). Entry +8 points to a category-
+specific payload. Its constructor dispatcher `0x65840C` resolves eight 12-byte
+reference slots for category zero, one slot for categories 2..10, and two slots
+for the remaining observed categories. The resolver `0x656B70` reads each slot's
+resource ID, chooses SingleMoCap `0x60900D71` when its kind word is zero or the
+group family `0x39F61D57` otherwise, and writes a resolved pointer into +8.
+Serialized slots in the supplied banks have zero runtime-cache words.
+
+The reader validates each payload's own bounds, retains empty slots and unknown
+tails, and resolves dependencies using **type and ID**, including related banks.
+It reports missing/duplicate identities without selecting a load-order winner.
+Group identity resolution is not group-payload or alias-graph translation.
+Native accessor `0x656AEC` selects resolved group members for kind 1..4 at runtime
+object offsets +0xC/+0x1C/+0x2C/+0x3C; kind zero uses the direct resolved pointer
+and kind five returns null. Other kind values remain unestablished in the report.
+The four supplied nonempty group references all use kind one. Category-zero
+accessor `0x657004` chooses slot six or seven from a caller flag; its handedness
+or gameplay meaning is not yet established, so neither slot is arbitrarily chosen.
+These runtime offsets must not be treated as serialized file pointer fields.
+
+```
+python -m choops_py.cli inspect-donor-registry siganims_generic.iff nba-2k11 output/research/signature-registry.json --related-bank siganims_generic_extra.iff
+```
+
+Private supplied-copy audit: 988 entries, 31 categories, 2,478 uniquely resolved
+nonempty slots and 320 explicit empty slots; no missing/ambiguous references.
+Four nonempty slots refer to the group family. Every combined category has unique
+contiguous ordinals. Category zero has 147 entries, ordinals 0..146, eight reference
+slots and an additional four-byte field whose meaning remains unresolved; other
+categories have larger unparsed tails. The parser is not an executable writer.
+
+This is materially different from CH's fixed 112-row shot table. A mechanical
+append of 147 styles would need 259 indices, exceeding the existing unsigned byte
+at player +0x73. No ID is wrapped/truncated and no original style is discarded.
+A wider-ID or indirection design, complete variant mapping and target registration
+metadata still need implementation. Native source entry lookup uses a full word;
+source keys/ordinals must not be written into the CH byte field directly.
+
+## Header and sampling reference
+
+`MotionSampler` maps decoded ELF analysis copies read-only. It verifies the
+canonical bind, validates motion masks/counts, rejects NBA11's unhandled unpacked
+pose branch, and reads source byte-delta key timing at header +0x24, poses at
++0x28 and root tracks at +0x2C. It validates the **complete** pose/root extents
+before returning even a time-zero sample, without allocating those extents.
+
+It checks positive finite rate/time-scale metadata and agreement between declared
+duration and the authored key ticks. It decodes only the two bracketing poses,
+using the existing mathematical SLERP/linear reference. Authored endpoints retain
+exact packed-selector conversion and padding. Root signed words use the matching
+key interval. Mirror/world/auxiliary transformations, root heading angle conversion,
+loop policy and event dispatch remain separate, explicitly reported stages.
+
+```
+python -m choops_py.cli sample-native-motion NBA11_ANALYSIS.ELF CH_ANALYSIS.ELF 0xHEADER_ADDRESS 0.25 output/research/sample.json --cache-bytes 65536
+```
+
+The JSON includes the one-frame CH packed pose, source key indices/fraction,
+pre-transform root words, confirmed timing fields, raw header words and cache
+statistics. Inputs cannot be overwritten. All actual-game reports stay private.
+
+This does not establish CH +0x24/+0x28/+0x2C authoring metadata from an NBA clip.
+Those offsets have different source/target meanings. Remaining header flag bits,
+auxiliary curves, desired-motion metadata and bank relocation still prevent a
+automatic complete header writer. The contract-gated component builder below
+does not establish those missing semantics. No unrelated template metadata is substituted.
+
+## Memory handling and verification
+
+The source pose data stays at authored keys. The offline sampler retains a byte-
+budgeted LRU rather than a 235 MB expanded pose bank or an expanded key index.
+Only one worker owns a sampler. Each cached read is bounded; eviction updates
+accounting, close releases mappings, and changed input size/mtime/inode invalidates
+the cache. These metadata checks do not certify same-metadata external edits.
+
+Synthetic tests compare every integer tick against full expansion using nontrivial
+rotations/translations/root tracks; they exercise long scrubs/eviction, endpoint
+clamping, timeline errors, stale inputs, closed readers and later-key BSS overlap.
+Private corpus: 28,722 samples across 9,574 unique streams, zero errors; first/last
+pose bytes match the converter. With a 65,536-byte budget, peak retained payload
+was exactly 65,536 bytes, with no expanded bank allocation.
+
+The cap describes retained **payload bytes**, not all Python/OS memory, mapped
+virtual address space or PS3 heap residency. A native demand loader/sampler hook,
+allocator integration and real-game memory/lifetime validation remain required.
+No native hook, emulator, hardware test or automatic/testing JB was run.
+
+
+## Target header ownership and native relocation follow-up
+
+The new `research.target_motion` backend validates existing CH headers and builds
+self-contained **CH-backed** resident images. It does not derive the unresolved
+CH authoring fields from NBA, install a native demand-loader, or finish the donor
+port. Every nonpointer byte of a supplied CH header is preserved; the builder
+never substitutes metadata from an unrelated style into a donor header.
+
+Focused Ghidra and original-instruction checks establish these boundaries:
+
+| Native route | Confirmed operation |
+| --- | --- |
+| CH `0x1E9C0` | Fix up +0x30/+0x34/+0x38/+0x3C, then +0x40 tail sized by +0x10 low six bits |
+| CH `0x1EAA0` | Inverse fixup of the same fields |
+| CH `0x77FB1C` through `0x11650` | Null stays null; signed relative word becomes field address + word - 1 |
+| CH `0x77FAF4` through `0x15200` | Null stays null; pointer becomes pointer - field address + 1 |
+| CH `0x23D58` | Alias resolution copies those four pointers and the counted pointer tail; it does not copy scalar/mask metadata |
+| CH `0x23B6C` / `0x23C60` | Group pointer fixup/unfixup surrounds the corresponding motion fixup/unfixup |
+
+Consequently, resolving an alias is not ownership transfer or a deep copy. A
+cache may not evict backing tracks while registered headers or their aliases
+still reference them. These routines do not establish a heap pin/refcount API.
+The raw relocation oracle requires the caller to declare its pointer state;
+state cannot be inferred reliably from arbitrary words. A future native loader
+must own that state and call each transition once, not guess from pointer values.
+
+`inspect_target_motion` checks canonical channels, count/rate, finite time and
+movement metadata, complete header/tail extent, full poses/root tracks and a
+bounded event list through its sentinel. It reports load-segment ownership and
+unknown dependency extents. CH root rows use six or eight bytes according to the
+confirmed high mode bit. Unknown flag meanings remain raw and explicitly incomplete.
+It does not equate a successful extent check with validated contacts or playback.
+
+`prepare_target_image` accepts 1..4096 distinct existing CH headers and a 64-byte
+to 16-MiB payload budget. It materializes complete known dependencies, deduplicates
+identical source extents, aligns stored extents to 16 bytes, and emits relative
+pointers. Header overlaps, unresolved aliases, auxiliary tracks and nonnull +0x3C
+unknown extents block preparation. `relocate_target_image` checks the complete
+native view before returning a result, including later pose/root frames, events,
+32-bit address overflow and header storage collisions. No file is modified.
+The budget covers resident-image payload, not temporary preparation memory or RSS.
+
+The shot-registration CLI gains the opt-in deep check:
+
+```
+python -m choops_py.cli inspect-shot-registration CH_ANALYSIS.ELF output/research/deep-registration.json --motion-extents
+```
+
+It deduplicates the registered motion audits and retains the shallow compatibility
+check as the default. On the supplied stock executable, 112 styles reference 224
+distinct headers; all 224 pass full dependency extents. Fifty-six fit the current
+self-contained subset without unknown auxiliary extents. Across the identified
+full-body family, all 7,055 headers pass inspection, and all 2,522 supported
+headers pass owned-image preparation and exact relative/native/inverse roundtrip.
+The largest individual image is 126,996 bytes. Other headers remain inspectable,
+but are not silently copied with guessed auxiliary lengths.
+
+### Separate resident registration experiment
+
+The private, authorized decoded-ELF experiment extends the earlier table-only
+probe. It copies the two headers of stock row eight plus complete pose/root/event
+tracks into one 4,656-byte owned image. The headers share track storage where the
+originals share the same source extent. Both appended row pointers address the
+new image; no motion pointer borrows original or donor storage. The first 112
+playback rows remain byte-identical and the appended row retains its source's
+other playback metadata. Its display name is the existing Generic 1 tagged key,
+an explicit placeholder, not a claimed donor label.
+
+The plan reserves table, names and image after the entire TLS template. It uses
+9,648 bytes of 14,848 available verified-zero file padding, extends only the
+existing writable segment's file/memory sizes, and now checks both physical file
+padding and collisions with every other virtual load range. All segment offsets,
+TLS, neighboring label arrays and unrelated bytes remain unchanged. Reparse,
+full registered-track extents, image roundtrip and exact byte-diff allowlist pass.
+Original source hashes remain unchanged.
+
+This is a **stock-backed static residency/registration structure probe**. It adds
+no heap allocations and relies on normal executable-segment lifetime; it does
+not implement the donor loader's allocation, eviction, synchronization or shutdown
+protocol. It is a decoded analysis ELF, not a signed/hardware-certified EBOOT.
+No executable writer is exposed in the tool, and no probe assets are published.
+No emulator, hardware or automatic/testing JB was run.
+
+### Still required for the requested donor integration
+
+- Establish donor-to-CH authoring metadata, remaining flags and auxiliary extents;
+  do not advertise retained CH metadata as a completed cross-game translator.
+- Finish donor event/variant and graph dependencies before registering a playable
+  style. An idle clip in a shot slot would not prove a working donor shot.
+- Implement native resource lifetime/allocator or an appropriately bounded native
+  streaming path for the donor library. This static probe does not provide it.
+- Validate native runtime behavior separately. Structural checks cannot certify
+  frame-time memory use, asynchronous load ordering, lifetime or gameplay.
+
+
+## Contract-gated donor header construction
+
+`research.donor_header.translate_donor_motion` now assembles a relative CH motion
+component from the observed NBA11 **decoded-ELF** packed family, with verified
+canonical binds and separately supplied metadata/event contracts. This goes beyond
+retaining an existing CH header, but it does not automatically discover the missing
+metadata or install the component in a native bank. The signature-IFF records and
+aliases discussed below still need their own source adapter.
+
+The builder places the source low rotation/translation masks into CH's mask words,
+retains native channel counts and rate, expands authored key deltas to fixed frames,
+retains exact source time-scale/duration float bits, converts packed quaternion
+selectors, resamples the root with its six/eight-byte mode, and writes mapped CH
+events. Every mandatory pointer targets the owned component; full target extents
+and relative/native/inverse byte equality are checked before returning it. Exact
+aligned output size is budgeted before expanded tracks are allocated. Payload
+budget is not a total Python/PS3 process-memory claim.
+
+The mandatory metadata contract contains these fields:
+
+| Field | Required assertion |
+| --- | --- |
+| `schema` | 1 |
+| `source_sha256`, `target_sha256` | Complete decoded input fingerprints |
+| `source_header_address`, `source_header_sha256` | Exact 56-byte donor header |
+| `target_mode_high16` | Explicit target upper mode word |
+| `target_state_bits` | Explicit target +0x18 word |
+| `authored_planar` | Explicit finite `[speed, X, Z]` for +0x24/+0x28/+0x2C |
+| `evidence` | Bounded nonempty `mode`, `state`, `planar` research explanations |
+
+These are **caller research assertions**, not facts proved by an evidence string.
+No default contract or unrelated CH template is supplied. Fingerprints prevent
+stale stream/revision assertions from being reused with changed inputs. The
+manifest retains the assertions and labels automatic metadata establishment false.
+Current conversion verification uses synthetic assertions only; this update does
+not claim a verified real-game metadata contract or playable donor shot.
+
+Missing event rules, opaque payloads, unsupported packing, null dependencies,
+header +4 references, counted auxiliary tracks and +0x34 membership dependencies
+still block output. They are not replaced with empty data. The root-stride, mirror
+and cyclic-phase bit positions must remain consistent with the donor. Other mode
+and state semantics remain explicit assertions rather than copied opaque defaults.
+No executable writer or automatic installation is added to the editor.
+
+## Native allocator wrapper and ownership model
+
+RTTI identifies `VCRESOURCEGLOBAL_HEAP_ALLOCATOR`, whose observed vtable is at
+`0x12773AF8`. The allocation entry is CH `0x843404`, release is `0x8434B8`, both
+using TOC `0xA64A94`. Allocation takes its heap object from wrapper +0x14 and
+forwards size/alignment into heap vtable slot +0x4C. Wrapper +0x10 selects heap
+policy word 3 when nonzero or the heap's +0x18 word otherwise; the remaining two
+arguments are forwarded unchanged. Release invokes the **same bound heap** at
+vtable +8 with the pointer and two zero arguments, then returns 1. The release
+wrapper's return is not an independent proof of heap success.
+
+The observed `VCHEAP2` vtable at `0x12773580` resolves +0x4C to `0x8258C0` and +8
+to `0x8248A8`. The allocation implementation rounds using the requested alignment
+and includes heap bookkeeping; component bytes alone are not a measured heap cost.
+These type/descriptor links and wrapper instructions were checked in Ghidra and
+original disassembly. Resource getter `0x841810` looks up via `0x841690`, then
+calls the selected provider's +0x18 method. Resource attachment `0x8418C4` first
+invokes provider +0xC and links it only after success. This is a concrete native
+route, but the provider's complete file/bank ownership protocol remains unfinished.
+
+The asset-free Ghidra script `tools/research/AllocatorABITrace.java` supplies a
+bounded revision-guarded instruction harness. On a separate decoded analysis
+project it runs the actual wrapper instructions with synthetic heap objects,
+traps the synthetic heap callback, checks arguments/TOC and resumes through return.
+Four cases pass: default policy, alternate policy, null allocation and release.
+The harness does **not execute the actual heap allocator/free implementation**, run
+a match or patch an executable. It writes a new JSON only and refuses existing
+outputs. Ghidra's `/C:/...` Windows source spelling is normalized for source checks.
+
+`research.resident_loader.ResidentLoaderModel` implements an offline ownership
+protocol around synchronous bound allocation/free/read/write callbacks:
+
+1. Validate the entire relative image before allocation; enforce a resident
+   payload budget and at most 4,096 tracked live/quarantined allocations.
+2. Allocate with 16-byte alignment, relocate at the returned address, write and
+   read back all bytes before publishing to the **local Python registry**.
+3. Acquire explicit reader leases. Retirement stops new leases; release waits
+   until the last existing reader leaves, including shutdown/concurrent retirement.
+4. Roll back an unpublished write/readback failure through the same allocator.
+   An uncertain free is quarantined with its budget retained and is not retried.
+5. Invalid/overlapping allocator results are quarantined; every overlapping older
+   bank also stops accepting leases. Released records are removed so repeated
+   load/release cycles do not retain a growing history. Callback reentry is refused.
+6. Require an immutable heap-address/generation identity callback. Check it before
+   allocation, after allocation/readback, before issuing a reader lease and before
+   release. A rebound/reused heap quarantines all affected banks; the model never
+   substitutes the wrapper's current heap for an allocation's captured owner.
+
+This model is **not native loader installation**. It provides tested ordering,
+rollback and lifetime rules for the future bridge. No game pointers are published,
+and native aliases/cached readers do not automatically acquire these Python leases.
+Every relevant native reader/publication/retirement boundary must be connected
+before this protocol can safely authorize real-game frees. Identity checks detect
+reported rebinding; they do not stop external heap destruction or close a check/use
+race. A native binding still needs heap-lifetime synchronization and real generation
+tracking, beyond this model's local lock. The callback arguments
+carry the observed ABI shape, not newly invented meanings for its policy/tag words.
+
+## Signature banks, auxiliary curves and memory scope
+
+The signature bank resources are distinct from the embedded ELF motion pool.
+The category-zero lookup IDs do not resolve to that pool, so its 235 MB full-family
+expansion is not the right way to size a signature-shot subset. Read-only inspection
+of the two actual IFF banks resolves all 918 nonempty category-zero references,
+including 458 alias slots. There are 911 distinct referenced headers and 456 distinct
+resolved payloads; alias metadata/count compatibility passes before estimating size.
+
+At fixed donor rate, the known pose/root/header components plus one eight-byte CH
+event row per source marker project to 12,307,462 bytes after exact-source extent
+deduplication. Per-style projections range from 32,758 to 151,272 bytes. These
+figures exclude auxiliary/opaque event payloads, alignment, registration, heap
+bookkeeping and existing CH assets; they are **not a certified resident budget**.
+The 259-ID versus byte-field limit also remains. No stock style is removed to fit.
+
+Native CH `0x203AC` and the auxiliary branch in NBA11 `0x1B764` use four-byte
+selector knots: upper byte selector, low **signed 24-bit tick**, at a fixed 300 Hz
+multiplied by header time-scale. The samplers find bracketing knots and construct
+selector/weight results; these are not ordinary fixed-rate pose/root rows. The
+new read-only `research.motion_auxiliary.inspect_selector_curve` accepts a caller-
+established complete region, retains words/selectors/ticks, checks monotonicity
+and declared-duration bracketing, and reports equal-time knots without certifying
+playback. It does not infer a terminator or turn unknown padding into knots.
+
+Private signature-bank audit: all 806 bounded curves in the 456 resolved payloads
+pass inspection, totaling 35,852 curve bytes. Selector identities/target routing
+remain unresolved; byte-compatible knot layout does not authorize copying their
+meaning across games. The current donor writer therefore continues to reject these
+auxiliary dependencies. This preserves the remaining gate instead of discarding
+required data to manufacture an apparently successful shot conversion.
+
+Mode consumers CH `0x235BC` and NBA11 `0x12C10` share the cyclic-phase gate at bit
+28, selector nibble at bits 24..27 and threshold byte at bits 16..23, with mirror
+participating in phase selection. Their input-state layouts and final clamping
+behavior differ. This establishes field use/positions, not identical complete
+phase algorithms or the remaining mode/state semantics.
+
+Original executables and source banks remain unchanged. Ghidra's bounded instruction
+harness was run; RPCS3, hardware/gameplay and automatic/testing JB were not run.
+The full native donor loader, automatic metadata derivation, signature-bank source
+adapter/auxiliary selector mapping and playable additive shot remain unfinished.
 
 ---
 
@@ -1785,6 +2465,13 @@ source-immutable decoding, destination reparse, untouched-range comparison,
 ambiguity rejection and rollback. Engine/memory behavior remains uncertified
 without user testing. This research launches no game, edits no executable,
 builds no real/testing JB and distributes no donor assets.
+
+## Transfer follow-up
+
+[Legacy transfer feasibility](LEGACY_TRANSFER_PORTAL.md) now traces native candidate
+frequency gates, ranked destinations, transfer menus and serialized queue relocation.
+These improve the evidence behind a possible portal; recruiting integration and
+higher rates remain unimplemented and gameplay-unverified.
 
 ---
 
@@ -2999,6 +3686,24 @@ produces2,434 paired gameplay/SELU additions, and yields2,205 active rows (five
 per usable owner), with all original team owners retained. One final roster
 reparse validates the batch rather than rebuilding player dictionaries per team.
 This15.95-second local observation is not a portable performance guarantee.
+
+
+## Loose alternate folders (v1.22)
+
+New X/Y/Z gameplay or SELU folders can be imported without `team_assets.json` when
+their exact archive identities are enabled by the source JB roster or the unique
+full `roster_english.iff` inside the selected overrides tree. Save roster changes
+with **Save roster to overrides** before selecting that tree. A missing container
+uses the same owner's Home bank as its structural template; nested DDS artwork
+still takes priority over TXTR. Preparation reports the template filename, and
+build preflight supplies a missing linked gameplay/SELU partner through the normal
+Home fallback. New archive IDs are written to the rebuilt TOC.
+
+Folders not linked by that effective roster are rejected; their names alone do
+not activate uniforms. Conflicting rosters/templates, missing Home sources, links
+and ambiguous identities remain errors. Existing explicit team-assets manifests
+retain their source-roster checks. Selecting a folder never alters its files or
+the source JB. Gameplay compatibility is not certified by structural validation.
 
 ---
 
@@ -4651,6 +5356,178 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+# v1.22 alternate discovery and PR integration
+
+Targeted: `python -m pytest tests/test_team_assets.py tests/test_folder_overrides.py
+tests/test_parallel_overrides.py tests/test_output_path_spelling.py -q -o addopts=`:
+**59 passed**. New regressions
+cover manifest-free roster-enabled SELU additions with raw/DDS input in serial and
+spawned workers, exact virtual metadata byte ranges, unchanged new container
+retention, build-time partner fallback, synthetic final TOC and source preservation.
+Unlinked alternate names are rejected with a corrective message. A bounded stress
+reproduction traced the prior intermittent worker failure to Windows returning a
+resolved path with a Win32 extended prefix. Normalization now retains source and
+output-root guards; drive and UNC spelling regressions pass. No original game
+or override writes, RPCS3/gameplay or testing JB. Earlier combined source verification: **963 passed, 10 optional skips, 2 deselected**;
+compile, CLI/offscreen Qt, Ruff, mypy, handoff and diff checks pass. Exact-head
+isolated, CI and packaged verification results are recorded in the release PR.
+
+# Unreleased donor header / allocation protocol follow-up
+
+Twelve-file targeted animation suite: 160 passed. New synthetic cases cover target
+header layout, exact resampled component data, preserved timing bits, fingerprint-
+bound authoring assertions, missing/opaque metadata/events/auxiliary dependencies,
+budget rejection before expansion, huge-input/float-conversion guards, exact aligned
+budget acceptance, relocation
+roundtrip, allocation failure, write/readback rollback, concurrent reader retirement,
+shutdown, overlap quarantine, uncertain-free no-retry, callback reentry, and heap
+generation/rebinding fences during allocation, readback, leasing and release.
+
+The shareable revision-guarded Ghidra instruction harness passes four native-wrapper
+cases: inherited/alternate heap policy, null allocation and release. It traps a
+synthetic heap callback and checks arguments plus TOC restoration; actual heap
+allocation/free, native publication/readers and gameplay are not exercised.
+
+Read-only actual signature-bank audit: 918 resolved nonempty slots including 458
+aliases, 911 referenced headers / 456 resolved payloads / zero dependency or alias
+metadata-count errors. Known component projection is 12,307,462 bytes excluding
+auxiliary/opaque payloads, alignment, registration, heap overhead and existing CH
+assets. All 806 bounded selector curves pass, totaling 35,852 bytes; their cross-
+game meanings remain unresolved. No real-game metadata contract or donor shot is
+certified. Original sources remain unchanged. RPCS3/hardware/gameplay NOT RUN;
+automatic/testing JB NOT BUILT. Full portable/exact-head results are in PR45.
+
+# Unreleased target header residency follow-up
+
+Nine-file animation regression suite: 123 passed. New cases cover complete later
+track extents/BSS rejection, metadata retention, shared dependency storage, source
+immutability, exact relocation/inverse at different bases, wrong declared pointer
+state, malformed metadata, missing sentinel, output budget, unknown auxiliary
+extents and header overlap. Allocation tests cover image reservation after TLS,
+physical padding and a virtual collision despite free file padding. Deep
+registration checks reject a header that passes shallow mask checks but lacks
+valid counts/tracks. Source portable verification: 832 passed, 9 optional skips, 2 deselected; compile,
+CLI/offscreen Qt startup, Ruff, mypy, handoff and diff checks pass. Exact-head
+isolated results are recorded in PR45.
+
+Private read-only corpus: 7,055 inspected target headers, zero errors; all 2,522
+supported headers pass owned-image preparation/relocation/inverse byte equality.
+Largest image: 126,996 bytes. All 224 distinct headers from 112 stock shot rows
+pass full dependency extents. Separate stock-backed resident probe: 113 rows,
+112 original rows preserved, 4,656-byte image, 9,648-byte total allocation within
+14,848 available padding bytes, no borrowed motion pointers, exact diff allowlist
+and reparse pass. Original source hashes unchanged. No donor header is derived,
+no native heap/demand loader is installed, and no gameplay compatibility is claimed.
+No emulator, hardware, automatic/testing JB or release build was run.
+
+# Unreleased runtime adapter follow-up
+
+Targeted command: `python -m pytest tests/test_motion_sampling.py
+ tests/test_donor_registry.py tests/test_motion_events.py tests/test_motion_bind.py
+ tests/test_shot_registration.py tests/test_motion_frames.py
+ tests/test_embedded_motion.py tests/test_motion_envelope.py -q -o addopts=`:
+108 passed. Full source portable verification: 817 passed, 9 optional skips,
+2 deselected; exact-head isolated verification is recorded in the PR handoff.
+
+New tests compare every integer tick of a nontrivial pose/root fixture against
+full expansion, exercise cache eviction and stale/closed input rejection, and
+reject later-key BSS overlap, inconsistent duration and unsupported unpacked mode.
+Registry fixtures cover category bounds, typed cross-bank identity, ambiguity,
+nonzero runtime pointers, unknown selection kinds and output-input protection.
+Event regression compares the four native cache timing fields and rejects a
+convenient but incorrect global ID decrement.
+
+Private read-only audit: 28,722 samples / 9,574 unique streams / zero errors;
+peak retained payload 65,536 bytes under the 65,536-byte budget. Seven explicit
+event rules accept 3,616 tables (including empty), with 2,337 actual converted
+rows; 5,958 tables remain blocked. Registry: 988 entries / 31 categories /
+2,478 uniquely resolved nonempty references / 320 empty slots, with no missing
+or ambiguous identities. This does not establish full group payload semantics.
+Source analysis ELF hashes remain unchanged. No emulator, hardware, native hook,
+full runtime memory test or automatic/testing JB was run. No playable port claimed.
+
+# Unreleased canonical bind / registration phase
+
+Targeted animation regression suite:66 passed. Source portable verification:
+781 passed,9 optional skips,2 deselected before the final unpacked-mode guard; compile,CLI/Qt smoke,Ruff,mypy,
+handoff and diff checks passed. Exact committed-head verification is recorded
+in the PR handoff. Tests cover bind mismatch rejection, mask/count agreement, all five observed
+translation counts, decoded-pose equivalence, padding/reverse-byte preservation,
+changed native consumers/ranges, TLS-safe zero-padding planning, mirror-selector
+parity and opaque-payload refusal after consumer inspection.
+
+Private read-only corpus:7,055 CH and18,831 NBA11 headers pass canonical-channel
+validation.9,574 NBA11 pose streams/341,823 keys/49,278,288 bytes pass conversion
+and exact reverse checks; no component-preparation errors. Of9,574 event tables,
+2,674 use only the verified subset (including empty tables),6,900 remain blocked.
+Traced payload reads pass for151 event90,1117 event92,71 event93,47 event94,
+1260 event173,23 event178 and187 event186 rows; no extent errors.
+
+The authorized separate registration-only decoded ELF reparses at113 entries,
+preserves112 original records, TLS and adjacent label pointers, and passes an
+exact diff allowlist. This is structural evidence only, not runtime registration.
+Source hashes are unchanged. No game assets/binaries/reports are tracked or
+published; no RPCS3, hardware or automatic/testing JB was used.
+# Native-only continuity and Legacy diagnostics — 2026-10-21
+
+Targeted: `python -m pytest tests/test_legacy_recruiting_gui.py
+tests/test_recruit_pool.py tests/test_transfer_portal.py tests/test_cli.py
+tests/test_legacy_save_adapter.py -q -o addopts=`: **94 passed**. Six new Qt cases
+cover immutable data/history, metadata/preferences, filtering, unknown profile and
+malformed-table handling, changed/closed-source callbacks, editor entry and view
+invalidation. No transfer/sign/save actions exist in the diagnostic view. An initial
+sandboxed run hit three temporary-directory setup permission errors (91 passed);
+the rerun with normal temporary-directory access passed all 94. Focused Ruff and
+module mypy pass.
+
+Private read-only Ghidra continuation establishes annual regeneration, native
+commitment, player-to-recruit copying/class mismatch and reusable-player-pool
+operations. Eight callsites, five tail branches and the 2,500-entry pool bound
+independently match raw PowerPC. Original ELF digest and byte equality pass.
+No executable patch, native portal, historical-stat/team-link writer or in-game
+continuity validation is claimed. RPCS3/gameplay NOT RUN; testing JB NOT BUILT.
+Full source portable verification: **847 passed, 10 optional skips, 2 deselected**;
+compile, CLI/offscreen Qt startup, Ruff, mypy, handoff and diff checks pass.
+Exact-head isolated portable results are recorded in PR46.
+
+# Native recruiting pool and persistence continuation — 2026-10-21
+
+Targeted: `python -m pytest tests/test_recruit_pool.py tests/test_transfer_portal.py
+tests/test_cli.py tests/test_legacy_save_adapter.py -q -o addopts=`: **88 passed**.
+New module/tests pass focused Ruff/import formatting and module mypy. Source
+read-only CLI audit verifies all 2,000 reserved stock recruit records (432,000 bytes)
+are blank and explicitly does not certify slot reuse. Private source/digest checks
+pass; native constant getters independently match section size 0x415A4 and aggregate
+relative offset 0x11418. Ghidra/raw instruction traces establish list ownership,
+serializers and destructive-to-new-object recruit conversion. No original writes.
+Exact-head isolated portable results are recorded in the PR handoff. No offseason
+save supplied, save roundtrip/gameplay/emulator NOT RUN, testing JB NOT BUILT.
+
+# Transfer recruiting policy follow-up — 2026-10-21
+
+Synthetic targeted suite: `python -m pytest tests/test_transfer_portal.py -q -o
+addopts=`: **42 passed**. Covers all college class/RS labels, rejection of HS/unknown
+classes and transfer-status-as-RS, stable/order-independent priorities, framed
+identities, rejection sampling, three distinct preference winners, capacity/source/
+eligibility filters, duplicate identities and malformed/nonfinite metrics.
+All 96 reconstructed profiles match an independent native-loop-order audit and
+source float32 weights; source digest and byte equality remain unchanged. Invalid
+uninitialized profile indices are rejected. Focused Ruff format/check and module
+mypy passed. Native read-only follow-up confirms HS/JC label
+codes, separate recruit class/preference fields, localization captions, geography,
+position-depth and recruit-rank consumers. No game execution or native record writes.
+Exact-head isolated portable results are recorded in the PR handoff.
+
+# Legacy transfer feasibility research — 2026-10-21
+
+Documentation-only update. Read-only Ghidra generated 17 focused function reports;
+PowerPC instructions and constants independently checked. Private audit passes
+source digest/byte equality, the chance subtraction instruction, 3.0/0.66 constants,
+eight state-gate cases and 0x12CC = 401 x 12 arithmetic. Static evidence only:
+no game execution, measured transfer distribution, save roundtrip, modified EBOOT
+or JB. No editor runtime behavior changes, so runtime suites are not rerun.
+Documentation/handoff/diff validation is recorded in the PR handoff.
 
 # v1.21 animation event bridge
 

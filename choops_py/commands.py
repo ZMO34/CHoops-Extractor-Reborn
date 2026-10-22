@@ -6,6 +6,7 @@ class Command:
     options: tuple = ()
     output_file: bool = False
 COMMANDS={
+    'inspect-recruit-pool':Command(('input','output'),('recruit-pool',),True),
     'export-uniform-models':Command(('source','output')),
     'modern-fit-uniforms':Command(('source','output')),
     'import-uniform-models':Command(('edited','output')),
@@ -14,6 +15,10 @@ COMMANDS={
     'inspect-animations':Command(('input','output')),
     'inspect-animation-links':Command(('input','profile','output')),
     'inspect-embedded-motion':Command(('input','profile','output')),
+    'inspect-motion-bind':Command(('input','target_elf','output')),
+    'inspect-shot-registration':Command(('input','output'),('motion-extents',)),
+    'sample-native-motion':Command(('input','target_elf','address','seconds','output'),('motion-sampler',)),
+    'inspect-donor-registry':Command(('input','profile','output'),('related-banks',)),
     'inspect-motion-events':Command(('input','profile','address','output'),('motion-events',)),
     'transcode-motion-events':Command(('input','profile','address','contract','output'),('motion-events',)),
     'inspect-scorebug-runtime':Command(('input','output')),

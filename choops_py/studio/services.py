@@ -218,7 +218,7 @@ def stage_folder(source: Path, folder: Path, mod: Path, job=None, *, workers=Non
     from ..archive.folder_import import discover
     from ..archive.parallel_import import compiled_groups,prior_cache
     from ..archive.build_copy import preflight
-    from ..archive.manifests import write_bytes,digest
+    from ..archive.manifests import write_bytes,digest,resolved_path
     archive=Archive(source);folder=Path(folder);mod=safe_output(mod,[source,folder])
     requested_mod = mod
     reuse=prior_cache(mod)
@@ -229,9 +229,11 @@ def stage_folder(source: Path, folder: Path, mod: Path, job=None, *, workers=Non
         suffix += 1
     job=job or JobContext()
     base = archive
-    if (folder/'team_assets.json').is_file():
+    from ..archive.hash_names import replacement_hash
+    if (folder/'team_assets.json').is_file() or any(e['hash']==replacement_hash('roster_english.iff') for e in base.entries):
         from ..modding.team_assets import AdditionInputs
-        archive = AdditionInputs(base, folder)
+        virtual = AdditionInputs(base, folder)
+        if virtual.additions or (folder/'team_assets.json').is_file():archive = virtual
     discovery=discover(archive,folder,job)
     if getattr(archive,'logo_templates',None):
         for group in discovery['groups']:
@@ -270,7 +272,7 @@ def stage_folder(source: Path, folder: Path, mod: Path, job=None, *, workers=Non
             if group and group['whole'] and not group['dds'] and not group['records'] and not group['package_records'] and digest(group['whole'].read_bytes())==item.get('sha256'):
                 fallback_rows.append(item)
         if fallback_rows:save_json(work/'alternate_fallbacks.json',fallback_rows,[source,folder])
-        report_warnings=[item['message'] for item in fallback_rows]
+        report_warnings=[item['message'] for item in fallback_rows] + getattr(archive,'discovery_warnings',[])
         save_json(work/'source_preconditions.json',dict(schema=1,entries=conditions),[source,folder])
         save_json(work/'import_options.json',dict(schema=1,allow_archive_growth=True,dds_priority=True,scne_priority=True),[source,folder])
         from .live_overrides import describe_groups
@@ -284,7 +286,7 @@ def stage_folder(source: Path, folder: Path, mod: Path, job=None, *, workers=Non
         work.rename(mod)
         return report
     except BaseException:
-        if work.exists() and work.resolve().is_relative_to(OUTPUT.resolve()):shutil.rmtree(work)
+        if work.exists() and resolved_path(work).is_relative_to(resolved_path(OUTPUT)):shutil.rmtree(work)
         raise
     finally:
         from ..texture_tools.conversion_cache import _maintain

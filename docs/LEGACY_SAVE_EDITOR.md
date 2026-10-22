@@ -21,9 +21,18 @@ they cannot shift data in the enclosing save. Exporting a detached USERDATA
 payload is disabled for this profile because it would omit the surrounding mode
 state.
 
-The editor currently exposes only the confirmed roster fields. Season,
-recruiting, schedule, progression, and other Legacy-specific data remain
-uninterpreted and unchanged. The request is to make all Legacy data editable;
+The editor changes only the confirmed roster fields. **Recruiting diagnostics…**
+now opens a read-only, searchable view of the native recruit table: HS/JUCO class,
+commitment, location ID, preference profile/weights and metadata issues. Missing
+or malformed tables are reported as unavailable; no speculative fields are
+made editable. The view does not certify available recruit slots or full interest
+and history semantics. See [LEGACY_TRANSFER_PORTAL.md](LEGACY_TRANSFER_PORTAL.md).
+
+The requested transfer portal must operate fully in game while preserving player
+statistics and historical school associations. No external save-editing, transfer
+plan application or signing workflow is added. The native portal remains
+unfinished. Season, schedule, progression and other unestablished Legacy-specific
+data stay unchanged. The earlier request was to make all Legacy data editable;
 that broader support is not yet implemented because this single save cannot
 show which opaque bytes correspond to which values.
 

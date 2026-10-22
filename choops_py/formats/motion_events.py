@@ -17,12 +17,106 @@ MAX_EVENTS = 100000
 MAX_INPUT = 256 * 1024 * 1024
 PROFILES = {"college-hoops-2k8": 8, "nba-2k11": 12}
 
+# Only individually traced reads, not inferred complete payload layouts. The
+# roles describe native operations, not unproven basketball/contact labels.
+PAYLOAD_READS = {
+    90: ((0, "I", "actor-category-comparison", "0x47F4FC"),),
+    92: (
+        (0, "i", "nonzero-dispatch-index", "0x4D1B9C"),
+        (4, "f", "clamped-random-threshold", "0x4D1B9C"),
+    ),
+    93: ((0, "i", "nonzero-dispatch-table-index", "0x43903C"),),
+    94: (
+        (0, "i", "dispatch-table-index-0xA1E25C", "0x38603C"),
+        (4, "i", "identity-table-index-0xA1E200", "0x38603C"),
+    ),
+    173: (
+        (0, "i", "selection-table-index-0xA1E11C", "0x3839B8"),
+        (12, "f", "event-time-window-extension", "0x3839B8"),
+    ),
+    178: ((0, "i", "dispatch-cases-59-60-61", "0x655604"),),
+    186: ((0, "i", "selection-value-addend", "0x42EBD8"),),
+}
+
+
+def inspect_payload_consumers(raw, identity, address, *, native=False):
+    """Inspect traced payload reads without treating them as portable semantics.
+
+    Gaps, remaining size, other consumers and target enum correspondence stay
+    unresolved. This does not make opaque payloads eligible for conversion.
+    """
+    if len(raw) > MAX_INPUT or type(address) is not int or address < 0 or address % 4:
+        raise ValueError("Payload input/address exceeds bounds or alignment")
+    reader = NativeELF(raw).read if native else Binary(raw).slice
+    fields = []
+    for offset, kind, role, consumer in PAYLOAD_READS.get(identity, ()):
+        data = reader(address + offset, 4)
+        value = struct.unpack(">" + kind, data)[0]
+        fields.append(
+            dict(
+                offset=offset,
+                type=kind,
+                raw_bits=int.from_bytes(data, "big"),
+                value=value if kind != "f" or math.isfinite(value) else None,
+                role=role,
+                consumer=consumer,
+            )
+        )
+    return dict(
+        fields=fields,
+        complete_payload=False,
+        portable_semantics=False,
+        gameplay_ready=False,
+    )
+
+
+def mirrored_marker_contract():
+    """The native mirror-swapped pair plus invariant third marker, not all IDs.
+
+    NBA11 0x3806D4 and CH 0x231BB0 exchange the pair under the same mirror flag.
+    NBA11's additional marker 24 is deliberately excluded. Anatomical or ball
+    contact names are not inferred from this selector alone.
+    """
+    return dict(
+        schema=1,
+        rules=[
+            dict(
+                source_id=source,
+                target_id=target,
+                payload_word=None,
+                evidence="Native mirrored selector NBA11 0x3806D4 / CH 0x231BB0",
+            )
+            for source, target in ((21, 20), (22, 21), (23, 22))
+        ],
+    )
+
+
+def curve_timing_contract():
+    """Verified selector and trajectory-cache timing roles, not all events.
+
+    Native CH 0x3073B4 / NBA11 0x46DE20 fill the same four timing fields
+    and pass them to equivalent curve normalizers CH 0x2CBEC / NBA11 0x141CC.
+    NBA11 46 maps to CH 40 here: a blanket minus-one rule is incorrect.
+    """
+    result = mirrored_marker_contract()
+    result["rules"].extend(
+        dict(
+            source_id=source,
+            target_id=target,
+            payload_word=None,
+            evidence="Native trajectory cache CH 0x3073B4 / NBA11 0x46DE20; equivalent five-float curve normalizers",
+        )
+        for source, target in ((20, 19), (37, 36), (46, 40), (38, 37))
+    )
+    return result
+
 
 def inspect_events(raw, profile, start=0, *, native=False):
     """Read relative IFF-block offsets or absolute decoded-ELF addresses.
 
-    Only NBA11 event 90 has a confirmed four-byte payload *consumer*. Other
-    payloads remain opaque; even their first word is not guessed as an enum.
+    Only NBA11 event 90 exposes a rule-selecting payload word here. Additional
+    individually traced reads have separate opt-in inspection; their complete
+    payload schemas and cross-game enum correspondence remain unresolved.
     The sentinel occupies at least four bytes, not a complete event row.
     """
     if profile not in PROFILES:

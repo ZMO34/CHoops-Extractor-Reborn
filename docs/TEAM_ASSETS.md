@@ -135,3 +135,21 @@ produces2,434 paired gameplay/SELU additions, and yields2,205 active rows (five
 per usable owner), with all original team owners retained. One final roster
 reparse validates the batch rather than rebuilding player dictionaries per team.
 This15.95-second local observation is not a portable performance guarantee.
+
+
+## Loose alternate folders (v1.22)
+
+New X/Y/Z gameplay or SELU folders can be imported without `team_assets.json` when
+their exact archive identities are enabled by the source JB roster or the unique
+full `roster_english.iff` inside the selected overrides tree. Save roster changes
+with **Save roster to overrides** before selecting that tree. A missing container
+uses the same owner's Home bank as its structural template; nested DDS artwork
+still takes priority over TXTR. Preparation reports the template filename, and
+build preflight supplies a missing linked gameplay/SELU partner through the normal
+Home fallback. New archive IDs are written to the rebuilt TOC.
+
+Folders not linked by that effective roster are rejected; their names alone do
+not activate uniforms. Conflicting rosters/templates, missing Home sources, links
+and ambiguous identities remain errors. Existing explicit team-assets manifests
+retain their source-roster checks. Selecting a folder never alters its files or
+the source JB. Gameplay compatibility is not certified by structural validation.
