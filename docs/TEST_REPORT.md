@@ -1,3 +1,26 @@
+# Unreleased history ownership and scheduling follow-up
+
+Portable verification: `python tools/dev/verify.py --python <development-python>`
+passed: **1001 passed, 10 skipped, 2 deselected**, compilation, CLI help, Qt startup,
+Ruff, mypy (18 source files), generated handoff and diff checks. Targeted five-file
+Legacy/conference suite: **123 passed**. Offscreen scheduling/history tabs were
+rendered and visually inspected; tests cover immutable snapshots and stale results.
+
+Read-only stock roster inspection: 16,000 statistics records, all five player
+history IDs empty before Legacy initialization; 5,523 schedule rows, 4,523 valid
+nonblank fixtures, 1,000 zero reserved rows, zero invalid nonblank fixtures.
+Synthetic realignment verifies fixture bytes remain unchanged and undo restores
+membership. Bracket edits reject counts above membership or 16 without mutation;
+a 20-member conference with 16 qualifiers is accepted. Pool tests cover free/owned
+collisions, duplicate IDs, sentinel handling and historical school independence.
+Native Ghidra and instruction traces establish the storage/rollover/reclamation
+and tournament-buffer evidence described in the linked research documents.
+
+The failing modern-alignment roster and offseason aggregate were unavailable.
+No live history-preservation, generated modern schedule or all-conference bracket
+compatibility claim. Original EBOOT/JB/overrides remain unchanged; RPCS3/gameplay
+NOT RUN; automatic/testing JB NOT BUILT.
+
 # Unreleased Legacy backend diagnostics
 
 Read-only Ghidra continuation traced 46 getter/serializer/loader/provider functions.

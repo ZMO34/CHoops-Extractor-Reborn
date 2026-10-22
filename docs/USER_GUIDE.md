@@ -1,3 +1,14 @@
+# Conference schedules and player history
+
+In Roster Editor → Recruiting diagnostics, use **Scheduling / tournaments** to
+inspect fixtures by current conference, missing matches, shared tournament routes
+and disabled/hardcoded policies. **Player history** shows five linked season
+records and their stored school independently of current membership. Both tabs
+are read-only and support search and row details. Realignment does not generate
+new fixtures. Tournament entrant edits cannot exceed 16 or current membership.
+See [scheduling](LEGACY_SCHEDULING.md) and [history ownership](LEGACY_HISTORY_OWNERSHIP.md)
+for remaining native integration limits.
+
 # Legacy backend research view
 
 In Roster Editor, **Recruiting diagnostics… → Legacy backend** shows the confirmed

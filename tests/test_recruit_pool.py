@@ -23,7 +23,8 @@ def pool_fixture():
     cursor = 0x100
     for field, bias, stride, _ in HEADER_TABLES.values():
         struct.pack_into(">Ii", data, field, 1, cursor - field - 4 + bias)
-        cursor += stride
+        # Keep both biased editor windows and logical native table spans disjoint.
+        cursor += stride + 0x40
         cursor = (cursor + 3) & ~3
     start = cursor
     struct.pack_into(">Ii", data, 0x48, 3, start - 0x4C + 1)

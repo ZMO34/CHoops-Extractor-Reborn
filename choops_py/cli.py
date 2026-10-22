@@ -15,6 +15,7 @@ def parser():
         s=sub.add_parser(name)
         for field in spec.fields:s.add_argument(field)
         for group in spec.options:
+            if group=='history':s.add_argument('--free-state')
             if group=='recruit-pool':
                 dependency=s.add_mutually_exclusive_group()
                 dependency.add_argument('--interest-nodes')
@@ -62,9 +63,25 @@ def execute(a):
     sources=[getattr(a,key) for key in ('source','input','cdf','dds_file','wav_file','image','mod','modded','edited','patch','timing','root_track','contract','target_elf','interest_nodes','recruiting_state') if getattr(a,key,None)]
     sources.extend(getattr(a,'related_bank',[]))
     if getattr(a, 'aggregate', None):sources.append(a.aggregate)
+    if getattr(a, 'free_state', None):sources.append(a.free_state)
     if hasattr(a,'output'):
         validator=build_destination if c=='build-copy' else safe_output
         a.output=validator(a.output,sources)
+    if c in ('inspect-legacy-history', 'inspect-legacy-schedule'):
+        from .research.legacy_history import FREE_STATE_SIZE, inspect_player_history
+        from .research.legacy_schedule import inspect_conference_schedule
+        from .research.recruit_pool import MAX_INPUT
+        from .roster.adapters import load_bytes
+        with Path(a.input).open('rb') as stream:source = load_bytes(stream.read(MAX_INPUT+1))
+        if c=='inspect-legacy-history':
+            free = None
+            if a.free_state:
+                with Path(a.free_state).open('rb') as stream:free=stream.read(FREE_STATE_SIZE+1)
+            report = inspect_player_history(source.payload, free)
+        else:report = inspect_conference_schedule(source.payload)
+        report['source_kind']=source.kind
+        save_json(a.output,report,sources)
+        return report
     if c == 'inspect-legacy-backend':
         from .research.legacy_backend import AGGREGATE_SIZE, inspect_legacy_aggregate
         from .research.recruit_pool import MAX_INPUT

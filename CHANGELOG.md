@@ -1,3 +1,11 @@
+## Unreleased — history ownership and scheduling diagnostics
+
+- Establish persistent player history IDs, historical school attribution and annual free/reclaim behavior; correct a school counter previously labelled as player state.
+- Add read-only history and conference schedule views and CLI audits, preserving unknown bytes.
+- Reject explicit conference bracket counts exceeding 16 or membership; diagnose disabled/shared routes and index-specific champion policies.
+- Fix roster audit bounds to compare native logical spans, accepting the stock biased table layout without relaxing overlap checks.
+- Modern fixture regeneration, all-conference tournaments and the playable native portal remain unfinished.
+
 ## Unreleased — Legacy backend diagnostics
 
 - Map all 17 native Legacy save components; distinguish boundaries from unresolved field meanings.

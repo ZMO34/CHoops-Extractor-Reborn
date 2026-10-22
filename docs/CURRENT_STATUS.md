@@ -1,3 +1,21 @@
+# Unreleased — history ownership and conference scheduling
+
+Established five player-owned history IDs, the shared 24-byte statistics pool,
+stored historical school indices, annual shifts and free/reclamation paths.
+Added read-only Player history and Scheduling / tournaments diagnostics plus CLI
+reports. Stock schedule has 4,523 nonblank fixtures and 1,000 reserved rows;
+realignment changes membership without regenerating those fixtures. Native
+conference brackets hold 16 entrants: explicit edits now reject larger counts
+or counts exceeding membership. This does not cap conference membership at 16.
+Ivy and Independents retain index-specific champion policies; route 96 disables
+registration. No modern fixture generator or all-conference tournament repair
+is claimed. The failing community roster has not been supplied.
+
+History storage ownership is established; durable portal binding, unsigned-player
+calendar handling and native runtime preservation remain unfinished. No playable
+portal, EBOOT patch, emulator run or testing JB. See [history](LEGACY_HISTORY_OWNERSHIP.md)
+and [scheduling](LEGACY_SCHEDULING.md).
+
 # Unreleased — Legacy backend and transfer identity diagnostics
 
 Mapped all 17 native aggregate sizes/order against original size getters and paired
@@ -5,7 +23,8 @@ save/load routines (0x15D1CC total). Added a read-only Legacy backend tab and
 `inspect-legacy-backend`: explicit aggregate only, no guessed USERDATA offset,
 per-component hashes/errors, recruiting audits, typed transfer player/school
 anchors and bounded reference-bank inspection. Unknown meanings remain named by
-native routine. History ownership, calendar interception and durable proxy binding
+native routine. This earlier phase left history ownership unresolved; the follow-up
+above establishes storage ownership. Calendar interception and durable proxy binding
 remain unfinished. No portal, executable patch, emulator run or test JB in this
 update. See [LEGACY_BACKEND.md](LEGACY_BACKEND.md) for the wider subsystem map.
 

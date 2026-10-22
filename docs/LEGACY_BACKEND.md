@@ -1,3 +1,6 @@
+Current follow-up: [history ownership](LEGACY_HISTORY_OWNERSHIP.md) and
+[scheduling / tournament limits](LEGACY_SCHEDULING.md).
+
 # Legacy backend map and portal integration
 
 Read-only research on the supplied PS3 College Hoops 2K8 executable revision.
@@ -18,7 +21,7 @@ roster alone does not inspect or update all of Legacy.
 | Transfer selection | Candidate queue, conditional frequency gates, scored destinations | Named meanings of all filters and configurable frequency |
 | Commitment | Commitment bit, school counter, interest rebuild and queues/messages | Transfer reservation, cancellation and repeated callbacks |
 | Membership | Source removal, destination addition, reusable player pool | Atomic signing with capacity guarantees |
-| Statistics/history | Menu player binding and serialized reference banks located | Authoritative career totals, historical affiliation and rollover writes |
+| Statistics/history | Five player-owned IDs, shared 24-byte records, stored historical school, rollover and free/reclaim paths | Native portal calendar integration and runtime continuity |
 | Save/load | All 17 native aggregate component sizes and order | Enclosing USERDATA location across variants and full field semantics |
 | Other Legacy systems | Bounded serialized regions mapped | Schedule, coaching, awards, rankings, tournaments and finances not comprehensively decoded |
 
@@ -52,8 +55,8 @@ component is real and does not shift subsequent components.
 | Recruiting | 0x011418 | 0x415A4 | 0x5C5468 / 0x5C57B0 |
 | Unresolved | 0x0529BC | 0x5210 | 0x5CD7E8 / 0x5CD99C |
 | Unresolved paired reference arrays | 0x057BCC | 0xC0 | 0x5C29CC / 0x5C2BEC |
-| Unresolved count + 32,000-byte block | 0x057C8C | 0x7D04 | 0x75E2B8 / 0x75E314 |
-| 1,024-record bank; meaning unresolved | 0x05F990 | 0x92004 | 0x597F94 / 0x598178 |
+| Statistics free stack | 0x057C8C | 0x7D04 | 0x75E2B8 / 0x75E314 |
+| Seasonal box-score bank | 0x05F990 | 0x92004 | 0x597F94 / 0x598178 |
 | Unresolved reference component | 0x0F1994 | 0x1D54 | 0x5BDCD8 / 0x5BE02C |
 | Unresolved reference component | 0x0F36E8 | 0xA28 | 0x590B50 / 0x591294 |
 | Unresolved indexed/reference component | 0x0F4110 | 0x1B5C | 0x592C20 / 0x592E80 |
@@ -90,8 +93,10 @@ The 0x92004 component holds a count plus 1,024 records of stride 0x248. Save/loa
 visit two sets of twelve reference columns per active row at row +8 + side*0x120
 + slot*24. Nonzero columns are roster-base-relative on disk. The inspector checks
 those exact columns and counts references outside the roster; adjacent bytes stay
-uninterpreted. Referent types, totals and historical school associations remain
-unresolved. The insertion/search path `0x597D10` bounds the bank at 1,024 records
+uninterpreted. Live and simulated game writers establish seasonal box scores;
+player participant slots also store a player index. New-season initialization
+clears the active count. This is separate from persistent player history.
+The insertion/search path `0x597D10` bounds the bank at 1,024 records
 and can recycle entries. This is not proof of unlimited historical storage or a
 fully understood career-history bank.
 
@@ -116,8 +121,8 @@ The in-game portal remains the goal; inspection supports native integration.
 
 ## Next native integration gates
 
-1. Trace statistic/history providers and reference-bank writers; establish past
-   school attribution independently of current membership.
+1. Integrate the established history ownership chain with portal calendar handling,
+   including unsigned players missed by roster-only rollover and allocator reclamation.
 2. Trace calendar dispatch and save/resume boundaries around transfer finalization
    and ordinary recruit conversion.
 3. Establish durable proxy-to-player binding and reservation that survives annual

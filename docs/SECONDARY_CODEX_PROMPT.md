@@ -88,6 +88,24 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# Unreleased — history ownership and conference scheduling
+
+Established five player-owned history IDs, the shared 24-byte statistics pool,
+stored historical school indices, annual shifts and free/reclamation paths.
+Added read-only Player history and Scheduling / tournaments diagnostics plus CLI
+reports. Stock schedule has 4,523 nonblank fixtures and 1,000 reserved rows;
+realignment changes membership without regenerating those fixtures. Native
+conference brackets hold 16 entrants: explicit edits now reject larger counts
+or counts exceeding membership. This does not cap conference membership at 16.
+Ivy and Independents retain index-specific champion policies; route 96 disables
+registration. No modern fixture generator or all-conference tournament repair
+is claimed. The failing community roster has not been supplied.
+
+History storage ownership is established; durable portal binding, unsigned-player
+calendar handling and native runtime preservation remain unfinished. No playable
+portal, EBOOT patch, emulator run or testing JB. See [history](LEGACY_HISTORY_OWNERSHIP.md)
+and [scheduling](LEGACY_SCHEDULING.md).
+
 # Unreleased — Legacy backend and transfer identity diagnostics
 
 Mapped all 17 native aggregate sizes/order against original size getters and paired
@@ -95,7 +113,8 @@ save/load routines (0x15D1CC total). Added a read-only Legacy backend tab and
 `inspect-legacy-backend`: explicit aggregate only, no guessed USERDATA offset,
 per-component hashes/errors, recruiting audits, typed transfer player/school
 anchors and bounded reference-bank inspection. Unknown meanings remain named by
-native routine. History ownership, calendar interception and durable proxy binding
+native routine. This earlier phase left history ownership unresolved; the follow-up
+above establishes storage ownership. Calendar interception and durable proxy binding
 remain unfinished. No portal, executable patch, emulator run or test JB in this
 update. See [LEGACY_BACKEND.md](LEGACY_BACKEND.md) for the wider subsystem map.
 
@@ -3258,6 +3277,12 @@ changes reference overlays only and does not simulate a new runtime floor shader
 
 Embedded source: docs/CONFERENCE_ASSETS.md
 
+Current scheduling evidence: [LEGACY_SCHEDULING.md](LEGACY_SCHEDULING.md).
+Membership edits do not regenerate fixtures, seed lists or tournament registration.
+Explicit tournament entrant edits are bounded by both membership and the confirmed
+16-entry native bracket buffer. Existing unsafe values are reported, not silently
+rewritten. A 20-member conference may use a 16-entrant qualifying bracket.
+
 # Conference assignment, logos and tournament evidence
 
 School → References → Conference shows the name and numeric index. Double-click
@@ -5367,6 +5392,29 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+# Unreleased history ownership and scheduling follow-up
+
+Portable verification: `python tools/dev/verify.py --python <development-python>`
+passed: **1001 passed, 10 skipped, 2 deselected**, compilation, CLI help, Qt startup,
+Ruff, mypy (18 source files), generated handoff and diff checks. Targeted five-file
+Legacy/conference suite: **123 passed**. Offscreen scheduling/history tabs were
+rendered and visually inspected; tests cover immutable snapshots and stale results.
+
+Read-only stock roster inspection: 16,000 statistics records, all five player
+history IDs empty before Legacy initialization; 5,523 schedule rows, 4,523 valid
+nonblank fixtures, 1,000 zero reserved rows, zero invalid nonblank fixtures.
+Synthetic realignment verifies fixture bytes remain unchanged and undo restores
+membership. Bracket edits reject counts above membership or 16 without mutation;
+a 20-member conference with 16 qualifiers is accepted. Pool tests cover free/owned
+collisions, duplicate IDs, sentinel handling and historical school independence.
+Native Ghidra and instruction traces establish the storage/rollover/reclamation
+and tournament-buffer evidence described in the linked research documents.
+
+The failing modern-alignment roster and offseason aggregate were unavailable.
+No live history-preservation, generated modern schedule or all-conference bracket
+compatibility claim. Original EBOOT/JB/overrides remain unchanged; RPCS3/gameplay
+NOT RUN; automatic/testing JB NOT BUILT.
 
 # Unreleased Legacy backend diagnostics
 

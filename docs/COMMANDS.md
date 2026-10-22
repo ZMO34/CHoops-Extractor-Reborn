@@ -1,3 +1,13 @@
+# Scheduling and history inspection
+
+`inspect-legacy-schedule ROSTER_FILE OUTPUT.json` audits fixture membership,
+conference routes and native bracket capacity without modifying the roster.
+`inspect-legacy-history ROSTER_FILE OUTPUT.json [--free-state STATE.bin]` audits
+five player history IDs and stored school indices. The optional state is the
+separately identified 0x7D04 statistics free-stack component, not a whole save.
+Both inputs are protected from output overwrites. Reports may contain game-derived
+metadata and should remain private. Unknown fields remain uninterpreted.
+
 # Native Legacy backend inspection
 
 `inspect-legacy-backend ROSTER_FILE NATIVE_AGGREGATE.bin OUTPUT.json` audits an

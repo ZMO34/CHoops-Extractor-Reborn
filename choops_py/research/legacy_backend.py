@@ -7,7 +7,7 @@ USERDATA offsets; no scanning, save mutation or portal installation is performed
 from hashlib import sha256
 from struct import unpack_from
 
-from ..roster.schema import detect_tables
+from ..roster.schema import HEADER_TABLES, detect_tables
 from .recruit_pool import inspect_recruiting_section
 
 # Order independently corroborated by 0x595C20, 0x595D64 and 0x595FB0.
@@ -20,7 +20,7 @@ COMPONENTS = (
     ("recruiting", 0x415A4, 0x5C5450, 0x5C5468, 0x5C57B0),
     ("component_5cd7e8", 0x5210, 0x5CD7D4, 0x5CD7E8, 0x5CD99C),
     ("component_5c29cc", 0xC0, 0x5C29B8, 0x5C29CC, 0x5C2BEC),
-    ("component_75e2b8", 0x7D04, 0x75E2A4, 0x75E2B8, 0x75E314),
+    ("statistics_free_stack", 0x7D04, 0x75E2A4, 0x75E2B8, 0x75E314),
     ("record_bank_597f94", 0x92004, 0x597F7C, 0x597F94, 0x598178),
     ("component_5bdcd8", 0x1D54, 0x5BDCC4, 0x5BDCD8, 0x5BE02C),
     ("component_590b50", 0xA28, 0x590B3C, 0x590B50, 0x591294),
@@ -43,11 +43,15 @@ def _roster_tables(roster):
         raise ValueError("Legacy audit requires a bounded decoded CH roster")
     tables = detect_tables(roster)
     spans = sorted(
-        (start, start + count * stride, name)
+        (
+            start + HEADER_TABLES[name][1] - 1,
+            start + HEADER_TABLES[name][1] - 1 + count * stride,
+            name,
+        )
         for name, (start, count, stride) in tables.items()
     )
     for index, (start, end, name) in enumerate(spans):
-        if start < 0xB0 or start % 4:
+        if start < 0xB0 or start % 4 or end > len(roster):
             raise ValueError(f"invalid {name} table start")
         if index and start < spans[index - 1][1]:
             raise ValueError(
@@ -130,7 +134,7 @@ def inspect_transfer_section(section: bytes, roster: bytes):
 
 
 def inspect_record_bank(section: bytes, roster: bytes):
-    """Audit only the serializer-established reference columns; meaning unknown."""
+    """Audit serializer-established box-score reference columns, not career totals."""
     if len(section) != 0x92004:
         raise ValueError("record bank must be exactly 0x92004 bytes")
     count = unpack_from(">i", section)[0]
@@ -152,10 +156,13 @@ def inspect_record_bank(section: bytes, roster: bytes):
         references_outside_roster=outside,
         referent_types_established=False,
         history_semantics_established=False,
+        role="game_box_scores_cleared_at_season_initialization",
     )
 
 
 def inspect_legacy_aggregate(aggregate: bytes, roster: bytes):
+    from .legacy_history import inspect_statistics_free_stack
+
     if (
         not isinstance(aggregate, (bytes, bytearray))
         or len(aggregate) != AGGREGATE_SIZE
@@ -169,6 +176,7 @@ def inspect_legacy_aggregate(aggregate: bytes, roster: bytes):
         recruiting=inspect_recruiting_section,
         transfers=inspect_transfer_section,
         record_bank_597f94=inspect_record_bank,
+        statistics_free_stack=inspect_statistics_free_stack,
     )
     for row in component_layout():
         start, size = row["offset"], row["bytes"]
@@ -213,8 +221,12 @@ def backend_overview():
         "Signing: ordinary recruit conversion rebuilds a player. Transfers must "
         "retain the original player and bypass that conversion. An unsigned "
         "transfer must not reach the reusable-player-pool finalizer.\n"
-        "Continuity: career stats, historical school ownership, persistent proxy "
-        "binding and calendar interception still need native tracing.\n\n"
+        "History: five player-owned IDs link 24-byte statistics records with stored "
+        "school attribution. Recruiting shares the pool; exhaustion can recycle old "
+        "history. Detached portal players need explicit rollover coverage. "
+        "Persistent proxy binding and calendar interception remain unfinished.\n"
+        "Scheduling: roster-backed fixtures are separate from conference membership. "
+        "Tournament route 96 skips event creation; inspect the Scheduling tab.\n\n"
         "Goal: in-game offseason transfer recruiting, TR class/redshirt labels, "
         "playing-time/home-distance/team-ranking priorities, CPU and user signing, "
         "scholarship checks and preserved statistics/history. No playable portal "

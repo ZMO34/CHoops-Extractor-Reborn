@@ -1,3 +1,9 @@
+Current scheduling evidence: [LEGACY_SCHEDULING.md](LEGACY_SCHEDULING.md).
+Membership edits do not regenerate fixtures, seed lists or tournament registration.
+Explicit tournament entrant edits are bounded by both membership and the confirmed
+16-entry native bracket buffer. Existing unsafe values are reported, not silently
+rewritten. A 20-member conference may use a 16-entrant qualifying bracket.
+
 # Conference assignment, logos and tournament evidence
 
 School → References → Conference shows the name and numeric index. Double-click

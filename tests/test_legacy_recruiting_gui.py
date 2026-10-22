@@ -150,3 +150,38 @@ def test_aggregate_picker_reads_only_exact_size_and_clears_failed_prior_data(
     assert dialog.backend_view.model().rowCount() == 17
     assert bytes(owner.roster.data) == before
     assert path.read_bytes() == b"wrong whole save"
+
+
+def test_schedule_and_history_tabs_inspect_snapshot_without_editing(qtbot):
+    from test_legacy_schedule_history import native_fixture
+
+    owner, dialog = diagnostics(qtbot, native_fixture())
+    before = bytes(owner.roster.data)
+    dialog.display(dialog.inspect(None))
+    assert dialog.schedule_view.model().rowCount() == 2
+    assert "5 roster fixtures" in dialog.schedule_status.text()
+    assert dialog.history_view.model().rowCount() == 2
+    assert "4 referenced statistics records" in dialog.history_status.text()
+    dialog.schedule_view.selectRow(1)
+    assert "native_tournament_event_skipped" in dialog.schedule_details.toPlainText()
+    assert "packed_record_sha256" in dialog.history_details.toPlainText()
+    assert bytes(owner.roster.data) == before and owner.roster.edits == []
+    dialog.display_research(
+        {
+            "scheduling": {"error": "unavailable"},
+            "player_history": {"error": "unavailable"},
+        }
+    )
+    assert dialog.history_details.toPlainText() == ""
+    assert dialog.schedule_details.toPlainText() == ""
+
+
+def test_stale_worker_cannot_fill_schedule_or_history_tabs(qtbot):
+    from test_legacy_schedule_history import native_fixture
+
+    owner, dialog = diagnostics(qtbot, native_fixture())
+    report = dialog.inspect(None)
+    owner.roster.data[-1] ^= 1
+    dialog.display(report)
+    assert dialog.schedule_view.model() is None
+    assert dialog.history_view.model() is None

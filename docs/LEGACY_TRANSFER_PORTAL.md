@@ -1,3 +1,6 @@
+Latest evidence: [persistent history ownership](LEGACY_HISTORY_OWNERSHIP.md),
+including unsigned rollover and reclamation hazards; [conference scheduling](LEGACY_SCHEDULING.md).
+
 # Legacy transfers and a recruitable portal: feasibility
 
 Continuation: [Legacy backend and aggregate diagnostics](LEGACY_BACKEND.md)
@@ -33,7 +36,7 @@ fully recruitable pool nor increased transfer rates have been implemented here.
 | Generate outgoing queue | `0x5B4E50` | Resets queue, checks Legacy context +0x204, traverses schools and players, applies eligibility/state and chance/value gates, then enqueues candidates. The exact setting name of +0x204 is unresolved. |
 | Insert/sort candidate | `0x5BCA74` | Stores a 12-byte row: player pointer, source-school pointer, destination-school pointer initially zero. Orders rows using the position-aware player evaluation at `0x74AA30`. |
 | Select destinations | `0x5BCCF4` | Scores candidate schools using capacity/availability, a per-school arrival counter, player/school values, distance and other terms; excludes matching source/destination school identities. Retains the best score rather than a random school index. Full term semantics remain incomplete. |
-| Finalize transfer | `0x5BC250` | Removes players from source membership, updates a player count byte, sets scholarship and Transfer sit-out status, then adds destination membership. A zero destination takes a separate removal path; it is not a proven safe uncommitted portal state at finalization. |
+| Finalize transfer | `0x5BC250` | Removes players from source membership, updates a source-school counter byte, sets scholarship and Transfer sit-out status, then adds destination membership. A zero destination takes a separate removal path; it is not a proven safe uncommitted portal state at finalization. |
 | Reconcile school state | `0x5BC990` | Adjusts packed school counters around the queued source/destination records. Precise neighboring counter meanings require further tracing. |
 | Save/load queue | `0x5BC660` / `0x5BC854` | Serializes count plus 0x12CC bytes, temporarily rebases the three pointer columns against the roster base, and restores native addresses. The enclosing save-file offset is not established. |
 
@@ -415,7 +418,7 @@ authoritative identity; a new player created from this proxy would fail continui
 ### Player lifetime and membership hazards
 
 The original transfer finalizer `0x5BC250` removes source membership first and
-increments runtime player +0x2A4. Its zero-destination branch calls `0x74410C`.
+increments runtime source-school +0x2A4 (corrected from the earlier player claim). Its zero-destination branch calls `0x74410C`.
 That wrapper resolves through `0x49FF74 -> 0x1BC014` to a player pointer pool and
 through `0x49D684 -> 0x1AE8D4` to **append that player to the reusable pool**, with
 an observed 2,500-entry limit. It must never run for a still-recruitable portal
@@ -467,8 +470,9 @@ Native player statistics menu/provider registration is now located through
 `PlayerCardMenu_StatsMenu` and callbacks including `0x68C8C0`, which passes the
 selected player into the menu binding path. This is a starting point for tracing
 stat/history consumers, **not proof of complete career-stat or historical-team
-storage semantics**. Those storage/link owners, proxy persistence and the exact
-calendar interception window remain unresolved. Keeping an ID alone cannot
+storage semantics**. Subsequent [history ownership research](LEGACY_HISTORY_OWNERSHIP.md)
+establishes the five IDs, stored school, rollover and free/reclaim paths. Proxy
+persistence, calendar interception and runtime continuity remain unresolved. Keeping an ID alone cannot
 certify history preservation. No native patch or playable portal is installed.
 
 ### Legacy editor diagnostics

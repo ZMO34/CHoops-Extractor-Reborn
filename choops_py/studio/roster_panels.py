@@ -21,6 +21,7 @@ from ..roster.schema import (
     REFERENCES,
     STRING_FIELDS,
     CONFERENCE_SCALARS,
+    CONFERENCE_TOURNAMENT_CAPACITY,
     JERSEY_SHAPES,
 )
 from ..roster.shoes import FIELDS, choices, BRANDS, texture_name
@@ -483,13 +484,16 @@ class RecordDetails(QTabWidget):
                 self.apply(key, values[labels.index(text)])
         else:
             size = CONFERENCE_SCALARS.get(key, (0, 2))[1]
+            maximum = (1 << (size * 8)) - 1
+            if self.table=='conferences' and key=='tourney_slots':
+                maximum=min(CONFERENCE_TOURNAMENT_CAPACITY,len(set(row['team_indices'])))
             value, ok = QInputDialog.getInt(
                 self,
                 "Edit " + item.text(0),
                 item.text(0),
-                current,
+                min(current, maximum),
                 0,
-                (1 << (size * 8)) - 1,
+                maximum,
             )
             if ok:
                 self.apply(key, value)
