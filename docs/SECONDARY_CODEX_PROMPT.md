@@ -88,6 +88,77 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# Unreleased - dual recruiting-pool ownership and exhaustion proof
+
+Implemented the second native recruiting graph: all school +0x260 lists and its
+independent free chain, exact serialized recruit anchors, duplicate/cycle/shared
+ownership rejection, cleared free-node validation and full 16,000-node coverage.
+Both pool audits now expose snapshot free counts; complete coverage is distinct
+from a future native reservation budget. The Legacy editor adds a Recruiting node
+pools tab, using the same backend as both existing inspection commands. Corrupt
+second-pool data remains a local diagnostic; stale/failed loads clear old rows.
+
+Ten bounded Ghidra instruction cases confirm second-pool initialization/release,
+school lookup, offer-bit preservation, first-pool exhaustion and commitment order.
+In an exhausted/no-existing-interest synthetic case, 0x5C8CD8 sets commitment and
+decrements the school counter before 0x5C3144 returns -1. Following instructions
+lack an allocation-result guard before indexed stores. Future portal hooks must
+reserve capacity and guard before mutation; the stock routine alone is unsafe.
+
+This closes the structural second-pool ownership gap, not native proxy admission,
+reservation/rollback, UI hooks, save/resume or the requested playable portal.
+The full Legacy editor and native portal remain unfinished. No actual offseason
+state was available for this pass. Original executable/assets/saves unchanged;
+no RPCS3/gameplay run or testing JB. See LEGACY_PORTAL_IMPLEMENTATION.md.
+
+# Unreleased — portal callback, tuning and persistence investigation
+
+Recovered native postseason/rollover callback order; confirmed Confidence as the
+secondary transfer gate and identified offer/refund/commitment counter paths.
+Found the fixed 2,000-recruit CPU loop and16,000-byte sort buffer that must change
+before additional proxies can participate safely. Dynamic recruit save rebasing
+is confirmed; saved transfer queue order suggests a binding design that freezes
+after insertion. Proposed valid preference profiles can persist the three portal
+priorities without borrowing unknown fields. Native lifecycle integration is not
+installed or certified.
+
+Identified Media/Coaches/Mid-Major/RPI poll tables, with read-only aggregate audits.
+Added a Portal research tab and offline single-precision transfer-tuning policy;
+these are explicitly not working in-game settings. Complete proxy setup, protected
+cleanup, allocation/node budgets, scholarship rollback and phase-specific native
+save/resume proof remain implementation gates. See [implementation contract](LEGACY_PORTAL_IMPLEMENTATION.md).
+No EBOOT mutation, emulator run or testing JB.
+
+# Unreleased — history ownership and conference scheduling
+
+Established five player-owned history IDs, the shared 24-byte statistics pool,
+stored historical school indices, annual shifts and free/reclamation paths.
+Added read-only Player history and Scheduling / tournaments diagnostics plus CLI
+reports. Stock schedule has 4,523 nonblank fixtures and 1,000 reserved rows;
+realignment changes membership without regenerating those fixtures. Native
+conference brackets hold 16 entrants: explicit edits now reject larger counts
+or counts exceeding membership. This does not cap conference membership at 16.
+Ivy and Independents retain index-specific champion policies; route 96 disables
+registration. No modern fixture generator or all-conference tournament repair
+is claimed. The failing community roster has not been supplied.
+
+History storage ownership is established; durable portal binding, unsigned-player
+calendar handling and native runtime preservation remain unfinished. No playable
+portal, EBOOT patch, emulator run or testing JB. See [history](LEGACY_HISTORY_OWNERSHIP.md)
+and [scheduling](LEGACY_SCHEDULING.md).
+
+# Unreleased — Legacy backend and transfer identity diagnostics
+
+Mapped all 17 native aggregate sizes/order against original size getters and paired
+save/load routines (0x15D1CC total). Added a read-only Legacy backend tab and
+`inspect-legacy-backend`: explicit aggregate only, no guessed USERDATA offset,
+per-component hashes/errors, recruiting audits, typed transfer player/school
+anchors and bounded reference-bank inspection. Unknown meanings remain named by
+native routine. This earlier phase left history ownership unresolved; the follow-up
+above establishes storage ownership. Calendar interception and durable proxy binding
+remain unfinished. No portal, executable patch, emulator run or test JB in this
+update. See [LEGACY_BACKEND.md](LEGACY_BACKEND.md) for the wider subsystem map.
+
 # v1.22 — new alternate folder discovery
 
 Windows extended drive/UNC path spellings are normalized consistently, fixing the
@@ -3247,6 +3318,12 @@ changes reference overlays only and does not simulate a new runtime floor shader
 
 Embedded source: docs/CONFERENCE_ASSETS.md
 
+Current scheduling evidence: [LEGACY_SCHEDULING.md](LEGACY_SCHEDULING.md).
+Membership edits do not regenerate fixtures, seed lists or tournament registration.
+Explicit tournament entrant edits are bounded by both membership and the confirmed
+16-entry native bracket buffer. Existing unsafe values are reported, not silently
+rewritten. A 20-member conference may use a 16-entrant qualifying bracket.
+
 # Conference assignment, logos and tournament evidence
 
 School → References → Conference shows the name and numeric index. Double-click
@@ -5356,6 +5433,104 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+# Unreleased dual-pool ownership verification
+
+Windows/Python 3.12, Qt offscreen. Full portable runner:
+python tools/dev/verify.py --python DEVELOPMENT_PYTHON
+passed **1063 tests, 10 skipped, 2 deselected**, compilation, CLI help, Qt startup,
+Ruff, mypy (18 files), generated handoff and diff checks. Separate new research
+module checks found no fatal/undefined-name issues. Source executable equality
+against the earlier private audit was verified. The node-pool tab was rendered
+with an explicitly loaded Windows font for offscreen visual inspection.
+
+Targeted command:
+python -m pytest tests/test_school_recruiting.py tests/test_recruit_pool.py tests/test_legacy_backend.py tests/test_legacy_recruiting_gui.py -q
+passed **96 tests**. Covers exact recruit anchors, full 16,000-node free and live
+chains, saturation, cycles, shared/live-free ownership, duplicate recruits,
+preserved unknown flags, partial ownership, corrupt second-pool diagnostics,
+both CLI/backend paths, GUI counts and stale/failed-load clearing.
+
+RecruitingPoolTrace.java, run on the observed decoded analysis project with
+-readOnly -noanalysis, passed **10 bounded native instruction cases**. Cases
+cover initialization and neighboring bytes, release/free links, first-node,
+last-node and exhausted allocation, present/missing/empty school lookups,
+offer-bit-only clearing and the exhausted commitment prefix. Synthetic memory
+only; the commitment case stops before external school lookup and invalid stores.
+The script rejects existing report paths and checks the observed pool topology.
+These are instruction-contract checks, not execution of the game.
+
+No actual offseason save, native proxy insertion, signing transaction or native
+save/resume acceptance is verified. Original inputs remain unchanged. RPCS3/gameplay
+NOT RUN; automatic/testing JB NOT BUILT.
+
+# Unreleased native portal readiness investigation
+
+`python tools/dev/verify.py --python <development-python>` passed: **1036 passed,
+10 skipped, 2 deselected**, compile/CLI help, Qt startup, Ruff, mypy (18 source
+files), generated handoff and diff checks. Portal research tab rendered offscreen
+and visually inspected. Added tests reproduce all eight stock state probabilities,
+strict single-precision confidence thresholds, bounded proposed tuning, eligibility
+preservation, priority-profile scoping, native poll school anchors, missing snapshots,
+rank positions, duplicate/invalid references and the 25/26-row display boundary.
+
+A private read-only instruction auditor verifies 53-entry and17-entry callback
+sequences/order, both hardcoded 2,000-entry CPU comparisons, the16,000-byte sort
+span and its adjacent32-byte destructor boundary, native confidence getter/scaling,
+preference setter field and offer-action dispatch targets. Focused Ghidra and
+original instructions establish the poll mode/table and serialization evidence.
+Original decoded executable digest remained unchanged. Native code listings,
+private paths, game data and raw reports are excluded from Git.
+
+No actual offseason recruiting save/aggregate was available. New-proxy setup,
+node-allocation limits, scholarship rollback and native phase/save/resume behavior
+are not certified by these tests. No portal, executable patch or game settings
+were installed. RPCS3/gameplay NOT RUN; automatic/testing JB NOT BUILT.
+
+# Unreleased history ownership and scheduling follow-up
+
+Portable verification: `python tools/dev/verify.py --python <development-python>`
+passed: **1001 passed, 10 skipped, 2 deselected**, compilation, CLI help, Qt startup,
+Ruff, mypy (18 source files), generated handoff and diff checks. Targeted five-file
+Legacy/conference suite: **123 passed**. Offscreen scheduling/history tabs were
+rendered and visually inspected; tests cover immutable snapshots and stale results.
+
+Read-only stock roster inspection: 16,000 statistics records, all five player
+history IDs empty before Legacy initialization; 5,523 schedule rows, 4,523 valid
+nonblank fixtures, 1,000 zero reserved rows, zero invalid nonblank fixtures.
+Synthetic realignment verifies fixture bytes remain unchanged and undo restores
+membership. Bracket edits reject counts above membership or 16 without mutation;
+a 20-member conference with 16 qualifiers is accepted. Pool tests cover free/owned
+collisions, duplicate IDs, sentinel handling and historical school independence.
+Native Ghidra and instruction traces establish the storage/rollover/reclamation
+and tournament-buffer evidence described in the linked research documents.
+
+The failing modern-alignment roster and offseason aggregate were unavailable.
+No live history-preservation, generated modern schedule or all-conference bracket
+compatibility claim. Original EBOOT/JB/overrides remain unchanged; RPCS3/gameplay
+NOT RUN; automatic/testing JB NOT BUILT.
+
+# Unreleased Legacy backend diagnostics
+
+Read-only Ghidra continuation traced 46 getter/serializer/loader/provider functions.
+An independent instruction audit verified all 17 size constants and aggregate
+save/load call order; total 0x15D1CC. Original decoded executable hash remained
+unchanged. Raw reports and proprietary listings stay private. No native portal,
+executable patch, RPCS3 test or testing JB was produced for this update.
+
+Portable verification on Python 3.12/Windows: **983 passed, 10 skipped, 2
+deselected**, followed by compileall, CLI help, Qt startup smoke, configured Ruff
+checks and mypy passing. The offscreen backend tab was rendered and visually
+inspected with an explicit available font. Exact-head verification is recorded
+in the PR. Temporary fixtures must remain outside project output for the existing
+output-protection regressions; sandbox-denied hard links require an unrestricted
+test run, not changes to the production output guards.
+
+Synthetic regressions cover exact aggregate boundaries, component-local errors,
+400-active/401-stored transfer limits, typed record anchors, unsigned/duplicate
+players, reference-column bounds, input/output protection, stale GUI results and
+read-only file selection. No supplied offseason aggregate is available; real
+save correspondence and history continuity remain unverified.
 
 # v1.22 alternate discovery and PR integration
 

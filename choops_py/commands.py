@@ -7,6 +7,9 @@ class Command:
     output_file: bool = False
 COMMANDS={
     'inspect-recruit-pool':Command(('input','output'),('recruit-pool',),True),
+    'inspect-legacy-backend':Command(('input','aggregate','output'),(),True),
+    'inspect-legacy-history':Command(('input','output'),('history',),True),
+    'inspect-legacy-schedule':Command(('input','output'),(),True),
     'export-uniform-models':Command(('source','output')),
     'modern-fit-uniforms':Command(('source','output')),
     'import-uniform-models':Command(('edited','output')),

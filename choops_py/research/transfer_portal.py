@@ -196,3 +196,33 @@ def native_preference_profile(index: int) -> dict[str, tuple[int, float]]:
         name: (rank, _NATIVE_WEIGHTS[rank])
         for name, rank in zip(NATIVE_MOTIVATIONS, _NATIVE_PROFILES[index], strict=True)
     }
+
+
+# Proposed portal-only encoding in an established native preference field.
+# Current team ranking requires its own scoring/display adapter; ordinary
+# big_program motivation does not acquire that meaning automatically.
+PORTAL_PREFERENCE_INDICES = {
+    Priority.HOMETOWN: 24,
+    Priority.PLAYING_TIME: 33,
+    Priority.TEAM_RANKING: 32,
+}
+
+
+def portal_preference_index(priority: Priority) -> int:
+    """Return a valid native profile for a future, positively identified proxy."""
+    if not isinstance(priority, Priority):
+        raise ValueError("priority must be a Priority")
+    return PORTAL_PREFERENCE_INDICES[priority]
+
+
+def priority_from_profile(index: int, *, portal_proxy: bool) -> Priority | None:
+    """Never infer a portal from a profile also used by ordinary HS/JUCO recruits."""
+    if type(portal_proxy) is not bool:
+        raise ValueError("portal_proxy must be a boolean")
+    if not portal_proxy:
+        return None
+    if type(index) is int:
+        for priority, profile in PORTAL_PREFERENCE_INDICES.items():
+            if profile == index:
+                return priority
+    raise ValueError("portal proxy does not have an assigned priority profile")

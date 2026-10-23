@@ -1,3 +1,40 @@
+# Recruiting node pools
+
+In Roster Editor, open **Recruiting diagnostics...**, then **Legacy backend** and
+load an explicitly identified native aggregate. **Recruiting node pools** shows
+both independent pools: live nodes, traced free nodes, unowned nodes, complete
+coverage and local corruption errors. Select a row for node/reference details.
+A failed or stale load clears old results. Counts describe this snapshot; they
+do not reserve recruiting space or enable portal signing. A whole USERDATA is
+not an aggregate.
+
+# Portal research and saved polls
+
+Recruiting diagnostics → **Portal research** shows confirmed native integration
+points and remaining proof. **Legacy backend** now audits the identified ranking/
+poll component in a separately supplied native aggregate, including current Media
+and Coaches Top25 school references. This is read-only. Proposed transfer tuning
+is an offline API; no slider or game patch is implied. See [native portal contract](LEGACY_PORTAL_IMPLEMENTATION.md).
+
+# Conference schedules and player history
+
+In Roster Editor → Recruiting diagnostics, use **Scheduling / tournaments** to
+inspect fixtures by current conference, missing matches, shared tournament routes
+and disabled/hardcoded policies. **Player history** shows five linked season
+records and their stored school independently of current membership. Both tabs
+are read-only and support search and row details. Realignment does not generate
+new fixtures. Tournament entrant edits cannot exceed 16 or current membership.
+See [scheduling](LEGACY_SCHEDULING.md) and [history ownership](LEGACY_HISTORY_OWNERSHIP.md)
+for remaining native integration limits.
+
+# Legacy backend research view
+
+In Roster Editor, **Recruiting diagnostics… → Legacy backend** shows the confirmed
+native component map and explains the remaining transfer-portal work. An optional
+**Inspect native Legacy aggregate…** button reads a separately identified aggregate;
+it does not edit saves or install transfers. A whole USERDATA file is not an
+aggregate. See [Legacy backend evidence and limits](LEGACY_BACKEND.md).
+
 # Team assets (v1.20)
 
 Use **Team Assets** for the searchable assignment list and checked S/Home/Away/

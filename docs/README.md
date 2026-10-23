@@ -1,6 +1,6 @@
 # Documentation index
 
-Current release: **v1.19**. This index separates usable instructions from format
+Current release: **v1.22**. This index separates usable instructions from format
 research and earlier development records. A documented parser result is not proof
 of gameplay compatibility. The per-game support matrix takes precedence over
 historical claims that all related games behave identically.
@@ -15,6 +15,7 @@ historical claims that all related games behave identically.
 | Detailed existing GUI controls | [User guide](USER_GUIDE.md), [GUI](GUI.md) |
 | Team asset assignments and expansion | [Team Assets](TEAM_ASSETS.md) |
 | College Hoops rosters and side editors | [Roster editor](ROSTER_EDITOR.md), [side panels](ROSTER_SIDE_PANELS.md) |
+| Legacy backend, recruiting and transfer research | [Backend map](LEGACY_BACKEND.md), [transfer portal](LEGACY_TRANSFER_PORTAL.md), [history ownership](LEGACY_HISTORY_OWNERSHIP.md), [scheduling](LEGACY_SCHEDULING.md), [portal implementation investigation](LEGACY_PORTAL_IMPLEMENTATION.md) |
 | NBA roster editing and NBA 2K14 | [NBA evidence and limits](NBA_ROSTERS_AND_2K14.md) |
 | CSV, comparisons, text growth and previews | [Roster scale](ROSTER_SCALE_AND_PREVIEWS.md) |
 | WAV export and queued soundtrack import | [Audio workflow](AUDIO_WORKFLOW.md) |

@@ -1637,6 +1637,8 @@ class Window(QMainWindow):
         for conf in conferences:choices.addItem(str(conf['index'])+': '+conf['conference_name'],conf['index'])
         choices.setCurrentIndex(max(0,choices.findData(row.get('conference_index'))))
         form.addRow('Destination conference',choices)
+        note=QLabel('Updates membership only. Existing fixtures and tournament registration remain unchanged. Inspect Scheduling / tournaments in Recruiting diagnostics before using the alignment in Legacy.')
+        note.setWordWrap(True);form.addRow(note)
         buttons=QDialogButtonBox(QDialogButtonBox.StandardButton.Ok|QDialogButtonBox.StandardButton.Cancel)
         buttons.accepted.connect(dialog.accept);buttons.rejected.connect(dialog.reject);form.addRow(buttons)
         if dialog.exec()!=QDialog.DialogCode.Accepted:return

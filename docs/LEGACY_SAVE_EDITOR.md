@@ -36,6 +36,16 @@ data stay unchanged. The earlier request was to make all Legacy data editable;
 that broader support is not yet implemented because this single save cannot
 show which opaque bytes correspond to which values.
 
+## Recruiting node ownership
+
+The **Recruiting node pools** tab inspects both independent 16,000-node pools
+after loading a separately identified aggregate through **Legacy backend**.
+It shows live/free/unowned counts, complete coverage and corruption diagnostics.
+Live school-list references must identify exact recruit records. Node counts
+describe the loaded snapshot; portal insertion and native reservations are not
+installed. This does not change the fixed-size save writer or certify an
+aggregate's USERDATA location. See [implementation evidence](LEGACY_PORTAL_IMPLEMENTATION.md).
+
 ## Evidence needed to map more fields
 
 For each field, provide two copies of the same save slot: one before changing a

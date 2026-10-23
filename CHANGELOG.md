@@ -1,3 +1,30 @@
+## Unreleased - recruiting node ownership and exhaustion checks
+
+- Audit both 16,000-node recruiting pools, exact saved recruit references and complete disjoint coverage.
+- Show snapshot node counts and local errors in a searchable Legacy editor tab; invalidate stale displays.
+- Add ten bounded native instruction checks, including mutation before an exhausted commitment allocation.
+- Native portal signing, reservation, proxy lifecycle and save/resume remain unfinished.
+
+## Unreleased — native portal implementation investigation
+
+- Recover indirect offseason callback order, confidence-state generation and offer/refund/commitment paths.
+- Identify the 2,000-entry CPU recruiting limit and separate sort-buffer boundary; document why a roster-count-only expansion is unsafe.
+- Add native poll component audits, an editor research tab, offline transfer-gate tuning and a typed proposal for persisted portal priorities.
+- Document a queue-backed proxy design and remaining native correctness gates; no playable portal or executable patch is installed.
+
+## Unreleased — history ownership and scheduling diagnostics
+
+- Establish persistent player history IDs, historical school attribution and annual free/reclaim behavior; correct a school counter previously labelled as player state.
+- Add read-only history and conference schedule views and CLI audits, preserving unknown bytes.
+- Reject explicit conference bracket counts exceeding 16 or membership; diagnose disabled/shared routes and index-specific champion policies.
+- Fix roster audit bounds to compare native logical spans, accepting the stock biased table layout without relaxing overlap checks.
+- Modern fixture regeneration, all-conference tournaments and the playable native portal remain unfinished.
+
+## Unreleased — Legacy backend diagnostics
+
+- Map all 17 native Legacy save components; distinguish boundaries from unresolved field meanings.
+- Add a Legacy backend tab and read-only CLI for identified aggregates, including transfer identity and reference-bank audits. No playable portal or save-editing transfer workflow is installed.
+
 ## v1.22 — alternate discovery and combined research updates
 
 Windows extended drive/UNC path spellings are normalized consistently, fixing the

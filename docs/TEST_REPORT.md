@@ -1,3 +1,101 @@
+# Unreleased dual-pool ownership verification
+
+Windows/Python 3.12, Qt offscreen. Full portable runner:
+python tools/dev/verify.py --python DEVELOPMENT_PYTHON
+passed **1063 tests, 10 skipped, 2 deselected**, compilation, CLI help, Qt startup,
+Ruff, mypy (18 files), generated handoff and diff checks. Separate new research
+module checks found no fatal/undefined-name issues. Source executable equality
+against the earlier private audit was verified. The node-pool tab was rendered
+with an explicitly loaded Windows font for offscreen visual inspection.
+
+Targeted command:
+python -m pytest tests/test_school_recruiting.py tests/test_recruit_pool.py tests/test_legacy_backend.py tests/test_legacy_recruiting_gui.py -q
+passed **96 tests**. Covers exact recruit anchors, full 16,000-node free and live
+chains, saturation, cycles, shared/live-free ownership, duplicate recruits,
+preserved unknown flags, partial ownership, corrupt second-pool diagnostics,
+both CLI/backend paths, GUI counts and stale/failed-load clearing.
+
+RecruitingPoolTrace.java, run on the observed decoded analysis project with
+-readOnly -noanalysis, passed **10 bounded native instruction cases**. Cases
+cover initialization and neighboring bytes, release/free links, first-node,
+last-node and exhausted allocation, present/missing/empty school lookups,
+offer-bit-only clearing and the exhausted commitment prefix. Synthetic memory
+only; the commitment case stops before external school lookup and invalid stores.
+The script rejects existing report paths and checks the observed pool topology.
+These are instruction-contract checks, not execution of the game.
+
+No actual offseason save, native proxy insertion, signing transaction or native
+save/resume acceptance is verified. Original inputs remain unchanged. RPCS3/gameplay
+NOT RUN; automatic/testing JB NOT BUILT.
+
+# Unreleased native portal readiness investigation
+
+`python tools/dev/verify.py --python <development-python>` passed: **1036 passed,
+10 skipped, 2 deselected**, compile/CLI help, Qt startup, Ruff, mypy (18 source
+files), generated handoff and diff checks. Portal research tab rendered offscreen
+and visually inspected. Added tests reproduce all eight stock state probabilities,
+strict single-precision confidence thresholds, bounded proposed tuning, eligibility
+preservation, priority-profile scoping, native poll school anchors, missing snapshots,
+rank positions, duplicate/invalid references and the 25/26-row display boundary.
+
+A private read-only instruction auditor verifies 53-entry and17-entry callback
+sequences/order, both hardcoded 2,000-entry CPU comparisons, the16,000-byte sort
+span and its adjacent32-byte destructor boundary, native confidence getter/scaling,
+preference setter field and offer-action dispatch targets. Focused Ghidra and
+original instructions establish the poll mode/table and serialization evidence.
+Original decoded executable digest remained unchanged. Native code listings,
+private paths, game data and raw reports are excluded from Git.
+
+No actual offseason recruiting save/aggregate was available. New-proxy setup,
+node-allocation limits, scholarship rollback and native phase/save/resume behavior
+are not certified by these tests. No portal, executable patch or game settings
+were installed. RPCS3/gameplay NOT RUN; automatic/testing JB NOT BUILT.
+
+# Unreleased history ownership and scheduling follow-up
+
+Portable verification: `python tools/dev/verify.py --python <development-python>`
+passed: **1001 passed, 10 skipped, 2 deselected**, compilation, CLI help, Qt startup,
+Ruff, mypy (18 source files), generated handoff and diff checks. Targeted five-file
+Legacy/conference suite: **123 passed**. Offscreen scheduling/history tabs were
+rendered and visually inspected; tests cover immutable snapshots and stale results.
+
+Read-only stock roster inspection: 16,000 statistics records, all five player
+history IDs empty before Legacy initialization; 5,523 schedule rows, 4,523 valid
+nonblank fixtures, 1,000 zero reserved rows, zero invalid nonblank fixtures.
+Synthetic realignment verifies fixture bytes remain unchanged and undo restores
+membership. Bracket edits reject counts above membership or 16 without mutation;
+a 20-member conference with 16 qualifiers is accepted. Pool tests cover free/owned
+collisions, duplicate IDs, sentinel handling and historical school independence.
+Native Ghidra and instruction traces establish the storage/rollover/reclamation
+and tournament-buffer evidence described in the linked research documents.
+
+The failing modern-alignment roster and offseason aggregate were unavailable.
+No live history-preservation, generated modern schedule or all-conference bracket
+compatibility claim. Original EBOOT/JB/overrides remain unchanged; RPCS3/gameplay
+NOT RUN; automatic/testing JB NOT BUILT.
+
+# Unreleased Legacy backend diagnostics
+
+Read-only Ghidra continuation traced 46 getter/serializer/loader/provider functions.
+An independent instruction audit verified all 17 size constants and aggregate
+save/load call order; total 0x15D1CC. Original decoded executable hash remained
+unchanged. Raw reports and proprietary listings stay private. No native portal,
+executable patch, RPCS3 test or testing JB was produced for this update.
+
+Portable verification on Python 3.12/Windows: **983 passed, 10 skipped, 2
+deselected**, followed by compileall, CLI help, Qt startup smoke, configured Ruff
+checks and mypy passing. The offscreen backend tab was rendered and visually
+inspected with an explicit available font. Exact-head verification is recorded
+in the PR. Temporary fixtures must remain outside project output for the existing
+output-protection regressions; sandbox-denied hard links require an unrestricted
+test run, not changes to the production output guards.
+
+Synthetic regressions cover exact aggregate boundaries, component-local errors,
+400-active/401-stored transfer limits, typed record anchors, unsigned/duplicate
+players, reference-column bounds, input/output protection, stale GUI results and
+read-only file selection. No supplied offseason aggregate is available; real
+save correspondence and history continuity remain unverified.
+
 # v1.22 alternate discovery and PR integration
 
 Targeted: `python -m pytest tests/test_team_assets.py tests/test_folder_overrides.py

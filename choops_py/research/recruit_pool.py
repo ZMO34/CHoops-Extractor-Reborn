@@ -9,6 +9,7 @@ from hashlib import sha256
 from struct import unpack_from
 
 from ..roster.schema import detect_tables
+from .school_recruiting import inspect_school_recruit_graph
 from .transfer_portal import native_preference_profile
 
 MAX_INPUT = 64 * 1024 * 1024
@@ -203,6 +204,7 @@ def inspect_interest_graph(
         "free_nodes_traced": free_nodes,
         "free_head_supplied": free_head is not None,
         "unowned_nodes": INTEREST_CAPACITY - len(owners),
+        "all_nodes_owned": len(owners) == INTEREST_CAPACITY,
         "chains": chains,
         "native_pool_insertion_installed": False,
         "enclosing_save_offset_established": False,
@@ -218,7 +220,8 @@ def inspect_recruiting_section(section: bytes, roster: bytes) -> dict:
     """Inspect an explicitly identified native recruiting component.
 
     The offset is relative to 0x595D64's aggregate, not a certified USERDATA offset.
-    Secondary-node ownership and every queue-field meaning remain unresolved.
+    Both ownership graphs are checked; queue-field meanings remain partial.
+    A bad second graph is a local diagnostic, not a loss of the first audit.
     """
     if (
         not isinstance(section, (bytes, bytearray))
@@ -256,6 +259,27 @@ def inspect_recruiting_section(section: bytes, roster: bytes) -> dict:
             secondary_nonnull += 1
             if pointer >= len(roster):
                 secondary_outside += 1
+    # Runtime school anchors are editor starts +48 (header table bias 49).
+    # The second graph traverses ALL schools, independently of recruit flags &4.
+    team_start, school_count, team_stride = detect_tables(roster)["teams"]
+    school_heads = {
+        index: unpack_from(">h", roster, team_start + 48 + index * team_stride + 0x260)[
+            0
+        ]
+        for index in range(school_count)
+    }
+    try:
+        secondary_graph = inspect_school_recruit_graph(
+            section[0x1F428:0x3E828],
+            school_heads,
+            recruit_start=pool["pool_start"],
+            recruit_count=pool["allocated_slots"],
+            free_head=secondary_free,
+        )
+    except ValueError as error:
+        secondary_graph = {"error": str(error), "all_nodes_owned": False}
+    secondary_valid = secondary_graph["all_nodes_owned"]
+    dual_valid = graph["all_nodes_owned"] and secondary_valid
     queues = []
     for block, count in enumerate(queue_counts):
         base = 0x3E828 + block * 0xA00
@@ -284,7 +308,16 @@ def inspect_recruiting_section(section: bytes, roster: bytes) -> dict:
         "secondary_free_head": secondary_free,
         "secondary_nonnull_references": secondary_nonnull,
         "secondary_references_outside_roster": secondary_outside,
-        "secondary_node_ownership_validated": False,
+        "secondary_node_ownership_validated": secondary_valid,
+        "school_recruit_graph": secondary_graph,
+        "dual_pool_ownership_validated": dual_valid,
+        "node_availability": {
+            "interest_free_nodes_traced": graph["free_nodes_traced"],
+            "school_free_nodes_traced": secondary_graph.get("free_nodes_traced"),
+            "complete_ownership_verified": dual_valid,
+            "native_reservation_installed": False,
+            "future_native_recruiting_budget_established": False,
+        },
         "queue_counts": queue_counts,
         "other_counters_raw": other_counters,
         "queues": queues,

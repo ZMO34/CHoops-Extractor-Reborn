@@ -17,6 +17,7 @@ def test_conference_scalar_preserves_neighbors_and_reopens(field):
     before = bytes(model.data)
     relative, size = CONFERENCE_SCALARS[field]
     value = 0x1234 if size == 2 else 0xab
+    if field=='tourney_slots':value=1
     model.edit('conferences', 0, field, value)
     offset = starts['conferences'] + relative
     expected = bytearray(before)

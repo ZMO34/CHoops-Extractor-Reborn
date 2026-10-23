@@ -195,6 +195,11 @@ class EditorModel:
             rel,size=CONFERENCE_SCALARS[field]
             if not 0 <= value < (1 << (size*8)):
                 raise ToolError('conference_value_out_of_range',f'{field} must be 0..{(1 << (size*8))-1}')
+            if field=='tourney_slots':
+                from .schema import CONFERENCE_TOURNAMENT_CAPACITY
+                maximum=min(CONFERENCE_TOURNAMENT_CAPACITY,len(set(self.rows[table][index]['team_indices'])))
+                if value>maximum:
+                    raise ToolError('conference_tournament_capacity',f'Conference tournament entrants must be 0..{maximum}: no more than the members or the native 16-slot bracket')
             changes.append((off+rel,value.to_bytes(size,'big')))
         elif table=='players' and field=='shot_tendencies':
             slot=self.integer(slot);value=self.integer(value)

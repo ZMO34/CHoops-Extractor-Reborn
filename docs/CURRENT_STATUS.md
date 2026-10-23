@@ -1,3 +1,74 @@
+# Unreleased - dual recruiting-pool ownership and exhaustion proof
+
+Implemented the second native recruiting graph: all school +0x260 lists and its
+independent free chain, exact serialized recruit anchors, duplicate/cycle/shared
+ownership rejection, cleared free-node validation and full 16,000-node coverage.
+Both pool audits now expose snapshot free counts; complete coverage is distinct
+from a future native reservation budget. The Legacy editor adds a Recruiting node
+pools tab, using the same backend as both existing inspection commands. Corrupt
+second-pool data remains a local diagnostic; stale/failed loads clear old rows.
+
+Ten bounded Ghidra instruction cases confirm second-pool initialization/release,
+school lookup, offer-bit preservation, first-pool exhaustion and commitment order.
+In an exhausted/no-existing-interest synthetic case, 0x5C8CD8 sets commitment and
+decrements the school counter before 0x5C3144 returns -1. Following instructions
+lack an allocation-result guard before indexed stores. Future portal hooks must
+reserve capacity and guard before mutation; the stock routine alone is unsafe.
+
+This closes the structural second-pool ownership gap, not native proxy admission,
+reservation/rollback, UI hooks, save/resume or the requested playable portal.
+The full Legacy editor and native portal remain unfinished. No actual offseason
+state was available for this pass. Original executable/assets/saves unchanged;
+no RPCS3/gameplay run or testing JB. See LEGACY_PORTAL_IMPLEMENTATION.md.
+
+# Unreleased — portal callback, tuning and persistence investigation
+
+Recovered native postseason/rollover callback order; confirmed Confidence as the
+secondary transfer gate and identified offer/refund/commitment counter paths.
+Found the fixed 2,000-recruit CPU loop and16,000-byte sort buffer that must change
+before additional proxies can participate safely. Dynamic recruit save rebasing
+is confirmed; saved transfer queue order suggests a binding design that freezes
+after insertion. Proposed valid preference profiles can persist the three portal
+priorities without borrowing unknown fields. Native lifecycle integration is not
+installed or certified.
+
+Identified Media/Coaches/Mid-Major/RPI poll tables, with read-only aggregate audits.
+Added a Portal research tab and offline single-precision transfer-tuning policy;
+these are explicitly not working in-game settings. Complete proxy setup, protected
+cleanup, allocation/node budgets, scholarship rollback and phase-specific native
+save/resume proof remain implementation gates. See [implementation contract](LEGACY_PORTAL_IMPLEMENTATION.md).
+No EBOOT mutation, emulator run or testing JB.
+
+# Unreleased — history ownership and conference scheduling
+
+Established five player-owned history IDs, the shared 24-byte statistics pool,
+stored historical school indices, annual shifts and free/reclamation paths.
+Added read-only Player history and Scheduling / tournaments diagnostics plus CLI
+reports. Stock schedule has 4,523 nonblank fixtures and 1,000 reserved rows;
+realignment changes membership without regenerating those fixtures. Native
+conference brackets hold 16 entrants: explicit edits now reject larger counts
+or counts exceeding membership. This does not cap conference membership at 16.
+Ivy and Independents retain index-specific champion policies; route 96 disables
+registration. No modern fixture generator or all-conference tournament repair
+is claimed. The failing community roster has not been supplied.
+
+History storage ownership is established; durable portal binding, unsigned-player
+calendar handling and native runtime preservation remain unfinished. No playable
+portal, EBOOT patch, emulator run or testing JB. See [history](LEGACY_HISTORY_OWNERSHIP.md)
+and [scheduling](LEGACY_SCHEDULING.md).
+
+# Unreleased — Legacy backend and transfer identity diagnostics
+
+Mapped all 17 native aggregate sizes/order against original size getters and paired
+save/load routines (0x15D1CC total). Added a read-only Legacy backend tab and
+`inspect-legacy-backend`: explicit aggregate only, no guessed USERDATA offset,
+per-component hashes/errors, recruiting audits, typed transfer player/school
+anchors and bounded reference-bank inspection. Unknown meanings remain named by
+native routine. This earlier phase left history ownership unresolved; the follow-up
+above establishes storage ownership. Calendar interception and durable proxy binding
+remain unfinished. No portal, executable patch, emulator run or test JB in this
+update. See [LEGACY_BACKEND.md](LEGACY_BACKEND.md) for the wider subsystem map.
+
 # v1.22 — new alternate folder discovery
 
 Windows extended drive/UNC path spellings are normalized consistently, fixing the

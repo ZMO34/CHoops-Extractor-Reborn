@@ -1,4 +1,15 @@
+Latest continuation: [native implementation contract](LEGACY_PORTAL_IMPLEMENTATION.md)
+records recovered callback order, scholarship actions, recruit-capacity hazards,
+current poll sources, proposed priority encoding and remaining readiness gates.
+
+Latest evidence: [persistent history ownership](LEGACY_HISTORY_OWNERSHIP.md),
+including unsigned rollover and reclamation hazards; [conference scheduling](LEGACY_SCHEDULING.md).
+
 # Legacy transfers and a recruitable portal: feasibility
+
+Continuation: [Legacy backend and aggregate diagnostics](LEGACY_BACKEND.md)
+maps all 17 native component boundaries and adds typed transfer-reference checks.
+Full field meanings, history continuity and playable integration remain unresolved.
 
 Read-only native research, 2026-10-21, on the supplied PS3 College Hoops 2K8
 revision. Addresses are revision-specific virtual addresses, not universal file
@@ -29,7 +40,7 @@ fully recruitable pool nor increased transfer rates have been implemented here.
 | Generate outgoing queue | `0x5B4E50` | Resets queue, checks Legacy context +0x204, traverses schools and players, applies eligibility/state and chance/value gates, then enqueues candidates. The exact setting name of +0x204 is unresolved. |
 | Insert/sort candidate | `0x5BCA74` | Stores a 12-byte row: player pointer, source-school pointer, destination-school pointer initially zero. Orders rows using the position-aware player evaluation at `0x74AA30`. |
 | Select destinations | `0x5BCCF4` | Scores candidate schools using capacity/availability, a per-school arrival counter, player/school values, distance and other terms; excludes matching source/destination school identities. Retains the best score rather than a random school index. Full term semantics remain incomplete. |
-| Finalize transfer | `0x5BC250` | Removes players from source membership, updates a player count byte, sets scholarship and Transfer sit-out status, then adds destination membership. A zero destination takes a separate removal path; it is not a proven safe uncommitted portal state at finalization. |
+| Finalize transfer | `0x5BC250` | Removes players from source membership, updates a source-school counter byte, sets scholarship and Transfer sit-out status, then adds destination membership. A zero destination takes a separate removal path; it is not a proven safe uncommitted portal state at finalization. |
 | Reconcile school state | `0x5BC990` | Adjusts packed school counters around the queued source/destination records. Precise neighboring counter meanings require further tracing. |
 | Save/load queue | `0x5BC660` / `0x5BC854` | Serializes count plus 0x12CC bytes, temporarily rebases the three pointer columns against the roster base, and restores native addresses. The enclosing save-file offset is not established. |
 
@@ -59,12 +70,13 @@ chance formula is confirmed by the instructions and constants, not an inferred
 menu label. For state values 1, 2, 3 and 4+, the chance gate is respectively 0,
 about 33%, about 67% and 100%. **These are conditional gate probabilities, not the
 percentage of all players who transfer.** Other filters and the second gate still
-apply. The exact meaning and writers of this three-bit state are not established;
-calling it a proven dissatisfaction or transfer-demand field would be premature.
+apply. The later [implementation investigation](LEGACY_PORTAL_IMPLEMENTATION.md) traces
+a writer in 0x5A7230 during low-confidence evaluation, plus annual clearing.
+The exact localized state meaning is still not a proven menu enum.
 
 The second gate uses `0x74AA30` (position-aware weighted player evaluation) and
-`0x744C40` (player +0x70 byte converted through `0x742BD0`). The latter's precise
-localized meaning is unconfirmed. Constants are 3.0 at `0xA61340` and approximately
+`0x744C40` (player +0x70 byte converted through `0x742BD0`). The latter is now confirmed as **Confidence**, through the named getter
+0x69E910; the scaling is float32 0.01. Constants are 3.0 at `0xA61340` and approximately
 0.66 at `0xA6133C` in this revision. Candidate filters also inspect the upper nibble
 of player anchor +0x84 and bit 0x20 at anchor +0x0A. Do not remove these as if they
 were redundant probability checks.
@@ -411,7 +423,7 @@ authoritative identity; a new player created from this proxy would fail continui
 ### Player lifetime and membership hazards
 
 The original transfer finalizer `0x5BC250` removes source membership first and
-increments runtime player +0x2A4. Its zero-destination branch calls `0x74410C`.
+increments runtime source-school +0x2A4 (corrected from the earlier player claim). Its zero-destination branch calls `0x74410C`.
 That wrapper resolves through `0x49FF74 -> 0x1BC014` to a player pointer pool and
 through `0x49D684 -> 0x1AE8D4` to **append that player to the reusable pool**, with
 an observed 2,500-entry limit. It must never run for a still-recruitable portal
@@ -463,8 +475,9 @@ Native player statistics menu/provider registration is now located through
 `PlayerCardMenu_StatsMenu` and callbacks including `0x68C8C0`, which passes the
 selected player into the menu binding path. This is a starting point for tracing
 stat/history consumers, **not proof of complete career-stat or historical-team
-storage semantics**. Those storage/link owners, proxy persistence and the exact
-calendar interception window remain unresolved. Keeping an ID alone cannot
+storage semantics**. Subsequent [history ownership research](LEGACY_HISTORY_OWNERSHIP.md)
+establishes the five IDs, stored school, rollover and free/reclaim paths. Proxy
+persistence, calendar interception and runtime continuity remain unresolved. Keeping an ID alone cannot
 certify history preservation. No native patch or playable portal is installed.
 
 ### Legacy editor diagnostics
