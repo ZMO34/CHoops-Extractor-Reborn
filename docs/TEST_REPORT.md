@@ -1,3 +1,27 @@
+# Installed scorebug context provider
+
+Focused four-file scorebug suite: **64 passed**, including 35 new synthetic tests
+(34 instruction paths and nine sequential output transitions). New test Ruff
+E/F/I passes. The harness stubs native external functions and checks strict memory,
+ABI/TOC/CR and balanced string wrappers, including rejection of borrowed stack
+character storage. Optional Capstone/Keystone absence skips the harness.
+
+Private v5: scoped ELF edits/branch/load-extent checks and SELF roundtrip pass;
+only one four-byte style property changes in gamedata, 261 other records and all
+geometry/meter/English bytes stay exact. Both IFFs prepare/preflight. Native string
+ownership and existing newline template were verified separately from source.
+No native renderer execution, gameplay/emulator or automatic/testing JB.
+
+# Scorebug context and geometry investigation — 2026-10-23
+
+Documentation-only public update. Private source-bound candidate: 30 index spans
+across three SCNEs, all header/vertex bytes preserved, 259 other v1 records exact,
+all meter data and executable unchanged, five HUD scenes reparse. Two IFFs stage
+and preflight without a JB build. Focused Ghidra: five context consumers plus six
+dependencies, with original-instruction/switch-table checks. Full gamedata text
+inventory finds no authored text1/text2/text3/text3_b records. Native popup table
+and localization inspection remains static evidence, not live admission proof.
+No runtime context hook was installed. User-reported line cause unconfirmed.
 # v1.22 alternate discovery and PR integration
 
 Targeted: `python -m pytest tests/test_team_assets.py tests/test_folder_overrides.py

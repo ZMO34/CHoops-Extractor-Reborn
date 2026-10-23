@@ -1,3 +1,33 @@
+# Unreleased — installed scorebug context provider
+
+Owner-authorized private v5 output installs a native home_ABL provider, preserving
+the existing renderer and geometry-v2 suppression. It selects timeout, verified
+current-game NCAA/NIT/conference tournament, same-conference matchup or branding.
+Scheduled-game participant ownership and current conference roundtrips gate
+context; no stale date/school cache is used. Native refcounted formatting avoids
+returning stack character storage. The matching SCNE clears its forced-literal
+bit; English, event queues and all meter/geometry data remain unchanged.
+
+New authored PPC source/profile and synthetic harness are public. Focused tests:
+64 passed; new-test Ruff E/F/I passes. Private scoped ELF/SELF and two-IFF preflight
+checks pass. This is an installed local experiment, not runtime certification or
+a complete multi-line popup implementation. No emulator/gameplay/testing JB.
+See [SCOREBUG_CONTEXT_CALLBACKS.md](SCOREBUG_CONTEXT_CALLBACKS.md).
+
+# Unreleased — scorebug context and line-artifact investigation
+
+Mapped native NCAA/NIT calendar predicates, season/conference/national label
+consumers and timeout calling-team selection. The current gamedata lacks authored
+text1/text2/text3/text3_b records despite registered providers: broad popup display
+coverage is not established. Added an explicit context/layer specification with
+per-feature proof requirements; no new native context hook is installed.
+
+A private correction degenerates 30 index spans in three scenes to suppress old
+frames/masks, twelve transparent surplus quads and an edge-on popup helper.
+All scene headers/vertices and 259 other v1 records remain exact; native meter
+and executable are unchanged. Two IFFs prepare/preflight. This removes identified
+geometry risks, not a certified fix for all reported lines. No emulator/gameplay
+or testing JB. See [SCOREBUG_CONTEXT_AND_ARTIFACTS.md](SCOREBUG_CONTEXT_AND_ARTIFACTS.md).
 # v1.22 — new alternate folder discovery
 
 Windows extended drive/UNC path spellings are normalized consistently, fixing the

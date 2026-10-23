@@ -88,6 +88,36 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# Unreleased — installed scorebug context provider
+
+Owner-authorized private v5 output installs a native home_ABL provider, preserving
+the existing renderer and geometry-v2 suppression. It selects timeout, verified
+current-game NCAA/NIT/conference tournament, same-conference matchup or branding.
+Scheduled-game participant ownership and current conference roundtrips gate
+context; no stale date/school cache is used. Native refcounted formatting avoids
+returning stack character storage. The matching SCNE clears its forced-literal
+bit; English, event queues and all meter/geometry data remain unchanged.
+
+New authored PPC source/profile and synthetic harness are public. Focused tests:
+64 passed; new-test Ruff E/F/I passes. Private scoped ELF/SELF and two-IFF preflight
+checks pass. This is an installed local experiment, not runtime certification or
+a complete multi-line popup implementation. No emulator/gameplay/testing JB.
+See [SCOREBUG_CONTEXT_CALLBACKS.md](SCOREBUG_CONTEXT_CALLBACKS.md).
+
+# Unreleased — scorebug context and line-artifact investigation
+
+Mapped native NCAA/NIT calendar predicates, season/conference/national label
+consumers and timeout calling-team selection. The current gamedata lacks authored
+text1/text2/text3/text3_b records despite registered providers: broad popup display
+coverage is not established. Added an explicit context/layer specification with
+per-feature proof requirements; no new native context hook is installed.
+
+A private correction degenerates 30 index spans in three scenes to suppress old
+frames/masks, twelve transparent surplus quads and an edge-on popup helper.
+All scene headers/vertices and 259 other v1 records remain exact; native meter
+and executable are unchanged. Two IFFs prepare/preflight. This removes identified
+geometry risks, not a certified fix for all reported lines. No emulator/gameplay
+or testing JB. See [SCOREBUG_CONTEXT_AND_ARTIFACTS.md](SCOREBUG_CONTEXT_AND_ARTIFACTS.md).
 # v1.22 — new alternate folder discovery
 
 Windows extended drive/UNC path spellings are normalized consistently, fixing the
@@ -4911,6 +4941,19 @@ compatibility. Conditional popup backgrounds still require matching visibility,
 opacity and transition state. No new executable or installable scorebug is
 produced by this inspection.
 
+## Context and recurring lines follow-up
+
+See [SCOREBUG_CONTEXT_AND_ARTIFACTS.md](SCOREBUG_CONTEXT_AND_ARTIFACTS.md) for the
+2026-10-23 native context map, incomplete authored popup coverage, geometry
+correction evidence and explicit remaining implementation requirements.
+
+## Installed context callback follow-up
+
+See [SCOREBUG_CONTEXT_CALLBACKS.md](SCOREBUG_CONTEXT_CALLBACKS.md) for the
+owner-authorized native provider installation, source, synthetic tests, native
+string lifetime proof and preserved geometry/event behavior. Earlier no-hook
+statements describe the prior research baseline. Runtime validation remains open.
+
 ---
 
 Embedded source: docs/PROJECT_SOURCE_OF_TRUTH.md
@@ -5357,6 +5400,30 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 
 Embedded source: docs/TEST_REPORT.md
 
+# Installed scorebug context provider
+
+Focused four-file scorebug suite: **64 passed**, including 35 new synthetic tests
+(34 instruction paths and nine sequential output transitions). New test Ruff
+E/F/I passes. The harness stubs native external functions and checks strict memory,
+ABI/TOC/CR and balanced string wrappers, including rejection of borrowed stack
+character storage. Optional Capstone/Keystone absence skips the harness.
+
+Private v5: scoped ELF edits/branch/load-extent checks and SELF roundtrip pass;
+only one four-byte style property changes in gamedata, 261 other records and all
+geometry/meter/English bytes stay exact. Both IFFs prepare/preflight. Native string
+ownership and existing newline template were verified separately from source.
+No native renderer execution, gameplay/emulator or automatic/testing JB.
+
+# Scorebug context and geometry investigation — 2026-10-23
+
+Documentation-only public update. Private source-bound candidate: 30 index spans
+across three SCNEs, all header/vertex bytes preserved, 259 other v1 records exact,
+all meter data and executable unchanged, five HUD scenes reparse. Two IFFs stage
+and preflight without a JB build. Focused Ghidra: five context consumers plus six
+dependencies, with original-instruction/switch-table checks. Full gamedata text
+inventory finds no authored text1/text2/text3/text3_b records. Native popup table
+and localization inspection remains static evidence, not live admission proof.
+No runtime context hook was installed. User-reported line cause unconfirmed.
 # v1.22 alternate discovery and PR integration
 
 Targeted: `python -m pytest tests/test_team_assets.py tests/test_folder_overrides.py

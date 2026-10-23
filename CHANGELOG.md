@@ -1,3 +1,18 @@
+## Unreleased — native scorebug context provider
+
+- Add newly authored PPC context provider source/profile and 35 synthetic tests.
+- Document the matching private installation: timeout caller, current-game
+  NCAA/NIT/conference tournament and current conference matchup labels, guarded
+  fallback branding, native refcounted strings and retained renderer/geometry.
+- No public patcher/game binary or complete popup-coverage claim is introduced.
+
+## Unreleased — scorebug context research and geometry correction evidence
+
+- Document native tournament/timeout consumers, missing statistics bindings,
+  popup-layer logic, implementable feature dependencies and line-artifact risks.
+- Record an owner-authorized private index-only geometry candidate and structural
+  preservation/preflight results. No public game assets, patcher or claimed
+  gameplay/context implementation.
 ## v1.22 — alternate discovery and combined research updates
 
 Windows extended drive/UNC path spellings are normalized consistently, fixing the
