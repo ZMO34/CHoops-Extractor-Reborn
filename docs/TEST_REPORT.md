@@ -1,5 +1,9 @@
 ## Shot-family continuation
 
+Portable verification in the isolated detached checkout: **1,051 passed,
+10 skipped, 2 deselected**; handoff freshness, compile, CLI/offscreen Qt, Ruff
+and mypy (18 files) pass. This is author verification, not independent approval.
+
 Targeted `tests/test_shot_family.py tests/test_donor_registry.py`: **28 passed**.
 Covers all-slot preservation, distinct alias headers, optional empty pairs,
 relocation inverse, exact/insufficient budgets, unresolved dependencies before
