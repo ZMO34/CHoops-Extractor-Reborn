@@ -88,6 +88,16 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# Unreleased — selector transport and native controller-axis continuation
+
+Counted auxiliary selector curves now have a complete bounded transport path: read the consumed knot prefix, require explicit input-bound per-channel selector maps for NBA11 translation, preserve signed tick bits, serialize the extended CH header, relocate every counted pointer, and keep curves resident with their owner image. Unknown extra +0x3C dependencies and missing selector rules still block output. No automatic cross-game selector meanings were invented.
+
+The updated read-only source inspector accepts all 2,444 motions / 1,222 aliases, now including 4,016 bounded selector references. CLI reports expose consumed prefix sizes, hashes and selector values while leaving semantics unresolved. Supplied-copy checks cover all 806 NBA11 shot curves and 336 CH shot curves. All 224 stock motion headers now prepare in one 559,640-byte relative image with 168 distinct shared selector tracks. A separate in-memory decoded-ELF structural probe adds 112 stock duplicates (224 total styles), preserves the original 112, and validates all owned headers/curves, original BSS and inverse reconstruction. It is a stock-backed structural probe, not a donor gameplay import; source hashes remain unchanged.
+
+The NBA2K14 native harness now passes 69 cases: the original nine input-prefix cases plus all 30 controller-axis getter indices on ports 0 and 6. The controller vtable routes axis indices 2/3 to right X/Y; movement dispatch and the default-right-stick/original-preset-A installation remain unfinished. A separate float32 curve-endpoint regression prevents native sampling from reading one knot beyond a mathematically sufficient prefix.
+
+Current semantic gaps remain: unmapped event identities/payloads, selector resource identities, authored target metadata/variants, and the 259-style byte-ID conflict. These require proof before a playable full port can be claimed. See [ANIMATION_RUNTIME_ADAPTER.md](ANIMATION_RUNTIME_ADAPTER.md). Earlier phase notes below are historical where superseded.
+
 # Unreleased — resident native integration and NBA2K14 input research
 
 Added a contract-gated serialized signature component builder and a separate decoded-ELF resident loading/publication backend. The backend retains all 112 stock styles, owns added motion/table/name storage for process lifetime, preserves original BSS as zeros, and verifies relocation and inverse reconstruction. A supplied-copy structural probe registers one stock duplicate (113 total); it does not establish donor playback or PS3 execution. No source executable, JB, or signed SELF was changed.
@@ -1989,9 +1999,33 @@ No RPCS3, hardware run, full-game build or controller remapping was performed.
 
 Embedded source: docs/ANIMATION_RUNTIME_ADAPTER.md
 
+# Counted selector transport and controller-axis routing — 2026-10-23
+
+The counted pointer tails are now supported end to end for the observed selector encoding: NBA11 +0x38 → CH +0x40, four bytes per curve pointer, count from header +0x10 & 0x3F. `read_selector_prefix` always reads at least two knots, then stops at the first upper knot bracketing the final declared query. A caller-supplied bounded reader enforces record or file-backed memory limits. It never copies an inferred neighboring region wholesale. Prefixes are limited to 65,536 knots; decreasing ticks, header/track overlaps, null counted pointers and missing terminal brackets reject installation. Exact sharing between selector tracks is allowed; partial overlap is rejected.
+
+The terminal bound covers both mathematical `ceil(duration * scale * 300)` and the native single-precision multiply sequence. For duration 2.2576792240142822 and scale 2.7786645889282227, the former is 1882 but native multiplication reaches 1882.0001220703125, requiring a knot at tick 1883. This bound prevents an endpoint read past the copied prefix. It does not claim bit-exact VMX reciprocal interpolation or establish out-of-domain queries.
+
+`translate_signature_motion(..., auxiliary_contracts=[...])` requires one schema-1 contract per counted channel, containing:
+
+- `source_channel`: exact zero-based index, preserving channel order;
+- `source_curve_sha256`: hash of the consumed prefix, not an inferred padded extent;
+- `target_elf_sha256`: the same complete target executable bound by the metadata contract;
+- `channel_evidence`: bounded research assertion about channel correspondence;
+- `rules`: explicit byte-valued `source`, `target`, and nonempty `evidence` for every consumed selector identity.
+
+No default identity map is supplied. Duplicate/stale/missing/unproven rules reject conversion. Only the upper selector byte changes; every signed 24-bit tick and knot is retained. Channel/resource semantics are caller research assertions, recorded as such rather than automatically established. Unknown header references, membership and event payloads still block component construction. The serializer includes the extended header and all aligned curves in its preflight budget before pose expansion. Existing CH curves require no cross-game mapping and can be copied with their native identities.
+
+Target inspection, preparation, relocation and static residency now validate full selector prefixes as owned dependencies. The generic allocator model also benefits from the shared relocation validation. Extra +0x3C data remains unbounded and blocked. Relocation and inverse byte preservation are mandatory. The serialized metadata report now records decoded float32 planar values, correcting a provenance-only bug that previously listed the packed bytes.
+
+The updated read-only source inspector accepts all 2,444 motions / 1,222 aliases, now including 4,016 bounded selector references. CLI reports expose consumed prefix sizes, hashes and selector values while leaving semantics unresolved. Private read-only corpus evidence: 806 NBA11 consumed prefixes total 35,592 bytes, compared with 35,852 bytes in previously bounded containing regions; the remaining 260 bytes occur beyond the needed terminal brackets and their meaning is not inferred. The 336 CH header references consume 12,424 bytes. All 224 distinct CH stock headers prepare together, deduplicating 168 selector tracks and producing 559,640 relative bytes. A separate in-memory resident-publication probe adds one duplicate of every original style: 224 total registrations, all 112 original rows unchanged, 224 owned motion headers, 569,504 bytes including tables/names, and exact inverse/BSS/source-preservation checks. Added labels deliberately use a documented stock placeholder. No donor shot or gameplay result is implied.
+
+The NBA2K14 input path continues through native getter 0xB5D298 and controller method 0x8E62C (descriptor 0xE12970, vtable 0xDA77F8 slot +0x2C). The getter reads record +0x110 + 16*axis, port stride 0x310; indices 0/1 are left X/Y and 2/3 right X/Y. The snapshot loop at 0x8E4CC copies all 30 axis values into a controller snapshot. `NativeStickInputTrace.java` now executes the real controller wrapper and getter for every axis on ports 0/6 with unique values, no mock calls in those 60 cases. Together with the original nine input-prefix cases, **69 native instruction cases pass**. This establishes raw routing, not dribble move selection, camera-relative gestures, deadzones or control presets. The observed low-level postprocessor at 0xB5D888 tests left-stick thresholds; it must not be relabeled as right-stick dribble dispatch.
+
+The required final control policy remains NBA2K14 right-stick dribbling by default, with old button-dribble controls selectable as preset A. It has not yet been installed. Native instruction checks use bounded Ghidra harnesses only; RPCS3, gameplay and automatic/testing JB builds remain unrun. Earlier phase notes below are historical where superseded by this section.
+
 # Resident loading, metadata contracts, and NBA2K14 controls — 2026-10-23
 
-`translate_signature_motion` builds an owned relative CH component only with schema-2 metadata bound to source bank index, record index, complete bank hash, header hash, donor executable hash, and target executable hash. It requires explicit target mode, state bits, authored planar values, and bounded evidence for each group. These are caller research assertions, not automatic semantic proof. Unknown event IDs, opaque payloads, auxiliary pointers, header references, and membership dependencies block construction. The shared serializer validates the known target layout and relocation inverse before returning bytes.
+`translate_signature_motion` builds an owned relative CH component only with schema-2 metadata bound to source bank index, record index, complete bank hash, header hash, donor executable hash, and target executable hash. It requires explicit target mode, state bits, authored planar values, and bounded evidence for each group. These are caller research assertions, not automatic semantic proof. Unknown event IDs, opaque payloads, uncontracted auxiliary channels, header references, and membership dependencies block construction. The shared serializer validates the known target layout and relocation inverse before returning bytes.
 
 `append_resident_image` creates a separate decoded ELF. It extends the final writable nonexecutable load segment after its original memory extent, materializes original BSS as zeros, preserves existing virtual addresses and loaded bytes, shifts trailing nonloaded data/section offsets, and reparses the result. Unsupported alignment, collisions, TLS interference, unknown dependencies and byte-budget overflow are rejected. Relative/native pointer conversion and inverse reconstruction must match exactly. This is static process-lifetime ownership: no runtime allocation, eviction, rebinding or shutdown free is introduced. It is not a signed SELF installer or proof of hardware loading.
 
@@ -5493,6 +5527,12 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+# Selector transport and controller routing — 2026-10-23
+
+Targeted selector/header/translation/residency regressions: **92 passed**. New coverage checks prefix bounds and adjacent-data exclusion, native endpoint rounding, stale/missing/duplicate selector maps, signed tick preservation, extended header alignment, all-dependency budgets, owned static loading, unknown extras and provenance isolation. Changed files pass strict Ruff E/F/I. Portable pytest verification: **1,039 passed, 10 skipped, 2 deselected**. Exact-head full verification is recorded in PR49. The sandboxed attempt failed/stalled in subprocess checks; the same suite passed outside the sandbox. Tests and private audits remain separate evidence.
+
+The updated read-only source inspector accepts all 2,444 motions / 1,222 aliases, now including 4,016 bounded selector references. CLI reports expose consumed prefix sizes, hashes and selector values while leaving semantics unresolved. Supplied-copy audit: 806 NBA11 and 336 CH selector references pass bounded prefix reads; all 224 CH stock headers prepare together (559,640 bytes, 168 deduplicated selector tracks). The separate in-memory decoded-ELF probe registers 112 stock duplicates, 224 total styles, preserving original 112 rows/BSS/input and inverse reconstruction. No donor gameplay is established. NBA2K14 Ghidra instruction harness: **69 passed** (nine input-prefix cases plus 60 real wrapper/getter cases). No RPCS3/gameplay or testing JB was run. Earlier phase reports below retain their original counts.
 
 # Native integration and control-input research — 2026-10-23
 

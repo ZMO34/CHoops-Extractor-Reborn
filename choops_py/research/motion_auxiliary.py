@@ -4,6 +4,7 @@ CH 0x203AC and NBA11 0x1B764 use low signed 24-bit ticks and upper-byte
 selectors. Selector identities are not established cross-game semantics.
 """
 
+import hashlib
 import math
 import struct
 
@@ -102,5 +103,124 @@ def sample_selector_curve(raw, seconds, *, duration, time_scale=1):
         interpolation="mathematical-reference",
         native_vmx_bit_exact=False,
         selector_semantics_established=False,
+        gameplay_ready=False,
+    )
+
+
+def read_selector_prefix(read, start, *, duration, time_scale=1):
+    """Read the minimum knots consumed over the declared interval, not padding.
+
+    The native sampler always loads the first two knots. Bound both mathematical
+    and native single-precision endpoint queries before following later knots.
+    The supplied reader must enforce the containing record/file-backed boundary.
+    """
+    inspect_selector_curve(
+        struct.pack(">II", 0, 0x007FFFFF),
+        duration=duration,
+        time_scale=time_scale,
+    )
+    if type(start) is not int or start < 0 or start % 4:
+        raise ValueError("Selector pointer must be word aligned")
+
+    def single(value):
+        try:
+            return struct.unpack(">f", struct.pack(">f", value))[0]
+        except (OverflowError, struct.error) as error:
+            raise ValueError("Selector query exceeds native float range") from error
+
+    query = max(
+        math.ceil(duration * time_scale * 300),
+        math.ceil(single(single(duration * time_scale) * 300)),
+    )
+    if query > 0x7FFFFF:
+        raise ValueError("Selector endpoint exceeds signed 24-bit ticks")
+    result = bytearray()
+    last_tick = None
+    for i in range(65536):
+        data = read(start + i * 4, 4)
+        if len(data) != 4:
+            raise ValueError("Truncated selector knot")
+        word = struct.unpack(">I", data)[0]
+        tick = word & 0xFFFFFF
+        if tick & 0x800000:
+            tick -= 0x1000000
+        if last_tick is not None and tick < last_tick:
+            raise ValueError("Decreasing selector ticks before terminal bracket")
+        result.extend(data)
+        last_tick = tick
+        if i and tick >= query:
+            inspect_selector_curve(result, duration=duration, time_scale=time_scale)
+            return bytes(result)
+    raise ValueError("Selector prefix exceeds bounded knot count")
+
+
+def transcode_selector_curve(
+    raw, contract, *, channel, target_elf_sha256, duration, time_scale=1
+):
+    """Translate selector bytes only under an explicit input-bound research map.
+
+    No identity mapping is implied. Preserve every signed tick bit and knot;
+    channel/resource semantics remain explicit caller assertions.
+    """
+    report = inspect_selector_curve(raw, duration=duration, time_scale=time_scale)
+    if (
+        not isinstance(contract, dict)
+        or type(contract.get("schema")) is not int
+        or contract["schema"] != 1
+        or type(channel) is not int
+        or not 0 <= channel < 63
+        or type(contract.get("source_channel")) is not int
+        or contract["source_channel"] != channel
+        or contract.get("source_curve_sha256") != hashlib.sha256(raw).hexdigest()
+        or not isinstance(target_elf_sha256, str)
+        or len(target_elf_sha256) != 64
+        or contract.get("target_elf_sha256") != target_elf_sha256
+    ):
+        raise ValueError("Selector contract identity/fingerprints changed")
+    evidence = contract.get("channel_evidence")
+    rules = contract.get("rules")
+    if (
+        not isinstance(evidence, str)
+        or not evidence.strip()
+        or len(evidence) > 2048
+        or not isinstance(rules, list)
+        or not 1 <= len(rules) <= 256
+    ):
+        raise ValueError("Selector channel needs bounded evidence and explicit rules")
+    mapping = {}
+    for rule in rules:
+        if not isinstance(rule, dict):
+            raise ValueError("Invalid selector rule")
+        a, b, text = (rule.get(k) for k in ("source", "target", "evidence"))
+        if (
+            any(type(v) is not int or not 0 <= v <= 255 for v in (a, b))
+            or a in mapping
+            or not isinstance(text, str)
+            or not text.strip()
+            or len(text) > 2048
+        ):
+            raise ValueError("Invalid, duplicate or unproven selector rule")
+        mapping[a] = b, text
+    used = sorted({v["selector"] for v in report["knots"]})
+    if any(v not in mapping for v in used):
+        raise ValueError("Selector curve contains unmapped identities")
+    output = b"".join(
+        struct.pack(">I", mapping[k["selector"]][0] << 24 | k["raw_word"] & 0xFFFFFF)
+        for k in report["knots"]
+    )
+    check = inspect_selector_curve(output, duration=duration, time_scale=time_scale)
+    if [v["tick"] for v in check["knots"]] != [v["tick"] for v in report["knots"]]:
+        raise ValueError("Selector tick preservation failed")
+    return output, dict(
+        source_channel=channel,
+        source_curve_sha256=hashlib.sha256(raw).hexdigest(),
+        target_elf_sha256=target_elf_sha256,
+        channel_evidence=evidence,
+        rules=[
+            dict(source=v, target=mapping[v][0], evidence=mapping[v][1]) for v in used
+        ],
+        signed_tick_bits_preserved=True,
+        mapping_provenance="explicit-caller-research-assertions",
+        semantics_automatically_established=False,
         gameplay_ready=False,
     )

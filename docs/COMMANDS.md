@@ -1,3 +1,5 @@
+Selector transport research API (2026-10-23): `translate_signature_motion` accepts `auxiliary_contracts`, one explicit input-bound selector map per counted curve. `prepare_target_image` now includes existing CH selector prefixes; native residency validates and owns them. These remain Python research APIs without a game-writing CLI. Contract fields and limits are documented in ANIMATION_RUNTIME_ADAPTER.md.
+
 Research API update (2026-10-23): `inspect-signature-motion` includes established event-mapping coverage. Complete component construction (`translate_signature_motion`) and separate decoded-ELF residency/publication (`append_resident_image`, `install_resident_shots`) remain contract-gated Python research APIs, with no executable-writing CLI. See ANIMATION_RUNTIME_ADAPTER.md.
 
 # Donor translation research APIs

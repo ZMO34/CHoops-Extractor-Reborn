@@ -30,10 +30,7 @@ def append_resident_image(raw, image, header_offsets, *, budget=MAX_IMAGE):
     # Validate the source image before any potentially large output allocation.
     relocate_target_image(image, header_offsets, 0x20000000, source_state="relative")
     for offset in header_offsets:
-        if (
-            struct.unpack_from(">I", image, offset + 16)[0] & 63
-            or struct.unpack_from(">I", image, offset + 60)[0]
-        ):
+        if struct.unpack_from(">I", image, offset + 60)[0]:
             raise ValueError("Unmapped auxiliary dependencies cannot be installed")
     phoff = struct.unpack_from(">Q", raw, 32)[0]
     phsize, phcount = struct.unpack_from(">HH", raw, 54)
@@ -281,12 +278,14 @@ def install_resident_shots(raw, image, header_offsets, contract, *, budget=MAX_I
             raise ValueError(
                 "Playback and label semantics need bounded research assertions"
             )
-        assertions.append(dict(
-            header_indices=list(indices),
-            playback_metadata_hex=metadata.hex(),
-            target_label_key=label,
-            evidence={k: evidence[k] for k in ("playback", "label")},
-        ))
+        assertions.append(
+            dict(
+                header_indices=list(indices),
+                playback_metadata_hex=metadata.hex(),
+                target_label_key=label,
+                evidence={k: evidence[k] for k in ("playback", "label")},
+            )
+        )
         at = table_at + (112 + i) * 40
         output_image[at : at + 32] = metadata
         struct.pack_into(

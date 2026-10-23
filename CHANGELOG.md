@@ -1,3 +1,10 @@
+## Unreleased — counted selector transport
+
+- Translate explicitly mapped auxiliary selector curves into extended CH headers and owned resident storage, preserving signed ticks and validated pointer extents.
+- Bound copied curves for native float32 endpoint rounding; reject overlaps, missing mappings, unknown extras and budget overflow.
+- Validate all CH stock motion/selector dependencies and 69 NBA2K14 input/controller-axis instruction cases. Full donor semantics and replacement control presets remain unfinished.
+- Correct serialized planar provenance to report decoded float32 values.
+
 ## Unreleased — native residency and NBA2K14 input foundation
 
 - Add contract-gated serialized motion construction, explicit event coverage, and weighted auxiliary selector reference sampling.

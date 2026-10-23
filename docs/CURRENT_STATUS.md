@@ -1,3 +1,13 @@
+# Unreleased — selector transport and native controller-axis continuation
+
+Counted auxiliary selector curves now have a complete bounded transport path: read the consumed knot prefix, require explicit input-bound per-channel selector maps for NBA11 translation, preserve signed tick bits, serialize the extended CH header, relocate every counted pointer, and keep curves resident with their owner image. Unknown extra +0x3C dependencies and missing selector rules still block output. No automatic cross-game selector meanings were invented.
+
+The updated read-only source inspector accepts all 2,444 motions / 1,222 aliases, now including 4,016 bounded selector references. CLI reports expose consumed prefix sizes, hashes and selector values while leaving semantics unresolved. Supplied-copy checks cover all 806 NBA11 shot curves and 336 CH shot curves. All 224 stock motion headers now prepare in one 559,640-byte relative image with 168 distinct shared selector tracks. A separate in-memory decoded-ELF structural probe adds 112 stock duplicates (224 total styles), preserves the original 112, and validates all owned headers/curves, original BSS and inverse reconstruction. It is a stock-backed structural probe, not a donor gameplay import; source hashes remain unchanged.
+
+The NBA2K14 native harness now passes 69 cases: the original nine input-prefix cases plus all 30 controller-axis getter indices on ports 0 and 6. The controller vtable routes axis indices 2/3 to right X/Y; movement dispatch and the default-right-stick/original-preset-A installation remain unfinished. A separate float32 curve-endpoint regression prevents native sampling from reading one knot beyond a mathematically sufficient prefix.
+
+Current semantic gaps remain: unmapped event identities/payloads, selector resource identities, authored target metadata/variants, and the 259-style byte-ID conflict. These require proof before a playable full port can be claimed. See [ANIMATION_RUNTIME_ADAPTER.md](ANIMATION_RUNTIME_ADAPTER.md). Earlier phase notes below are historical where superseded.
+
 # Unreleased — resident native integration and NBA2K14 input research
 
 Added a contract-gated serialized signature component builder and a separate decoded-ELF resident loading/publication backend. The backend retains all 112 stock styles, owns added motion/table/name storage for process lifetime, preserves original BSS as zeros, and verifies relocation and inverse reconstruction. A supplied-copy structural probe registers one stock duplicate (113 total); it does not establish donor playback or PS3 execution. No source executable, JB, or signed SELF was changed.

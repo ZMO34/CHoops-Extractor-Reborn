@@ -198,11 +198,24 @@ def translate_donor_motion(
 
 
 def _assemble_target_image(
-    source, channels, high, state, planar, frames, packed, roots, event_bytes, budget
+    source,
+    channels,
+    high,
+    state,
+    planar,
+    frames,
+    packed,
+    roots,
+    event_bytes,
+    budget,
+    *,
+    selectors=(),
 ):
     """Shared final serializer/relocation check for established packed sources."""
     flags = struct.unpack_from(">I", source, 16)[0]
-    header = bytearray(64)
+    if len(selectors) != flags & 63:
+        raise ValueError("Every counted selector needs a translated curve")
+    header = bytearray(64 + 4 * len(selectors))
     struct.pack_into(
         ">4I", header, 0, 0, channels["rotation_mask"], 0, channels["translation_mask"]
     )
@@ -215,6 +228,7 @@ def _assemble_target_image(
         (0x30, "poses", packed),
         (0x34, "root", roots),
         (0x38, "events", event_bytes),
+        *((0x40 + i * 4, f"selector:{i}", data) for i, data in enumerate(selectors)),
     ):
         at = (len(output) + 15) & ~15
         if at + len(data) > budget:

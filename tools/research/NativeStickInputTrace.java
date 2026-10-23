@@ -56,6 +56,36 @@ public class NativeStickInputTrace extends GhidraScript {
    throw new Exception("NBA14 input prefix exceeded instruction bound");
   }finally{e.dispose();}
  }
+ private String runAxisGetter(int port,int axis) throws Exception {
+  if(getInt(toAddr(0xda7824L))!=0xe12970 || getInt(toAddr(0xe12970L))!=0x8e62c
+    ||getInt(toAddr(0x8e62cL))!=0xf821ff91 ||getInt(toAddr(0xb5d298L))!=0x1c630310)
+   throw new Exception("Unsupported NBA14 controller-axis interface revision");
+  EmulatorHelper e=new EmulatorHelper(currentProgram);
+  try {
+   long record=0x1457fe8L+port*0x310L,done=0x40007000L;
+   e.writeMemory(toAddr(0x40000000L),new byte[0x8000]);
+   int expected=0;
+   for(int i=0;i<30;i++){
+    int bits=0x3e800000+i*0x1000+port*0x100;
+    word(e,record+0x110+i*16,bits);
+    if(i==axis)expected=bits;
+   }
+   e.writeRegister("xer_so",0);e.writeRegister("r1",0x40001000L);
+   e.writeRegister("r2",0xe4dad0L);e.writeRegister("r3",0);
+   e.writeRegister("r4",port);e.writeRegister("r5",axis);
+   e.writeRegister("LR",done);e.writeRegister(e.getPCRegister(),0x8e62cL);
+   for(int step=0;step<64;step++){
+    long pc=e.getExecutionAddress().getOffset();
+    if(pc==done){
+     float actual=(float)Double.longBitsToDouble(e.readRegister("f1").longValue());
+     if(Float.floatToRawIntBits(actual)!=expected)throw new Exception("Controller axis routing mismatch");
+     return "{\"kind\":\"controller-axis-getter\",\"port\":"+port+",\"axis\":"+axis+",\"float_bits\":"+expected+",\"passed\":true}";
+    }
+    if(!e.step(monitor))throw new Exception("Axis getter instruction failure at "+Long.toHexString(pc)+": "+e.getLastError());
+   }
+   throw new Exception("Axis getter exceeded instruction bound");
+  }finally{e.dispose();}
+ }
  public void run() throws Exception {
   revision();
   Path output=Paths.get(getScriptArgs()[0]).toAbsolutePath().normalize();
@@ -66,7 +96,8 @@ public class NativeStickInputTrace extends GhidraScript {
   rows.add(runCase(0,new int[]{0,255,0,255},7,0x74,0));
   rows.add(runCase(6,new int[]{0,255,0,255},8,0x44,0));
   rows.add(runCase(0,new int[]{0,255,0,255},8,0x74,1));
+  for(int port:new int[]{0,6})for(int axis=0;axis<30;axis++)rows.add(runAxisGetter(port,axis));
   Files.writeString(output,"[\n"+String.join(",\n",rows)+"\n]\n",StandardOpenOption.CREATE_NEW);
-  println("NBA2K14 input-prefix native instruction cases: "+rows.size()+" passed");
+  println("NBA2K14 input-prefix/controller-axis native instruction cases: "+rows.size()+" passed");
  }
 }

@@ -24,6 +24,7 @@ from ..formats.motion_frames import (
 )
 from ..formats.standard_iff import StandardIFF
 from .donor_registry import MAX_BANK_BYTES, MOTION
+from .motion_auxiliary import read_selector_prefix, transcode_selector_curve
 from .target_motion import MAX_IMAGE
 
 
@@ -131,7 +132,7 @@ class SignatureMotionSource:
         return origin, raw, path
 
     def tracks(self, bank, record):
-        """Read known tracks without inferring auxiliary ends or selector routing."""
+        """Read bounded tracks/selector prefixes without routing guesses."""
         header, raw, path = self.resolve(bank, record)
         envelope = inspect_envelope(raw, "nba-2k11")
         channels = canonical_channels(header, "nba-2k11")
@@ -182,14 +183,44 @@ class SignatureMotionSource:
         if pointers["0x34"] is not None:
             membership = inspect_auxiliary_pairs(raw, pointers["0x34"])
             track(52, "membership", 4 + membership["count"] * 8)
+        auxiliary = []
+        for i in range(flags & 63):
+            field = 56 + i * 4
+            pointer = pointers[hex(field)]
+            if pointer is None:
+                raise ValueError("Signature counted selector pointer is null")
+            curve = read_selector_prefix(
+                b.slice, pointer, duration=duration, time_scale=scale
+            )
+            track(field, f"selector:{i}", len(curve))
+            auxiliary.append(
+                dict(
+                    channel=i,
+                    offset=pointer,
+                    bytes=len(curve),
+                    curve_sha256=hashlib.sha256(curve).hexdigest(),
+                    selectors=sorted(set(curve[::4])),
+                    selector_semantics_established=False,
+                )
+            )
         ordered = sorted(
-            (e["offset"], e["offset"] + e["bytes"]) for e in extents if e["bytes"]
+            (e["offset"], e["offset"] + e["bytes"], e["role"])
+            for e in extents
+            if e["bytes"]
         )
-        if any(a[1] > b[0] for a, b in zip(ordered, ordered[1:])):
+        if any(
+            a[1] > b[0]
+            and not (
+                a[:2] == b[:2]
+                and a[2].startswith("selector:")
+                and b[2].startswith("selector:")
+            )
+            for a, b in zip(ordered, ordered[1:])
+        ):
             raise ValueError("Known signature dependency extents overlap")
         blockers = ["target-authoring-metadata", "native-registration-and-lifetime"]
         if flags & 63:
-            blockers.append("auxiliary-selector-extents-and-semantics")
+            blockers.append("auxiliary-selector-semantics")
         if pointers["0x4"] is not None:
             blockers.append("header-reference-dependency")
         if membership is not None:
@@ -214,7 +245,9 @@ class SignatureMotionSource:
             duration=duration,
             extents=extents,
             auxiliary_pointers=[pointers[hex(56 + i * 4)] for i in range(flags & 63)],
-            auxiliary_extents_established=False if flags & 63 else True,
+            auxiliary_extents_established=True,
+            auxiliary_tracks=auxiliary,
+            auxiliary_semantics_established=False,
             header_reference=pointers["0x4"],
             membership=membership,
             events=events,
@@ -276,12 +309,14 @@ def translate_signature_motion(
     event_contract,
     *,
     budget=MAX_IMAGE,
+    auxiliary_contracts=None,
 ):
     """Construct a complete known-layout component using explicit assertions.
 
     Schema 2 binds metadata to the serialized record, complete bank, donor bind
-    executable and target executable. Auxiliary/reference/membership semantics
-    remain blocked; no metadata defaults or native installation are inferred.
+    executable and target executable. Counted selector curves additionally need
+    explicit per-channel contracts. References/membership remain blocked; no
+    metadata defaults or native installation are inferred.
     """
     from .donor_header import _assemble_target_image, _authoring_fields
 
@@ -307,24 +342,45 @@ def translate_signature_motion(
     ):
         raise ValueError("Signature metadata contract identity/fingerprints changed")
     high, state, planar = _authoring_fields(header, c)
-    if (
-        report["auxiliary_pointers"]
-        or report["header_reference"] is not None
-        or report["membership"] is not None
-    ):
+    if report["header_reference"] is not None or report["membership"] is not None:
         raise ValueError(
             "Signature auxiliary/reference/membership dependencies remain unmapped"
         )
+    pointers = report["auxiliary_pointers"]
+    if auxiliary_contracts is None:
+        auxiliary_contracts = []
+    if not isinstance(auxiliary_contracts, list) or len(auxiliary_contracts) != len(
+        pointers
+    ):
+        raise ValueError("All auxiliary channels need explicit selector contracts")
+    selectors, selector_reports = [], []
+    for i, contract in enumerate(auxiliary_contracts):
+        translated, assertion = transcode_selector_curve(
+            tracks[f"selector:{i}"],
+            contract,
+            channel=i,
+            target_elf_sha256=expected["target_elf_sha256"],
+            duration=report["duration"],
+            time_scale=report["time_scale"],
+        )
+        selectors.append(translated)
+        selector_reports.append(assertion)
     frames, channels = report["target_frame_count"], report["channels"]
     _, pose_bytes = layout(channels["rotations"], channels["translations"], frames)
     root_stride = len(tracks["root"]) // report["source_key_count"]
-    root_at = (64 + pose_bytes + 15) & ~15
+    pose_at = (64 + 4 * len(selectors) + 15) & ~15
+    root_at = (pose_at + pose_bytes + 15) & ~15
     event_at = (root_at + frames * root_stride + 15) & ~15
     if event_at + 4 > budget:
         raise ValueError("Signature target component exceeds byte budget")
     events, event_report = transcode_events(report["events"], event_contract)
     if event_at + len(events) > budget:
         raise ValueError("Signature target events exceed byte budget")
+    planned_end = event_at + len(events)
+    for curve in selectors:
+        planned_end = ((planned_end + 15) & ~15) + len(curve)
+    if planned_end > budget:
+        raise ValueError("Signature target selectors exceed byte budget")
     poses, sampling = resample_nba11_frames(
         tracks["poses"],
         tracks["timing"],
@@ -335,10 +391,26 @@ def translate_signature_motion(
         tracks["root"], tracks["timing"], has_heading=root_stride == 8
     )
     image, extents = _assemble_target_image(
-        header, channels, high, state, planar, frames, poses, roots, events, budget
+        header,
+        channels,
+        high,
+        state,
+        planar,
+        frames,
+        poses,
+        roots,
+        events,
+        budget,
+        selectors=selectors,
     )
     report.update(
         component_format="owned-relative-CH-motion",
+        auxiliary_translation=selector_reports,
+        auxiliary_extents_established=True,
+        conversion_blockers=[
+            "target-authoring-and-selector-semantics-assertions-need-proof",
+            "native-publication-and-gameplay-validation",
+        ],
         header_offsets=[0],
         extents=extents,
         bytes=len(image),
@@ -349,7 +421,7 @@ def translate_signature_motion(
         metadata_assertions=dict(
             target_mode_high16=high,
             target_state_bits=state,
-            authored_planar=list(planar),
+            authored_planar_float32=list(struct.unpack(">3f", planar)),
             evidence={k: c["evidence"][k] for k in ("mode", "state", "planar")},
         ),
         metadata_automatically_established=False,

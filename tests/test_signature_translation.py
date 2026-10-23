@@ -144,7 +144,7 @@ def test_signature_budget_gate_runs_before_expansion_and_auxiliary_is_not_discar
     struct.pack_into(">i", raw, 56, len(raw) - 56 + 1)
     raw.extend(struct.pack(">II", 0, 300))
     source = SignatureMotionSource([("auxiliary", bank(raw))])
-    with pytest.raises(ValueError, match="remain unmapped"):
+    with pytest.raises(ValueError, match="explicit selector contracts"):
         translate(source, donor, target)
 
 

@@ -172,8 +172,10 @@ def test_auxiliary_selectors_remain_unresolved_and_bind_changes_block_components
     source = SignatureMotionSource([("curve", bank(out))])
     _, report = source.tracks(0, 0)
     assert report["auxiliary_pointers"] == [len(raw)]
-    assert not report["auxiliary_extents_established"]
-    assert "auxiliary-selector-extents-and-semantics" in report["conversion_blockers"]
+    assert report["auxiliary_extents_established"]
+    assert not report["auxiliary_semantics_established"]
+    assert report["auxiliary_tracks"][0]["selectors"] == [1, 2]
+    assert "auxiliary-selector-semantics" in report["conversion_blockers"]
     with pytest.raises(ValueError):
         source.prepare_pose_root(0, 0, donor, bytes(64))
 
