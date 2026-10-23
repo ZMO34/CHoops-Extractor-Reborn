@@ -200,3 +200,14 @@ consumed control word separately from unknown tail bytes. Python callers can use
 metadata/auxiliary contracts and an event contract to prepare all source slots.
 The result is a relative owned image and explicit family manifest, not installed
 playable dispatch. No new executable-writing CLI is exposed.
+
+### Shot fallback research APIs
+
+`choops_py.research.shot_fallback.inspect_shot_fallbacks(donor_elf, source=None)`
+reads the revision-bound fallback dependency tables; supply a bounded
+`SignatureMotionSource` to resolve serialized IDs across banks. It initializes
+no native resources and writes no executable. `resolve_shot_fallbacks` accepts
+resolved uint32 handles (zero means explicitly empty), all eight weighted rows,
+18 bucket rows, fixed lanes, explicit RNG samples and the context predicate
+result. `shot_cache_matches` models the native player/+0xD4 key. These Python
+research APIs establish source behavior; no new game-writing CLI is exposed.

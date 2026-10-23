@@ -160,6 +160,22 @@ def prepare_shot_family(
         pairs=[slots[i : i + 2] for i in range(0, 8, 2)],
         components=components,
         all_source_slots_accounted_for=True,
+        original_pair_presence_by_selector={
+            str(bit): [
+                not empty for empty in select_shot_pairs(row, bit)["disabled_or_empty"]
+            ]
+            for bit in (0, 1)
+        },
+        fallback_resources_included=False,
+        native_cache_key_fields=["player-identity", "player+0xD4"],
+        fallback_requirements={
+            "pair0": "eight-row-weighted-pool-if-empty",
+            "pair1": "player+0x1C-modulo-18-if-empty-also-replaces-pair2",
+            "pair2": "lane-specific-fixed-header-if-still-empty",
+            "pair3": "lane-specific-fixed-header-if-empty-or-context-predicate",
+            "control_value": "reset-to-zero-whenever-pair3-is-replaced",
+            "presence_flags": "original-pair0-and-pair1-presence-before-fallbacks",
+        },
         selected_slots_when_zero=select_shot_pairs(row, 0)["selected_slots"],
         selected_slots_when_one=select_shot_pairs(row, 1)["selected_slots"],
         native_family_selection_installed=False,

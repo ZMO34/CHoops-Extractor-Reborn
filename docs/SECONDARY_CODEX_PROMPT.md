@@ -88,6 +88,58 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+## Native shot fallback graph and dependency closure
+
+Current priority remains animation porting; right-stick controls stay deferred.
+NBA11 cache initializer `0x6535BC` is now traced through its fallback branches,
+and cache-key reader `0x6533C0` is established. This supersedes the older
+statement that the fallback graph itself was untraced; target role mapping,
+context predicate semantics and native target dispatch are still unresolved.
+
+- Cache identity is player pointer plus player +0xD4. Selector/context are not
+  additional keys. Resource replacement must invalidate cached pointers or retain
+  their owners; the resident process-lifetime owner remains necessary.
+- Cache +0x1C/+0x20 retain original pair0/pair1 presence, before filling fallbacks.
+  Callers of `0x653A3C`/`0x6539D8` can request these original-presence flags.
+- Missing pair0 uses eight weighted rows (`0x434F1D0`, stride20). Each row consumes
+  one RNG sample; native float32 weight/cumulative-weight must strictly exceed
+  that sample to replace the selected row. This is a reservoir pass, not a
+  single cumulative-distribution draw.
+- Missing pair1 uses unsigned player +0x1C modulo18 into `0x434F270`, stride32;
+  it replaces pair1 AND pair2 even if pair2 originally existed. The player field's
+  basketball meaning is not assumed.
+- Still-empty pair2 selects embedded `0x3F8C798`/`0x3F8C7D0` by lane. Empty pair3
+  or a true optional context predicate selects lane-specific globals at
+  `0x434F1C4`/`0x434F1CC` and resets cache +0x18 to zero. Missing context, a -1
+  context ID, and a false predicate do not force replacement. The extra generator
+  getter call on pair3 replacement remains observable even without an RNG draw.
+
+`shot_fallback.py` adds bounded resolution and read-only revision-guarded table
+inspection. Handles/predicate results/RNG samples are explicit inputs; it does
+not guess target resource identities or reimplement unproven service semantics.
+The inspector distinguishes serialized resource IDs, embedded pointers, explicit
+empty entries and ambiguous identities, retaining input fingerprints. A family
+preparation report now records original lane presence, fallback requirements and
+that fallback resources are not included in its eight-slot image.
+
+Supplied-copy closure: 92 referenced positions = 64 unique bank-backed motions
+(all resolve uniquely in the supplied signature banks and already occur among
+shot slots), 24 unique executable-held headers, and four explicit empties.
+All 24 embedded headers' pose/root components convert: 708 authored keys remain
+exact across 6,426 fixed frames / 972,972 component bytes, before deduplication.
+Source hashes are unchanged. Header references, events, selectors and metadata
+still gate complete motion construction; component success is not playability.
+
+`NativeShotFallbackTrace.java` passes 145 bounded read-only instruction cases:
+140 fallback cases across both lanes, all 16 presence masks, missing/invalid-ID/
+false/true context, modulo boundaries and reservoir thresholds; five native cache
+key cases. RNG/context service results are mocked, with original fallback
+instructions executed. A Python/native comparison agrees on all 140 motion
+vectors and RNG draw counts. Nonzero control-value preservation/reset is checked.
+Next: map CH playback contexts and integrate the complete fallback dependency set
+with resident registration, retaining original presence flags. Remaining event,
+selector, authoring metadata and style-capacity gaps still block a full port.
+
 ## NBA11 shot-family preservation (animation priority)
 
 Animation porting takes priority; NBA2K14 right-stick/default-preset work is deferred.
@@ -2030,6 +2082,58 @@ No RPCS3, hardware run, full-game build or controller remapping was performed.
 ---
 
 Embedded source: docs/ANIMATION_RUNTIME_ADAPTER.md
+
+## Native shot fallback graph and dependency closure
+
+Current priority remains animation porting; right-stick controls stay deferred.
+NBA11 cache initializer `0x6535BC` is now traced through its fallback branches,
+and cache-key reader `0x6533C0` is established. This supersedes the older
+statement that the fallback graph itself was untraced; target role mapping,
+context predicate semantics and native target dispatch are still unresolved.
+
+- Cache identity is player pointer plus player +0xD4. Selector/context are not
+  additional keys. Resource replacement must invalidate cached pointers or retain
+  their owners; the resident process-lifetime owner remains necessary.
+- Cache +0x1C/+0x20 retain original pair0/pair1 presence, before filling fallbacks.
+  Callers of `0x653A3C`/`0x6539D8` can request these original-presence flags.
+- Missing pair0 uses eight weighted rows (`0x434F1D0`, stride20). Each row consumes
+  one RNG sample; native float32 weight/cumulative-weight must strictly exceed
+  that sample to replace the selected row. This is a reservoir pass, not a
+  single cumulative-distribution draw.
+- Missing pair1 uses unsigned player +0x1C modulo18 into `0x434F270`, stride32;
+  it replaces pair1 AND pair2 even if pair2 originally existed. The player field's
+  basketball meaning is not assumed.
+- Still-empty pair2 selects embedded `0x3F8C798`/`0x3F8C7D0` by lane. Empty pair3
+  or a true optional context predicate selects lane-specific globals at
+  `0x434F1C4`/`0x434F1CC` and resets cache +0x18 to zero. Missing context, a -1
+  context ID, and a false predicate do not force replacement. The extra generator
+  getter call on pair3 replacement remains observable even without an RNG draw.
+
+`shot_fallback.py` adds bounded resolution and read-only revision-guarded table
+inspection. Handles/predicate results/RNG samples are explicit inputs; it does
+not guess target resource identities or reimplement unproven service semantics.
+The inspector distinguishes serialized resource IDs, embedded pointers, explicit
+empty entries and ambiguous identities, retaining input fingerprints. A family
+preparation report now records original lane presence, fallback requirements and
+that fallback resources are not included in its eight-slot image.
+
+Supplied-copy closure: 92 referenced positions = 64 unique bank-backed motions
+(all resolve uniquely in the supplied signature banks and already occur among
+shot slots), 24 unique executable-held headers, and four explicit empties.
+All 24 embedded headers' pose/root components convert: 708 authored keys remain
+exact across 6,426 fixed frames / 972,972 component bytes, before deduplication.
+Source hashes are unchanged. Header references, events, selectors and metadata
+still gate complete motion construction; component success is not playability.
+
+`NativeShotFallbackTrace.java` passes 145 bounded read-only instruction cases:
+140 fallback cases across both lanes, all 16 presence masks, missing/invalid-ID/
+false/true context, modulo boundaries and reservoir thresholds; five native cache
+key cases. RNG/context service results are mocked, with original fallback
+instructions executed. A Python/native comparison agrees on all 140 motion
+vectors and RNG draw counts. Nonzero control-value preservation/reset is checked.
+Next: map CH playback contexts and integrate the complete fallback dependency set
+with resident registration, retaining original presence flags. Remaining event,
+selector, authoring metadata and style-capacity gaps still block a full port.
 
 ## NBA11 shot-family preservation (animation priority)
 
@@ -5591,6 +5695,22 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+## Native shot fallback continuation
+
+Targeted shot fallback/family/registry suite: **51 passed**. Checks retain original
+presence flags, replace existing pair2 when pair1 is missing, preserve/reset
+nonzero control words, distinguish empty dependencies, bound table extents and
+reject invalid float arithmetic. Native instruction harness: **145 passed**;
+140 fallback vectors/draw counts also match the Python model. Services are explicit
+mocks; no game execution. A first nonzero-control harness check caught an incorrect
+synthetic high-address register setup; it was corrected before the final 145-case
+run. The final harness initializes floating-point exception state.
+
+Supplied read-only dependency audit: 64 resolved serialized motions, 24 embedded
+headers, four empty positions. Embedded pose/root conversion preserves 708
+keys exactly (6,426 frames, 972,972 bytes before deduplication). Originals unchanged;
+complete event/metadata/selector conversion and gameplay remain unverified.
 
 ## Shot-family continuation
 

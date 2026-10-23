@@ -1,3 +1,19 @@
+## Native shot fallback continuation
+
+Targeted shot fallback/family/registry suite: **51 passed**. Checks retain original
+presence flags, replace existing pair2 when pair1 is missing, preserve/reset
+nonzero control words, distinguish empty dependencies, bound table extents and
+reject invalid float arithmetic. Native instruction harness: **145 passed**;
+140 fallback vectors/draw counts also match the Python model. Services are explicit
+mocks; no game execution. A first nonzero-control harness check caught an incorrect
+synthetic high-address register setup; it was corrected before the final 145-case
+run. The final harness initializes floating-point exception state.
+
+Supplied read-only dependency audit: 64 resolved serialized motions, 24 embedded
+headers, four empty positions. Embedded pose/root conversion preserves 708
+keys exactly (6,426 frames, 972,972 bytes before deduplication). Originals unchanged;
+complete event/metadata/selector conversion and gameplay remain unverified.
+
 ## Shot-family continuation
 
 Portable verification in the isolated detached checkout: **1,051 passed,

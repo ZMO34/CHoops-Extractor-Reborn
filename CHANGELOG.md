@@ -464,3 +464,8 @@ excluded, while source/stale-edit safety columns are retained.
 - Preserve all four NBA11 shot pairs and consumed control-word provenance.
 - Prepare bounded complete family images with explicit contracts; reject unknown dependencies.
 - Add native pair-selection traces; defer secondary right-stick control work.
+
+### Shot fallback dependency continuation
+- Model native four-pair fallbacks, original-presence flags and cache key.
+- Inspect typed serialized/embedded/empty fallback dependencies without initializing resources.
+- Record fallback requirements in complete-family reports; add bounded native instruction checks.
