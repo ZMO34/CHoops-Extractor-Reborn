@@ -88,6 +88,29 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# Unreleased - dual recruiting-pool ownership and exhaustion proof
+
+Implemented the second native recruiting graph: all school +0x260 lists and its
+independent free chain, exact serialized recruit anchors, duplicate/cycle/shared
+ownership rejection, cleared free-node validation and full 16,000-node coverage.
+Both pool audits now expose snapshot free counts; complete coverage is distinct
+from a future native reservation budget. The Legacy editor adds a Recruiting node
+pools tab, using the same backend as both existing inspection commands. Corrupt
+second-pool data remains a local diagnostic; stale/failed loads clear old rows.
+
+Ten bounded Ghidra instruction cases confirm second-pool initialization/release,
+school lookup, offer-bit preservation, first-pool exhaustion and commitment order.
+In an exhausted/no-existing-interest synthetic case, 0x5C8CD8 sets commitment and
+decrements the school counter before 0x5C3144 returns -1. Following instructions
+lack an allocation-result guard before indexed stores. Future portal hooks must
+reserve capacity and guard before mutation; the stock routine alone is unsafe.
+
+This closes the structural second-pool ownership gap, not native proxy admission,
+reservation/rollback, UI hooks, save/resume or the requested playable portal.
+The full Legacy editor and native portal remain unfinished. No actual offseason
+state was available for this pass. Original executable/assets/saves unchanged;
+no RPCS3/gameplay run or testing JB. See LEGACY_PORTAL_IMPLEMENTATION.md.
+
 # Unreleased — portal callback, tuning and persistence investigation
 
 Recovered native postseason/rollover callback order; confirmed Confidence as the
@@ -5410,6 +5433,36 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+# Unreleased dual-pool ownership verification
+
+Windows/Python 3.12, Qt offscreen. Full portable runner:
+python tools/dev/verify.py --python DEVELOPMENT_PYTHON
+passed **1063 tests, 10 skipped, 2 deselected**, compilation, CLI help, Qt startup,
+Ruff, mypy (18 files), generated handoff and diff checks. Separate new research
+module checks found no fatal/undefined-name issues. Source executable equality
+against the earlier private audit was verified. The node-pool tab was rendered
+with an explicitly loaded Windows font for offscreen visual inspection.
+
+Targeted command:
+python -m pytest tests/test_school_recruiting.py tests/test_recruit_pool.py tests/test_legacy_backend.py tests/test_legacy_recruiting_gui.py -q
+passed **96 tests**. Covers exact recruit anchors, full 16,000-node free and live
+chains, saturation, cycles, shared/live-free ownership, duplicate recruits,
+preserved unknown flags, partial ownership, corrupt second-pool diagnostics,
+both CLI/backend paths, GUI counts and stale/failed-load clearing.
+
+RecruitingPoolTrace.java, run on the observed decoded analysis project with
+-readOnly -noanalysis, passed **10 bounded native instruction cases**. Cases
+cover initialization and neighboring bytes, release/free links, first-node,
+last-node and exhausted allocation, present/missing/empty school lookups,
+offer-bit-only clearing and the exhausted commitment prefix. Synthetic memory
+only; the commitment case stops before external school lookup and invalid stores.
+The script rejects existing report paths and checks the observed pool topology.
+These are instruction-contract checks, not execution of the game.
+
+No actual offseason save, native proxy insertion, signing transaction or native
+save/resume acceptance is verified. Original inputs remain unchanged. RPCS3/gameplay
+NOT RUN; automatic/testing JB NOT BUILT.
 
 # Unreleased native portal readiness investigation
 

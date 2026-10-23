@@ -1,3 +1,13 @@
+# Recruiting node pools
+
+In Roster Editor, open **Recruiting diagnostics...**, then **Legacy backend** and
+load an explicitly identified native aggregate. **Recruiting node pools** shows
+both independent pools: live nodes, traced free nodes, unowned nodes, complete
+coverage and local corruption errors. Select a row for node/reference details.
+A failed or stale load clears old results. Counts describe this snapshot; they
+do not reserve recruiting space or enable portal signing. A whole USERDATA is
+not an aggregate.
+
 # Portal research and saved polls
 
 Recruiting diagnostics → **Portal research** shows confirmed native integration

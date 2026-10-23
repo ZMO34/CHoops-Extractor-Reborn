@@ -12,7 +12,7 @@ history. An external save-editing transfer workflow does not satisfy that goal.
 **A concrete native design is plausible, with identified intervention points.
 The complete feature is not yet ready to implement safely.** Callback sequencing,
 frequency arithmetic and storage contracts are now substantially stronger than
-the earlier feasibility assessment. However, proxy initialization, node capacity,
+the earlier feasibility assessment. However, proxy initialization, future node reservation capacity,
 reservation rollback, the native poll adapter and native load/resume proof
 remain open. These are correctness gates, not optional presentation polish.
 
@@ -296,3 +296,66 @@ full destinations, no offers, queue saturation, both pools near exhaustion,
 source/destination cycles, class/redshirt/sit-out policy, identical history before
 and after signing, in-game save/reload during recruiting, season rollover and a
 second transfer season. A passing Python policy test does not pass these cases.
+
+
+## Second-pool ownership and exhaustion - implementation continuation
+
+The structural ownership gap is now closed for an explicitly identified recruiting
+component and its supplied roster. This supersedes earlier statements that the
+second pool has only in-bounds pointer checks. It does not establish that the two
+inputs belong together or certify the native proxy lifecycle.
+
+Native auditor 0x5CA108 checks BOTH pools. Its second half traverses every school's
+runtime +0x260 list, then the independent second free head, marks each visited
+node and checks complete 16,000-node coverage. Unlike the first half, school-list
+traversal does not depend on the recruit flags &4 filter. Node initialization
+0x5C34F0 clears reference and word +6 and writes next=-1. Release 0x5C3528 calls
+that initializer before linking the node to the free head. Lookup 0x5C3580 and
+detach 0x5C5EE8 follow signed next at node +4.
+
+research.school_recruiting.inspect_school_recruit_graph audits those exact
+structures. Live references must equal a recruit record start, not merely land
+inside the roster. Lists reject duplicate recruits within one school, cycles,
+shared node ownership and live/free aliasing. Different schools may pursue the
+same recruit through different nodes. The free list must contain cleared references
+and flags. Word +6 is retained raw; only the established scholarship-offer bit7
+is separately exposed. No equality between the two distinct list families is
+invented.
+
+inspect_recruiting_section supplies every school head using editor table start
++48 + school_index*704 +0x260, resolves references against the decoded recruit
+directory, and records the second graph or its local error. First-pool and queue
+diagnostics survive a bad second graph. dual_pool_ownership_validated requires
+complete disjoint coverage in BOTH pools. Unowned nodes are counted without
+inventing their purpose. Free counts describe the supplied snapshot; they do not
+reserve nodes or guarantee space for future ordinary recruiting.
+
+### Confirmed allocation-failure ordering
+
+First-pool pop 0x5C3144 returns -1 when its free head is negative. Commitment
+0x5C8CD8 sets the recruit committed bit and changes school +0x2A8 bits24..27
+before reclaiming the old interest chain and obtaining the new node. A bounded
+instruction case starts with no old interest and an exhausted first pool:
+commitment and the school counter change while the returned node is -1. The
+subsequent code uses that index for node writes without an intervening failure
+check. Static inspection places the first indexed store at 0x5C8E18.
+
+This is an established failure path under synthetic exhaustion, not a claim that
+the stock game encounters it routinely. A portal adds demand and cannot rely on
+that stock routine as an atomic transaction. Guard ownership/capacity and reserve
+resources before any commitment/counter mutation. Releasing an existing interest
+chain may provide capacity in another case; the empty-chain case provides none.
+No native guard, reservation allocator or rollback hook is installed in this update.
+
+tools/research/RecruitingPoolTrace.java uses synthetic memory for ten bounded
+instruction cases, including both node boundaries, exhaustion, lookup and offer
+mask preservation. Run against the observed decoded Ghidra project with
+-readOnly -noanalysis; choose a new private JSON path. It neither launches the
+game nor saves the executable/project.
+
+Next work remains valid native proxy construction/visibility, additional-recruit
+storage and CPU scratch allocation, ordinary-recruit capacity headroom,
+reservation/rollback across all recruiting actions, identity/history-preserving
+membership signing, then phase-specific native save/load and multi-season owner
+acceptance. Full Legacy editing still requires mapped save-envelope fields and
+controlled before/after saves. Neither requested feature is complete.

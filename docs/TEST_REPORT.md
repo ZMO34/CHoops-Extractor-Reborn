@@ -1,3 +1,33 @@
+# Unreleased dual-pool ownership verification
+
+Windows/Python 3.12, Qt offscreen. Full portable runner:
+python tools/dev/verify.py --python DEVELOPMENT_PYTHON
+passed **1063 tests, 10 skipped, 2 deselected**, compilation, CLI help, Qt startup,
+Ruff, mypy (18 files), generated handoff and diff checks. Separate new research
+module checks found no fatal/undefined-name issues. Source executable equality
+against the earlier private audit was verified. The node-pool tab was rendered
+with an explicitly loaded Windows font for offscreen visual inspection.
+
+Targeted command:
+python -m pytest tests/test_school_recruiting.py tests/test_recruit_pool.py tests/test_legacy_backend.py tests/test_legacy_recruiting_gui.py -q
+passed **96 tests**. Covers exact recruit anchors, full 16,000-node free and live
+chains, saturation, cycles, shared/live-free ownership, duplicate recruits,
+preserved unknown flags, partial ownership, corrupt second-pool diagnostics,
+both CLI/backend paths, GUI counts and stale/failed-load clearing.
+
+RecruitingPoolTrace.java, run on the observed decoded analysis project with
+-readOnly -noanalysis, passed **10 bounded native instruction cases**. Cases
+cover initialization and neighboring bytes, release/free links, first-node,
+last-node and exhausted allocation, present/missing/empty school lookups,
+offer-bit-only clearing and the exhausted commitment prefix. Synthetic memory
+only; the commitment case stops before external school lookup and invalid stores.
+The script rejects existing report paths and checks the observed pool topology.
+These are instruction-contract checks, not execution of the game.
+
+No actual offseason save, native proxy insertion, signing transaction or native
+save/resume acceptance is verified. Original inputs remain unchanged. RPCS3/gameplay
+NOT RUN; automatic/testing JB NOT BUILT.
+
 # Unreleased native portal readiness investigation
 
 `python tools/dev/verify.py --python <development-python>` passed: **1036 passed,

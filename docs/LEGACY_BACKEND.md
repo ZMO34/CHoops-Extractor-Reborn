@@ -137,3 +137,16 @@ The in-game portal remains the goal; inspection supports native integration.
 
 Detailed recruiting evidence and requested interest policy:
 [LEGACY_TRANSFER_PORTAL.md](LEGACY_TRANSFER_PORTAL.md).
+
+
+## Both recruiting graphs
+
+The recruiting component audit now traverses both full ownership graphs, including
+all school +0x260 heads and the independent second free list. This supersedes the
+earlier second-pool pointer-bounds-only limit. Exact recruit references, live/free
+separation, duplicate/cycle rejection and complete node coverage are checked.
+A second-graph error is local and does not hide first-pool or queue results.
+Neither complete graph coverage nor a snapshot free count establishes future
+native reservation capacity. The editor's Recruiting node pools tab presents
+the shared backend results. Native signing and full Legacy mutation remain
+unfinished; see LEGACY_PORTAL_IMPLEMENTATION.md for allocation-failure evidence.

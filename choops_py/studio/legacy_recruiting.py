@@ -84,6 +84,12 @@ class RecruitingDiagnostics(QDialog):
         backend_splitter.addWidget(self.backend_details)
         backend_layout.addWidget(backend_splitter, 1)
         tabs.addTab(backend, "Legacy backend")
+        self.pool_status, self.pool_view, self.pool_details = self.research_page(
+            tabs,
+            "Recruiting node pools",
+            "Load a separately identified aggregate from Legacy backend to inspect both pools. "
+            "Free-node counts describe this snapshot; no native portal reservation is installed.",
+        )
         self.schedule_status, self.schedule_view, self.schedule_details = (
             self.research_page(
                 tabs,
@@ -211,11 +217,15 @@ class RecruitingDiagnostics(QDialog):
                 )
                 self.display_components(component_layout())
                 self.backend_details.clear()
+                self.display_node_pools(
+                    error="The source roster changed. Reopen diagnostics."
+                )
             return
         if "error" in report:
             self.aggregate_status.setText("Aggregate unavailable: " + report["error"])
             self.display_components(component_layout())
             self.backend_details.clear()
+            self.display_node_pools(error=report["error"])
             return
         errors = sum("audit_error" in row for row in report["components"])
         self.aggregate_status.setText(
@@ -224,6 +234,53 @@ class RecruitingDiagnostics(QDialog):
         )
         self.display_components(report["components"])
         self.backend_view.selectRow(0)
+        recruiting = next(
+            (row for row in report["components"] if row["component"] == "recruiting"),
+            {},
+        )
+        self.display_node_pools(
+            recruiting.get("audit"), error=recruiting.get("audit_error", "")
+        )
+
+    def display_node_pools(self, audit=None, *, error=""):
+        from .app import set_rows
+
+        self.pool_details.clear()
+        columns = [
+            ("pool", "Native pool"),
+            ("live_nodes", "Owned live nodes"),
+            ("free_nodes_traced", "Free nodes traced"),
+            ("unowned_nodes", "Unowned nodes"),
+            ("all_nodes_owned", "Complete coverage"),
+            ("error", "Diagnostics"),
+        ]
+        if audit is None:
+            self.pool_status.setText(
+                "Node pools unavailable: " + (error or "Not inspected")
+            )
+            set_rows(self.pool_view, [], columns)
+            return
+        rows = [
+            dict(graph, pool=name, error=graph.get("error", ""))
+            for name, graph in (
+                ("Recruit interests", audit["interest_graph"]),
+                ("School recruit lists", audit["school_recruit_graph"]),
+            )
+        ]
+        complete = audit["dual_pool_ownership_validated"]
+        self.pool_status.setText(
+            (
+                "Both pools have complete disjoint ownership. "
+                if complete
+                else "Complete ownership is not verified for both pools. "
+            )
+            + "Counts apply to this snapshot; future recruiting demand and native reservation are unverified."
+        )
+        set_rows(self.pool_view, rows, columns)
+        self.pool_view.selectionModel().selectionChanged.connect(
+            self.pool_view._research_selection
+        )
+        self.pool_view.selectRow(0)
 
     def inspect(self, _job):
         # Captured immutable bytes, never a live EditorModel or Qt widget read.

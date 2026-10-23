@@ -1,3 +1,10 @@
+## Unreleased - recruiting node ownership and exhaustion checks
+
+- Audit both 16,000-node recruiting pools, exact saved recruit references and complete disjoint coverage.
+- Show snapshot node counts and local errors in a searchable Legacy editor tab; invalidate stale displays.
+- Add ten bounded native instruction checks, including mutation before an exhausted commitment allocation.
+- Native portal signing, reservation, proxy lifecycle and save/resume remain unfinished.
+
 ## Unreleased — native portal implementation investigation
 
 - Recover indirect offseason callback order, confidence-state generation and offer/refund/commitment paths.

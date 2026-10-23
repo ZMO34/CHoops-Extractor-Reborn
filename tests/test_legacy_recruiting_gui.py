@@ -193,9 +193,50 @@ def test_portal_research_is_read_only_and_does_not_claim_native_settings(qtbot):
     owner, dialog = diagnostics(qtbot)
     before = bytes(owner.roster.data)
     tabs = dialog.findChild(QTabWidget)
-    assert tabs.tabText(4) == "Portal research"
-    page = tabs.widget(4)
+    index = next(i for i in range(tabs.count()) if tabs.tabText(i) == "Portal research")
+    page = tabs.widget(index)
     assert isinstance(page, QPlainTextEdit) and page.isReadOnly()
     assert "not working game" in page.toPlainText()
     assert "Not implementation-ready" in page.toPlainText()
     assert bytes(owner.roster.data) == before
+
+
+def test_both_node_pools_display_snapshot_counts_and_clear_on_source_change(qtbot):
+    from test_legacy_backend import aggregate_fixture
+    from test_school_recruiting import complete_state
+    from choops_py.research.legacy_backend import inspect_legacy_aggregate
+
+    roster, state, _, _ = complete_state()
+    aggregate = aggregate_fixture()
+    aggregate[0x11418:0x529BC] = state
+    owner, dialog = diagnostics(qtbot, roster)
+    before = bytes(owner.roster.data)
+    report = inspect_legacy_aggregate(aggregate, dialog.payload)
+    dialog.display_aggregate(report)
+    assert dialog.pool_view.model().rowCount() == 2
+    assert "complete disjoint ownership" in dialog.pool_status.text()
+    dialog.pool_view.selectRow(1)
+    assert '"free_nodes_traced": 16000' in dialog.pool_details.toPlainText()
+    assert bytes(owner.roster.data) == before
+    owner.roster.data[-1] ^= 1
+    dialog.display_aggregate(report)
+    assert dialog.pool_view.model().rowCount() == 0
+    assert not dialog.pool_details.toPlainText()
+    assert "source roster changed" in dialog.pool_status.text()
+
+
+def test_failed_secondary_audit_is_visible_without_hiding_primary(qtbot):
+    from test_legacy_backend import aggregate_fixture
+    from choops_py.research.legacy_backend import inspect_legacy_aggregate
+
+    _, dialog = diagnostics(qtbot)
+    dialog.display_aggregate(
+        inspect_legacy_aggregate(aggregate_fixture(), dialog.payload)
+    )
+    assert dialog.pool_view.model().rowCount() == 2
+    assert "not verified" in dialog.pool_status.text()
+    dialog.pool_view.selectRow(1)
+    assert '"error"' in dialog.pool_details.toPlainText()
+    dialog.display_aggregate({"error": "bad component"})
+    assert dialog.pool_view.model().rowCount() == 0
+    assert not dialog.pool_details.toPlainText()

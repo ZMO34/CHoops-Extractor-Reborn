@@ -1,3 +1,20 @@
+# Both recruiting ownership graphs
+
+The existing inspect-recruit-pool command with --recruiting-state STATE.bin and
+inspect-legacy-backend command now include school_recruit_graph,
+dual_pool_ownership_validated and node_availability in the recruiting audit.
+The first accepts the separately identified 0x415A4 component; the second requires
+the 0x15D1CC aggregate. Exact recruit anchors and all school lists/free nodes are
+checked. A malformed second graph is reported locally while the first graph and
+queue diagnostics remain available. Free counts are snapshot diagnostics, not
+a native portal allocation promise.
+
+Optional native research: run tools/research/RecruitingPoolTrace.java through
+Ghidra headless with -readOnly -noanalysis -process EBOOT.ELF -postScript RecruitingPoolTrace.java NEW_PRIVATE_REPORT.json.
+Requires the observed decoded analysis project. The ten bounded cases use
+synthetic memory and do not launch the game or write an executable. Existing
+report paths are rejected. Keep reports and analysis inputs private.
+
 # Scheduling and history inspection
 
 `inspect-legacy-schedule ROSTER_FILE OUTPUT.json` audits fixture membership,
