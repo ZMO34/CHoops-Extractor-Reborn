@@ -1,5 +1,9 @@
 ## Native shot fallback continuation
 
+Portable verification in the isolated detached checkout: **1,074 passed,
+10 skipped, 2 deselected**; compile, handoff, CLI/offscreen Qt, Ruff and mypy
+(18 files) pass. Author verification only; no independent approval.
+
 Targeted shot fallback/family/registry suite: **51 passed**. Checks retain original
 presence flags, replace existing pair2 when pair1 is missing, preserve/reset
 nonzero control words, distinguish empty dependencies, bound table extents and
