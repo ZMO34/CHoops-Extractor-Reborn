@@ -1,3 +1,17 @@
+# Unreleased — scorebug context and line-artifact investigation
+
+Mapped native NCAA/NIT calendar predicates, season/conference/national label
+consumers and timeout calling-team selection. The current gamedata lacks authored
+text1/text2/text3/text3_b records despite registered providers: broad popup display
+coverage is not established. Added an explicit context/layer specification with
+per-feature proof requirements; no new native context hook is installed.
+
+A private correction degenerates 30 index spans in three scenes to suppress old
+frames/masks, twelve transparent surplus quads and an edge-on popup helper.
+All scene headers/vertices and 259 other v1 records remain exact; native meter
+and executable are unchanged. Two IFFs prepare/preflight. This removes identified
+geometry risks, not a certified fix for all reported lines. No emulator/gameplay
+or testing JB. See [SCOREBUG_CONTEXT_AND_ARTIFACTS.md](SCOREBUG_CONTEXT_AND_ARTIFACTS.md).
 # v1.22 — new alternate folder discovery
 
 Windows extended drive/UNC path spellings are normalized consistently, fixing the

@@ -1,3 +1,13 @@
+# Scorebug context and geometry investigation — 2026-10-23
+
+Documentation-only public update. Private source-bound candidate: 30 index spans
+across three SCNEs, all header/vertex bytes preserved, 259 other v1 records exact,
+all meter data and executable unchanged, five HUD scenes reparse. Two IFFs stage
+and preflight without a JB build. Focused Ghidra: five context consumers plus six
+dependencies, with original-instruction/switch-table checks. Full gamedata text
+inventory finds no authored text1/text2/text3/text3_b records. Native popup table
+and localization inspection remains static evidence, not live admission proof.
+No runtime context hook was installed. User-reported line cause unconfirmed.
 # v1.22 alternate discovery and PR integration
 
 Targeted: `python -m pytest tests/test_team_assets.py tests/test_folder_overrides.py

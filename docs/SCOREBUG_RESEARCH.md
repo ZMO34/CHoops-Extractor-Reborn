@@ -523,3 +523,9 @@ ELF without changing it. It reports static metadata, not live state or game
 compatibility. Conditional popup backgrounds still require matching visibility,
 opacity and transition state. No new executable or installable scorebug is
 produced by this inspection.
+
+## Context and recurring lines follow-up
+
+See [SCOREBUG_CONTEXT_AND_ARTIFACTS.md](SCOREBUG_CONTEXT_AND_ARTIFACTS.md) for the
+2026-10-23 native context map, incomplete authored popup coverage, geometry
+correction evidence and explicit remaining implementation requirements.
