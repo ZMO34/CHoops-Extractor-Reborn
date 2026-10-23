@@ -1,3 +1,20 @@
+# Unreleased — signature-IFF motion source adapter
+
+Continued the NBA11 port from merged PR45/47 with typed cross-bank SingleMoCap
+alias resolution and a bounded serialized source adapter. Each alias retains its
+own metadata; missing/ambiguous identities, cycles, incompatible counts, truncated
+tracks and overlapping known dependencies are rejected. Added read-only CLI
+`inspect-signature-motion` and canonical-bind-gated pose/root component preparation.
+
+Supplied-copy audit: all 2,444 motions / 1,222 aliases pass known track checks.
+All 918 nonempty shot slots resolve to 911 headers / 456 payloads. Preparing those
+456 payloads produces 82,076 fixed frames; all 11,215 authored pose/root keys
+roundtrip exactly. Input executable/bank hashes remain unchanged. These are partial
+pose/root components, not complete motions or a playable import. Auxiliary selector,
+event/variant/authoring and native registration/lifetime gates remain. NBA2K14
+right-stick dribbling remains a separate unimplemented runtime-control goal.
+See [ANIMATION_RUNTIME_ADAPTER.md](ANIMATION_RUNTIME_ADAPTER.md).
+
 # v1.22 — new alternate folder discovery
 
 Windows extended drive/UNC path spellings are normalized consistently, fixing the

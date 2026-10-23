@@ -1,3 +1,24 @@
+# Signature-IFF source adaptation — 2026-10-23
+
+`python -m pytest tests/test_signature_motion.py -q -p no:cacheprovider`:
+**19 passed**. Covers compressed/uncompressed serialized sources, exact pose/root
+components, cross-bank alias metadata retention, missing/ambiguous/wrong-type IDs,
+cycles, incompatible masks/counts/packing/timing, identity mismatch, truncated or
+overlapping tracks, missing event sentinel, decoded-size limits, budget-before-
+expansion, canonical bind rejection, omitted auxiliary semantics, keys-minus-one
+timing boundaries, CLI parity and every-related-source output protection.
+New adapter/tests pass strict Ruff E/F/I checks. Source portable verification:
+**984 passed, 10 optional skips, 2 deselected**; compile, CLI/offscreen Qt, Ruff,
+mypy and handoff checks pass. Final exact-head evidence is recorded in the PR.
+
+Private read-only audit: 2,444 motion records / 1,222 aliases pass; all 918 nonempty
+shot slots resolve to 911 headers / 456 payloads. All 456 payloads prepare with
+82,076 fixed frames / 11,215 exactly preserved authored pose and root keys.
+Summed pose/root bytes: 12,324,180, before cross-payload deduplication and without
+other motion dependencies/native overhead. Input bank/executable hashes unchanged.
+No complete motion/native loader, playable animation or right-stick control port
+is claimed. RPCS3/gameplay NOT RUN; automatic/testing JB NOT BUILT.
+
 # v1.22 alternate discovery and PR integration
 
 Targeted: `python -m pytest tests/test_team_assets.py tests/test_folder_overrides.py

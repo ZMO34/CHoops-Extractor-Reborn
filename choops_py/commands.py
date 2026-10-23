@@ -18,6 +18,7 @@ COMMANDS={
     'inspect-motion-bind':Command(('input','target_elf','output')),
     'inspect-shot-registration':Command(('input','output'),('motion-extents',)),
     'sample-native-motion':Command(('input','target_elf','address','seconds','output'),('motion-sampler',)),
+    'inspect-signature-motion':Command(('input','index','output'),('related-banks',)),
     'inspect-donor-registry':Command(('input','profile','output'),('related-banks',)),
     'inspect-motion-events':Command(('input','profile','address','output'),('motion-events',)),
     'transcode-motion-events':Command(('input','profile','address','contract','output'),('motion-events',)),

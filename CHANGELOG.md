@@ -1,3 +1,9 @@
+## Unreleased — signature-IFF source adaptation
+
+- Resolve bounded typed NBA11 signature aliases while retaining original per-header metadata and rejecting ambiguous or incompatible dependencies.
+- Add `inspect-signature-motion` JSON diagnostics and canonical-bind-gated partial pose/root preparation with record-local bounds and expansion budgets.
+- Audit all supplied signature records and preserve authored keys exactly across 456 shot payload conversions. Full native import and NBA2K14 right-stick dribbling remain unfinished.
+
 ## v1.22 — alternate discovery and combined research updates
 
 Windows extended drive/UNC path spellings are normalized consistently, fixing the

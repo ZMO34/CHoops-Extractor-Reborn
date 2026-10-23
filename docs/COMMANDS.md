@@ -176,3 +176,14 @@ This audits class/preferences, native flags and links. It does not add transfers
 edit records, treat blank slots as safe to overwrite, repair unknown data or export
 research fields through game-data CSVs. The second node pool and remaining queue
 semantics are reported as incomplete. See LEGACY_TRANSFER_PORTAL.md.
+
+
+## Signature-IFF motion source audit
+
+`inspect-signature-motion INPUT_IFF RECORD_INDEX output/research/signature.json`
+accepts repeated `--related-bank OTHER_IFF` dependencies. The index is in INPUT_IFF;
+all banks use the observed NBA11 layout. JSON reports original alias metadata,
+typed resolution path, known source track extents and unresolved conversion gates.
+Stored and declared decoded blocks are bounded in aggregate to 128 MiB. Sources
+remain read-only; no complete motion, bank export or gameplay installation occurs.
+See ANIMATION_RUNTIME_ADAPTER.md for the partial pose/root research API.

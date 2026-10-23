@@ -236,7 +236,8 @@ component from the observed NBA11 **decoded-ELF** packed family, with verified
 canonical binds and separately supplied metadata/event contracts. This goes beyond
 retaining an existing CH header, but it does not automatically discover the missing
 metadata or install the component in a native bank. The signature-IFF records and
-aliases discussed below still need their own source adapter.
+aliases were outside this ELF builder; the later serialized-source section below
+now supplies their read-only adapter and partial pose/root preparation.
 
 The builder places the source low rotation/translation masks into CH's mask words,
 retains native channel counts and rate, expands authored key deltas to fixed frames,
@@ -371,5 +372,92 @@ phase algorithms or the remaining mode/state semantics.
 
 Original executables and source banks remain unchanged. Ghidra's bounded instruction
 harness was run; RPCS3, hardware/gameplay and automatic/testing JB were not run.
-The full native donor loader, automatic metadata derivation, signature-bank source
-adapter/auxiliary selector mapping and playable additive shot remain unfinished.
+The full native donor loader, automatic metadata derivation, signature-bank auxiliary selector mapping and playable additive shot remain unfinished.
+The serialized source adapter below supersedes the earlier source-adapter gap.
+
+
+## Serialized signature-IFF source adapter — 2026-10-23
+
+`research.signature_motion.SignatureMotionSource` consumes 1..32 related standard
+IFF banks with combined stored and declared decoded-block limits of 128 MiB.
+It indexes only typed SingleMoCap identities. A caller chooses a bank/record
+index; aliases follow their +0x28 ID until a record with nonzero event pointer is
+reached. Missing/duplicate matches, cycles and paths beyond 4,096 records fail.
+No resource-group selection is silently substituted for a direct motion.
+
+Resolution returns the original alias header separately from the track-owning
+record. Masks, channel/rate/auxiliary counts, key count and root/packing modes
+must agree across the path. Original mirror/phase/state/timing words remain
+original metadata; the adapter does not replace them with the payload owner's
+words or claim to derive target authoring fields. Declared timing must agree
+with the borrowed key intervals. This is an offline compatibility gate, not
+installation of the game's native resource resolver.
+
+All pointers are signed record-relative offsets. Known timing/pose/root/event
+and membership extents must fit within their record, stay outside its counted
+header, and not overlap one another. Events preserve their existing payload
+inspection limits. Counted auxiliary pointers and header +4 references remain
+reported dependencies: no curve end, padding, selector meaning or complete
+payload semantics is invented. Source bank/record/payload hashes and the entire
+alias path distinguish header identity from track ownership.
+
+The native timeline consumes **keys minus one interval bytes**. The existing
+shared resampler accepts keys slots but ignores its final slot. Some supplied
+serialized records end immediately after the consumed intervals. The adapter
+reads only those intervals, appends an explicit unused zero slot in memory and
+reports `timing_unused_final_slot_normalized=true`. It never obtains that slot
+from a neighboring record. A missing consumed interval still fails bounds checks.
+
+`tracks(bank, record)` returns known source components and a diagnostic manifest.
+`prepare_pose_root(bank, record, donor_elf, target_elf, budget=...)` verifies the
+canonical executable bind, preflights expanded pose/root bytes against a 64-byte
+to 16-MiB budget, and resamples both components. Reports bind provenance to both
+complete executable fingerprints, retain the original source header, and list
+omitted header/event/auxiliary/membership dependencies. Mirror/phase transforms
+are not baked into the component arrays. Neither API produces a complete CH
+header, native resident image, installable bank or patched executable.
+
+Read-only CLI (record index is in the first bank):
+
+```
+python -m choops_py.cli inspect-signature-motion siganims_generic.iff 0 output/research/signature-motion.json --related-bank siganims_generic_extra.iff
+```
+
+The CLI writes JSON only under output/ and protects every related source from
+replacement. It reports `complete_motion=false` and `gameplay_ready=false`.
+
+Supplied two-bank audit: all **2,444** SingleMoCap records pass known track checks,
+including **1,222** aliases. Category zero retains all **918** nonempty slots,
+**458** alias slots, **911** distinct headers and **456** distinct payload owners.
+All 456 payloads prepare successfully: **82,076** fixed frames, **11,215** authored
+keys, and **12,324,180** total pose/root component bytes summed per payload without
+cross-payload deduplication. Every authored pose is reverse-transcoded at its
+original tick and equals the original bytes; authored root rows also equal their
+source bytes. Interpolated frames retain the existing offline SLERP/quantization
+limits. Both banks and both decoded executables keep their original hashes.
+
+This measured component sum has a different scope from the earlier deduplicated
+known-component projection; neither is a complete native library/heap budget.
+Header/auxiliary/events, alignment, registration, allocator overhead and all
+existing CH memory still require separate accounting.
+
+### Remaining route to full NBA11 import and NBA2K14 right-stick dribbling
+
+1. Establish auxiliary selector identities/target routing, complete event payload
+   correspondence, per-header target authoring fields and every signature variant.
+   Connect the serialized adapter to the complete component writer only when those
+   dependencies have explicit validated contracts.
+2. Finish additive native lookup/registration and reader/publication/retirement/
+   heap-lifetime synchronization. Resolve the 259-style versus byte-ID ceiling
+   without truncating IDs or replacing stock styles. Then extend beyond signature
+   shots to other motion families, interaction/ball contacts and graph consumers.
+3. Trace the supplied **PS3** NBA2K14 right-stick input consumers, normalization,
+   camera-relative interpretation, move selection, cancel/blend windows and
+   ball/hand ownership against CH's controller/animation dispatch. Existing
+   controller/dribble strings are leads, not proof of these semantics. Importing
+   clips or changing a controller default alone does not implement right-stick
+   dribbling. No NBA2K14 input adapter or control patch is supplied this phase.
+
+Native execution/gameplay acceptance remains separate from structural conversion.
+No emulator, hardware or automatic/testing JB was used. Original game inputs
+remain immutable; game-derived component arrays/reports stay private.
