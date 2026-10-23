@@ -332,6 +332,7 @@ def translate_signature_motion(
         source_bank_index=bank,
         source_record_index=record,
         source_bank_sha256=source.fingerprints[bank],
+        source_banks_sha256=list(source.fingerprints),
         source_header_sha256=report["source_header_sha256"],
         donor_elf_sha256=hashlib.sha256(donor_elf).hexdigest(),
         target_elf_sha256=hashlib.sha256(target_elf).hexdigest(),

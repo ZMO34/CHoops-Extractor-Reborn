@@ -1,5 +1,7 @@
 ## Unreleased — counted selector transport
 
+- Bind serialized metadata contracts to every related donor bank, rejecting changed alias payloads under stale assertions.
+
 - Translate explicitly mapped auxiliary selector curves into extended CH headers and owned resident storage, preserving signed ticks and validated pointer extents.
 - Bound copied curves for native float32 endpoint rounding; reject overlaps, missing mappings, unknown extras and budget overflow.
 - Validate all CH stock motion/selector dependencies and 69 NBA2K14 input/controller-axis instruction cases. Full donor semantics and replacement control presets remain unfinished.

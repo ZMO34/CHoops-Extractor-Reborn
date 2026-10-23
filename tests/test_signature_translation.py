@@ -3,7 +3,7 @@ import struct
 
 import pytest
 from test_donor_header import contract as elf_contract
-from test_signature_motion import bank, fixtures
+from test_signature_motion import alias, bank, fixtures
 
 from choops_py.formats.motion_events import curve_timing_contract, inspect_events
 from choops_py.research.donor_header import translate_donor_motion
@@ -21,6 +21,7 @@ def metadata(source, donor, target):
         source_bank_index=0,
         source_record_index=0,
         source_bank_sha256=source.fingerprints[0],
+        source_banks_sha256=list(source.fingerprints),
         source_header_sha256=report["source_header_sha256"],
         donor_elf_sha256=hashlib.sha256(donor).hexdigest(),
         target_elf_sha256=hashlib.sha256(target).hexdigest(),
@@ -163,9 +164,60 @@ def test_serialized_component_loads_into_owned_native_segment(tmp_path):
     image, component = translate(source, donor, target)
     result, resident = append_resident_image(target, image, component["header_offsets"])
     native = NativeELF(result).read(resident["resident_base"], len(image))
-    assert relocate_target_image(
-        native, [0], resident["resident_base"], source_state="native"
-    ) == image
+    assert (
+        relocate_target_image(
+            native, [0], resident["resident_base"], source_state="native"
+        )
+        == image
+    )
     assert NativeELF(result).read(0x20100, 256) == bytes(256)
     assert resident["inverse_preservation_verified"]
     assert not resident["registered"] and not resident["gameplay_ready"]
+
+
+def test_metadata_contract_binds_related_alias_payload_bank(tmp_path):
+    donor, target, raw = fixtures(tmp_path)
+    original_alias = bank(alias(raw), identity=2)
+    source = SignatureMotionSource(
+        [
+            ("alias", original_alias),
+            ("owner", bank(raw)),
+        ]
+    )
+    c = metadata(source, donor, target)
+    image, _ = translate_signature_motion(
+        source,
+        0,
+        0,
+        donor,
+        target,
+        c,
+        curve_timing_contract(),
+    )
+    changed = bytearray(raw)
+    # Change one packed pose word in the related bank, preserving all headers,
+    # alias metadata, canonical binds and the origin bank fingerprint.
+    pose = 40 + struct.unpack_from(">i", raw, 40)[0] - 1
+    changed[pose + 1] ^= 1
+    updated = SignatureMotionSource(
+        [
+            ("alias", original_alias),
+            ("owner", bank(changed)),
+        ]
+    )
+    assert source.fingerprints[0] == updated.fingerprints[0]
+    assert (
+        source.tracks(0, 0)[1]["source_header_sha256"]
+        == updated.tracks(0, 0)[1]["source_header_sha256"]
+    )
+    assert image
+    with pytest.raises(ValueError, match="identity/fingerprints changed"):
+        translate_signature_motion(
+            updated,
+            0,
+            0,
+            donor,
+            target,
+            c,
+            curve_timing_contract(),
+        )

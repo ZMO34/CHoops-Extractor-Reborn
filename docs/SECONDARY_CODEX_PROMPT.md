@@ -90,6 +90,8 @@ Embedded source: docs/CURRENT_STATUS.md
 
 # Unreleased — selector transport and native controller-axis continuation
 
+Schema-2 serialized metadata now also requires `source_banks_sha256`, an ordered list of complete fingerprints for every supplied bank. A reproduced stale-contract bug allowed a related alias payload bank to change while the origin bank/header stayed unchanged. The full bank-set binding rejects that change; reports retain their own list copy. Earlier draft contracts missing this field must be regenerated. This closes an input-binding gap, not a semantic-mapping gap.
+
 Counted auxiliary selector curves now have a complete bounded transport path: read the consumed knot prefix, require explicit input-bound per-channel selector maps for NBA11 translation, preserve signed tick bits, serialize the extended CH header, relocate every counted pointer, and keep curves resident with their owner image. Unknown extra +0x3C dependencies and missing selector rules still block output. No automatic cross-game selector meanings were invented.
 
 The updated read-only source inspector accepts all 2,444 motions / 1,222 aliases, now including 4,016 bounded selector references. CLI reports expose consumed prefix sizes, hashes and selector values while leaving semantics unresolved. Supplied-copy checks cover all 806 NBA11 shot curves and 336 CH shot curves. All 224 stock motion headers now prepare in one 559,640-byte relative image with 168 distinct shared selector tracks. A separate in-memory decoded-ELF structural probe adds 112 stock duplicates (224 total styles), preserves the original 112, and validates all owned headers/curves, original BSS and inverse reconstruction. It is a stock-backed structural probe, not a donor gameplay import; source hashes remain unchanged.
@@ -2000,6 +2002,8 @@ No RPCS3, hardware run, full-game build or controller remapping was performed.
 Embedded source: docs/ANIMATION_RUNTIME_ADAPTER.md
 
 # Counted selector transport and controller-axis routing — 2026-10-23
+
+Schema-2 serialized metadata now also requires `source_banks_sha256`, an ordered list of complete fingerprints for every supplied bank. A reproduced stale-contract bug allowed a related alias payload bank to change while the origin bank/header stayed unchanged. The full bank-set binding rejects that change; reports retain their own list copy. Earlier draft contracts missing this field must be regenerated. This closes an input-binding gap, not a semantic-mapping gap.
 
 The counted pointer tails are now supported end to end for the observed selector encoding: NBA11 +0x38 → CH +0x40, four bytes per curve pointer, count from header +0x10 & 0x3F. `read_selector_prefix` always reads at least two knots, then stops at the first upper knot bracketing the final declared query. A caller-supplied bounded reader enforces record or file-backed memory limits. It never copies an inferred neighboring region wholesale. Prefixes are limited to 65,536 knots; decreasing ticks, header/track overlaps, null counted pointers and missing terminal brackets reject installation. Exact sharing between selector tracks is allowed; partial overlap is rejected.
 
@@ -5529,6 +5533,8 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 Embedded source: docs/TEST_REPORT.md
 
 # Selector transport and controller routing — 2026-10-23
+
+Schema-2 serialized metadata now also requires `source_banks_sha256`, an ordered list of complete fingerprints for every supplied bank. A reproduced stale-contract bug allowed a related alias payload bank to change while the origin bank/header stayed unchanged. The full bank-set binding rejects that change; reports retain their own list copy. Earlier draft contracts missing this field must be regenerated. This closes an input-binding gap, not a semantic-mapping gap.
 
 Targeted selector/header/translation/residency regressions: **92 passed**. New coverage checks prefix bounds and adjacent-data exclusion, native endpoint rounding, stale/missing/duplicate selector maps, signed tick preservation, extended header alignment, all-dependency budgets, owned static loading, unknown extras and provenance isolation. Changed files pass strict Ruff E/F/I. Portable pytest verification: **1,039 passed, 10 skipped, 2 deselected**. Exact-head full verification is recorded in PR49. The sandboxed attempt failed/stalled in subprocess checks; the same suite passed outside the sandbox. Tests and private audits remain separate evidence.
 
