@@ -88,6 +88,18 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# Unreleased — resident native integration and NBA2K14 input research
+
+Added a contract-gated serialized signature component builder and a separate decoded-ELF resident loading/publication backend. The backend retains all 112 stock styles, owns added motion/table/name storage for process lifetime, preserves original BSS as zeros, and verifies relocation and inverse reconstruction. A supplied-copy structural probe registers one stock duplicate (113 total); it does not establish donor playback or PS3 execution. No source executable, JB, or signed SELF was changed.
+
+Event coverage across 911 distinct NBA11 shot headers: 5,358 rows, 2,642 covered by the existing seven explicit rules, and 333 complete event tables. Only 84 headers also lack unresolved auxiliary/reference/membership dependencies; target metadata still gates those records. No new event identities were guessed. The auxiliary sampler has 2,418 mathematical reference samples across 806 curves; selector resource identities remain unmapped.
+
+NBA2K14, not NBA2K11, supplies the right-stick input research. Nine bounded native instruction cases validate raw axis normalization and invalid-packet retention. Dribble move dispatch, deadzones, and control-preset installation remain unfinished. Required final policy: right-stick dribbling is default; the original button-dribble layout remains selectable as preset A. Current controls have not been changed.
+
+See [ANIMATION_RUNTIME_ADAPTER.md](ANIMATION_RUNTIME_ADAPTER.md) for implementation contracts and remaining gates. Full playable import is not complete.
+
+Earlier phase notes below are historical; the resident integration status above supersedes prior loading and lifetime gates.
+
 # Unreleased — signature-IFF motion source adapter
 
 Continued the NBA11 port from merged PR45/47 with typed cross-bank SingleMoCap
@@ -1976,6 +1988,26 @@ No RPCS3, hardware run, full-game build or controller remapping was performed.
 ---
 
 Embedded source: docs/ANIMATION_RUNTIME_ADAPTER.md
+
+# Resident loading, metadata contracts, and NBA2K14 controls — 2026-10-23
+
+`translate_signature_motion` builds an owned relative CH component only with schema-2 metadata bound to source bank index, record index, complete bank hash, header hash, donor executable hash, and target executable hash. It requires explicit target mode, state bits, authored planar values, and bounded evidence for each group. These are caller research assertions, not automatic semantic proof. Unknown event IDs, opaque payloads, auxiliary pointers, header references, and membership dependencies block construction. The shared serializer validates the known target layout and relocation inverse before returning bytes.
+
+`append_resident_image` creates a separate decoded ELF. It extends the final writable nonexecutable load segment after its original memory extent, materializes original BSS as zeros, preserves existing virtual addresses and loaded bytes, shifts trailing nonloaded data/section offsets, and reparses the result. Unsupported alignment, collisions, TLS interference, unknown dependencies and byte-budget overflow are rejected. Relative/native pointer conversion and inverse reconstruction must match exactly. This is static process-lifetime ownership: no runtime allocation, eviction, rebinding or shutdown free is introduced. It is not a signed SELF installer or proof of hardware loading.
+
+`install_resident_shots` publishes the owned table through established native table/name slots and capacity instruction. It preserves the 112 stock rows and requires explicit paired header indices, 32-byte playback metadata, tagged target localization key, and evidence per added style. The byte-ID limit permits at most 144 additions; 112 + 147 = 259 is rejected rather than truncating donor styles. Original name initialization remains native; tagged added labels do not require freeing. Reports retain validated assertion copies and explicitly mark semantics and gameplay unverified. These APIs are research-only; no GUI or executable-writing CLI was added.
+
+The owner-requested separate-ELF probe installs a stock duplicate with a documented placeholder stock label: 113 total styles, 9,636 resident bytes, 9,443,216 original BSS bytes preserved, exact inverse check, and unchanged input hash. This tests structural publication only. Actual native resource lookups return borrowed pointers; the always-resident image deliberately avoids relying on an unproven resource pin/lease mechanism.
+
+`event_mapping_coverage` uses the same rules as transcoding and reports missing `(source_id, payload_word)` pairs and opaque payload IDs. Across 911 shot headers: 5,358 rows, 2,642 covered, 333 complete event tables; 84 additionally have no unresolved auxiliary/reference/membership dependencies. Unmapped IDs are 4, 18, 25, 55, 103, 114, 147, 148; opaque payload IDs include 92 and 173. These counts do not establish 84 usable shots. CH state words differ from NBA11 and authored planar values cannot be supplied by an unvalidated root-endpoint estimate.
+
+`sample_selector_curve` models weighted selector interpolation from signed 24-bit tick/8-bit selector knots. It is a mathematical reference, not bit-exact VMX reciprocal emulation or a cross-game selector-ID mapping. Across 806 bounded curves, start/midpoint/end queries pass (2,418 samples). Equal-time conflicting selectors and invalid queries are rejected.
+
+`tools/research/NativeStickInputTrace.java` executes the NBA2K14 input prefix at 0xB5DAF0 through 0xB5DD08 in a bounded Ghidra instruction harness. Only pad API/port calls are mocked. Native stores place left X/Y at record +0x110/+0x120 and right X/Y at +0x130/+0x140; port stride is 0x310, valid ports 0..6. CellPadData indices 4/5 supply right X/Y and 6/7 left X/Y. Native single-precision normalization uses reciprocal 255 and inverts Y, without imposing a new deadzone or clamping the slight center/endpoint rounding. Six valid packets on ports 0/6 and three rejected packets pass; rejection retains prior axes. ABI reference: [RPCS3 pad_types.h](https://github.com/RPCS3/rpcs3/blob/master/rpcs3/Emu/Io/pad_types.h). No RPCS3 or gameplay was launched.
+
+Remaining work: establish auxiliary resource identities and event payload semantics, prove per-shot target metadata/variants, resolve the 259-style capacity conflict, trace NBA2K14 dribble dispatch and target control consumers, then integrate the default right-stick layout with original controls selectable as preset A. Smooth transitions and gameplay accuracy require subsequent validation; the structural and instruction checks do not certify them.
+
+Earlier phase documentation below is historical. The resident backend above supersedes earlier statements that no native loading path exists; semantic and gameplay gates remain.
 
 # Runtime adapter follow-up
 
@@ -5461,6 +5493,10 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+# Native integration and control-input research — 2026-10-23
+
+Targeted tests cover static BSS/section preservation, native table publication, explicit serialized metadata binding, event coverage, selector interpolation, and existing donor/header/loader regressions. Nine NBA2K14 instruction-harness cases pass. The separate supplied-copy decoded-ELF probe preserves 112 originals and adds one stock duplicate; no donor gameplay claim follows. Private event coverage and selector sample counts are documented in ANIMATION_RUNTIME_ADAPTER.md. No emulator/gameplay or testing JB was launched. Source portable verification: **1,026 passed, 10 skipped, 2 deselected** before the final source-to-resident regression. Final exact-head verification, including that regression, is recorded in the PR. Compile, CLI/offscreen Qt, strict changed-file Ruff, portable lint, mypy (18 files), and handoff checks passed.
 
 # Signature-IFF source adaptation — 2026-10-23
 

@@ -1,3 +1,5 @@
+Research API update (2026-10-23): `inspect-signature-motion` includes established event-mapping coverage. Complete component construction (`translate_signature_motion`) and separate decoded-ELF residency/publication (`append_resident_image`, `install_resident_shots`) remain contract-gated Python research APIs, with no executable-writing CLI. See ANIMATION_RUNTIME_ADAPTER.md.
+
 # Donor translation research APIs
 
 `choops_py.research.donor_header.translate_donor_motion` accepts decoded donor/target

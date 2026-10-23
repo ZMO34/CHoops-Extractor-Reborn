@@ -28,6 +28,10 @@ def _contract(header, address, contract):
         or contract.get("source_header_sha256") != hashlib.sha256(header).hexdigest()
     ):
         raise ValueError("Metadata contract is not bound to this donor header")
+    return _authoring_fields(header, contract)
+
+
+def _authoring_fields(header, contract):
     high, state = contract.get("target_mode_high16"), contract.get("target_state_bits")
     if (
         type(high) is not int
@@ -150,31 +154,18 @@ def translate_donor_motion(
     )
     if len(packed) != target_size or len(roots) != frames * root_stride:
         raise ValueError("Converted tracks disagree with target header extents")
-    header = bytearray(64)
-    struct.pack_into(
-        ">4I", header, 0, 0, channels["rotation_mask"], 0, channels["translation_mask"]
+    output, extents = _assemble_target_image(
+        source,
+        channels,
+        high,
+        state,
+        planar,
+        frames,
+        packed,
+        roots,
+        event_bytes,
+        budget,
     )
-    struct.pack_into(">3I", header, 16, flags, high << 16 | frames, state)
-    header[28:36] = source[28:36]
-    header[36:48] = planar
-    output = bytearray(header)
-    extents = []
-    for field, role, data in (
-        (0x30, "poses", packed),
-        (0x34, "root", roots),
-        (0x38, "events", event_bytes),
-    ):
-        at = (len(output) + 15) & ~15
-        if at + len(data) > budget:
-            raise ValueError("Aligned donor component exceeds byte budget")
-        output.extend(bytes(at - len(output)))
-        output.extend(data)
-        struct.pack_into(">i", output, field, at - field + 1)
-        extents.append(dict(role=role, offset=at, bytes=len(data)))
-    # Exercise both transitions plus the complete target extent validator.
-    native = relocate_target_image(output, [0], 0x20000000, source_state="relative")
-    if relocate_target_image(native, [0], 0x20000000, source_state="native") != output:
-        raise ValueError("Donor target relocation roundtrip failed")
     return bytes(output), dict(
         schema=1,
         pointer_state="relative",
@@ -204,3 +195,36 @@ def translate_donor_motion(
         native_loader_installed=False,
         gameplay_ready=False,
     )
+
+
+def _assemble_target_image(
+    source, channels, high, state, planar, frames, packed, roots, event_bytes, budget
+):
+    """Shared final serializer/relocation check for established packed sources."""
+    flags = struct.unpack_from(">I", source, 16)[0]
+    header = bytearray(64)
+    struct.pack_into(
+        ">4I", header, 0, 0, channels["rotation_mask"], 0, channels["translation_mask"]
+    )
+    struct.pack_into(">3I", header, 16, flags, high << 16 | frames, state)
+    header[28:36] = source[28:36]
+    header[36:48] = planar
+    output = bytearray(header)
+    extents = []
+    for field, role, data in (
+        (0x30, "poses", packed),
+        (0x34, "root", roots),
+        (0x38, "events", event_bytes),
+    ):
+        at = (len(output) + 15) & ~15
+        if at + len(data) > budget:
+            raise ValueError("Aligned donor component exceeds byte budget")
+        output.extend(bytes(at - len(output)))
+        output.extend(data)
+        struct.pack_into(">i", output, field, at - field + 1)
+        extents.append(dict(role=role, offset=at, bytes=len(data)))
+    # Exercise both transitions plus the complete target extent validator.
+    native = relocate_target_image(output, [0], 0x20000000, source_state="relative")
+    if relocate_target_image(native, [0], 0x20000000, source_state="native") != output:
+        raise ValueError("Donor target relocation roundtrip failed")
+    return bytes(output), extents

@@ -1,3 +1,9 @@
+## Unreleased — native residency and NBA2K14 input foundation
+
+- Add contract-gated serialized motion construction, explicit event coverage, and weighted auxiliary selector reference sampling.
+- Add bounded separate decoded-ELF resident loading and native shot publication with original-style preservation and process-lifetime storage.
+- Validate the NBA2K14 raw stick input prefix in nine instruction cases. Default right-stick controls and original preset A remain required but unimplemented; full donor playback remains gated by semantics.
+
 ## Unreleased — signature-IFF source adaptation
 
 - Resolve bounded typed NBA11 signature aliases while retaining original per-header metadata and rejecting ambiguous or incompatible dependencies.

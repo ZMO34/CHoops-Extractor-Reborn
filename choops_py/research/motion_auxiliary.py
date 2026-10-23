@@ -55,3 +55,52 @@ def inspect_selector_curve(raw, *, duration, time_scale=1):
         cross_game_translation_allowed=False,
         gameplay_ready=False,
     )
+
+
+def sample_selector_curve(raw, seconds, *, duration, time_scale=1):
+    """Reference the native bracketing/weighted-selector operation, not state IDs.
+
+    CH 0x203AC / NBA11 0x1B764 choose the first upper knot at or after ceil(query),
+    then emit one constant state or two byte-weighted states, heavier first.
+    Arithmetic here is mathematical; VMX reciprocal estimates are not certified.
+    A complete caller-established region and in-domain query are mandatory.
+    """
+    report = inspect_selector_curve(raw, duration=duration, time_scale=time_scale)
+    if type(seconds) not in (int, float) or not 0 <= seconds <= duration:
+        raise ValueError("Selector sample must be finite and inside declared duration")
+    query = seconds * time_scale * 300
+    upper = 1
+    knots = report["knots"]
+    while upper < len(knots) and knots[upper]["tick"] < math.ceil(query):
+        upper += 1
+    if upper == len(knots):
+        raise ValueError("Selector query exceeds the established curve region")
+    a, b = knots[upper - 1], knots[upper]
+    if a["selector"] == b["selector"]:
+        weights = [dict(selector=a["selector"], weight=255)]
+    else:
+        if a["tick"] == b["tick"]:
+            raise ValueError(
+                "Coincident different selectors have no established weight"
+            )
+        fraction = (query - a["tick"]) / (b["tick"] - a["tick"])
+        if not 0 <= fraction <= 1:
+            raise ValueError("Selector sample is outside its established bracket")
+        right = math.floor(fraction * 255 + 0.5)
+        weights = [
+            dict(selector=a["selector"], weight=255 - right),
+            dict(selector=b["selector"], weight=right),
+        ]
+        weights.sort(key=lambda row: -row["weight"])
+        weights = [row for row in weights if row["weight"]]
+    return dict(
+        query_tick=query,
+        bracket=[upper - 1, upper],
+        weights=weights,
+        operation="byte-weighted-selector-channel",
+        weight_sum=255,
+        interpolation="mathematical-reference",
+        native_vmx_bit_exact=False,
+        selector_semantics_established=False,
+        gameplay_ready=False,
+    )

@@ -1,3 +1,15 @@
+# Unreleased — resident native integration and NBA2K14 input research
+
+Added a contract-gated serialized signature component builder and a separate decoded-ELF resident loading/publication backend. The backend retains all 112 stock styles, owns added motion/table/name storage for process lifetime, preserves original BSS as zeros, and verifies relocation and inverse reconstruction. A supplied-copy structural probe registers one stock duplicate (113 total); it does not establish donor playback or PS3 execution. No source executable, JB, or signed SELF was changed.
+
+Event coverage across 911 distinct NBA11 shot headers: 5,358 rows, 2,642 covered by the existing seven explicit rules, and 333 complete event tables. Only 84 headers also lack unresolved auxiliary/reference/membership dependencies; target metadata still gates those records. No new event identities were guessed. The auxiliary sampler has 2,418 mathematical reference samples across 806 curves; selector resource identities remain unmapped.
+
+NBA2K14, not NBA2K11, supplies the right-stick input research. Nine bounded native instruction cases validate raw axis normalization and invalid-packet retention. Dribble move dispatch, deadzones, and control-preset installation remain unfinished. Required final policy: right-stick dribbling is default; the original button-dribble layout remains selectable as preset A. Current controls have not been changed.
+
+See [ANIMATION_RUNTIME_ADAPTER.md](ANIMATION_RUNTIME_ADAPTER.md) for implementation contracts and remaining gates. Full playable import is not complete.
+
+Earlier phase notes below are historical; the resident integration status above supersedes prior loading and lifetime gates.
+
 # Unreleased — signature-IFF motion source adapter
 
 Continued the NBA11 port from merged PR45/47 with typed cross-bank SingleMoCap

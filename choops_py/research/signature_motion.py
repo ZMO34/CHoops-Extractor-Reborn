@@ -9,7 +9,13 @@ from ..formats.binary import Binary
 from ..formats.compression import decode
 from ..formats.motion_bind import canonical_channels, verify_canonical_bind
 from ..formats.motion_envelope import inspect_envelope
-from ..formats.motion_events import inspect_auxiliary_pairs, inspect_events
+from ..formats.motion_events import (
+    curve_timing_contract,
+    event_mapping_coverage,
+    inspect_auxiliary_pairs,
+    inspect_events,
+    transcode_events,
+)
 from ..formats.motion_frames import (
     layout,
     nba11_key_ticks,
@@ -212,6 +218,9 @@ class SignatureMotionSource:
             header_reference=pointers["0x4"],
             membership=membership,
             events=events,
+            established_event_mapping=event_mapping_coverage(
+                events, curve_timing_contract()
+            ),
             complete_motion=False,
             conversion_blockers=blockers,
             gameplay_ready=False,
@@ -255,3 +264,98 @@ class SignatureMotionSource:
             native_loader_installed=False,
         )
         return dict(poses=poses, root=root), report
+
+
+def translate_signature_motion(
+    source,
+    bank,
+    record,
+    donor_elf,
+    target_elf,
+    metadata_contract,
+    event_contract,
+    *,
+    budget=MAX_IMAGE,
+):
+    """Construct a complete known-layout component using explicit assertions.
+
+    Schema 2 binds metadata to the serialized record, complete bank, donor bind
+    executable and target executable. Auxiliary/reference/membership semantics
+    remain blocked; no metadata defaults or native installation are inferred.
+    """
+    from .donor_header import _assemble_target_image, _authoring_fields
+
+    if type(budget) is not int or not 64 <= budget <= MAX_IMAGE:
+        raise ValueError("Signature component budget must be 64 bytes..16 MiB")
+    bind = verify_canonical_bind(donor_elf, target_elf)
+    tracks, report = source.tracks(bank, record)
+    header = bytes.fromhex(report["header_hex"])
+    c = metadata_contract
+    if not isinstance(c, dict) or c.get("schema") != 2:
+        raise ValueError("Signature metadata requires a schema-2 research contract")
+    expected = dict(
+        source_bank_index=bank,
+        source_record_index=record,
+        source_bank_sha256=source.fingerprints[bank],
+        source_header_sha256=report["source_header_sha256"],
+        donor_elf_sha256=hashlib.sha256(donor_elf).hexdigest(),
+        target_elf_sha256=hashlib.sha256(target_elf).hexdigest(),
+    )
+    if any(
+        c.get(k) != value or type(c.get(k)) is not type(value)
+        for k, value in expected.items()
+    ):
+        raise ValueError("Signature metadata contract identity/fingerprints changed")
+    high, state, planar = _authoring_fields(header, c)
+    if (
+        report["auxiliary_pointers"]
+        or report["header_reference"] is not None
+        or report["membership"] is not None
+    ):
+        raise ValueError(
+            "Signature auxiliary/reference/membership dependencies remain unmapped"
+        )
+    frames, channels = report["target_frame_count"], report["channels"]
+    _, pose_bytes = layout(channels["rotations"], channels["translations"], frames)
+    root_stride = len(tracks["root"]) // report["source_key_count"]
+    root_at = (64 + pose_bytes + 15) & ~15
+    event_at = (root_at + frames * root_stride + 15) & ~15
+    if event_at + 4 > budget:
+        raise ValueError("Signature target component exceeds byte budget")
+    events, event_report = transcode_events(report["events"], event_contract)
+    if event_at + len(events) > budget:
+        raise ValueError("Signature target events exceed byte budget")
+    poses, sampling = resample_nba11_frames(
+        tracks["poses"],
+        tracks["timing"],
+        channels["rotations"],
+        channels["translations"],
+    )
+    roots = resample_nba11_root(
+        tracks["root"], tracks["timing"], has_heading=root_stride == 8
+    )
+    image, extents = _assemble_target_image(
+        header, channels, high, state, planar, frames, poses, roots, events, budget
+    )
+    report.update(
+        component_format="owned-relative-CH-motion",
+        header_offsets=[0],
+        extents=extents,
+        bytes=len(image),
+        bind=bind,
+        resampling=sampling,
+        events=event_report,
+        metadata_bindings=expected,
+        metadata_assertions=dict(
+            target_mode_high16=high,
+            target_state_bits=state,
+            authored_planar=list(planar),
+            evidence={k: c["evidence"][k] for k in ("mode", "state", "planar")},
+        ),
+        metadata_automatically_established=False,
+        metadata_provenance="explicit-per-record-caller-research-assertions",
+        complete_known_layout=True,
+        native_loader_installed=False,
+        gameplay_ready=False,
+    )
+    return image, report

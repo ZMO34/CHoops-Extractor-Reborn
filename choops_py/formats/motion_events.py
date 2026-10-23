@@ -104,7 +104,10 @@ def curve_timing_contract():
             source_id=source,
             target_id=target,
             payload_word=None,
-            evidence="Native trajectory cache CH 0x3073B4 / NBA11 0x46DE20; equivalent five-float curve normalizers",
+            evidence=(
+                "Native trajectory cache CH 0x3073B4 / NBA11 0x46DE20; "
+                "equivalent five-float curve normalizers"
+            ),
         )
         for source, target in ((20, 19), (37, 36), (46, 40), (38, 37))
     )
@@ -217,35 +220,7 @@ def transcode_events(report, contract):
     """
     if report.get("profile") != "nba-2k11":
         raise ValueError("Event bridge requires an inspected NBA 2K11 event table")
-    if not isinstance(contract, dict) or contract.get("schema") != 1:
-        raise ValueError("Event mapping contract requires schema 1")
-    rules = contract.get("rules")
-    if not isinstance(rules, list) or len(rules) > MAX_EVENTS:
-        raise ValueError("Event mapping contract requires bounded rules")
-    mapping = {}
-    for rule in rules:
-        if not isinstance(rule, dict):
-            raise ValueError("Invalid event mapping rule")
-        source, target = rule.get("source_id"), rule.get("target_id")
-        word, evidence = rule.get("payload_word"), rule.get("evidence")
-        if any(
-            type(v) is not int or not 0 <= v <= 0x7FFFFFFF for v in (source, target)
-        ):
-            raise ValueError("Event mapping IDs must be nonnegative signed integers")
-        if word is not None and (
-            source != 90 or type(word) is not int or not 0 <= word <= 0xFFFFFFFF
-        ):
-            raise ValueError("Only event 90 supports an explicit payload-word rule")
-        if (
-            not isinstance(evidence, str)
-            or not evidence.strip()
-            or len(evidence) > 2048
-        ):
-            raise ValueError("Each event mapping rule requires bounded evidence text")
-        key = (source, word)
-        if key in mapping:
-            raise ValueError("Duplicate or ambiguous event mapping rule")
-        mapping[key] = (target, evidence)
+    mapping = _event_rules(contract)
     output, applied = bytearray(), []
     rows = report["entries"]
     if len(rows) > MAX_EVENTS:
@@ -288,4 +263,71 @@ def transcode_events(report, contract):
         gameplay_ready=False,
         complete_motion=False,
         time_bits_preserved=True,
+    )
+
+
+def _event_rules(contract):
+    if not isinstance(contract, dict) or contract.get("schema") != 1:
+        raise ValueError("Event mapping contract requires schema 1")
+    rules = contract.get("rules")
+    if not isinstance(rules, list) or len(rules) > MAX_EVENTS:
+        raise ValueError("Event mapping contract requires bounded rules")
+    mapping = {}
+    for rule in rules:
+        if not isinstance(rule, dict):
+            raise ValueError("Invalid event mapping rule")
+        source, target = rule.get("source_id"), rule.get("target_id")
+        word, evidence = rule.get("payload_word"), rule.get("evidence")
+        if any(
+            type(v) is not int or not 0 <= v <= 0x7FFFFFFF for v in (source, target)
+        ):
+            raise ValueError("Event mapping IDs must be nonnegative signed integers")
+        if word is not None and (
+            source != 90 or type(word) is not int or not 0 <= word <= 0xFFFFFFFF
+        ):
+            raise ValueError("Only event 90 supports an explicit payload-word rule")
+        if (
+            not isinstance(evidence, str)
+            or not evidence.strip()
+            or len(evidence) > 2048
+        ):
+            raise ValueError("Each event mapping rule requires bounded evidence text")
+        key = (source, word)
+        if key in mapping:
+            raise ValueError("Duplicate or ambiguous event mapping rule")
+        mapping[key] = (target, evidence)
+    return mapping
+
+
+def event_mapping_coverage(report, contract):
+    """Audit every event dependency; never discard an unmapped/opaque marker."""
+    if report.get("profile") != "nba-2k11" or len(report["entries"]) > MAX_EVENTS:
+        raise ValueError("Choose a bounded inspected NBA11 event table")
+    mapping = _event_rules(contract)
+    missing, opaque, mapped = set(), set(), 0
+    for row in report["entries"]:
+        if row["payload"] is not None and (
+            row["id"] != 90 or row["payload_word"] is None
+        ):
+            opaque.add(row["id"])
+            continue
+        word = row["payload_word"] if row["payload"] is not None else None
+        key = row["id"], word
+        if key in mapping:
+            mapped += 1
+        else:
+            missing.add(key)
+    return dict(
+        events=len(report["entries"]),
+        mapped_events=mapped,
+        unmapped_rules=[
+            dict(source_id=identity, payload_word=word)
+            for identity, word in sorted(
+                missing, key=lambda k: (k[0], -1 if k[1] is None else k[1])
+            )
+        ],
+        opaque_payload_ids=sorted(opaque),
+        complete=not missing and not opaque,
+        mapping_scope="explicit-event-contract-only",
+        gameplay_ready=False,
     )

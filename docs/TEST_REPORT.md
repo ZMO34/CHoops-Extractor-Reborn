@@ -1,3 +1,7 @@
+# Native integration and control-input research — 2026-10-23
+
+Targeted tests cover static BSS/section preservation, native table publication, explicit serialized metadata binding, event coverage, selector interpolation, and existing donor/header/loader regressions. Nine NBA2K14 instruction-harness cases pass. The separate supplied-copy decoded-ELF probe preserves 112 originals and adds one stock duplicate; no donor gameplay claim follows. Private event coverage and selector sample counts are documented in ANIMATION_RUNTIME_ADAPTER.md. No emulator/gameplay or testing JB was launched. Source portable verification: **1,026 passed, 10 skipped, 2 deselected** before the final source-to-resident regression. Final exact-head verification, including that regression, is recorded in the PR. Compile, CLI/offscreen Qt, strict changed-file Ruff, portable lint, mypy (18 files), and handoff checks passed.
+
 # Signature-IFF source adaptation — 2026-10-23
 
 `python -m pytest tests/test_signature_motion.py -q -p no:cacheprovider`:
