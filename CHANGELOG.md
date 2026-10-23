@@ -459,3 +459,8 @@ raw TXTR replacement; TXTR remains the fallback only when no DDS is present.
 SCNE replacements remain supported. CSVs use explicit binary-backed field
 whitelists: asset references, preview labels, research fields and row offsets are
 excluded, while source/stale-edit safety columns are retained.
+
+### Animation family continuation
+- Preserve all four NBA11 shot pairs and consumed control-word provenance.
+- Prepare bounded complete family images with explicit contracts; reject unknown dependencies.
+- Add native pair-selection traces; defer secondary right-stick control work.

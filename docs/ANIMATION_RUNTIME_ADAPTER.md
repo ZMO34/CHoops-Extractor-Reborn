@@ -1,3 +1,33 @@
+## NBA11 shot-family preservation (animation priority)
+
+Animation porting takes priority; NBA2K14 right-stick/default-preset work is deferred.
+NBA11 native consumer `0x6535BC`, player getter `0x949CF0`, and reference
+resolver `0x656AEC` establish four paired references per category-zero entry.
+Player +0xCC bit zero selects slots 1/3/5/7; bit one selects 0/2/4/6.
+The consumed word at payload +0x60 indexes native table `0xA51564`; its full
+meaning/table bounds and target mapping remain unresolved. All 147 supplied
+styles use index zero. Only 18 styles have the first pair; all 147 have pairs
+one through three. The first pair must not be assumed to be the base shot.
+CH `0x3213B8` selects row +0x20 for a nonzero selector and +0x24 for zero.
+That proves ordering, not basketball roles or cross-game contextual equivalence.
+
+`prepare_shot_family` now prepares every nonempty direct source reference with
+explicit per-header metadata/event/auxiliary contracts. It retains all eight
+slots, four pairs and distinct alias headers, deduplicates repeated header
+references, checks the whole-family byte budget and verifies relocation inverse.
+Missing/ambiguous resources, unsupported group dependencies, unknown trailing
+bytes and incomplete/stale contracts reject the complete result. Empty slots
+remain explicit; no contextual fallbacks or target role names are invented.
+This research API does not install native family dispatch or establish playable
+metadata. Existing event/selector identity gaps and the 259-style byte-ID conflict
+remain. Next: trace contextual fallbacks and map each pair to CH playback contexts
+before binding complete donor families into the resident registration path.
+
+A bounded read-only Ghidra harness checks 14 donor cases (both selection bits,
+reference kinds 0..5, and empty optional pairs) plus two CH row-order cases.
+Only registry lookup is mocked; source selection stops before contextual
+fallback handling. No game execution or source executable writes occur.
+
 # Counted selector transport and controller-axis routing — 2026-10-23
 
 Schema-2 serialized metadata now also requires `source_banks_sha256`, an ordered list of complete fingerprints for every supplied bank. A reproduced stale-contract bug allowed a related alias payload bank to change while the origin bank/header stayed unchanged. The full bank-set binding rejects that change; reports retain their own list copy. Earlier draft contracts missing this field must be regenerated. This closes an input-binding gap, not a semantic-mapping gap.

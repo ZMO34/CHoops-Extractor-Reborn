@@ -83,6 +83,23 @@ def inspect_entries(raw, profile="nba-2k11"):
                     selection=reference_selection(kind),
                 )
             )
+        tail_bytes = ends[start] - start - count * 12
+        family = None
+        if category == 0:
+            if tail_bytes < 4:
+                raise ValueError("Shot family is missing its consumed control word")
+            family = dict(
+                pairs=[[i * 2, i * 2 + 1] for i in range(4)],
+                player_selector_offset=0xCC,
+                player_selector_mask=1,
+                slots_when_zero=[1, 3, 5, 7],
+                slots_when_one=[0, 2, 4, 6],
+                control_word=b.u32(start + count * 12),
+                control_word_role="index-into-native-table-0xA51564",
+                native_consumer="0x6535BC",
+                contextual_fallbacks_established=False,
+                basketball_role_names_established=False,
+            )
         result.append(
             dict(
                 index=row["index"],
@@ -92,7 +109,9 @@ def inspect_entries(raw, profile="nba-2k11"):
                 ordinal_word=ordinal,
                 raw_flag_0x10=flag,
                 references=refs,
-                unparsed_tail_bytes=ends[start] - start - count * 12,
+                tail_bytes=tail_bytes,
+                unparsed_tail_bytes=tail_bytes - (4 if family else 0),
+                shot_family=family,
                 payload_semantics_complete=False,
             )
         )

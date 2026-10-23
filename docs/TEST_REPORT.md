@@ -1,3 +1,12 @@
+## Shot-family continuation
+
+Targeted `tests/test_shot_family.py tests/test_donor_registry.py`: **28 passed**.
+Covers all-slot preservation, distinct alias headers, optional empty pairs,
+relocation inverse, exact/insufficient budgets, unresolved dependencies before
+expansion, stale contracts and missing consumed control words. Native bounded
+selection harness: **14 NBA11 + 2 CH cases passed**, read-only, synthetic runtime
+resources; stops before contextual fallbacks. No gameplay validation.
+
 # Selector transport and controller routing — 2026-10-23
 
 Schema-2 serialized metadata now also requires `source_banks_sha256`, an ordered list of complete fingerprints for every supplied bank. A reproduced stale-contract bug allowed a related alias payload bank to change while the origin bank/header stayed unchanged. The full bank-set binding rejects that change; reports retain their own list copy. Earlier draft contracts missing this field must be regenerated. This closes an input-binding gap, not a semantic-mapping gap.

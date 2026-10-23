@@ -191,3 +191,12 @@ typed resolution path, known source track extents and unresolved conversion gate
 Stored and declared decoded blocks are bounded in aggregate to 128 MiB. Sources
 remain read-only; no complete motion, bank export or gameplay installation occurs.
 See ANIMATION_RUNTIME_ADAPTER.md for the partial pose/root research API.
+
+## Shot-family research API
+
+`inspect-donor-registry` reports the four shot pairs, player selector lanes and
+consumed control word separately from unknown tail bytes. Python callers can use
+`choops_py.research.shot_family.prepare_shot_family` with exact `bank:record`
+metadata/auxiliary contracts and an event contract to prepare all source slots.
+The result is a relative owned image and explicit family manifest, not installed
+playable dispatch. No new executable-writing CLI is exposed.
