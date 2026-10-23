@@ -1,3 +1,26 @@
+# Unreleased native portal readiness investigation
+
+`python tools/dev/verify.py --python <development-python>` passed: **1036 passed,
+10 skipped, 2 deselected**, compile/CLI help, Qt startup, Ruff, mypy (18 source
+files), generated handoff and diff checks. Portal research tab rendered offscreen
+and visually inspected. Added tests reproduce all eight stock state probabilities,
+strict single-precision confidence thresholds, bounded proposed tuning, eligibility
+preservation, priority-profile scoping, native poll school anchors, missing snapshots,
+rank positions, duplicate/invalid references and the 25/26-row display boundary.
+
+A private read-only instruction auditor verifies 53-entry and17-entry callback
+sequences/order, both hardcoded 2,000-entry CPU comparisons, the16,000-byte sort
+span and its adjacent32-byte destructor boundary, native confidence getter/scaling,
+preference setter field and offer-action dispatch targets. Focused Ghidra and
+original instructions establish the poll mode/table and serialization evidence.
+Original decoded executable digest remained unchanged. Native code listings,
+private paths, game data and raw reports are excluded from Git.
+
+No actual offseason recruiting save/aggregate was available. New-proxy setup,
+node-allocation limits, scholarship rollback and native phase/save/resume behavior
+are not certified by these tests. No portal, executable patch or game settings
+were installed. RPCS3/gameplay NOT RUN; automatic/testing JB NOT BUILT.
+
 # Unreleased history ownership and scheduling follow-up
 
 Portable verification: `python tools/dev/verify.py --python <development-python>`

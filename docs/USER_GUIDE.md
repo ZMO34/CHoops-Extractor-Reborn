@@ -1,3 +1,11 @@
+# Portal research and saved polls
+
+Recruiting diagnostics → **Portal research** shows confirmed native integration
+points and remaining proof. **Legacy backend** now audits the identified ranking/
+poll component in a separately supplied native aggregate, including current Media
+and Coaches Top25 school references. This is read-only. Proposed transfer tuning
+is an offline API; no slider or game patch is implied. See [native portal contract](LEGACY_PORTAL_IMPLEMENTATION.md).
+
 # Conference schedules and player history
 
 In Roster Editor → Recruiting diagnostics, use **Scheduling / tournaments** to

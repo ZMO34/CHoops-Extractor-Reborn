@@ -88,6 +88,24 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# Unreleased — portal callback, tuning and persistence investigation
+
+Recovered native postseason/rollover callback order; confirmed Confidence as the
+secondary transfer gate and identified offer/refund/commitment counter paths.
+Found the fixed 2,000-recruit CPU loop and16,000-byte sort buffer that must change
+before additional proxies can participate safely. Dynamic recruit save rebasing
+is confirmed; saved transfer queue order suggests a binding design that freezes
+after insertion. Proposed valid preference profiles can persist the three portal
+priorities without borrowing unknown fields. Native lifecycle integration is not
+installed or certified.
+
+Identified Media/Coaches/Mid-Major/RPI poll tables, with read-only aggregate audits.
+Added a Portal research tab and offline single-precision transfer-tuning policy;
+these are explicitly not working in-game settings. Complete proxy setup, protected
+cleanup, allocation/node budgets, scholarship rollback and phase-specific native
+save/resume proof remain implementation gates. See [implementation contract](LEGACY_PORTAL_IMPLEMENTATION.md).
+No EBOOT mutation, emulator run or testing JB.
+
 # Unreleased — history ownership and conference scheduling
 
 Established five player-owned history IDs, the shared 24-byte statistics pool,
@@ -5392,6 +5410,29 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+# Unreleased native portal readiness investigation
+
+`python tools/dev/verify.py --python <development-python>` passed: **1036 passed,
+10 skipped, 2 deselected**, compile/CLI help, Qt startup, Ruff, mypy (18 source
+files), generated handoff and diff checks. Portal research tab rendered offscreen
+and visually inspected. Added tests reproduce all eight stock state probabilities,
+strict single-precision confidence thresholds, bounded proposed tuning, eligibility
+preservation, priority-profile scoping, native poll school anchors, missing snapshots,
+rank positions, duplicate/invalid references and the 25/26-row display boundary.
+
+A private read-only instruction auditor verifies 53-entry and17-entry callback
+sequences/order, both hardcoded 2,000-entry CPU comparisons, the16,000-byte sort
+span and its adjacent32-byte destructor boundary, native confidence getter/scaling,
+preference setter field and offer-action dispatch targets. Focused Ghidra and
+original instructions establish the poll mode/table and serialization evidence.
+Original decoded executable digest remained unchanged. Native code listings,
+private paths, game data and raw reports are excluded from Git.
+
+No actual offseason recruiting save/aggregate was available. New-proxy setup,
+node-allocation limits, scholarship rollback and native phase/save/resume behavior
+are not certified by these tests. No portal, executable patch or game settings
+were installed. RPCS3/gameplay NOT RUN; automatic/testing JB NOT BUILT.
 
 # Unreleased history ownership and scheduling follow-up
 

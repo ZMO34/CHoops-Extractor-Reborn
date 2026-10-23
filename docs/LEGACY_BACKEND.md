@@ -1,3 +1,6 @@
+Current portal lifecycle/tuning investigation: [LEGACY_PORTAL_IMPLEMENTATION.md](LEGACY_PORTAL_IMPLEMENTATION.md).
+The identified poll component now has bounded read-only audits in the aggregate view.
+
 Current follow-up: [history ownership](LEGACY_HISTORY_OWNERSHIP.md) and
 [scheduling / tournament limits](LEGACY_SCHEDULING.md).
 
@@ -57,7 +60,7 @@ component is real and does not shift subsequent components.
 | Unresolved paired reference arrays | 0x057BCC | 0xC0 | 0x5C29CC / 0x5C2BEC |
 | Statistics free stack | 0x057C8C | 0x7D04 | 0x75E2B8 / 0x75E314 |
 | Seasonal box-score bank | 0x05F990 | 0x92004 | 0x597F94 / 0x598178 |
-| Unresolved reference component | 0x0F1994 | 0x1D54 | 0x5BDCD8 / 0x5BE02C |
+| Ranking / poll state | 0x0F1994 | 0x1D54 | 0x5BDCD8 / 0x5BE02C |
 | Unresolved reference component | 0x0F36E8 | 0xA28 | 0x590B50 / 0x591294 |
 | Unresolved indexed/reference component | 0x0F4110 | 0x1B5C | 0x592C20 / 0x592E80 |
 | Unresolved reference component | 0x0F5C6C | 0x2198 | 0x770280 / 0x7704B8 |

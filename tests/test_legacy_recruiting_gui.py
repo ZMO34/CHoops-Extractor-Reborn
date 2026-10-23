@@ -185,3 +185,17 @@ def test_stale_worker_cannot_fill_schedule_or_history_tabs(qtbot):
     dialog.display(report)
     assert dialog.schedule_view.model() is None
     assert dialog.history_view.model() is None
+
+
+def test_portal_research_is_read_only_and_does_not_claim_native_settings(qtbot):
+    from PySide6.QtWidgets import QPlainTextEdit, QTabWidget
+
+    owner, dialog = diagnostics(qtbot)
+    before = bytes(owner.roster.data)
+    tabs = dialog.findChild(QTabWidget)
+    assert tabs.tabText(4) == "Portal research"
+    page = tabs.widget(4)
+    assert isinstance(page, QPlainTextEdit) and page.isReadOnly()
+    assert "not working game" in page.toPlainText()
+    assert "Not implementation-ready" in page.toPlainText()
+    assert bytes(owner.roster.data) == before

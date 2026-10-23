@@ -1,3 +1,7 @@
+Latest continuation: [native implementation contract](LEGACY_PORTAL_IMPLEMENTATION.md)
+records recovered callback order, scholarship actions, recruit-capacity hazards,
+current poll sources, proposed priority encoding and remaining readiness gates.
+
 Latest evidence: [persistent history ownership](LEGACY_HISTORY_OWNERSHIP.md),
 including unsigned rollover and reclamation hazards; [conference scheduling](LEGACY_SCHEDULING.md).
 
@@ -66,12 +70,13 @@ chance formula is confirmed by the instructions and constants, not an inferred
 menu label. For state values 1, 2, 3 and 4+, the chance gate is respectively 0,
 about 33%, about 67% and 100%. **These are conditional gate probabilities, not the
 percentage of all players who transfer.** Other filters and the second gate still
-apply. The exact meaning and writers of this three-bit state are not established;
-calling it a proven dissatisfaction or transfer-demand field would be premature.
+apply. The later [implementation investigation](LEGACY_PORTAL_IMPLEMENTATION.md) traces
+a writer in 0x5A7230 during low-confidence evaluation, plus annual clearing.
+The exact localized state meaning is still not a proven menu enum.
 
 The second gate uses `0x74AA30` (position-aware weighted player evaluation) and
-`0x744C40` (player +0x70 byte converted through `0x742BD0`). The latter's precise
-localized meaning is unconfirmed. Constants are 3.0 at `0xA61340` and approximately
+`0x744C40` (player +0x70 byte converted through `0x742BD0`). The latter is now confirmed as **Confidence**, through the named getter
+0x69E910; the scaling is float32 0.01. Constants are 3.0 at `0xA61340` and approximately
 0.66 at `0xA6133C` in this revision. Candidate filters also inspect the upper nibble
 of player anchor +0x84 and bit 0x20 at anchor +0x0A. Do not remove these as if they
 were redundant probability checks.

@@ -162,6 +162,7 @@ def inspect_record_bank(section: bytes, roster: bytes):
 
 def inspect_legacy_aggregate(aggregate: bytes, roster: bytes):
     from .legacy_history import inspect_statistics_free_stack
+    from .legacy_polls import inspect_poll_section
 
     if (
         not isinstance(aggregate, (bytes, bytearray))
@@ -177,6 +178,7 @@ def inspect_legacy_aggregate(aggregate: bytes, roster: bytes):
         transfers=inspect_transfer_section,
         record_bank_597f94=inspect_record_bank,
         statistics_free_stack=inspect_statistics_free_stack,
+        component_5bdcd8=inspect_poll_section,
     )
     for row in component_layout():
         start, size = row["offset"], row["bytes"]

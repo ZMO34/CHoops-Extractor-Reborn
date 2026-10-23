@@ -102,6 +102,11 @@ class RecruitingDiagnostics(QDialog):
                 "These views inspect ownership; they do not certify in-game transfer continuity.",
             )
         )
+        from ..research.transfer_tuning import portal_research_overview
+
+        portal = QPlainTextEdit(portal_research_overview())
+        portal.setReadOnly(True)
+        tabs.addTab(portal, "Portal research")
         layout.addWidget(tabs)
         self.display_components(component_layout())
 

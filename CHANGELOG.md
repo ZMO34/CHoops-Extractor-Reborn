@@ -1,3 +1,10 @@
+## Unreleased — native portal implementation investigation
+
+- Recover indirect offseason callback order, confidence-state generation and offer/refund/commitment paths.
+- Identify the 2,000-entry CPU recruiting limit and separate sort-buffer boundary; document why a roster-count-only expansion is unsafe.
+- Add native poll component audits, an editor research tab, offline transfer-gate tuning and a typed proposal for persisted portal priorities.
+- Document a queue-backed proxy design and remaining native correctness gates; no playable portal or executable patch is installed.
+
 ## Unreleased — history ownership and scheduling diagnostics
 
 - Establish persistent player history IDs, historical school attribution and annual free/reclaim behavior; correct a school counter previously labelled as player state.
