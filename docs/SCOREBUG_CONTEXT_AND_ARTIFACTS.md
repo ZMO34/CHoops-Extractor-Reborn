@@ -1,5 +1,10 @@
 # Scorebug context and recurring line investigation
 
+Historical v2 research baseline. The subsequent installed provider and updated
+current-game key/ownership evidence are in
+[SCOREBUG_CONTEXT_CALLBACKS.md](SCOREBUG_CONTEXT_CALLBACKS.md). Statements below
+about no installed callback describe that earlier baseline.
+
 Research date: 2026-10-23. This is native disassembly, focused Ghidra analysis,
 localization inspection and source-bound archive analysis. No emulator/gameplay
 run, automatic/testing JB or public executable patcher was used. Local experiment

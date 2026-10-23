@@ -88,6 +88,22 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# Unreleased — installed scorebug context provider
+
+Owner-authorized private v5 output installs a native home_ABL provider, preserving
+the existing renderer and geometry-v2 suppression. It selects timeout, verified
+current-game NCAA/NIT/conference tournament, same-conference matchup or branding.
+Scheduled-game participant ownership and current conference roundtrips gate
+context; no stale date/school cache is used. Native refcounted formatting avoids
+returning stack character storage. The matching SCNE clears its forced-literal
+bit; English, event queues and all meter/geometry data remain unchanged.
+
+New authored PPC source/profile and synthetic harness are public. Focused tests:
+64 passed; new-test Ruff E/F/I passes. Private scoped ELF/SELF and two-IFF preflight
+checks pass. This is an installed local experiment, not runtime certification or
+a complete multi-line popup implementation. No emulator/gameplay/testing JB.
+See [SCOREBUG_CONTEXT_CALLBACKS.md](SCOREBUG_CONTEXT_CALLBACKS.md).
+
 # Unreleased — scorebug context and line-artifact investigation
 
 Mapped native NCAA/NIT calendar predicates, season/conference/national label
@@ -4931,6 +4947,13 @@ See [SCOREBUG_CONTEXT_AND_ARTIFACTS.md](SCOREBUG_CONTEXT_AND_ARTIFACTS.md) for t
 2026-10-23 native context map, incomplete authored popup coverage, geometry
 correction evidence and explicit remaining implementation requirements.
 
+## Installed context callback follow-up
+
+See [SCOREBUG_CONTEXT_CALLBACKS.md](SCOREBUG_CONTEXT_CALLBACKS.md) for the
+owner-authorized native provider installation, source, synthetic tests, native
+string lifetime proof and preserved geometry/event behavior. Earlier no-hook
+statements describe the prior research baseline. Runtime validation remains open.
+
 ---
 
 Embedded source: docs/PROJECT_SOURCE_OF_TRUTH.md
@@ -5376,6 +5399,20 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+# Installed scorebug context provider
+
+Focused four-file scorebug suite: **64 passed**, including 35 new synthetic tests
+(34 instruction paths and nine sequential output transitions). New test Ruff
+E/F/I passes. The harness stubs native external functions and checks strict memory,
+ABI/TOC/CR and balanced string wrappers, including rejection of borrowed stack
+character storage. Optional Capstone/Keystone absence skips the harness.
+
+Private v5: scoped ELF edits/branch/load-extent checks and SELF roundtrip pass;
+only one four-byte style property changes in gamedata, 261 other records and all
+geometry/meter/English bytes stay exact. Both IFFs prepare/preflight. Native string
+ownership and existing newline template were verified separately from source.
+No native renderer execution, gameplay/emulator or automatic/testing JB.
 
 # Scorebug context and geometry investigation — 2026-10-23
 

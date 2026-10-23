@@ -1,3 +1,17 @@
+# Installed scorebug context provider
+
+Focused four-file scorebug suite: **64 passed**, including 35 new synthetic tests
+(34 instruction paths and nine sequential output transitions). New test Ruff
+E/F/I passes. The harness stubs native external functions and checks strict memory,
+ABI/TOC/CR and balanced string wrappers, including rejection of borrowed stack
+character storage. Optional Capstone/Keystone absence skips the harness.
+
+Private v5: scoped ELF edits/branch/load-extent checks and SELF roundtrip pass;
+only one four-byte style property changes in gamedata, 261 other records and all
+geometry/meter/English bytes stay exact. Both IFFs prepare/preflight. Native string
+ownership and existing newline template were verified separately from source.
+No native renderer execution, gameplay/emulator or automatic/testing JB.
+
 # Scorebug context and geometry investigation — 2026-10-23
 
 Documentation-only public update. Private source-bound candidate: 30 index spans

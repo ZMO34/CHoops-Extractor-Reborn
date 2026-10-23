@@ -1,3 +1,11 @@
+## Unreleased — native scorebug context provider
+
+- Add newly authored PPC context provider source/profile and 35 synthetic tests.
+- Document the matching private installation: timeout caller, current-game
+  NCAA/NIT/conference tournament and current conference matchup labels, guarded
+  fallback branding, native refcounted strings and retained renderer/geometry.
+- No public patcher/game binary or complete popup-coverage claim is introduced.
+
 ## Unreleased — scorebug context research and geometry correction evidence
 
 - Document native tournament/timeout consumers, missing statistics bindings,

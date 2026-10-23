@@ -1,0 +1,242 @@
+# Scorebug native context provider. Fresh selection on each update; no cache.
+mflr 0
+stdu 1, -0x200(1)
+std 0, 0x210(1)
+std 25, 0x190(1)
+std 26, 0x198(1)
+std 27, 0x1a0(1)
+std 28, 0x1a8(1)
+std 29, 0x1b0(1)
+std 30, 0x1b8(1)
+std 31, 0x1c0(1)
+mfcr 0
+stw 0, 0x1c8(1)
+mr 31, 3
+cmpdi 7, 31, 0
+beq 7, finish
+lwz 9, -0x6d70(2)
+cmpwi 7, 9, 0
+beq 7, fallback
+lwz 0, 0(9)
+cmpwi 7, 0, 4
+beq 7, fallback
+cmpwi 7, 0, 7
+beq 7, legacy_mode
+cmpwi 7, 0, 8
+bne 7, timeout_check
+legacy_mode:
+lwz 0, 0xd0(9)
+cmpwi 7, 0, 2
+beq 7, fallback
+timeout_check:
+teams:
+bl 0x57f050
+nop
+mr 30, 3
+cmpwi 7, 30, 0
+beq 7, fallback
+bl 0x57f064
+nop
+mr 29, 3
+cmpwi 7, 29, 0
+beq 7, fallback
+cmpw 7, 30, 29
+beq 7, fallback
+lwz 9, 0x4664(2)
+cmpwi 7, 9, 0
+beq 7, context
+lwz 0, 0(9)
+cmpwi 7, 0, 14
+bne 7, context
+lwz 9, 0x4618(2)
+cmpwi 7, 9, 0
+beq 7, context
+lwz 0, 0(9)
+cmpwi 7, 0, 0
+bne 7, context
+mr 3, 31
+bl 0x719e98
+nop
+b finish
+context:
+li 26, -1
+bl 0x4a3924
+ld 2, 0x28(1)
+cmpwi 7, 3, 1
+beq 7, scheduled
+cmpwi 7, 3, 2
+bne 7, conference
+scheduled:
+# Native current scheduled-game key, not calendar day or selected Legacy school.
+bl 0x57f49c
+nop
+cmpwi 7, 3, 0
+beq 7, fallback
+lwz 27, 0(3)
+cmpwi 7, 27, 0
+beq 7, fallback
+mr 3, 27
+bl 0x5aab80
+nop
+cmpwi 7, 3, 0
+beq 7, fallback
+mr 25, 3
+# Both participants must resolve to exactly the active home/away objects.
+lhz 3, 4(25)
+bl 0x4a3174
+ld 2, 0x28(1)
+cmpw 7, 3, 30
+beq 7, home_first
+cmpw 7, 3, 29
+bne 7, fallback
+lhz 3, 6(25)
+bl 0x4a3174
+ld 2, 0x28(1)
+cmpw 7, 3, 30
+bne 7, fallback
+b game_verified
+home_first:
+lhz 3, 6(25)
+bl 0x4a3174
+ld 2, 0x28(1)
+cmpw 7, 3, 29
+bne 7, fallback
+game_verified:
+mr 3, 27
+bl 0x58bc60
+nop
+mr 26, 3
+cmpwi 7, 26, 0x5a
+blt 7, nit_check
+cmpwi 7, 26, 0x5f
+ble 7, ncaa
+nit_check:
+cmpwi 7, 26, 0x55
+blt 7, conference
+cmpwi 7, 26, 0x59
+ble 7, nit
+conference:
+lwz 28, 0x18(30)
+cmpwi 7, 28, 0
+beq 7, fallback
+lwz 9, 0x18(29)
+cmpw 7, 28, 9
+bne 7, fallback
+# Validate conference pointer against the active roster getter.
+lhz 3, 0xc(28)
+bl 0x4a1ff4
+ld 2, 0x28(1)
+cmpw 7, 3, 28
+bne 7, fallback
+lis 25, 0x89
+ori 25, 25, 0xa6a4
+cmpwi 7, 26, -1
+beq 7, conference_name
+lhz 9, 0x1a(28)
+cmpw 7, 9, 26
+bne 7, fallback
+lis 25, 0x89
+ori 25, 25, 0xa6b4
+conference_name:
+lwz 4, 4(28)
+cmpwi 7, 4, 0
+beq 7, fallback
+li 10, 0
+scan_name:
+lhz 0, 0(4)
+cmpwi 7, 0, 0
+beq 7, name_done
+cmpwi 7, 10, 24
+bge 7, fallback
+cmpwi 7, 0, 32
+blt 7, fallback
+addi 4, 4, 2
+addi 10, 10, 1
+b scan_name
+name_done:
+cmpwi 7, 10, 0
+beq 7, fallback
+# Never return a native string borrowing a stack character array. Both sources
+# here persist: the loaded conference abbreviation and constant suffix data.
+lwz 4, 4(28)
+addi 3, 1, 0x70
+li 5, -1
+bl 0x49e1b4
+ld 2, 0x28(1)
+mr 4, 25
+addi 3, 1, 0x74
+li 5, -1
+bl 0x49e1b4
+ld 2, 0x28(1)
+# Existing localized two-string newline format, with native string formatter
+# descriptor 0xA18CD8; the graph retains the underlying string nodes.
+lis 0, 0x36a3
+ori 0, 0, 0x7fbf
+stw 0, 0x78(1)
+li 0, 0
+stw 0, 0x80(1)
+stw 0, 0x88(1)
+stw 0, 0x94(1)
+li 0, 2
+stw 0, 0x84(1)
+addi 9, 1, 0x70
+stw 9, 0x8c(1)
+addi 9, 1, 0x74
+stw 9, 0x98(1)
+lis 9, 0xa1
+ori 9, 9, 0x8cd8
+stw 9, 0x90(1)
+stw 9, 0x9c(1)
+mr 3, 31
+addi 4, 1, 0x78
+addi 5, 1, 0x80
+bl 0x49e0e4
+ld 2, 0x28(1)
+addi 3, 1, 0x70
+bl 0x49f3a4
+ld 2, 0x28(1)
+addi 3, 1, 0x74
+bl 0x49f3a4
+ld 2, 0x28(1)
+b finish
+ncaa:
+lis 4, 0x89
+ori 4, 4, 0xa66a
+b emit
+nit:
+lis 4, 0x89
+ori 4, 4, 0xa686
+b emit
+fallback:
+lis 4, 0x89
+ori 4, 4, 0xa640
+emit:
+# Construct temporary native wide string, assign to initialized callback output,
+# then release temporary. Match the stock 0x4ef92c ownership sequence.
+addi 3, 1, 0x70
+li 5, -1
+bl 0x49e1b4
+ld 2, 0x28(1)
+mr 3, 31
+addi 4, 1, 0x70
+li 5, 1
+bl 0x49d604
+ld 2, 0x28(1)
+addi 3, 1, 0x70
+bl 0x49f3a4
+ld 2, 0x28(1)
+finish:
+lwz 0, 0x1c8(1)
+mtcr 0
+mr 3, 31
+ld 25, 0x190(1)
+ld 26, 0x198(1)
+ld 27, 0x1a0(1)
+ld 28, 0x1a8(1)
+ld 29, 0x1b0(1)
+ld 30, 0x1b8(1)
+ld 31, 0x1c0(1)
+ld 0, 0x210(1)
+mtlr 0
+addi 1, 1, 0x200
+blr

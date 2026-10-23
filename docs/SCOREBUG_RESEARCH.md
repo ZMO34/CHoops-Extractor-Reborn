@@ -529,3 +529,10 @@ produced by this inspection.
 See [SCOREBUG_CONTEXT_AND_ARTIFACTS.md](SCOREBUG_CONTEXT_AND_ARTIFACTS.md) for the
 2026-10-23 native context map, incomplete authored popup coverage, geometry
 correction evidence and explicit remaining implementation requirements.
+
+## Installed context callback follow-up
+
+See [SCOREBUG_CONTEXT_CALLBACKS.md](SCOREBUG_CONTEXT_CALLBACKS.md) for the
+owner-authorized native provider installation, source, synthetic tests, native
+string lifetime proof and preserved geometry/event behavior. Earlier no-hook
+statements describe the prior research baseline. Runtime validation remains open.
