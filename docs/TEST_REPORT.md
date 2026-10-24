@@ -4,7 +4,11 @@ Native source/target leaf harness:560 passed per profile /1,120 total. Exact
 float-bit outputs match single-precision/fused reference arithmetic; source and
 target reports match, headers and output sentinels remain unchanged. No mock
 calls. Python timing/state/donor/signature/bundle regression:80 passed. Ruff E/F/I
-passes. Exact-head isolated portable verification is pending for this update.
+passes. Isolated author verification ata35f79d8e49692e582a3fe82c8676aca4e75f8f7:
+**1,221 passed,10 skipped,2 deselected**; handoff, compile, CLI/offscreen Qt,
+Ruff and mypy18files pass. Both native profiles reran from the isolated committed
+harness:560 each /1,120 total, no warnings. Final publication-head verification
+is recorded in PR49.
 No emulator/gameplay run or testing JB was created.
 
 ## Native motion state predicate comparison
