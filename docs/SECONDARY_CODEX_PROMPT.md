@@ -88,6 +88,47 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+## Grouped motion coverage and alias lifetime
+
+The full-bank audit now includes native group records, not just individually
+typed SingleMoCap records. The supplied 11 containers contain 75 groups with
+150 embedded headers in addition to 4,705 standalone headers: **4,855 inspected
+source headers**, with zero track-inspection failures. This supersedes earlier
+4,705-only coverage totals. All families remain in scope, including paired and
+coordinated motions; none of these group members is discarded.
+
+NBA11 group relocation 0x1602C fixes +4, then the first pointer of each 16-byte
+member entry at +0xC and calls motion fixup 0x15F24. Group count is at +8.
+Resolver 0x1C700 uses the FIRST member's unresolved +0x28 word to look up a group,
+then copies member dependencies through 0x11DD0 in corresponding slot order.
+The second member's zero reference ID must not become a SingleMoCap lookup.
+The native copy retains each alias header's state/mirror metadata and creates
+bidirectional +4 links between corresponding member headers. The resolver also
+links both group +4 fields. These are lifetime dependencies, not ownership
+transfer: backing groups/motions cannot be freed while referenced. Native
+backlink lifecycle and complete target group registration remain uninstalled.
+
+`MotionGroupSource` shares bounded bank decoding and retains original group and
+member provenance, placement words, per-member metadata and the owning group
+path. It rejects missing/ambiguous typed group owners, cycles, mixed packed/alias
+members, count/packing mismatches, invalid headers and dependencies intersecting
+another member's header. It never substitutes a direct clip for a group. Group
+ambiguity remains strict even when exact duplicate SingleMoCap coalescing is on.
+Placement-word semantics and synchronized target group behavior remain gated.
+The shared standalone track reader was factored without relaxing its bind gate.
+
+`inspect-animation-library` includes every group member, preserves standalone
+record counts separately, and limits total standalone+embedded headers to
+100,000 before reading tracks. The supplied audit adds 60 alias headers and 90
+conservative member-payload hashes: **2,323 alias headers /2,531 payload hashes**,
+**3,240 canonical-family candidates /1,615 other-rig headers**, and **30,055 event
+rows /11,169 covered by existing rules**. The numerical fixed-rate pose/root
+estimate becomes **78,490,456 bytes**, excluding headers/events/selectors/group
+metadata/registration and before target bind mapping. Hashes include complete
+member-tail bytes; this is conservative deduplication, not a minimal memory
+budget. Source bytes/size/mtime are unchanged. Executable-held and unknown-bank
+coverage, full semantic mapping, native streaming and gameplay remain unresolved.
+
 ## Whole-bank marker dispatch continuation
 
 The scope remains the entire animation bank. Native caller indexing establishes
@@ -2229,6 +2270,47 @@ No RPCS3, hardware run, full-game build or controller remapping was performed.
 ---
 
 Embedded source: docs/ANIMATION_RUNTIME_ADAPTER.md
+
+## Grouped motion coverage and alias lifetime
+
+The full-bank audit now includes native group records, not just individually
+typed SingleMoCap records. The supplied 11 containers contain 75 groups with
+150 embedded headers in addition to 4,705 standalone headers: **4,855 inspected
+source headers**, with zero track-inspection failures. This supersedes earlier
+4,705-only coverage totals. All families remain in scope, including paired and
+coordinated motions; none of these group members is discarded.
+
+NBA11 group relocation 0x1602C fixes +4, then the first pointer of each 16-byte
+member entry at +0xC and calls motion fixup 0x15F24. Group count is at +8.
+Resolver 0x1C700 uses the FIRST member's unresolved +0x28 word to look up a group,
+then copies member dependencies through 0x11DD0 in corresponding slot order.
+The second member's zero reference ID must not become a SingleMoCap lookup.
+The native copy retains each alias header's state/mirror metadata and creates
+bidirectional +4 links between corresponding member headers. The resolver also
+links both group +4 fields. These are lifetime dependencies, not ownership
+transfer: backing groups/motions cannot be freed while referenced. Native
+backlink lifecycle and complete target group registration remain uninstalled.
+
+`MotionGroupSource` shares bounded bank decoding and retains original group and
+member provenance, placement words, per-member metadata and the owning group
+path. It rejects missing/ambiguous typed group owners, cycles, mixed packed/alias
+members, count/packing mismatches, invalid headers and dependencies intersecting
+another member's header. It never substitutes a direct clip for a group. Group
+ambiguity remains strict even when exact duplicate SingleMoCap coalescing is on.
+Placement-word semantics and synchronized target group behavior remain gated.
+The shared standalone track reader was factored without relaxing its bind gate.
+
+`inspect-animation-library` includes every group member, preserves standalone
+record counts separately, and limits total standalone+embedded headers to
+100,000 before reading tracks. The supplied audit adds 60 alias headers and 90
+conservative member-payload hashes: **2,323 alias headers /2,531 payload hashes**,
+**3,240 canonical-family candidates /1,615 other-rig headers**, and **30,055 event
+rows /11,169 covered by existing rules**. The numerical fixed-rate pose/root
+estimate becomes **78,490,456 bytes**, excluding headers/events/selectors/group
+metadata/registration and before target bind mapping. Hashes include complete
+member-tail bytes; this is conservative deduplication, not a minimal memory
+budget. Source bytes/size/mtime are unchanged. Executable-held and unknown-bank
+coverage, full semantic mapping, native streaming and gameplay remain unresolved.
 
 ## Whole-library scope and provider routing correction
 
@@ -5903,6 +5985,27 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+## Grouped motion continuation verification
+
+Read-only supplied-IFF API audit: **4,855/4,855 headers inspected** (4,705 standalone
+plus 150 members in 75 groups), zero failures. Group members include 60 alias
+headers and 90 distinct member-tail hashes; source bytes, sizes and mtimes stayed
+unchanged. Numerical pose/root estimate is now 78,490,456 bytes; this does not
+measure native working-set residency or establish target group placement.
+
+Native `NativeMotionGroupTrace.java`: **6 cases passed** (1/2/4 members, relocation
+and alias-copy modes), executing real group/motion fixups and the native
+member-copy loop. Verify original header ID/mode/state and group placement words,
+all copied dependency/tail pointers, and bidirectional motion/group backlinks.
+Final run explicitly initializes saved registers and condition state, with no
+uninitialized-register warnings. No game/emulator or testing JB run.
+
+Targeted group/library/source checks: **42 passed**. Cover all-member alias
+resolution from the first reference, typed identity separation, ambiguity,
+cycles, incompatible/mixed members, header/table/dependency bounds, unchanged
+source bytes, group-only libraries, failed-member reporting and pre-read total
+header limits. Full exact-head results follow after isolated verification.
 
 ## Whole-bank marker dispatch verification
 

@@ -1,3 +1,24 @@
+## Grouped motion continuation verification
+
+Read-only supplied-IFF API audit: **4,855/4,855 headers inspected** (4,705 standalone
+plus 150 members in 75 groups), zero failures. Group members include 60 alias
+headers and 90 distinct member-tail hashes; source bytes, sizes and mtimes stayed
+unchanged. Numerical pose/root estimate is now 78,490,456 bytes; this does not
+measure native working-set residency or establish target group placement.
+
+Native `NativeMotionGroupTrace.java`: **6 cases passed** (1/2/4 members, relocation
+and alias-copy modes), executing real group/motion fixups and the native
+member-copy loop. Verify original header ID/mode/state and group placement words,
+all copied dependency/tail pointers, and bidirectional motion/group backlinks.
+Final run explicitly initializes saved registers and condition state, with no
+uninitialized-register warnings. No game/emulator or testing JB run.
+
+Targeted group/library/source checks: **42 passed**. Cover all-member alias
+resolution from the first reference, typed identity separation, ambiguity,
+cycles, incompatible/mixed members, header/table/dependency bounds, unchanged
+source bytes, group-only libraries, failed-member reporting and pre-read total
+header limits. Full exact-head results follow after isolated verification.
+
 ## Whole-bank marker dispatch verification
 
 Native read-only Ghidra instruction harness: **192 NBA11 + 185 CH cases passed**.

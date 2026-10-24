@@ -27,7 +27,7 @@ from ..formats.motion_frames import (
     resample_nba11_root,
 )
 from ..formats.standard_iff import StandardIFF
-from .donor_registry import MAX_BANK_BYTES, MOTION
+from .donor_registry import GROUP, MAX_BANK_BYTES, MOTION
 from .motion_auxiliary import read_selector_prefix, transcode_selector_curve
 from .target_motion import MAX_IMAGE
 
@@ -63,7 +63,7 @@ class SignatureMotionSource:
                 if record["type_hash"] == MOTION:
                     self.index[record["id"]].append((bank, record["index"]))
 
-    def _record(self, bank, record):
+    def _record(self, bank, record, *, type_hash=MOTION):
         if (
             type(bank) is not int
             or not 0 <= bank < len(self.banks)
@@ -73,7 +73,7 @@ class SignatureMotionSource:
             raise ValueError("Choose an existing signature bank/record index")
         iff = self.banks[bank]
         item = iff.records[record]
-        if item["type_hash"] != MOTION:
+        if type_hash not in (MOTION, GROUP) or item["type_hash"] != type_hash:
             raise ValueError("Signature source must be a typed SingleMoCap record")
         spans = list(iff.spans(item))
         if len(spans) != 1:
@@ -89,7 +89,7 @@ class SignatureMotionSource:
                 block["logical_size"],
             )
         raw = Binary(self.cache[key]).slice(start, end - start)
-        Binary(raw).slice(0, 56)
+        Binary(raw).slice(0, 56 if type_hash == MOTION else 12)
         if struct.unpack_from(">I", raw)[0] != item["id"]:
             raise ValueError("Signature record identity disagrees with motion header")
         return raw
@@ -167,6 +167,13 @@ class SignatureMotionSource:
 
     def _tracks(self, bank, record, *, canonical):
         header, raw, path = self.resolve(bank, record)
+        return self._read_tracks(
+            header, raw, path, canonical=canonical,
+            source_record=self._record(bank, record),
+        )
+
+    def _read_tracks(self, header, raw, path, *, canonical, source_record):
+        """Shared bounded track reader; grouped headers have a separate resolver."""
         envelope = inspect_envelope(raw, "nba-2k11")
         channel_reader = canonical_channels if canonical else declared_channels
         channels = channel_reader(header, "nba-2k11")
@@ -266,7 +273,7 @@ class SignatureMotionSource:
             source_kind="nba11-signature-iff",
             alias_path=path,
             source_header_sha256=hashlib.sha256(header[:56]).hexdigest(),
-            source_record_sha256=hashlib.sha256(self._record(bank, record)).hexdigest(),
+            source_record_sha256=hashlib.sha256(source_record).hexdigest(),
             payload_record_sha256=hashlib.sha256(raw).hexdigest(),
             header_hex=header[:56].hex(),
             original_alias_metadata_retained=True,

@@ -218,8 +218,7 @@ research APIs establish source behavior; no new game-writing CLI is exposed.
 python -m choops_py.cli inspect-animation-library first.iff library.json --related-bank second.iff --coalesce-identical
 ```
 
-Accepts 1..32 banks within 128 MiB stored/declared decoded limits and at most 100,000
-motion records. Coalescing is opt-in and requires equality of every decoded
+Accepts 1..32 banks within 128 MiB stored/declared decoded limits and at most 100,000 total standalone and grouped motion headers. Coalescing is opt-in and requires equality of every decoded
 record byte; default duplicate ambiguity remains blocked. Reports count all
 supplied typed records, retain up to 256 explicit failures, and distinguish
 unmapped channel families from canonical-family candidates. Executable-held
@@ -245,3 +244,13 @@ IDs after validating the observed revision and dependencies. This establishes
 neither cross-game event semantics nor payload portability. See
 [the event ledger](ANIMATION_EVENT_BRIDGE.md) for the verified callback ABI and
 native harness boundary. No executable writer is exposed.
+
+### Grouped motion inspection API
+
+`MotionGroupSource(SignatureMotionSource(banks)).inspect_member(bank, record,
+member)` reads an embedded member, using typed group aliases and preserving
+placement words. `canonical=True` additionally requires canonical channel masks;
+this still establishes no new bone map or gameplay registration. The library CLI
+includes these members automatically and separates standalone counts from group
+record/member counts. Missing/ambiguous owners, incompatible members and malformed
+extents fail explicitly. There is no group writer or executable installation CLI.

@@ -1,3 +1,12 @@
+## Grouped animation library continuation
+
+- Include embedded group members in the full-bank audit, with typed group alias
+  resolution, original member/placement metadata and source protection.
+- Bound every member header and dependency; retain standalone/group counts and
+  enforce the total header limit before reading tracks.
+- Verify native relocation/member-copy/backlink behavior; document the backing
+  group lifetime requirement without claiming playable target group integration.
+
 ## Animation marker dispatch research continuation
 
 - Inventory all 192 NBA11 and 185 CH native marker dispatch entries through a
