@@ -6071,7 +6071,9 @@ group conversion API or game installation published. Research readers remain.
 
 Report changes label inventory scope and unset compatible conversion counts;
 paired-shot/four-pair manifests preserve explicit target compatibility gates.
-Verification results are recorded after the scoped update's isolated checks.
+Targeted affected checks: **37 passed**. Isolated author verification: **1,115
+passed, 10 skipped, 2 deselected**; handoff freshness, compile, CLI/offscreen Qt,
+Ruff and mypy (18 files) pass. Gameplay was not run; no testing JB was built.
 
 ## Grouped motion continuation verification
 
