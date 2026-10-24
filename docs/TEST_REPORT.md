@@ -1,5 +1,9 @@
 ## Dribbler style gate and graph-node dependency closure
 
+Isolated author verification at28974b64d29186c2a2b7d5b8b00384a625c7b5c1:
+**1,171 passed,10 skipped,2 deselected**; handoff, compile, CLI/offscreen Qt,
+Ruff and mypy18files pass. Final published-head checks are recorded in PR49.
+
 Graph tests **45 passed**; affected graph/source/group/library regression
 **87 passed**. Ruff E/F/I passes. Node-boundary errors, distinct selector-family
 slots, missing keys/slots, explicit inputs, zero/null/bypass and unsupported
