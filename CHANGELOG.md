@@ -1,3 +1,9 @@
+# v1.23
+
+- Native macOS Apple Silicon/Intel app packages and Windows x64 release archives.
+- Mac writable data outside the app bundle; native audio and OpenGL package checks.
+- Per-package source identity and checksums; existing v1.22 behavior retained.
+
 ## v1.22 — alternate discovery and combined research updates
 
 Windows extended drive/UNC path spellings are normalized consistently, fixing the

@@ -50,7 +50,8 @@ def main():
             raise SystemExit(
                 "--check cannot fetch/build; use --audio-encoder separately."
             )
-        run([executable, "-m", "pip", "install", "ziglang==0.13.0"])
+        if sys.platform != "darwin":
+            run([executable, "-m", "pip", "install", "ziglang==0.13.0"])
         source = ROOT / ".private/vendor/atracdenc"
         source.parent.mkdir(parents=True, exist_ok=True)
         if not source.exists():

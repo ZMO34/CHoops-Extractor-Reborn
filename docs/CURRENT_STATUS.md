@@ -1,3 +1,14 @@
+# v1.23 — native macOS and Windows release packaging
+
+Added native Apple Silicon and Intel Mac app packaging alongside Windows x64.
+Mac frozen-app data lives outside the bundle in Application Support. CI now
+checks both Mac architectures, bundles native LGPL audio helpers with exact
+corresponding sources/notices, and requires a real native OpenGL smoke before
+archiving. Packages include source identity, ZIP CRC and SHA-256 evidence.
+Mac apps are ad-hoc signed, not Apple-notarized; see MACOS.md. Native platform
+results are recorded in the release PR. Existing v1.22 features are retained;
+unfinished PR48/49/50 are not folded into this release. No gameplay certification.
+
 # v1.22 — new alternate folder discovery
 
 Windows extended drive/UNC path spellings are normalized consistently, fixing the

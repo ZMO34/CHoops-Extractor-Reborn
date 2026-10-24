@@ -88,6 +88,17 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# v1.23 — native macOS and Windows release packaging
+
+Added native Apple Silicon and Intel Mac app packaging alongside Windows x64.
+Mac frozen-app data lives outside the bundle in Application Support. CI now
+checks both Mac architectures, bundles native LGPL audio helpers with exact
+corresponding sources/notices, and requires a real native OpenGL smoke before
+archiving. Packages include source identity, ZIP CRC and SHA-256 evidence.
+Mac apps are ad-hoc signed, not Apple-notarized; see MACOS.md. Native platform
+results are recorded in the release PR. Existing v1.22 features are retained;
+unfinished PR48/49/50 are not folded into this release. No gameplay certification.
+
 # v1.22 — new alternate folder discovery
 
 Windows extended drive/UNC path spellings are normalized consistently, fixing the
@@ -622,7 +633,7 @@ No backport is implemented; modern runtime features remain distinct from assets.
 
 Embedded source: docs/FEATURE_MATRIX.md
 
-# Current support matrix — v1.21
+# Current support matrix — v1.23
 
 Supported means structurally verified by parsers and automated fixtures. No row
 certifies game/runtime compatibility. Unknown variants fail explicitly.
@@ -677,6 +688,12 @@ port, encrypted-save decryption, universal NBA roster fields or full arena shade
 emulation. Unknown reflection/fake-bump/AO/runtime palettes and universal text
 ceilings remain unestablished. See [limitations](KNOWN_LIMITATIONS.md),
 [NBA details](NBA_ROSTERS_AND_2K14.md) and [shader evidence](ARENA_SHADER_MASKS.md).
+
+## Desktop platforms
+
+Windows x64, macOS arm64 and macOS x86_64 have native packaging/check jobs.
+Mac packages require macOS 13+, are ad-hoc signed, and are not notarized.
+Linux remains a source/test target. Native checks do not certify gameplay.
 
 ---
 
@@ -897,7 +914,7 @@ game files. Do not delete a test just to make a failure disappear.
 
 Embedded source: docs/RELEASING.md
 
-# Windows and GitHub release procedure
+# Desktop and GitHub release procedure
 
 ## Prepare a reviewable source update
 
@@ -946,6 +963,26 @@ Do not regenerate a package from an uncommitted tree or label a parser-only resu
 as gameplay certification. Preserve published releases unless a specific owner
 request calls for removal. Cleanup local intermediates after successful publication;
 keep the delivered package/checksum and avoid deleting user builds/research.
+
+## Build macOS (Apple Silicon and Intel)
+
+Build on the matching native macOS runner with Python 3.12, Xcode command-line
+build tools and `MACOSX_DEPLOYMENT_TARGET=13.0`. Install the declared development
+dependencies, run `bash tools/audio_codec/build_ffmpeg.sh`, then
+`python tools/dev/setup.py --audio-encoder`. The encoder uses Apple's clang on Mac.
+Run `.venv/bin/python tools/rebuild/package_macos.py`. Each architecture runs full
+portable checks, frozen startup/CLI/audio checks and a native Cocoa/OpenGL render.
+The app is ad-hoc signed and verified, not Developer ID signed or notarized.
+Never describe this as an Apple-notarized release. Exact codec sources and docs
+are beside the app so copying documentation cannot invalidate its signature.
+
+Run `tools/rebuild/release_archive.py` with the native packaging interpreter on
+Windows or Mac. It records source commit/platform/version, verifies ZIP CRC and
+writes a per-ZIP SHA-256 file. Mac archives use ditto to preserve framework links
+and executable permissions. CI uploads the complete ZIP and checksum together.
+Download all three successful native job artifacts for the same tested commit;
+inspect checksums/contents before uploading release assets. Do not publish only a
+workflow or a source ZIP as a completed desktop release.
 
 ---
 
@@ -5356,6 +5393,14 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+# v1.23 desktop release validation
+
+Added regression coverage for frozen Mac output paths and preserved source/Windows
+paths. Portable and native package results, exact commit and skipped checks are
+recorded in the release PR. macOS jobs require frozen audio conversion and a
+real Cocoa/OpenGL framebuffer; startup alone is insufficient. No emulator,
+gameplay or testing JB is used.
 
 # v1.22 alternate discovery and PR integration
 

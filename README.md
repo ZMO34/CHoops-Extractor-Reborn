@@ -1,14 +1,21 @@
 # CHoops Modding Studio — v1.19
 
-Windows desktop editor and Python CLI for the verified PS3 College Hoops 2K8,
+Windows/macOS desktop editor and Python CLI for the verified PS3 College Hoops 2K8,
 NBA 2K9 and NBA 2K14 asset layouts. Browse/extract archives, edit supported textures
 and roster fields, preview authored models, and prepare compatible overrides.
 College Hoops has the broadest roster support. NBA 2K14 archive writing remains
 blocked because its authenticated SDAT container requires a separate validated writer.
 
-[Download Windows releases](https://github.com/ZMO34/CHoops-Extractor-Reborn/releases)
+[Download desktop releases](https://github.com/ZMO34/CHoops-Extractor-Reborn/releases)
 · [Documentation index](docs/README.md) · [Support matrix](docs/FEATURE_MATRIX.md)
 · [Current status](docs/CURRENT_STATUS.md) · [Known limits](docs/KNOWN_LIMITATIONS.md)
+
+## macOS quick start
+
+Download the **macos-arm64** ZIP for Apple Silicon or **macos-x86_64** for Intel.
+Requires macOS 13+. Extract the complete ZIP and move `CHoops-Studio.app` to
+Applications. The app is ad-hoc signed, not Apple-notarized; see
+[Mac installation and limitations](docs/MACOS.md). No Python installation is needed.
 
 ## Windows quick start
 

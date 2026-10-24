@@ -21,10 +21,10 @@ def ffmpeg_path():
     name='choops_ffmpeg.exe' if os.name=='nt' else 'choops_ffmpeg'
     bundled=Path(__file__).parent/'bin'/name
     if bundled.is_file():return bundled
-    if getattr(sys,'frozen',False):raise ValueError('The bundled LGPL audio helper is missing; reinstall the Windows package')
+    if getattr(sys,'frozen',False):raise ValueError('The bundled LGPL audio helper is missing; reinstall the application package')
     found=shutil.which(name) or shutil.which('ffmpeg')
     if found:return Path(found)
-    raise ValueError('The LGPL audio helper is missing; build it with tools/audio_codec/build_ffmpeg.sh in an MSYS2 MINGW64 shell')
+    raise ValueError('The LGPL audio helper is missing; run tools/audio_codec/build_ffmpeg.sh (MSYS2 MINGW64 on Windows, bash on macOS)')
 
 
 def _run_ffmpeg(args,work,job,label,timeout=1800):
@@ -84,7 +84,7 @@ def export_wav(data,channels,rate,output,samples=None,job=None):
 
 def encoder_path():
     path=Path(__file__).parent/'bin'/('choops_atrac3_encoder.exe' if os.name=='nt' else 'choops_atrac3_encoder')
-    if not path.is_file():raise ValueError('ATRAC encoder is missing; build it with tools/audio_encoder/build.py or use the Windows release')
+    if not path.is_file():raise ValueError('ATRAC encoder is missing; build it with tools/audio_encoder/build.py or use a desktop release')
     return path
 
 

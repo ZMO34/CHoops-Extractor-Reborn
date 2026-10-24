@@ -1,3 +1,11 @@
+# v1.23 desktop release validation
+
+Added regression coverage for frozen Mac output paths and preserved source/Windows
+paths. Portable and native package results, exact commit and skipped checks are
+recorded in the release PR. macOS jobs require frozen audio conversion and a
+real Cocoa/OpenGL framebuffer; startup alone is insufficient. No emulator,
+gameplay or testing JB is used.
+
 # v1.22 alternate discovery and PR integration
 
 Targeted: `python -m pytest tests/test_team_assets.py tests/test_folder_overrides.py

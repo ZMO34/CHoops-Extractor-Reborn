@@ -1,4 +1,4 @@
-# Windows and GitHub release procedure
+# Desktop and GitHub release procedure
 
 ## Prepare a reviewable source update
 
@@ -47,3 +47,23 @@ Do not regenerate a package from an uncommitted tree or label a parser-only resu
 as gameplay certification. Preserve published releases unless a specific owner
 request calls for removal. Cleanup local intermediates after successful publication;
 keep the delivered package/checksum and avoid deleting user builds/research.
+
+## Build macOS (Apple Silicon and Intel)
+
+Build on the matching native macOS runner with Python 3.12, Xcode command-line
+build tools and `MACOSX_DEPLOYMENT_TARGET=13.0`. Install the declared development
+dependencies, run `bash tools/audio_codec/build_ffmpeg.sh`, then
+`python tools/dev/setup.py --audio-encoder`. The encoder uses Apple's clang on Mac.
+Run `.venv/bin/python tools/rebuild/package_macos.py`. Each architecture runs full
+portable checks, frozen startup/CLI/audio checks and a native Cocoa/OpenGL render.
+The app is ad-hoc signed and verified, not Developer ID signed or notarized.
+Never describe this as an Apple-notarized release. Exact codec sources and docs
+are beside the app so copying documentation cannot invalidate its signature.
+
+Run `tools/rebuild/release_archive.py` with the native packaging interpreter on
+Windows or Mac. It records source commit/platform/version, verifies ZIP CRC and
+writes a per-ZIP SHA-256 file. Mac archives use ditto to preserve framework links
+and executable permissions. CI uploads the complete ZIP and checksum together.
+Download all three successful native job artifacts for the same tested commit;
+inspect checksums/contents before uploading release assets. Do not publish only a
+workflow or a source ZIP as a completed desktop release.
