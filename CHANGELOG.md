@@ -1,3 +1,7 @@
+Animation research: expose two native-tested header+0x18 predicate comparisons
+in donor translation manifests, retaining explicit target authoring and unknown
+state semantics. No automatic state mapping or playable import is introduced.
+
 NBA11 native donor component research: counted selector transport and explicit
 reciprocal mirror detachment with full header/dependency fingerprints, overlap
 checks and residency roundtrips. No automatic selector map or gameplay claim.

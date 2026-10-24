@@ -1,3 +1,12 @@
+## Motion state research harness
+
+`NativeMotionStateTrace.java` runs through Ghidra headless against a read-only
+supported executable project. Arguments: `nba-2k11|college-hoops-2k8 NEW_JSON`.
+It executes only synthetic native state predicates/context clearing, not gameplay.
+The output must not already exist. Keep native projects and reports private.
+Python `research.motion_state.compare_motion_states(source_word, target_word)`
+returns the bounded predicate comparison; it is not a complete state converter.
+
 Native donor research API: `translate_donor_motion(..., auxiliary_contracts=[...])`
 requires one existing schema1 selector contract per counted native curve. Metadata
 `source_header_sha256` binds the COMPLETE56+4*count-byte native header. For a

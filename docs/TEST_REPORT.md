@@ -1,3 +1,12 @@
+## Native motion state predicate comparison
+
+Native synthetic harness:42 passed (21 NBA11,21 CH), no mocked calls. Tests
+cover aggregate flags, absent header, bit30 clear/retain behavior, empty actor
+list and mixed actor traversal with untouched userdata sentinels. Python state/
+donor/signature/auxiliary/shot regression:77 passed. Full exact-head portable
+verification is pending for this update; earlier totals below apply to their
+stated revisions. No emulator/gameplay run or testing JB was created.
+
 ## Native donor auxiliary and reciprocal mirror extension
 
 Isolated author verification at7b453b9ac2f32b3c9d1657a3ce9bc9f6f12c03da:

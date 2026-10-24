@@ -29,6 +29,7 @@ from ..formats.motion_frames import (
 from ..formats.standard_iff import StandardIFF
 from .donor_registry import COLLECTION, GROUP, MAX_BANK_BYTES, MOTION
 from .motion_auxiliary import read_selector_prefix, transcode_selector_curve
+from .motion_state import compare_motion_states
 from .target_motion import MAX_IMAGE
 
 
@@ -83,7 +84,10 @@ class SignatureMotionSource:
             raise ValueError("Choose an existing signature bank/record index")
         iff = self.banks[bank]
         item = iff.records[record]
-        if type_hash not in (MOTION, GROUP, COLLECTION) or item["type_hash"] != type_hash:
+        if (
+            type_hash not in (MOTION, GROUP, COLLECTION)
+            or item["type_hash"] != type_hash
+        ):
             raise ValueError("Signature source must be a typed SingleMoCap record")
         spans = list(iff.spans(item))
         if len(spans) != 1:
@@ -174,7 +178,10 @@ class SignatureMotionSource:
     def _tracks(self, bank, record, *, canonical):
         header, raw, path = self.resolve(bank, record)
         return self._read_tracks(
-            header, raw, path, canonical=canonical,
+            header,
+            raw,
+            path,
+            canonical=canonical,
             source_record=self._record(bank, record),
         )
 
@@ -475,6 +482,9 @@ def translate_signature_motion(
             evidence={k: c["evidence"][k] for k in ("mode", "state", "planar")},
         ),
         metadata_automatically_established=False,
+        state_consumer_comparison=compare_motion_states(
+            struct.unpack_from(">I", header, 24)[0], state
+        ),
         metadata_provenance="explicit-per-record-caller-research-assertions",
         complete_known_layout=True,
         native_loader_installed=False,

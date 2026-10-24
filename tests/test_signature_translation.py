@@ -52,7 +52,7 @@ def test_serialized_signature_component_matches_equivalent_elf_source(tmp_path):
     donor, target, raw = fixtures(tmp_path)
     source = SignatureMotionSource([("synthetic", bank(raw))])
     image, report = translate(source, donor, target)
-    expected, _ = translate_donor_motion(
+    expected, expected_report = translate_donor_motion(
         donor,
         target,
         0x20000,
@@ -60,6 +60,10 @@ def test_serialized_signature_component_matches_equivalent_elf_source(tmp_path):
         curve_timing_contract(),
     )
     assert image == expected
+    assert (
+        report["state_consumer_comparison"]
+        == expected_report["state_consumer_comparison"]
+    )
     assert (
         report["complete_known_layout"]
         and not report["metadata_automatically_established"]

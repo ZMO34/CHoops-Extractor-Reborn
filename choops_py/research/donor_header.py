@@ -18,6 +18,7 @@ from ..formats.motion_frames import (
     resample_nba11_root,
 )
 from .motion_auxiliary import read_selector_prefix, transcode_selector_curve
+from .motion_state import compare_motion_states
 from .target_motion import MAX_IMAGE, relocate_target_image
 
 
@@ -317,6 +318,9 @@ def translate_donor_motion(
         source_identifier=struct.unpack_from(">I", source)[0],
         metadata_provenance="explicit-per-header-caller-research-assertions",
         metadata_automatically_established=False,
+        state_consumer_comparison=compare_motion_states(
+            struct.unpack_from(">I", source, 24)[0], state
+        ),
         metadata_assertions=dict(
             target_mode_high16=high,
             target_state_bits=state,

@@ -76,6 +76,10 @@ def test_translation_rebuilds_target_layout_tracks_and_timing_without_template(
         relocate_target_image(native, [0], 0x30000000, source_state="native") == image
     )
     assert before == (donor, target)
+    assert r["state_consumer_comparison"]["changed_predicates"] == [
+        "mask_0x3f0_nonzero"
+    ]
+    assert not r["state_consumer_comparison"]["target_compatibility_established"]
 
 
 @pytest.mark.parametrize(

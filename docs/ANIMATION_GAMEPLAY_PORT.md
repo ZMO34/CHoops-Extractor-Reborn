@@ -1,3 +1,21 @@
+## Native motion state consumer comparison
+
+Header+0x18 now has two native-tested cross-game predicates: whether mask0x3F0
+is nonzero, and whether bit30 skips clearing a per-actor context pair. The latter
+is distinct from mirroring at header+0x14. NBA11 consumers0x471C3C/0x38CC90 and
+CH consumers0x3095F8/0x23B794 execute against synthetic inputs in
+`NativeMotionStateTrace.java`:21 cases per game,42 total. Context-pair sentinels
+verify the expected two-word writes and untouched surrounding bytes.
+
+`motion_state.compare_motion_states` reports these predicate differences in both
+native-donor and signature-IFF adapter manifests. It preserves explicit authored
+values; it supplies no state defaults, individual-bit correspondence or complete
+state mapping. Aggregate predicate equality does not establish compatibility.
+Among99 shared-endpoint candidates,94 preserve both observed predicates and5
+change the mask0x3F0 predicate. These are correlations, not full motion identity.
+Further state consumers, auxiliary palettes, timing/blending, registration and
+native ownership remain unresolved. Confirmed playable donor imports remain zero.
+
 ## Executable-held native donor component construction
 
 Counted selector curves and explicitly bound reciprocal mirror headers can now

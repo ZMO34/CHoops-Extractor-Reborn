@@ -88,6 +88,24 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+## Native motion state consumer comparison
+
+Header+0x18 now has two native-tested cross-game predicates: whether mask0x3F0
+is nonzero, and whether bit30 skips clearing a per-actor context pair. The latter
+is distinct from mirroring at header+0x14. NBA11 consumers0x471C3C/0x38CC90 and
+CH consumers0x3095F8/0x23B794 execute against synthetic inputs in
+`NativeMotionStateTrace.java`:21 cases per game,42 total. Context-pair sentinels
+verify the expected two-word writes and untouched surrounding bytes.
+
+`motion_state.compare_motion_states` reports these predicate differences in both
+native-donor and signature-IFF adapter manifests. It preserves explicit authored
+values; it supplies no state defaults, individual-bit correspondence or complete
+state mapping. Aggregate predicate equality does not establish compatibility.
+Among99 shared-endpoint candidates,94 preserve both observed predicates and5
+change the mask0x3F0 predicate. These are correlations, not full motion identity.
+Further state consumers, auxiliary palettes, timing/blending, registration and
+native ownership remain unresolved. Confirmed playable donor imports remain zero.
+
 ## Native donor curves and reciprocal mirror ownership
 
 The executable-held donor adapter now handles counted selector curves through the
@@ -1903,6 +1921,24 @@ See NBA_ROSTERS_AND_2K14.md for container and primary format references.
 
 Embedded source: docs/ANIMATION_GAMEPLAY_PORT.md
 
+## Native motion state consumer comparison
+
+Header+0x18 now has two native-tested cross-game predicates: whether mask0x3F0
+is nonzero, and whether bit30 skips clearing a per-actor context pair. The latter
+is distinct from mirroring at header+0x14. NBA11 consumers0x471C3C/0x38CC90 and
+CH consumers0x3095F8/0x23B794 execute against synthetic inputs in
+`NativeMotionStateTrace.java`:21 cases per game,42 total. Context-pair sentinels
+verify the expected two-word writes and untouched surrounding bytes.
+
+`motion_state.compare_motion_states` reports these predicate differences in both
+native-donor and signature-IFF adapter manifests. It preserves explicit authored
+values; it supplies no state defaults, individual-bit correspondence or complete
+state mapping. Aggregate predicate equality does not establish compatibility.
+Among99 shared-endpoint candidates,94 preserve both observed predicates and5
+change the mask0x3F0 predicate. These are correlations, not full motion identity.
+Further state consumers, auxiliary palettes, timing/blending, registration and
+native ownership remain unresolved. Confirmed playable donor imports remain zero.
+
 ## Executable-held native donor component construction
 
 Counted selector curves and explicitly bound reciprocal mirror headers can now
@@ -2733,6 +2769,24 @@ No RPCS3, hardware run, full-game build or controller remapping was performed.
 ---
 
 Embedded source: docs/ANIMATION_RUNTIME_ADAPTER.md
+
+## Native motion state consumer comparison
+
+Header+0x18 now has two native-tested cross-game predicates: whether mask0x3F0
+is nonzero, and whether bit30 skips clearing a per-actor context pair. The latter
+is distinct from mirroring at header+0x14. NBA11 consumers0x471C3C/0x38CC90 and
+CH consumers0x3095F8/0x23B794 execute against synthetic inputs in
+`NativeMotionStateTrace.java`:21 cases per game,42 total. Context-pair sentinels
+verify the expected two-word writes and untouched surrounding bytes.
+
+`motion_state.compare_motion_states` reports these predicate differences in both
+native-donor and signature-IFF adapter manifests. It preserves explicit authored
+values; it supplies no state defaults, individual-bit correspondence or complete
+state mapping. Aggregate predicate equality does not establish compatibility.
+Among99 shared-endpoint candidates,94 preserve both observed predicates and5
+change the mask0x3F0 predicate. These are correlations, not full motion identity.
+Further state consumers, auxiliary palettes, timing/blending, registration and
+native ownership remain unresolved. Confirmed playable donor imports remain zero.
 
 ## Native donor curves and reciprocal mirror ownership
 
@@ -6743,6 +6797,15 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+## Native motion state predicate comparison
+
+Native synthetic harness:42 passed (21 NBA11,21 CH), no mocked calls. Tests
+cover aggregate flags, absent header, bit30 clear/retain behavior, empty actor
+list and mixed actor traversal with untouched userdata sentinels. Python state/
+donor/signature/auxiliary/shot regression:77 passed. Full exact-head portable
+verification is pending for this update; earlier totals below apply to their
+stated revisions. No emulator/gameplay run or testing JB was created.
 
 ## Native donor auxiliary and reciprocal mirror extension
 
