@@ -13,7 +13,11 @@ values; it supplies no state defaults, individual-bit correspondence or complete
 state mapping. Aggregate predicate equality does not establish compatibility.
 Among99 shared-endpoint candidates,94 preserve both observed predicates and5
 change the mask0x3F0 predicate. These are correlations, not full motion identity.
-Further state consumers, auxiliary palettes, timing/blending, registration and
+Further instruction-verified source consumers include0x491BE4 (combined bit11/
+mask0x380 predicate),0x49CC9C/0x49CFBC (bits12/13/14 dispatch) and0x59ECF4
+(bit22 copied into a context message). CH0x393284 separately checks bit4 during
+dribble launch. These are tracing leads, not established cross-game mappings or
+named basketball actions. Further state consumers, auxiliary palettes, timing/blending, registration and
 native ownership remain unresolved. Confirmed playable donor imports remain zero.
 
 ## Executable-held native donor component construction
@@ -218,7 +222,7 @@ an IFF parser, successful build or executable decompilation.
   ambiguities and cycles without calling them resolved gameplay dependencies.
 - Motion selection collection envelopes have distinct observed strides: NBA
   2K11 uses 20 bytes; NBA 2K14 uses 28. Neither profile enables an import writer.
-- Seven prior PR branches (#31–#37) are consolidated with ancestry retained.
+- Seven prior PR branches (#31â€“#37) are consolidated with ancestry retained.
   Legacy saves, override compatibility checks, faces, SDAT v3 reads, scorebug
   contracts, executable research documentation and uniform editing are preserved.
   The renamed roster-open button's GUI regression expectation is updated; added
@@ -265,7 +269,7 @@ Stock tutorial text explicitly warns that some drills depend on Default controls
 changing a preset requires checking those consumers as well. A global left/right
 axis swap is not an implementation of the requested controls.
 
-## Executable-held motion data — read-only follow-up
+## Executable-held motion data â€” read-only follow-up
 
 Archive counts above are not a total gameplay-library count. The supplied CH2K8
 and NBA 2K11 decoded executables contain large pools with the observed full-body
@@ -303,7 +307,7 @@ Original EBOOT remains untouched. The low-level normalized input getter has also
 been traced at CH 0x7B1F14 through bridge 0x121B0; downstream action semantics and
 preset save/default paths remain unestablished.
 
-## Packed pose translation — 2K11 to CH2K8
+## Packed pose translation â€” 2K11 to CH2K8
 
 A bounded packed-channel converter is implemented in `formats/motion_frames.py`.
 This is the first actual stream translation, not a complete animation-bank port.
@@ -394,7 +398,7 @@ uses distinct payload words. Endpoint agreement is not full-motion equivalence;
 none of these candidates is installed as an event conversion table. Observed event IDs differ, so dropping the third
 word or applying a uniform ID offset is not a supported event conversion.
 
-## Adding jump-shot choices — native requirements
+## Adding jump-shot choices â€” native requirements
 
 The next offline phase now provides [event/payload dependency inspection and a
 guarded table bridge](ANIMATION_EVENT_BRIDGE.md). It preserves marker order and

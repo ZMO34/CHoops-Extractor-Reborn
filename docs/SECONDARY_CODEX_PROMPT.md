@@ -1936,7 +1936,11 @@ values; it supplies no state defaults, individual-bit correspondence or complete
 state mapping. Aggregate predicate equality does not establish compatibility.
 Among99 shared-endpoint candidates,94 preserve both observed predicates and5
 change the mask0x3F0 predicate. These are correlations, not full motion identity.
-Further state consumers, auxiliary palettes, timing/blending, registration and
+Further instruction-verified source consumers include0x491BE4 (combined bit11/
+mask0x380 predicate),0x49CC9C/0x49CFBC (bits12/13/14 dispatch) and0x59ECF4
+(bit22 copied into a context message). CH0x393284 separately checks bit4 during
+dribble launch. These are tracing leads, not established cross-game mappings or
+named basketball actions. Further state consumers, auxiliary palettes, timing/blending, registration and
 native ownership remain unresolved. Confirmed playable donor imports remain zero.
 
 ## Executable-held native donor component construction
@@ -2141,7 +2145,7 @@ an IFF parser, successful build or executable decompilation.
   ambiguities and cycles without calling them resolved gameplay dependencies.
 - Motion selection collection envelopes have distinct observed strides: NBA
   2K11 uses 20 bytes; NBA 2K14 uses 28. Neither profile enables an import writer.
-- Seven prior PR branches (#31–#37) are consolidated with ancestry retained.
+- Seven prior PR branches (#31â€“#37) are consolidated with ancestry retained.
   Legacy saves, override compatibility checks, faces, SDAT v3 reads, scorebug
   contracts, executable research documentation and uniform editing are preserved.
   The renamed roster-open button's GUI regression expectation is updated; added
@@ -2188,7 +2192,7 @@ Stock tutorial text explicitly warns that some drills depend on Default controls
 changing a preset requires checking those consumers as well. A global left/right
 axis swap is not an implementation of the requested controls.
 
-## Executable-held motion data — read-only follow-up
+## Executable-held motion data â€” read-only follow-up
 
 Archive counts above are not a total gameplay-library count. The supplied CH2K8
 and NBA 2K11 decoded executables contain large pools with the observed full-body
@@ -2226,7 +2230,7 @@ Original EBOOT remains untouched. The low-level normalized input getter has also
 been traced at CH 0x7B1F14 through bridge 0x121B0; downstream action semantics and
 preset save/default paths remain unestablished.
 
-## Packed pose translation — 2K11 to CH2K8
+## Packed pose translation â€” 2K11 to CH2K8
 
 A bounded packed-channel converter is implemented in `formats/motion_frames.py`.
 This is the first actual stream translation, not a complete animation-bank port.
@@ -2317,7 +2321,7 @@ uses distinct payload words. Endpoint agreement is not full-motion equivalence;
 none of these candidates is installed as an event conversion table. Observed event IDs differ, so dropping the third
 word or applying a uniform ID offset is not a supported event conversion.
 
-## Adding jump-shot choices — native requirements
+## Adding jump-shot choices â€” native requirements
 
 The next offline phase now provides [event/payload dependency inspection and a
 guarded table bridge](ANIMATION_EVENT_BRIDGE.md). It preserves marker order and
@@ -6803,9 +6807,12 @@ Embedded source: docs/TEST_REPORT.md
 Native synthetic harness:42 passed (21 NBA11,21 CH), no mocked calls. Tests
 cover aggregate flags, absent header, bit30 clear/retain behavior, empty actor
 list and mixed actor traversal with untouched userdata sentinels. Python state/
-donor/signature/auxiliary/shot regression:77 passed. Full exact-head portable
-verification is pending for this update; earlier totals below apply to their
-stated revisions. No emulator/gameplay run or testing JB was created.
+donor/signature/auxiliary/shot regression:77 passed. Isolated author verification at0547b5c2d7d62eaea73aa6b28184d37f925a8d96:
+**1,207 passed,10 skipped,2 deselected**; handoff, compile, CLI/offscreen Qt,
+Ruff and mypy18files pass. Both native profiles reran from that isolated commit:42
+passed without warnings. The sandboxed portable attempt hit temporary-directory
+errors and a Qt hang; the complete successful run used a workspace-local pytest
+basetemp outside the sandbox. Final published-head checks are recorded in PR49. No emulator/gameplay run or testing JB was created.
 
 ## Native donor auxiliary and reciprocal mirror extension
 
@@ -7062,7 +7069,7 @@ expansion, stale contracts and missing consumed control words. Native bounded
 selection harness: **14 NBA11 + 2 CH cases passed**, read-only, synthetic runtime
 resources; stops before contextual fallbacks. No gameplay validation.
 
-# Selector transport and controller routing — 2026-10-23
+# Selector transport and controller routing â€” 2026-10-23
 
 Schema-2 serialized metadata now also requires `source_banks_sha256`, an ordered list of complete fingerprints for every supplied bank. A reproduced stale-contract bug allowed a related alias payload bank to change while the origin bank/header stayed unchanged. The full bank-set binding rejects that change; reports retain their own list copy. Earlier draft contracts missing this field must be regenerated. This closes an input-binding gap, not a semantic-mapping gap.
 
@@ -7070,11 +7077,11 @@ Targeted selector/header/translation/residency regressions: **92 passed**. New c
 
 The updated read-only source inspector accepts all 2,444 motions / 1,222 aliases, now including 4,016 bounded selector references. CLI reports expose consumed prefix sizes, hashes and selector values while leaving semantics unresolved. Supplied-copy audit: 806 NBA11 and 336 CH selector references pass bounded prefix reads; all 224 CH stock headers prepare together (559,640 bytes, 168 deduplicated selector tracks). The separate in-memory decoded-ELF probe registers 112 stock duplicates, 224 total styles, preserving original 112 rows/BSS/input and inverse reconstruction. No donor gameplay is established. NBA2K14 Ghidra instruction harness: **69 passed** (nine input-prefix cases plus 60 real wrapper/getter cases). No RPCS3/gameplay or testing JB was run. Earlier phase reports below retain their original counts.
 
-# Native integration and control-input research — 2026-10-23
+# Native integration and control-input research â€” 2026-10-23
 
 Targeted tests cover static BSS/section preservation, native table publication, explicit serialized metadata binding, event coverage, selector interpolation, and existing donor/header/loader regressions. Nine NBA2K14 instruction-harness cases pass. The separate supplied-copy decoded-ELF probe preserves 112 originals and adds one stock duplicate; no donor gameplay claim follows. Private event coverage and selector sample counts are documented in ANIMATION_RUNTIME_ADAPTER.md. No emulator/gameplay or testing JB was launched. Source portable verification: **1,026 passed, 10 skipped, 2 deselected** before the final source-to-resident regression. Final exact-head verification, including that regression, is recorded in the PR. Compile, CLI/offscreen Qt, strict changed-file Ruff, portable lint, mypy (18 files), and handoff checks passed.
 
-# Signature-IFF source adaptation — 2026-10-23
+# Signature-IFF source adaptation â€” 2026-10-23
 
 `python -m pytest tests/test_signature_motion.py -q -p no:cacheprovider`:
 **19 passed**. Covers compressed/uncompressed serialized sources, exact pose/root
@@ -7207,7 +7214,7 @@ preserves112 original records, TLS and adjacent label pointers, and passes an
 exact diff allowlist. This is structural evidence only, not runtime registration.
 Source hashes are unchanged. No game assets/binaries/reports are tracked or
 published; no RPCS3, hardware or automatic/testing JB was used.
-# Native-only continuity and Legacy diagnostics — 2026-10-21
+# Native-only continuity and Legacy diagnostics â€” 2026-10-21
 
 Targeted: `python -m pytest tests/test_legacy_recruiting_gui.py
 tests/test_recruit_pool.py tests/test_transfer_portal.py tests/test_cli.py
@@ -7229,7 +7236,7 @@ Full source portable verification: **847 passed, 10 optional skips, 2 deselected
 compile, CLI/offscreen Qt startup, Ruff, mypy, handoff and diff checks pass.
 Exact-head isolated portable results are recorded in PR46.
 
-# Native recruiting pool and persistence continuation — 2026-10-21
+# Native recruiting pool and persistence continuation â€” 2026-10-21
 
 Targeted: `python -m pytest tests/test_recruit_pool.py tests/test_transfer_portal.py
 tests/test_cli.py tests/test_legacy_save_adapter.py -q -o addopts=`: **88 passed**.
@@ -7242,7 +7249,7 @@ serializers and destructive-to-new-object recruit conversion. No original writes
 Exact-head isolated portable results are recorded in the PR handoff. No offseason
 save supplied, save roundtrip/gameplay/emulator NOT RUN, testing JB NOT BUILT.
 
-# Transfer recruiting policy follow-up — 2026-10-21
+# Transfer recruiting policy follow-up â€” 2026-10-21
 
 Synthetic targeted suite: `python -m pytest tests/test_transfer_portal.py -q -o
 addopts=`: **42 passed**. Covers all college class/RS labels, rejection of HS/unknown
@@ -7257,7 +7264,7 @@ codes, separate recruit class/preference fields, localization captions, geograph
 position-depth and recruit-rank consumers. No game execution or native record writes.
 Exact-head isolated portable results are recorded in the PR handoff.
 
-# Legacy transfer feasibility research — 2026-10-21
+# Legacy transfer feasibility research â€” 2026-10-21
 
 Documentation-only update. Read-only Ghidra generated 17 focused function reports;
 PowerPC instructions and constants independently checked. Private audit passes
@@ -7500,7 +7507,7 @@ No runtime appearance, game execution, physical PS3 or JB result is claimed.
 Public editor contract fixes and their portable tests are tracked in PR #32.
 This follow-up changes documentation only in PR #36.
 
-# Local executable experiment 01 — 2026-10-19
+# Local executable experiment 01 â€” 2026-10-19
 
 Private-only prototypes generated and audited on Windows / Python 3.12.14,
 Capstone PPC64 big-endian and locally installed Keystone 0.9.2. Keystone is not
@@ -7524,7 +7531,7 @@ suites and packaging are not rerun and historical passes do not certify EBOOT.
 The cleanup preserves active tracked regression tests and user builds/inputs;
 broader historical package deletion remains approval-blocked.
 
-# Executable modernization research — 2026-10-19
+# Executable modernization research â€” 2026-10-19
 
 Documentation-only update on Windows / Python 3.12.14. Read-only ELF mapping,
 function-descriptor/TOC inspection and PPC64 big-endian Capstone disassembly
@@ -7541,7 +7548,7 @@ head results are recorded in the PR. Runtime suites and Windows packaging were
 not rerun: no runtime/package code changed. Historical suite counts below do not
 validate the newly proposed executable candidates. No Ghidra, RPCS3/gameplay,
 executable patch, real/testing JB or release.
-# Experimental uniform mesh editing — verification
+# Experimental uniform mesh editing â€” verification
 
 Windows / Python 3.12.14. Targeted command:
 `python -m pytest tests/test_uniform_mesh.py tests/test_scene_preview.py tests/test_direct_asset_previews.py tests/test_cli.py -q`
@@ -7713,7 +7720,7 @@ The same ZIP also passes in an isolated v1.16 checkout; its generic screenshot
 failure is not reproduced. Final portable/isolated/frozen results are recorded
 on the release PR.
 
-# Verification — v1.18
+# Verification â€” v1.18
 
 Full portable verification on Windows / Python 3.12.14: **598 passed,
 9 offscreen OpenGL skips, 2 deselected**; compile, CLI/Qt smoke, Ruff, mypy,
