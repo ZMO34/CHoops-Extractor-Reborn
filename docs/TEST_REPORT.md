@@ -11,8 +11,9 @@ paths were rejected before analysis; final runs used resolved absolute paths.
 Portable targeted parser/CLI checks: **8 passed**, covering both table endpoints,
 flags-before-descriptor layout, shared callbacks, unsupported revisions,
 unbacked/unaligned descriptors, incorrect TOCs, non-executable callbacks and
-input overwrite protection. Full exact-head verification is recorded below once
-complete. Earlier complete-suite counts apply to their named earlier updates.
+input overwrite protection. Isolated author verification: **1,098 passed, 10 skipped, 2 deselected**;
+handoff freshness, compile, CLI/offscreen Qt, Ruff and mypy (18 files) pass.
+Earlier complete-suite counts apply to their named earlier updates.
 
 ## Whole-library and provider continuation
 
