@@ -1,6 +1,8 @@
 ## Whole-bank marker dispatch continuation
 
-The scope remains the entire animation bank. Native caller indexing establishes
+This dispatch inventory covers the source bank for format research. Conversion
+is limited to compatible on-court 5-v-5 animations; these table counts do not
+establish gameplay eligibility. Native caller indexing establishes
 NBA11's 192 marker entries (IDs 0..191) at 0x3E85474 and CH's 185 entries
 (IDs 0..184) at 0x8AC024. Each eight-byte entry is dispatch flags followed by an
 OPD descriptor pointer; scanning descriptor/next-word pairs misassigns flags and

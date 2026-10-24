@@ -158,8 +158,9 @@ The full-bank audit now includes native group records, not just individually
 typed SingleMoCap records. The supplied 11 containers contain 75 groups with
 150 embedded headers in addition to 4,705 standalone headers: **4,855 inspected
 source headers**, with zero track-inspection failures. This supersedes earlier
-4,705-only coverage totals. All families remain in scope, including paired and
-coordinated motions; none of these group members is discarded.
+4,705-only inventory coverage totals. These are historical format-research
+counts, not conversion eligibility. Only compatible on-court 5-v-5 motions
+remain in conversion scope; off-court group members may be omitted.
 
 NBA11 group relocation 0x1602C fixes +4, then the first pointer of each 16-byte
 member entry at +0xC and calls motion fixup 0x15F24. Group count is at +8.
@@ -195,7 +196,9 @@ coverage, full semantic mapping, native streaming and gameplay remain unresolved
 
 ## Whole-bank marker dispatch continuation
 
-The scope remains the entire animation bank. Native caller indexing establishes
+This dispatch inventory covers the source bank for format research. Conversion
+is limited to compatible on-court 5-v-5 animations; these table counts do not
+establish gameplay eligibility. Native caller indexing establishes
 NBA11's 192 marker entries (IDs 0..191) at 0x3E85474 and CH's 185 entries
 (IDs 0..184) at 0x8AC024. Each eight-byte entry is dispatch flags followed by an
 OPD descriptor pointer; scanning descriptor/next-word pairs misassigns flags and
@@ -2049,7 +2052,9 @@ Embedded source: docs/ANIMATION_EVENT_BRIDGE.md
 
 ## Whole-bank marker dispatch continuation
 
-The scope remains the entire animation bank. Native caller indexing establishes
+This dispatch inventory covers the source bank for format research. Conversion
+is limited to compatible on-court 5-v-5 animations; these table counts do not
+establish gameplay eligibility. Native caller indexing establishes
 NBA11's 192 marker entries (IDs 0..191) at 0x3E85474 and CH's 185 entries
 (IDs 0..184) at 0x8AC024. Each eight-byte entry is dispatch flags followed by an
 OPD descriptor pointer; scanning descriptor/next-word pairs misassigns flags and
@@ -2469,8 +2474,9 @@ The full-bank audit now includes native group records, not just individually
 typed SingleMoCap records. The supplied 11 containers contain 75 groups with
 150 embedded headers in addition to 4,705 standalone headers: **4,855 inspected
 source headers**, with zero track-inspection failures. This supersedes earlier
-4,705-only coverage totals. All families remain in scope, including paired and
-coordinated motions; none of these group members is discarded.
+4,705-only inventory coverage totals. These are historical format-research
+counts, not conversion eligibility. Only compatible on-court 5-v-5 motions
+remain in conversion scope; off-court group members may be omitted.
 
 NBA11 group relocation 0x1602C fixes +4, then the first pointer of each 16-byte
 member entry at +0xC and calls motion fixup 0x15F24. Group count is at +8.

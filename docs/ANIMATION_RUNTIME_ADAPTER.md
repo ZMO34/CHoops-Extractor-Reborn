@@ -68,8 +68,9 @@ The full-bank audit now includes native group records, not just individually
 typed SingleMoCap records. The supplied 11 containers contain 75 groups with
 150 embedded headers in addition to 4,705 standalone headers: **4,855 inspected
 source headers**, with zero track-inspection failures. This supersedes earlier
-4,705-only coverage totals. All families remain in scope, including paired and
-coordinated motions; none of these group members is discarded.
+4,705-only inventory coverage totals. These are historical format-research
+counts, not conversion eligibility. Only compatible on-court 5-v-5 motions
+remain in conversion scope; off-court group members may be omitted.
 
 NBA11 group relocation 0x1602C fixes +4, then the first pointer of each 16-byte
 member entry at +0xC and calls motion fixup 0x15F24. Group count is at +8.
