@@ -513,7 +513,7 @@ package rebuild was run on the v1.19 branch in this update.
 # Bounded Legacy recruit editing
 
 Focused recruit backend, undo/redo and Qt diagnostics tests: **56 passed**.
-Windows Python 3.12 portable verification: **975 passed, 10 skipped, 2 deselected**;
+Windows Python 3.12 portable verification: **976 passed, 9 skipped, 2 deselected**;
 compile, CLI help, Qt startup, Ruff, mypy, handoff and diff checks passed. The
 feature changes only confirmed HS/JUCO class bits and preserves every other byte.
 Skipped cases include the optional graphics/native reference checks. RPCS3/gameplay:
