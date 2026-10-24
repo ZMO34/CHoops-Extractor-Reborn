@@ -519,6 +519,12 @@ feature changes only confirmed HS/JUCO class bits and preserves every other byte
 Skipped cases include the optional graphics/native reference checks. RPCS3/gameplay:
 NOT RUN. Automatic/testing JB: NOT BUILT.
 
+Windows x64 standalone package built with `tools/rebuild/package_windows.ps1`;
+frozen Qt startup and LGPL audio round-trip smoke checks passed. The release ZIP
+passed CRC and private-file checks through `tools/rebuild/release_archive.py`.
+Package is a local review artifact, not a published release; no generated EXE or
+ZIP is committed.
+
 # Unreleased Legacy save editor foundation
 
 Read-only inspection of the supplied 5,523,948-byte Legacy-mode save found a
