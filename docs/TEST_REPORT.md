@@ -17,7 +17,9 @@ Targeted group/library/source checks: **42 passed**. Cover all-member alias
 resolution from the first reference, typed identity separation, ambiguity,
 cycles, incompatible/mixed members, header/table/dependency bounds, unchanged
 source bytes, group-only libraries, failed-member reporting and pre-read total
-header limits. Full exact-head results follow after isolated verification.
+header limits. Isolated author verification: **1,115 passed, 10 skipped,
+2 deselected**; handoff freshness, compile, CLI/offscreen Qt, Ruff and mypy
+(18 files) pass. This is author verification, not independent approval.
 
 ## Whole-bank marker dispatch verification
 

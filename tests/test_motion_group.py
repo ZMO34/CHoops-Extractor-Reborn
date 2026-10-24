@@ -47,6 +47,7 @@ def test_group_alias_uses_first_member_id_for_every_member_and_retains_metadata(
     mode = struct.unpack_from(">I", mirrored, 20)[0]
     struct.pack_into(">I", mirrored, 20, mode ^ 0x40000000)
     borrowed = group([mirrored, alias(motion, 2, 0)], 2)
+    struct.pack_into(">III", borrowed, 32, 0x80000000, 0xC1200000, 0xFFFFF000)
     banks = [("borrowed", bank(borrowed, 2, typ=GROUP)), ("owner", bank(owned, typ=GROUP))]
     source = MotionGroupSource(SignatureMotionSource(banks))
     for member in (0, 1):
@@ -54,6 +55,8 @@ def test_group_alias_uses_first_member_id_for_every_member_and_retains_metadata(
         assert tracks == source.inspect_member(1, 0, member)[0]
         assert len(report["alias_path"]) == 2
         assert report["group_record_sha256"] != report["payload_group_record_sha256"]
+        if member == 1:
+            assert report["placement_words"] == [0x80000000, 0xC1200000, 0xFFFFF000]
     assert bytes.fromhex(source.inspect_member(0, 0, 0)[1]["header_hex"])[24:28] == bytes.fromhex("12345678")
 
 
