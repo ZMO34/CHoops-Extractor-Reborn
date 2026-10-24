@@ -20,6 +20,7 @@ COMMANDS={
     'sample-native-motion':Command(('input','target_elf','address','seconds','output'),('motion-sampler',)),
     'inspect-signature-motion':Command(('input','index','output'),('related-banks','alias-equivalence','declared-channels')),
     'inspect-animation-library':Command(('input','output'),('related-banks','alias-equivalence')),
+    'inspect-marker-dispatch':Command(('input','profile','output')),
     'inspect-donor-registry':Command(('input','profile','output'),('related-banks',)),
     'inspect-motion-events':Command(('input','profile','address','output'),('motion-events',)),
     'transcode-motion-events':Command(('input','profile','address','contract','output'),('motion-events',)),

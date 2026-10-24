@@ -1,3 +1,38 @@
+## Whole-bank marker dispatch continuation
+
+The scope remains the entire animation bank. Native caller indexing establishes
+NBA11's 192 marker entries (IDs 0..191) at 0x3E85474 and CH's 185 entries
+(IDs 0..184) at 0x8AC024. Each eight-byte entry is dispatch flags followed by an
+OPD descriptor pointer; scanning descriptor/next-word pairs misassigns flags and
+misses the last ID. Source flags 0..3 and target flags 0..6 remain distinct,
+untranslated values. Table adjacency or a shared callback is not an event map.
+
+`inspect-marker-dispatch` validates observed caller instructions, bounded table
+reads, descriptor alignment, executable callback targets and TOCs. It reports
+all entries, raw flags and callback groups without editing an executable.
+`NativeMarkerDispatchTrace.java` executes actual indexing/OPD transfer for all
+377 entries with synthetic state, stopping before each callback. NBA11 passes
+the event-row pointer/header/actor in r3/r4/r5; CH passes marker ID/header/actor
+in r3/r4/r6 and marker time in f1. CH's missing payload-pointer argument makes
+the donor's twelve-byte event ABI unsuitable for direct callback substitution.
+
+Grouped source handlers are also being traced downstream. Source IDs 151..170
+use 0x384030, gated by actor +0x20 == 1, then 0x655ED8. That handler checks actor
++0x30 <= 9 and dispatches resource hashes, with additional per-case conditions.
+CH IDs 172..183 use 0x23282C -> thunk 0x15E60 -> 0x53895C; the final target
+function is a return-only stub. This is not evidence that those donor events are
+unnecessary or have a working stock equivalent. Their native/resource behavior
+must be retained and integrated rather than silently dropped. Other source
+variant groups have additional cases beyond CH's packed variant capacity;
+equal variant numbers and similar message routes are not yet semantic proof.
+
+No additional semantic conversion rules are installed from these observations.
+No-op callbacks can still have timing-query consumers (for example source 34
+and target 33). Preserve such markers pending role proof. Event/payload and
+selector correspondence, other rigs, executable-held library coverage, target
+playback/transition metadata, wide IDs and loading/lifetime/streaming remain
+active work. Native dispatch checks are instruction tests, not gameplay tests.
+
 ## Whole-library scope and provider routing correction
 
 The owner's scope is the entire NBA11 animation library: free throws, running

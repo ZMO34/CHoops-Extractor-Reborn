@@ -119,6 +119,14 @@ def execute(a):
             report=inspect_banks(banks,a.profile)
         save_json(a.output,report,sources)
         return report
+    if c == 'inspect-marker-dispatch':
+        from .formats.embedded_motion import MAX_ELF
+        from .research.marker_dispatch import inspect_dispatch
+        if Path(a.input).stat().st_size > MAX_ELF:
+            raise ValueError('Native analysis ELF exceeds inspection bounds')
+        report=inspect_dispatch(Path(a.input).read_bytes(),a.profile)
+        save_json(a.output,report,sources)
+        return report
     if c == 'sample-native-motion':
         from .research.motion_sampling import MotionSampler
         with MotionSampler(a.input,a.target_elf,cache_bytes=a.cache_bytes) as sampler:

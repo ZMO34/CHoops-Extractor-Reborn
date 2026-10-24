@@ -1,3 +1,19 @@
+## Whole-bank marker dispatch verification
+
+Native read-only Ghidra instruction harness: **192 NBA11 + 185 CH cases passed**.
+Every observed marker index reaches its actual OPD callback with the expected
+header/actor registers, callback TOC and return address. CH additionally passes
+marker time 1.5 exactly in f1. Checks stop before callbacks: this does not verify
+all callback effects, resource ownership or game playback. Source assets and
+executables remain unchanged. Initial headless attempts with relative project
+paths were rejected before analysis; final runs used resolved absolute paths.
+
+Portable targeted parser/CLI checks: **8 passed**, covering both table endpoints,
+flags-before-descriptor layout, shared callbacks, unsupported revisions,
+unbacked/unaligned descriptors, incorrect TOCs, non-executable callbacks and
+input overwrite protection. Full exact-head verification is recorded below once
+complete. Earlier complete-suite counts apply to their named earlier updates.
+
 ## Whole-library and provider continuation
 
 Full portable verification in the isolated detached checkout: **1,090 passed,

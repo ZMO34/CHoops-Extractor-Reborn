@@ -231,3 +231,17 @@ never enables noncanonical conversion. `prepare_jump_pair` prepares category 14
 motion components and retains all nine row metadata words; it does not install
 unmapped row semantics. `signature_binding` exposes the distinct provider code,
 registry category and player key field. See the runtime ledger for native proof.
+
+### Inspect native motion marker dispatch
+
+```
+python -m choops_py.cli inspect-marker-dispatch decoded-analysis.elf nba-2k11 output/research/marker-dispatch.json
+```
+
+Profiles: `nba-2k11`, `college-hoops-2k8`. Reads a decoded ELF analysis copy only;
+outputs stay under project output/ and cannot overwrite the input. Reports every
+observed marker dispatch entry, its raw flags, OPD callback and grouped callback
+IDs after validating the observed revision and dependencies. This establishes
+neither cross-game event semantics nor payload portability. See
+[the event ledger](ANIMATION_EVENT_BRIDGE.md) for the verified callback ABI and
+native harness boundary. No executable writer is exposed.

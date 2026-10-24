@@ -1,3 +1,13 @@
+## Animation marker dispatch research continuation
+
+- Inventory all 192 NBA11 and 185 CH native marker dispatch entries through a
+  bounded read-only API/CLI; retain raw flags and group callbacks without
+  inferring semantic event maps.
+- Verify actual OPD transfer/argument layout in 377 bounded native cases and
+  document a target stub that needs additional donor behavior integration.
+- Keep the entire animation bank in scope and preserve all existing conversion
+  gates; no emulator/gameplay run or new executable-writing command.
+
 ## Unreleased — counted selector transport
 
 - Bind serialized metadata contracts to every related donor bank, rejecting changed alias payloads under stale assertions.
