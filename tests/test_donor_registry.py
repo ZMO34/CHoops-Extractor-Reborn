@@ -53,7 +53,10 @@ def test_native_category_walk_uses_typed_references_and_keeps_unknown_tail(
     raw = collection(category)
     before = bytes(raw)
     row = inspect_entries(raw)[0]
-    assert len(row["references"]) == slots and row["unparsed_tail_bytes"] == 4
+    assert len(row["references"]) == slots
+    assert row["unparsed_tail_bytes"] == (0 if category == 0 else 4)
+    if category == 0:
+        assert row["shot_family"]["control_word"] == int.from_bytes(b"TAIL", "big")
     assert row["localization_key"] == 101 and row["ordinal_word"] == 0
     assert row["references"][0]["resource_type_hash"] == MOTION
     if slots > 1:

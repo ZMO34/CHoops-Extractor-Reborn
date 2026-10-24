@@ -259,3 +259,38 @@ def test_event_cli_validates_all_before_writing_and_protects_inputs(
         )
     )
     assert json.loads(output.read_text(encoding="utf-8"))["entry_stride"] == 12
+
+
+def test_mapping_coverage_reports_every_missing_and_opaque_dependency():
+    from choops_py.formats.motion_events import (
+        curve_timing_contract,
+        event_mapping_coverage,
+    )
+
+    rows = [
+        dict(id=22, payload=None, payload_word=None),
+        dict(id=25, payload=None, payload_word=None),
+        dict(id=25, payload=None, payload_word=None),
+        dict(id=92, payload=100, payload_word=None),
+    ]
+    report = event_mapping_coverage(
+        dict(profile=NBA, entries=rows), curve_timing_contract()
+    )
+    assert report["events"] == 4 and report["mapped_events"] == 1
+    assert report["unmapped_rules"] == [dict(source_id=25, payload_word=None)]
+    assert report["opaque_payload_ids"] == [92] and not report["complete"]
+    assert event_mapping_coverage(
+        dict(profile=NBA, entries=[]), curve_timing_contract()
+    )["complete"]
+
+
+def test_mapping_coverage_and_writer_share_ambiguity_rejection():
+    from choops_py.formats.motion_events import (
+        curve_timing_contract,
+        event_mapping_coverage,
+    )
+
+    mapping = curve_timing_contract()
+    mapping["rules"].append(mapping["rules"][0])
+    with pytest.raises(ValueError, match="ambiguous"):
+        event_mapping_coverage(dict(profile=NBA, entries=[]), mapping)

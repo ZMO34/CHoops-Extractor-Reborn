@@ -12,6 +12,7 @@ from ..formats.embedded_motion import NativeELF
 from ..formats.motion_bind import canonical_channels
 from ..formats.motion_events import inspect_events
 from ..formats.motion_frames import layout
+from .motion_auxiliary import read_selector_prefix
 
 MAX_IMAGE = 16 * 1024 * 1024
 POINTER_FIELDS = (0x30, 0x34, 0x38, 0x3C)
@@ -63,6 +64,20 @@ def inspect_target_motion(raw, address):
         ("root", root, root_size),
         ("events", events, len(event_report["entries"]) * 8 + 4),
     ]
+    unknown = []
+    if extra:
+        elf.file_span(extra, 1)
+        unknown.append(dict(field=0x3C, address=extra, extent_established=False))
+    for i in range(count):
+        field = 0x40 + i * 4
+        pointer = struct.unpack_from(">I", header, field)[0]
+        if not pointer:
+            unknown.append(dict(field=field, address=0, extent_established=False))
+            continue
+        curve = read_selector_prefix(
+            elf.read, pointer, duration=duration, time_scale=scale
+        )
+        spans.append((f"selector:{i}", pointer, len(curve)))
     dependencies = []
     for role, start, size in spans:
         if start % (4 if role in ("header", "events") else 2):
@@ -82,19 +97,25 @@ def inspect_target_motion(raw, address):
                 segment_flags=owner["flags"],
             )
         )
-    unknown = []
-    for field in (0x3C, *(0x40 + i * 4 for i in range(count))):
-        pointer = struct.unpack_from(">I", header, field)[0]
-        if pointer:
-            elf.file_span(pointer, 1)
-            unknown.append(dict(field=field, address=pointer, extent_established=False))
+    for i, (role, start, size) in enumerate(spans):
+        for other, a, n in spans[:i]:
+            if (
+                start < a + n
+                and a < start + size
+                and not (
+                    role.startswith("selector:")
+                    and other.startswith("selector:")
+                    and (start, size) == (a, n)
+                )
+            ):
+                raise ValueError("Overlapping target motion dependencies")
     return dict(
         header_address=address,
         channels=channels,
         metadata=metadata,
         dependencies=dependencies,
         unbounded_dependencies=unknown,
-        resident_image_supported=not unknown and count == 0,
+        resident_image_supported=not unknown,
         gameplay_ready=False,
         native_registration_installed=False,
     )
@@ -103,7 +124,8 @@ def inspect_target_motion(raw, address):
 def prepare_target_image(raw, addresses, *, budget=MAX_IMAGE):
     """Materialize existing CH headers/tracks in one bounded owned relative image.
 
-    Preserves every nonpointer header byte. Auxiliary/unknown extents are refused.
+    Preserves every nonpointer header byte and bounded selector prefixes.
+    Unknown extra dependencies are refused.
     No executable bytes, allocator calls, bank registration or donor metadata are
     synthesized. The caller must keep the whole image resident while referenced.
     """
@@ -150,7 +172,15 @@ def prepare_target_image(raw, addresses, *, budget=MAX_IMAGE):
         h = deps["header"]
         offset = locations[h["address"], h["bytes"]]
         offsets.append(offset)
-        for field, role in ((0x30, "poses"), (0x34, "root"), (0x38, "events")):
+        for field, role in (
+            (0x30, "poses"),
+            (0x34, "root"),
+            (0x38, "events"),
+            *(
+                (0x40 + i * 4, f"selector:{i}")
+                for i in range(report["metadata"]["auxiliary_pointer_count"])
+            ),
+        ):
             dep = deps[role]
             target = locations[dep["address"], dep["bytes"]]
             struct.pack_into(
@@ -225,7 +255,8 @@ def relocate_target_image(raw, header_offsets, base, *, source_state):
             encoded = (target - field + 1) & 0xFFFFFFFF
         if not 0 <= target < len(raw) or any(a <= target < z for a, z in ranges):
             raise ValueError(
-                "Motion pointer escapes image or overlaps header storage; wrong pointer state?"
+                "Motion pointer escapes image or overlaps header storage; "
+                "wrong pointer state?"
             )
         updates.append((field, encoded))
     result = bytearray(raw)

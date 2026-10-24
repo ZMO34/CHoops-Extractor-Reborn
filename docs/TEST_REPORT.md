@@ -1,3 +1,316 @@
+## Native paired-rate normalization
+
+Native source/target leaf harness:560 passed per profile /1,120 total. Exact
+float-bit outputs match single-precision/fused reference arithmetic; source and
+target reports match, headers and output sentinels remain unchanged. No mock
+calls. Python timing/state/donor/signature/bundle regression:80 passed. Ruff E/F/I
+passes. Isolated author verification ata35f79d8e49692e582a3fe82c8676aca4e75f8f7:
+**1,221 passed,10 skipped,2 deselected**; handoff, compile, CLI/offscreen Qt,
+Ruff and mypy18files pass. Both native profiles reran from the isolated committed
+harness:560 each /1,120 total, no warnings. Final publication-head verification
+is recorded in PR49.
+No emulator/gameplay run or testing JB was created.
+
+## Native motion state predicate comparison
+
+Native synthetic harness:42 passed (21 NBA11,21 CH), no mocked calls. Tests
+cover aggregate flags, absent header, bit30 clear/retain behavior, empty actor
+list and mixed actor traversal with untouched userdata sentinels. Python state/
+donor/signature/auxiliary/shot regression:77 passed. Isolated author verification at0547b5c2d7d62eaea73aa6b28184d37f925a8d96:
+**1,207 passed,10 skipped,2 deselected**; handoff, compile, CLI/offscreen Qt,
+Ruff and mypy18files pass. Both native profiles reran from that isolated commit:42
+passed without warnings. The sandboxed portable attempt hit temporary-directory
+errors and a Qt hang; the complete successful run used a workspace-local pytest
+basetemp outside the sandbox. Final published-head checks are recorded in PR49. No emulator/gameplay run or testing JB was created.
+
+## Native donor auxiliary and reciprocal mirror extension
+
+Isolated author verification at7b453b9ac2f32b3c9d1657a3ce9bc9f6f12c03da:
+**1,199 passed,10 skipped,2 deselected**; handoff, compile, CLI/offscreen Qt,
+Ruff and mypy18files pass. Final published-head checks are tracked in PR49.
+
+Donor/source/auxiliary/residency/target regression: **95 passed**. Ruff E/F/I
+passes for the changed module/tests. Synthetic images with0/1/2 selectors and
+explicit mirror detachment survive native-image relocation, separate decoded-ELF
+residency validation and inverse relocation while preserving input bytes.
+Coverage includes full counted-header fingerprints, missing maps/evidence,
+nonreciprocal/self/nonmirror links, changed peer dependencies despite refreshed
+hashes, exact shared selector prefixes, overlapping payload rejection before
+expansion, signed ticks, exact budgets and selector budget failures.
+
+Supplied structural audit:292 native dribbler mirror pairs /381 bounded selector
+prefixes pass. All peer mode XORs are0x40000000. This is source structure only,
+not a real donor translation, palette semantics, gameplay or compatible conversion.
+Shared-endpoint auxiliary correlations:133 aligned curves, zero identical curves,
+24 candidate source IDs; no global map is inferred or enabled.
+
+## Native CH motion-bundle prefix
+
+Isolated author verification ate95b4824ccb79f7cd0936149792d288e0411740e:
+**1,186 passed,10 skipped,2 deselected**; handoff, compile, CLI/offscreen Qt,
+Ruff and mypy18files pass. Final published-head verification is recorded in PR49.
+
+`NativeMotionBundleTrace.java`: **192 passed**, no mocked calls, stopping before
+native timing/playback. Covers counts1/5, six threshold values, explicit flag
+permission, lane policy, actor flag and guard-row bits. The observed lookahead
+read address is checked, including after the last variant. Motion/scalar outputs
+and untouched bundle bytes match. All FP/status registers are initialized; final
+run reports no undefined-read warnings or instruction failures.
+
+Python bundle tests **15 passed**; bundle/target-motion/residency/graph regression
+**92 passed**. Ruff E/F/I passes. Cases cover descending rather than sorted
+priority, flagged-neighbor clamping, selected-row scalars, explicit context,
+float32 overflow, missing lookahead bytes, malformed metadata/pointers, native
+revision, caller-index bounds, source immutability and complete target extents.
+Read-only supplied audit validates four ordinary bundles /20 variants /40 header
+references /20 distinct headers. Two special candidate types remain opaque;
+registered capacity, full dribbling coverage and donor compatibility are unproven.
+
+## Dribbler style gate and graph-node dependency closure
+
+Isolated author verification at28974b64d29186c2a2b7d5b8b00384a625c7b5c1:
+**1,171 passed,10 skipped,2 deselected**; handoff, compile, CLI/offscreen Qt,
+Ruff and mypy18files pass. Final published-head checks are recorded in PR49.
+
+Graph tests **45 passed**; affected graph/source/group/library regression
+**87 passed**. Ruff E/F/I passes. Node-boundary errors, distinct selector-family
+slots, missing keys/slots, explicit inputs, zero/null/bypass and unsupported
+selectors are covered. Supplied source graphs still pass structural inspection.
+
+`NativeGraphStyleGateTrace.java`: **72 passed**, with distinct family/slot pointers
+and initialized condition status. Private supplied-data probe: **222 passed**,
+using complete native player routing and style-gate code;124 accepted,98 rejected.
+All111 keyed node references are exercised with correct and missing-key sets.
+Graph bytes stay unchanged. No native warning/failure in successful final runs.
+This is source eligibility evidence, not a full transition or target gameplay test.
+
+## Dribbler keyed lookup and player routing
+
+Isolated author portable verification at7324d072658c4cf77bd551ee1fb9727fd6c1f1dc:
+**1,152 passed,10 skipped,2 deselected**; handoff, compile, CLI/offscreen Qt,
+Ruff and mypy18files pass. Subsequent cache-reset additions affect only the
+native Java harness and evidence notes; final-head verification is tracked in PR49.
+
+Graph tests **26 passed**; affected graph/source/group/library regression
+**68 passed**. Ruff E/F/I passes for the graph module and its tests.
+Native graph harness: **53 passed** (3 fixup,45 lookup,3 complete player routing,
+2 cache-clear/setup cases).
+Private real-graph lookups: **69 passed**, all60 rows plus9 missing keys.
+No uninitialized-read warning or instruction failure in the initialized successful
+runs. The first synthetic lookup run passed but exposed uninitialized xer_so;
+the harness now initializes it. The setup probe initially began after the actor
+argument move; correcting its start to0x46CB4C gives the complete native prefix.
+The final53-case run passes without uninitialized-read warnings.
+Full graph byte preservation and state-cache sentinels hold. No gameplay run.
+
+## NBA11 graph structural and native relocation continuation
+
+Isolated author verification at0a7065b02095ace7340adc6651da1140a548c853:
+**1,136 passed,10 skipped,2 deselected**; handoff, compile, CLI/offscreen Qt,
+Ruff and mypy18files pass. The committed native harness also passes all3 cases
+from that isolated checkout. Author verification is not independent approval.
+
+New graph parser tests: **10 passed**. Graph/source/group/library regression:
+**52 passed**. New module/tests pass Ruff E/F/I. Inputs cover mixed direct/group
+bindings, unknown-word preservation, signed/null/end pointers, overlap, nonempty
+null tables, count/fixup budgets, unsupported profiles and truncation.
+
+Native synthetic graph instruction harness: **3 passed**, no mocked calls.
+Private supplied-graph fixup probes: **2 passed**, full-byte equality against the
+reader-derived expected images (dribbler368,721 steps; bodyup1,633 steps). No
+uninitialized-read warning or instruction failure reported in successful runs.
+Original archive part sizes/mtimes unchanged; no gameplay or testing JB run.
+
+## Native shot state accessor continuation
+
+Isolated author portable verification at8311f247f78492c15861604619eee89ef830723e:
+**1,126 passed,10 skipped,2 deselected**; handoff, compile, CLI/offscreen Qt,
+Ruff and mypy18files passed. This is author verification, not independent approval.
+
+Read-only `NativeJumpGameplayTrace.java` on the supplied CH ELF: **18 passed**
+(hand0/1, style0/111/255, native stride0/1/2). The real0x2351D0 accessor and
+0x234E30 dependency execute; the previous state-pointer substitution is removed.
+All expected motion/metadata words and per-actor output match; a0x1200-byte
+sentinel confirms adjacent storage preservation. No harness instruction failure
+or uninitialized-read warning was reported. This is instruction-level evidence,
+not gameplay, allocation ownership or cross-game semantic validation.
+
+## On-court paired-shot planar proposals and cached collection reads
+
+Read-only public API audits: **224/224 existing CH shot headers** agree within one
+root-step velocity resolution (0.125/duration, epsilon1e-5); maximum planar-axis
+error0.0471587181 native units/second. **203 donor paired entries /406 lanes**
+produce bounded proposals. Original source bytes remain unchanged. These are
+metadata proposals, not eligible/compatible/playable conversion counts.
+
+The native full-root VMX probe stops at0x17C08 with Ghidra's unimplemented
+vectorSplatImmediateSignedByte operation. Native full-root execution is NOT a
+pass. Static native instruction inspection, numerical reference tests and the
+stock-corpus comparison are distinct evidence; no original authoring recovery or
+VMX bit-exact claim follows.
+
+Targeted proposal/cache/family/source/group/library checks: **83 passed**.
+Isolated author verification: **1,126 passed, 10 skipped, 2 deselected**; handoff
+freshness, compile, CLI/offscreen Qt, Ruff and mypy (18 files) pass. Tests cover cropped
+end times, mirroring, nonuniform source intervals, cyclic/timing/extent rejection,
+float32 range, paired-family selection, immutable inputs and decoded-block reuse
+with fresh mutable parsed rows.
+
+## Compatible on-court scope correction
+
+The owner narrowed conversion scope to compatible ordinary on-court 5-v-5
+animations. Earlier complete-bank/group totals remain inventory evidence only;
+they must not be interpreted as converted or compatible gameplay counts. The
+unpublished general group-component experiment was deferred, with no generic
+group conversion API or game installation published. Research readers remain.
+
+Report changes label inventory scope and unset compatible conversion counts;
+paired-shot/four-pair manifests preserve explicit target compatibility gates.
+Targeted affected checks: **37 passed**. Isolated author verification: **1,115
+passed, 10 skipped, 2 deselected**; handoff freshness, compile, CLI/offscreen Qt,
+Ruff and mypy (18 files) pass. Gameplay was not run; no testing JB was built.
+
+## Grouped motion continuation verification
+
+Read-only supplied-IFF API audit: **4,855/4,855 headers inspected** (4,705 standalone
+plus 150 members in 75 groups), zero failures. Group members include 60 alias
+headers and 90 distinct member-tail hashes; source bytes, sizes and mtimes stayed
+unchanged. Numerical pose/root estimate is now 78,490,456 bytes; this does not
+measure native working-set residency or establish target group placement.
+
+Native `NativeMotionGroupTrace.java`: **6 cases passed** (1/2/4 members, relocation
+and alias-copy modes), executing real group/motion fixups and the native
+member-copy loop. Verify original header ID/mode/state and group placement words,
+all copied dependency/tail pointers, and bidirectional motion/group backlinks.
+Final run explicitly initializes saved registers and condition state, with no
+uninitialized-register warnings. No game/emulator or testing JB run.
+
+Targeted group/library/source checks: **42 passed**. Cover all-member alias
+resolution from the first reference, typed identity separation, ambiguity,
+cycles, incompatible/mixed members, header/table/dependency bounds, unchanged
+source bytes, group-only libraries, failed-member reporting and pre-read total
+header limits. Isolated author verification: **1,115 passed, 10 skipped,
+2 deselected**; handoff freshness, compile, CLI/offscreen Qt, Ruff and mypy
+(18 files) pass. This is author verification, not independent approval.
+
+## Whole-bank marker dispatch verification
+
+Native read-only Ghidra instruction harness: **192 NBA11 + 185 CH cases passed**.
+Every observed marker index reaches its actual OPD callback with the expected
+header/actor registers, callback TOC and return address. CH additionally passes
+marker time 1.5 exactly in f1. Checks stop before callbacks: this does not verify
+all callback effects, resource ownership or game playback. Source assets and
+executables remain unchanged. Initial headless attempts with relative project
+paths were rejected before analysis; final runs used resolved absolute paths.
+
+Portable targeted parser/CLI checks: **8 passed**, covering both table endpoints,
+flags-before-descriptor layout, shared callbacks, unsupported revisions,
+unbacked/unaligned descriptors, incorrect TOCs, non-executable callbacks and
+input overwrite protection. Isolated author verification: **1,098 passed, 10 skipped, 2 deselected**;
+handoff freshness, compile, CLI/offscreen Qt, Ruff and mypy (18 files) pass.
+Earlier complete-suite counts apply to their named earlier updates.
+
+## Whole-library and provider continuation
+
+Full portable verification in the isolated detached checkout: **1,090 passed,
+10 skipped, 2 deselected**; handoff freshness, compile, CLI/offscreen Qt, Ruff and
+mypy (18 files) pass. Author verification, not independent review.
+
+Category 14 pose/root audit: 201 distinct payload owners / 402 distinct headers /
+406 reference slots; 5,902 authored keys preserved exactly across 23,352 fixed
+frames / 3,546,552 component bytes. All source hashes remain unchanged. This is
+component conversion only, with no fabricated target header metadata.
+
+The library audit also distinguishes valid source timelines exceeding CH's
+16-bit frame count from source-format failures; estimates remain numerical and
+do not allocate expanded images. Two additional boundary tests pass (unmapped
+mask bounds and a valid 66,049-frame source timeline that conversion rejects).
+
+Targeted source/library/provider/pair/registration/residency checks: **64 passed**.
+A separate combined provider/pair/library/source/registry/family run: **61 passed**.
+Checks cover exact duplicate equivalence including unknown tails, default
+ambiguity rejection, unmapped-rig conversion gates, family separation, full row
+word retention, byte budgets and protection of every CLI input.
+
+Read-only supplied-IFF audit: **4,705/4,705 records inspected**, 2,263 aliases,
+2,441 distinct payload hashes, 18 channel layouts, two proved duplicate-alias
+resolutions; 29,939 event rows / 11,139 covered by existing rules. Source banks'
+size/mtime remained unchanged; decoded caches/reports stay private. Numerical
+fixed-rate pose/root estimate: 71,643,008 bytes, excluding other dependencies and
+before target bone mapping. No semantic event rules were added from this audit.
+
+Native provider harness: **82 cases passed** (41 selectors, both alternate flags).
+Donor jump-pair selection: **2 passed**. CH gameplay row initialization: **6 passed**
+with real hand getter/thunk and TOC restoration, synthetic state lookup/actors and
+rows, indices 0/111/255. Incorrect handwritten opcode guard constants were corrected
+before the final runs; no original executable was patched. No gameplay runs.
+
+## Native shot fallback continuation
+
+Portable verification in the isolated detached checkout: **1,074 passed,
+10 skipped, 2 deselected**; compile, handoff, CLI/offscreen Qt, Ruff and mypy
+(18 files) pass. Author verification only; no independent approval.
+
+Targeted shot fallback/family/registry suite: **51 passed**. Checks retain original
+presence flags, replace existing pair2 when pair1 is missing, preserve/reset
+nonzero control words, distinguish empty dependencies, bound table extents and
+reject invalid float arithmetic. Native instruction harness: **145 passed**;
+140 fallback vectors/draw counts also match the Python model. Services are explicit
+mocks; no game execution. A first nonzero-control harness check caught an incorrect
+synthetic high-address register setup; it was corrected before the final 145-case
+run. The final harness initializes floating-point exception state.
+
+Supplied read-only dependency audit: 64 resolved serialized motions, 24 embedded
+headers, four empty positions. Embedded pose/root conversion preserves 708
+keys exactly (6,426 frames, 972,972 bytes before deduplication). Originals unchanged;
+complete event/metadata/selector conversion and gameplay remain unverified.
+
+## Shot-family continuation
+
+Portable verification in the isolated detached checkout: **1,051 passed,
+10 skipped, 2 deselected**; handoff freshness, compile, CLI/offscreen Qt, Ruff
+and mypy (18 files) pass. This is author verification, not independent approval.
+
+Targeted `tests/test_shot_family.py tests/test_donor_registry.py`: **28 passed**.
+Covers all-slot preservation, distinct alias headers, optional empty pairs,
+relocation inverse, exact/insufficient budgets, unresolved dependencies before
+expansion, stale contracts and missing consumed control words. Native bounded
+selection harness: **14 NBA11 + 2 CH cases passed**, read-only, synthetic runtime
+resources; stops before contextual fallbacks. No gameplay validation.
+
+# Selector transport and controller routing â€” 2026-10-23
+
+Schema-2 serialized metadata now also requires `source_banks_sha256`, an ordered list of complete fingerprints for every supplied bank. A reproduced stale-contract bug allowed a related alias payload bank to change while the origin bank/header stayed unchanged. The full bank-set binding rejects that change; reports retain their own list copy. Earlier draft contracts missing this field must be regenerated. This closes an input-binding gap, not a semantic-mapping gap.
+
+Targeted selector/header/translation/residency regressions: **92 passed**. New coverage checks prefix bounds and adjacent-data exclusion, native endpoint rounding, stale/missing/duplicate selector maps, signed tick preservation, extended header alignment, all-dependency budgets, owned static loading, unknown extras and provenance isolation. Changed files pass strict Ruff E/F/I. Portable pytest verification: **1,039 passed, 10 skipped, 2 deselected**. Exact-head full verification is recorded in PR49. The sandboxed attempt failed/stalled in subprocess checks; the same suite passed outside the sandbox. Tests and private audits remain separate evidence.
+
+The updated read-only source inspector accepts all 2,444 motions / 1,222 aliases, now including 4,016 bounded selector references. CLI reports expose consumed prefix sizes, hashes and selector values while leaving semantics unresolved. Supplied-copy audit: 806 NBA11 and 336 CH selector references pass bounded prefix reads; all 224 CH stock headers prepare together (559,640 bytes, 168 deduplicated selector tracks). The separate in-memory decoded-ELF probe registers 112 stock duplicates, 224 total styles, preserving original 112 rows/BSS/input and inverse reconstruction. No donor gameplay is established. NBA2K14 Ghidra instruction harness: **69 passed** (nine input-prefix cases plus 60 real wrapper/getter cases). No RPCS3/gameplay or testing JB was run. Earlier phase reports below retain their original counts.
+
+# Native integration and control-input research â€” 2026-10-23
+
+Targeted tests cover static BSS/section preservation, native table publication, explicit serialized metadata binding, event coverage, selector interpolation, and existing donor/header/loader regressions. Nine NBA2K14 instruction-harness cases pass. The separate supplied-copy decoded-ELF probe preserves 112 originals and adds one stock duplicate; no donor gameplay claim follows. Private event coverage and selector sample counts are documented in ANIMATION_RUNTIME_ADAPTER.md. No emulator/gameplay or testing JB was launched. Source portable verification: **1,026 passed, 10 skipped, 2 deselected** before the final source-to-resident regression. Final exact-head verification, including that regression, is recorded in the PR. Compile, CLI/offscreen Qt, strict changed-file Ruff, portable lint, mypy (18 files), and handoff checks passed.
+
+# Signature-IFF source adaptation â€” 2026-10-23
+
+`python -m pytest tests/test_signature_motion.py -q -p no:cacheprovider`:
+**19 passed**. Covers compressed/uncompressed serialized sources, exact pose/root
+components, cross-bank alias metadata retention, missing/ambiguous/wrong-type IDs,
+cycles, incompatible masks/counts/packing/timing, identity mismatch, truncated or
+overlapping tracks, missing event sentinel, decoded-size limits, budget-before-
+expansion, canonical bind rejection, omitted auxiliary semantics, keys-minus-one
+timing boundaries, CLI parity and every-related-source output protection.
+New adapter/tests pass strict Ruff E/F/I checks. Source portable verification:
+**984 passed, 10 optional skips, 2 deselected**; compile, CLI/offscreen Qt, Ruff,
+mypy and handoff checks pass. Final exact-head evidence is recorded in the PR.
+
+Private read-only audit: 2,444 motion records / 1,222 aliases pass; all 918 nonempty
+shot slots resolve to 911 headers / 456 payloads. All 456 payloads prepare with
+82,076 fixed frames / 11,215 exactly preserved authored pose and root keys.
+Summed pose/root bytes: 12,324,180, before cross-payload deduplication and without
+other motion dependencies/native overhead. Input bank/executable hashes unchanged.
+No complete motion/native loader, playable animation or right-stick control port
+is claimed. RPCS3/gameplay NOT RUN; automatic/testing JB NOT BUILT.
+
 # v1.22 alternate discovery and PR integration
 
 Targeted: `python -m pytest tests/test_team_assets.py tests/test_folder_overrides.py
@@ -98,19 +411,19 @@ translation counts, decoded-pose equivalence, padding/reverse-byte preservation,
 changed native consumers/ranges, TLS-safe zero-padding planning, mirror-selector
 parity and opaque-payload refusal after consumer inspection.
 
-Private read-only corpus:7,055 CH and18,831 NBA11 headers pass canonical-channel
+Private read-only corpus:7,055 CH and 18,831 NBA11 headers pass canonical-channel
 validation.9,574 NBA11 pose streams/341,823 keys/49,278,288 bytes pass conversion
 and exact reverse checks; no component-preparation errors. Of9,574 event tables,
 2,674 use only the verified subset (including empty tables),6,900 remain blocked.
 Traced payload reads pass for151 event90,1117 event92,71 event93,47 event94,
-1260 event173,23 event178 and187 event186 rows; no extent errors.
+1260 event173,23 event178 and 187 event186 rows; no extent errors.
 
 The authorized separate registration-only decoded ELF reparses at113 entries,
 preserves112 original records, TLS and adjacent label pointers, and passes an
 exact diff allowlist. This is structural evidence only, not runtime registration.
 Source hashes are unchanged. No game assets/binaries/reports are tracked or
 published; no RPCS3, hardware or automatic/testing JB was used.
-# Native-only continuity and Legacy diagnostics — 2026-10-21
+# Native-only continuity and Legacy diagnostics â€” 2026-10-21
 
 Targeted: `python -m pytest tests/test_legacy_recruiting_gui.py
 tests/test_recruit_pool.py tests/test_transfer_portal.py tests/test_cli.py
@@ -132,7 +445,7 @@ Full source portable verification: **847 passed, 10 optional skips, 2 deselected
 compile, CLI/offscreen Qt startup, Ruff, mypy, handoff and diff checks pass.
 Exact-head isolated portable results are recorded in PR46.
 
-# Native recruiting pool and persistence continuation — 2026-10-21
+# Native recruiting pool and persistence continuation â€” 2026-10-21
 
 Targeted: `python -m pytest tests/test_recruit_pool.py tests/test_transfer_portal.py
 tests/test_cli.py tests/test_legacy_save_adapter.py -q -o addopts=`: **88 passed**.
@@ -145,7 +458,7 @@ serializers and destructive-to-new-object recruit conversion. No original writes
 Exact-head isolated portable results are recorded in the PR handoff. No offseason
 save supplied, save roundtrip/gameplay/emulator NOT RUN, testing JB NOT BUILT.
 
-# Transfer recruiting policy follow-up — 2026-10-21
+# Transfer recruiting policy follow-up â€” 2026-10-21
 
 Synthetic targeted suite: `python -m pytest tests/test_transfer_portal.py -q -o
 addopts=`: **42 passed**. Covers all college class/RS labels, rejection of HS/unknown
@@ -160,7 +473,7 @@ codes, separate recruit class/preference fields, localization captions, geograph
 position-depth and recruit-rank consumers. No game execution or native record writes.
 Exact-head isolated portable results are recorded in the PR handoff.
 
-# Legacy transfer feasibility research — 2026-10-21
+# Legacy transfer feasibility research â€” 2026-10-21
 
 Documentation-only update. Read-only Ghidra generated 17 focused function reports;
 PowerPC instructions and constants independently checked. Private audit passes
@@ -281,7 +594,7 @@ NBA11 streams /341,823 frames with exact reverse bytes; all9,574 distinct donor
 timelines match rate/time-scale/duration. Resampling32 pose streams preserves644
 keys across4,642 fixed frames;33 root streams preserve keys across4,757 samples.
 Ghidra/native instructions establish frame layout, quaternion selector difference
-and the112-entry CH jump-shot table. No complete bank conversion, bone retargeting,
+and the 112-entry CH jump-shot table. No complete bank conversion, bone retargeting,
 new shot registration, control remap, native runtime or gameplay check is implied.
 RPCS3 NOT RUN; automatic/testing JB NOT BUILT. No EBOOT writes.
 
@@ -403,7 +716,7 @@ No runtime appearance, game execution, physical PS3 or JB result is claimed.
 Public editor contract fixes and their portable tests are tracked in PR #32.
 This follow-up changes documentation only in PR #36.
 
-# Local executable experiment 01 — 2026-10-19
+# Local executable experiment 01 â€” 2026-10-19
 
 Private-only prototypes generated and audited on Windows / Python 3.12.14,
 Capstone PPC64 big-endian and locally installed Keystone 0.9.2. Keystone is not
@@ -427,7 +740,7 @@ suites and packaging are not rerun and historical passes do not certify EBOOT.
 The cleanup preserves active tracked regression tests and user builds/inputs;
 broader historical package deletion remains approval-blocked.
 
-# Executable modernization research — 2026-10-19
+# Executable modernization research â€” 2026-10-19
 
 Documentation-only update on Windows / Python 3.12.14. Read-only ELF mapping,
 function-descriptor/TOC inspection and PPC64 big-endian Capstone disassembly
@@ -444,7 +757,7 @@ head results are recorded in the PR. Runtime suites and Windows packaging were
 not rerun: no runtime/package code changed. Historical suite counts below do not
 validate the newly proposed executable candidates. No Ghidra, RPCS3/gameplay,
 executable patch, real/testing JB or release.
-# Experimental uniform mesh editing — verification
+# Experimental uniform mesh editing â€” verification
 
 Windows / Python 3.12.14. Targeted command:
 `python -m pytest tests/test_uniform_mesh.py tests/test_scene_preview.py tests/test_direct_asset_previews.py tests/test_cli.py -q`
@@ -616,7 +929,7 @@ The same ZIP also passes in an isolated v1.16 checkout; its generic screenshot
 failure is not reproduced. Final portable/isolated/frozen results are recorded
 on the release PR.
 
-# Verification — v1.18
+# Verification â€” v1.18
 
 Full portable verification on Windows / Python 3.12.14: **598 passed,
 9 offscreen OpenGL skips, 2 deselected**; compile, CLI/Qt smoke, Ruff, mypy,
