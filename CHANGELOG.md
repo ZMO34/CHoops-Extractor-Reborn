@@ -1,3 +1,10 @@
+## On-court paired-shot metadata investigation
+
+- Add bounded read-only planar metadata proposals for paired gameplay shots,
+  using playback end time and mirroring; retain all compatibility gates.
+- Audit against original CH shot metadata and record native VMX validation limits.
+- Share decoded blocks for repeated collection reads without sharing mutable rows.
+
 ## Compatible on-court animation scope
 
 - Target compatible ordinary 5-v-5 gameplay animations; omit non-gameplay content

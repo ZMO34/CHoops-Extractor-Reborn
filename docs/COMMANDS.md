@@ -263,3 +263,13 @@ records; those counts are not eligible conversion totals. Its report now says
 unset, and does not establish target compatibility. Group inspection is also
 inventory only. Actual port work targets compatible 5-v-5 gameplay; dunk-contest,
 photo-op, crowd, mascot and other non-gameplay records are excluded from progress.
+
+### On-court paired-shot planar research APIs
+
+`shot_planar.inspect_pair_planar(source, bank, collection, index)` proposes planar
+speed/X/Z from each selected category-14 lane's represented root trajectory.
+`shot_planar.audit_stock_planar(target_elf_bytes)` compares the same calculation
+against existing CH paired-shot authoring values, validating full motion extents.
+Both are read-only Python research APIs; neither writes a contract, motion or
+executable, nor counts a proposal as a compatible conversion. See the runtime
+ledger for end-time/mirror handling, numeric resolution and native VMX limits.

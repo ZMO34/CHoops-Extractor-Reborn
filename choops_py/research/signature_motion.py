@@ -27,7 +27,7 @@ from ..formats.motion_frames import (
     resample_nba11_root,
 )
 from ..formats.standard_iff import StandardIFF
-from .donor_registry import GROUP, MAX_BANK_BYTES, MOTION
+from .donor_registry import COLLECTION, GROUP, MAX_BANK_BYTES, MOTION
 from .motion_auxiliary import read_selector_prefix, transcode_selector_curve
 from .target_motion import MAX_IMAGE
 
@@ -64,6 +64,16 @@ class SignatureMotionSource:
                     self.index[record["id"]].append((bank, record["index"]))
 
     def _record(self, bank, record, *, type_hash=MOTION):
+        if type_hash not in (MOTION, GROUP):
+            raise ValueError("Signature source must be a typed SingleMoCap record")
+        raw = self._record_bytes(bank, record, type_hash=type_hash)
+        Binary(raw).slice(0, 56 if type_hash == MOTION else 12)
+        if struct.unpack_from(">I", raw)[0] != self.banks[bank].records[record]["id"]:
+            raise ValueError("Signature record identity disagrees with motion header")
+        return raw
+
+    def _record_bytes(self, bank, record, *, type_hash):
+        """Share bounded decoded blocks with typed collection consumers."""
         if (
             type(bank) is not int
             or not 0 <= bank < len(self.banks)
@@ -73,7 +83,7 @@ class SignatureMotionSource:
             raise ValueError("Choose an existing signature bank/record index")
         iff = self.banks[bank]
         item = iff.records[record]
-        if type_hash not in (MOTION, GROUP) or item["type_hash"] != type_hash:
+        if type_hash not in (MOTION, GROUP, COLLECTION) or item["type_hash"] != type_hash:
             raise ValueError("Signature source must be a typed SingleMoCap record")
         spans = list(iff.spans(item))
         if len(spans) != 1:
@@ -88,11 +98,7 @@ class SignatureMotionSource:
                 iff.raw[block["start"] : block["start"] + block["size"]],
                 block["logical_size"],
             )
-        raw = Binary(self.cache[key]).slice(start, end - start)
-        Binary(raw).slice(0, 56 if type_hash == MOTION else 12)
-        if struct.unpack_from(">I", raw)[0] != item["id"]:
-            raise ValueError("Signature record identity disagrees with motion header")
-        return raw
+        return Binary(self.cache[key]).slice(start, end - start)
 
     def resolve(self, bank, record):
         """Return original header, track-owning record and an explicit alias path.

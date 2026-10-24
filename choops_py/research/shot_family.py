@@ -4,7 +4,6 @@ Four reference pairs survive intact. This is not a two-pointer CH registration
 or a claim that their basketball roles and fallback graphs are interchangeable.
 """
 
-from ..formats.standard_iff_writer import record_blocks
 from .donor_registry import COLLECTION, inspect_entries
 from .signature_motion import translate_signature_motion
 from .target_motion import MAX_IMAGE, relocate_target_image
@@ -49,10 +48,7 @@ def _entry(source, bank, collection, index, category=0):
     record = iff.records[collection]
     if record["type_hash"] != COLLECTION or len(list(iff.spans(record))) != 1:
         raise ValueError("Shot family requires one complete typed collection record")
-    blocks = record_blocks(iff, record)
-    if len(blocks) != 1:
-        raise ValueError("Shot collection must occupy one decoded block")
-    rows = inspect_entries(blocks[0][3])
+    rows = inspect_entries(source._record_bytes(bank, collection, type_hash=COLLECTION))
     if index >= len(rows) or rows[index]["category"] != category:
         raise ValueError("Choose an existing entry in the required registry category")
     return rows[index]

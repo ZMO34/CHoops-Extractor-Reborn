@@ -88,6 +88,45 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+## Paired on-court shot planar metadata investigation
+
+`research.shot_planar.inspect_pair_planar` now makes read-only root-derived
+proposals for category-14 paired shots, retaining both lanes and the complete
+bank-set fingerprints. It selects this established gameplay family explicitly;
+non-gameplay banks and group conversion are not included. Across the supplied
+203 entries /406 lane references every proposal passes bounded source inspection.
+These are proposals, not compatible conversion or playable-import totals.
+
+The represented-trajectory average samples ROOT POSITION AT PLAYBACK DURATION,
+not the final padded key, subtracts time zero, divides by duration, applies the
+native 1/8 position scale and mirrors X from mode bit30. Speed is the norm of the
+resulting X/Z components. Source byte-delta key times and CH fixed key times are
+handled separately. Cyclic interpretation, invalid timing/coverage, wrong rigs,
+incorrect root extents and float32 overflow reject; unknown authoring semantics
+remain unapproved. Outputs identify themselves as estimates, with no automatic
+metadata contract and no target compatibility claim.
+
+Read-only `audit_stock_planar` validates registered CH motion extents and compares
+against all224 existing paired-shot headers. All224 estimates agree with the
+stored planar X/Z within one root-step velocity resolution (0.125/duration;
+comparison epsilon1e-5), maximum per-axis error0.0471587181 native units/second.
+This supersedes the earlier naive endpoint comparison for THIS CONTEXT; it does
+not prove the original authoring algorithm or authorize estimates for running,
+rebounding or other transition contexts automatically. Root quantization and
+original authoring differences remain material limits on exact recovery.
+
+Native root routines NBA11 0x17BF4 /CH 0x2027C were inspected. A bounded synthetic
+full-root instruction probe could not execute NBA11's VMX instruction at0x17C08:
+Ghidra reports an unimplemented vectorSplatImmediateSignedByte user operation.
+No full-root native execution or VMX bit-exact claim is made. The numeric
+reference and stock corpus check remain separately identified evidence.
+
+Bulk pair inspection also exposed repeated full-bank decompression in the shared
+collection-entry helper. Collection reads now use the same bounded decoded-block
+cache as tracks; entry parsing remains fresh so a caller cannot poison later
+rows through mutation. This preserves the existing combined128-MiB decoded-byte
+limit and strict type/span checks; it is not a process-memory guarantee.
+
 ## Current conversion scope: compatible on-court 5-v-5 animations
 
 The owner's latest direction narrows the earlier entire-bank goal. Convert/add
@@ -2171,6 +2210,45 @@ No RPCS3 or automatic/testing game build was run.
 
 Embedded source: docs/ANIMATION_BIND_REGISTRATION.md
 
+## Paired on-court shot planar metadata investigation
+
+`research.shot_planar.inspect_pair_planar` now makes read-only root-derived
+proposals for category-14 paired shots, retaining both lanes and the complete
+bank-set fingerprints. It selects this established gameplay family explicitly;
+non-gameplay banks and group conversion are not included. Across the supplied
+203 entries /406 lane references every proposal passes bounded source inspection.
+These are proposals, not compatible conversion or playable-import totals.
+
+The represented-trajectory average samples ROOT POSITION AT PLAYBACK DURATION,
+not the final padded key, subtracts time zero, divides by duration, applies the
+native 1/8 position scale and mirrors X from mode bit30. Speed is the norm of the
+resulting X/Z components. Source byte-delta key times and CH fixed key times are
+handled separately. Cyclic interpretation, invalid timing/coverage, wrong rigs,
+incorrect root extents and float32 overflow reject; unknown authoring semantics
+remain unapproved. Outputs identify themselves as estimates, with no automatic
+metadata contract and no target compatibility claim.
+
+Read-only `audit_stock_planar` validates registered CH motion extents and compares
+against all224 existing paired-shot headers. All224 estimates agree with the
+stored planar X/Z within one root-step velocity resolution (0.125/duration;
+comparison epsilon1e-5), maximum per-axis error0.0471587181 native units/second.
+This supersedes the earlier naive endpoint comparison for THIS CONTEXT; it does
+not prove the original authoring algorithm or authorize estimates for running,
+rebounding or other transition contexts automatically. Root quantization and
+original authoring differences remain material limits on exact recovery.
+
+Native root routines NBA11 0x17BF4 /CH 0x2027C were inspected. A bounded synthetic
+full-root instruction probe could not execute NBA11's VMX instruction at0x17C08:
+Ghidra reports an unimplemented vectorSplatImmediateSignedByte user operation.
+No full-root native execution or VMX bit-exact claim is made. The numeric
+reference and stock corpus check remain separately identified evidence.
+
+Bulk pair inspection also exposed repeated full-bank decompression in the shared
+collection-entry helper. Collection reads now use the same bounded decoded-block
+cache as tracks; entry parsing remains fresh so a caller cannot poison later
+rows through mutation. This preserves the existing combined128-MiB decoded-byte
+limit and strict type/span checks; it is not a process-memory guarantee.
+
 # Canonical bind and additive registration investigation
 
 This update proves the observed 21-bone motion-space bind correspondence, adds
@@ -2320,6 +2398,45 @@ No RPCS3, hardware run, full-game build or controller remapping was performed.
 ---
 
 Embedded source: docs/ANIMATION_RUNTIME_ADAPTER.md
+
+## Paired on-court shot planar metadata investigation
+
+`research.shot_planar.inspect_pair_planar` now makes read-only root-derived
+proposals for category-14 paired shots, retaining both lanes and the complete
+bank-set fingerprints. It selects this established gameplay family explicitly;
+non-gameplay banks and group conversion are not included. Across the supplied
+203 entries /406 lane references every proposal passes bounded source inspection.
+These are proposals, not compatible conversion or playable-import totals.
+
+The represented-trajectory average samples ROOT POSITION AT PLAYBACK DURATION,
+not the final padded key, subtracts time zero, divides by duration, applies the
+native 1/8 position scale and mirrors X from mode bit30. Speed is the norm of the
+resulting X/Z components. Source byte-delta key times and CH fixed key times are
+handled separately. Cyclic interpretation, invalid timing/coverage, wrong rigs,
+incorrect root extents and float32 overflow reject; unknown authoring semantics
+remain unapproved. Outputs identify themselves as estimates, with no automatic
+metadata contract and no target compatibility claim.
+
+Read-only `audit_stock_planar` validates registered CH motion extents and compares
+against all224 existing paired-shot headers. All224 estimates agree with the
+stored planar X/Z within one root-step velocity resolution (0.125/duration;
+comparison epsilon1e-5), maximum per-axis error0.0471587181 native units/second.
+This supersedes the earlier naive endpoint comparison for THIS CONTEXT; it does
+not prove the original authoring algorithm or authorize estimates for running,
+rebounding or other transition contexts automatically. Root quantization and
+original authoring differences remain material limits on exact recovery.
+
+Native root routines NBA11 0x17BF4 /CH 0x2027C were inspected. A bounded synthetic
+full-root instruction probe could not execute NBA11's VMX instruction at0x17C08:
+Ghidra reports an unimplemented vectorSplatImmediateSignedByte user operation.
+No full-root native execution or VMX bit-exact claim is made. The numeric
+reference and stock corpus check remain separately identified evidence.
+
+Bulk pair inspection also exposed repeated full-bank decompression in the shared
+collection-entry helper. Collection reads now use the same bounded decoded-block
+cache as tracks; entry parsing remains fresh so a caller cannot poison later
+rows through mutation. This preserves the existing combined128-MiB decoded-byte
+limit and strict type/span checks; it is not a process-memory guarantee.
 
 ## Current conversion scope: compatible on-court 5-v-5 animations
 
@@ -6060,6 +6177,26 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+## On-court paired-shot planar proposals and cached collection reads
+
+Read-only public API audits: **224/224 existing CH shot headers** agree within one
+root-step velocity resolution (0.125/duration, epsilon1e-5); maximum planar-axis
+error0.0471587181 native units/second. **203 donor paired entries /406 lanes**
+produce bounded proposals. Original source bytes remain unchanged. These are
+metadata proposals, not eligible/compatible/playable conversion counts.
+
+The native full-root VMX probe stops at0x17C08 with Ghidra's unimplemented
+vectorSplatImmediateSignedByte operation. Native full-root execution is NOT a
+pass. Static native instruction inspection, numerical reference tests and the
+stock-corpus comparison are distinct evidence; no original authoring recovery or
+VMX bit-exact claim follows.
+
+Targeted proposal/cache/family/source/group/library checks passed; isolated final
+portable results are recorded after exact-head verification. Tests cover cropped
+end times, mirroring, nonuniform source intervals, cyclic/timing/extent rejection,
+float32 range, paired-family selection, immutable inputs and decoded-block reuse
+with fresh mutable parsed rows.
 
 ## Compatible on-court scope correction
 

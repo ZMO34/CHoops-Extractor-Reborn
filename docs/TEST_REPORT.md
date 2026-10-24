@@ -1,3 +1,23 @@
+## On-court paired-shot planar proposals and cached collection reads
+
+Read-only public API audits: **224/224 existing CH shot headers** agree within one
+root-step velocity resolution (0.125/duration, epsilon1e-5); maximum planar-axis
+error0.0471587181 native units/second. **203 donor paired entries /406 lanes**
+produce bounded proposals. Original source bytes remain unchanged. These are
+metadata proposals, not eligible/compatible/playable conversion counts.
+
+The native full-root VMX probe stops at0x17C08 with Ghidra's unimplemented
+vectorSplatImmediateSignedByte operation. Native full-root execution is NOT a
+pass. Static native instruction inspection, numerical reference tests and the
+stock-corpus comparison are distinct evidence; no original authoring recovery or
+VMX bit-exact claim follows.
+
+Targeted proposal/cache/family/source/group/library checks passed; isolated final
+portable results are recorded after exact-head verification. Tests cover cropped
+end times, mirroring, nonuniform source intervals, cyclic/timing/extent rejection,
+float32 range, paired-family selection, immutable inputs and decoded-block reuse
+with fresh mutable parsed rows.
+
 ## Compatible on-court scope correction
 
 The owner narrowed conversion scope to compatible ordinary on-court 5-v-5
