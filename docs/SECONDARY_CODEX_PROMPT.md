@@ -104,12 +104,17 @@ Families0..8 read player +0x100,+0x108,+0x110,+0x10C,+0x104,+0x11C,+0x114,+0x118
 These are native player offsets, not roster-file offsets or provider/category
 numbers. They must not be relabeled named dribble moves without more evidence.
 Cached rows point INTO the graph: backing graph storage must remain alive until
-all such caches are cleared or replaced. The actual release/invalidation path
-and corresponding CH2K8 selection/cache ownership are not yet established.
+all such caches are cleared or replaced. Native setup0x46CB4C..0x46CB6C derives
+state from actor[+0x14]+0x110 and calls0x469768. That helper clears0x70 bytes,
+including all nine caches, then copies parameter words into state+0x2C/+0x30.
+Two native cases verify this clear/seed behavior and untouched adjacent bytes.
+This establishes setup reset, not graph release or invalidation in other contexts;
+corresponding CH2K8 selection/cache ownership remains unresolved.
 
-The public native graph harness now passes51 cases: the earlier3 fixup cases,
+The public native graph harness now passes53 cases: the earlier3 fixup cases,
 45 keyed cases (first/last/missing/empty/duplicate across all9 families), and3
-complete player-routing prefixes with actual lookup calls (first/last/missing).
+complete player-routing prefixes with actual lookup calls (first/last/missing),
+and2 setup reset cases.
 Unique per-family keys catch swapped player fields; cache sentinels check unknown
 state bytes stay unchanged. Successful runs report no undefined-register warning.
 A private supplied-graph probe checks all60 keys plus9 missing-key cases:69 pass,
@@ -1830,12 +1835,17 @@ Families0..8 read player +0x100,+0x108,+0x110,+0x10C,+0x104,+0x11C,+0x114,+0x118
 These are native player offsets, not roster-file offsets or provider/category
 numbers. They must not be relabeled named dribble moves without more evidence.
 Cached rows point INTO the graph: backing graph storage must remain alive until
-all such caches are cleared or replaced. The actual release/invalidation path
-and corresponding CH2K8 selection/cache ownership are not yet established.
+all such caches are cleared or replaced. Native setup0x46CB4C..0x46CB6C derives
+state from actor[+0x14]+0x110 and calls0x469768. That helper clears0x70 bytes,
+including all nine caches, then copies parameter words into state+0x2C/+0x30.
+Two native cases verify this clear/seed behavior and untouched adjacent bytes.
+This establishes setup reset, not graph release or invalidation in other contexts;
+corresponding CH2K8 selection/cache ownership remains unresolved.
 
-The public native graph harness now passes51 cases: the earlier3 fixup cases,
+The public native graph harness now passes53 cases: the earlier3 fixup cases,
 45 keyed cases (first/last/missing/empty/duplicate across all9 families), and3
-complete player-routing prefixes with actual lookup calls (first/last/missing).
+complete player-routing prefixes with actual lookup calls (first/last/missing),
+and2 setup reset cases.
 Unique per-family keys catch swapped player fields; cache sentinels check unknown
 state bytes stay unchanged. Successful runs report no undefined-register warning.
 A private supplied-graph probe checks all60 keys plus9 missing-key cases:69 pass,
@@ -2628,12 +2638,17 @@ Families0..8 read player +0x100,+0x108,+0x110,+0x10C,+0x104,+0x11C,+0x114,+0x118
 These are native player offsets, not roster-file offsets or provider/category
 numbers. They must not be relabeled named dribble moves without more evidence.
 Cached rows point INTO the graph: backing graph storage must remain alive until
-all such caches are cleared or replaced. The actual release/invalidation path
-and corresponding CH2K8 selection/cache ownership are not yet established.
+all such caches are cleared or replaced. Native setup0x46CB4C..0x46CB6C derives
+state from actor[+0x14]+0x110 and calls0x469768. That helper clears0x70 bytes,
+including all nine caches, then copies parameter words into state+0x2C/+0x30.
+Two native cases verify this clear/seed behavior and untouched adjacent bytes.
+This establishes setup reset, not graph release or invalidation in other contexts;
+corresponding CH2K8 selection/cache ownership remains unresolved.
 
-The public native graph harness now passes51 cases: the earlier3 fixup cases,
+The public native graph harness now passes53 cases: the earlier3 fixup cases,
 45 keyed cases (first/last/missing/empty/duplicate across all9 families), and3
-complete player-routing prefixes with actual lookup calls (first/last/missing).
+complete player-routing prefixes with actual lookup calls (first/last/missing),
+and2 setup reset cases.
 Unique per-family keys catch swapped player fields; cache sentinels check unknown
 state bytes stay unchanged. Successful runs report no undefined-register warning.
 A private supplied-graph probe checks all60 keys plus9 missing-key cases:69 pass,
@@ -6498,13 +6513,21 @@ Embedded source: docs/TEST_REPORT.md
 
 ## Dribbler keyed lookup and player routing
 
+Isolated author portable verification at7324d072658c4cf77bd551ee1fb9727fd6c1f1dc:
+**1,152 passed,10 skipped,2 deselected**; handoff, compile, CLI/offscreen Qt,
+Ruff and mypy18files pass. Subsequent cache-reset additions affect only the
+native Java harness and evidence notes; final-head verification is tracked in PR49.
+
 Graph tests **26 passed**; affected graph/source/group/library regression
 **68 passed**. Ruff E/F/I passes for the graph module and its tests.
-Native graph harness: **51 passed** (3 fixup,45 lookup,3 complete player routing).
+Native graph harness: **53 passed** (3 fixup,45 lookup,3 complete player routing,
+2 cache-clear/setup cases).
 Private real-graph lookups: **69 passed**, all60 rows plus9 missing keys.
 No uninitialized-read warning or instruction failure in the initialized successful
 runs. The first synthetic lookup run passed but exposed uninitialized xer_so;
-the harness now initializes it and the final51-case run passes without warnings.
+the harness now initializes it. The setup probe initially began after the actor
+argument move; correcting its start to0x46CB4C gives the complete native prefix.
+The final53-case run passes without uninitialized-read warnings.
 Full graph byte preservation and state-cache sentinels hold. No gameplay run.
 
 ## NBA11 graph structural and native relocation continuation

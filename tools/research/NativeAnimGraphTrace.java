@@ -101,16 +101,34 @@ public class NativeAnimGraphTrace extends GhidraScript {
    return "{\"kind\":\"player-routing\",\"mode\":\""+mode+"\",\"passed\":true}";
   }finally{e.dispose();}
  }
+ private String reset(int seed) throws Exception {
+  EmulatorHelper e=new EmulatorHelper(currentProgram);
+  try{
+   long actor=0x40002000L,data=0x40003000L,parameters=0x40004000L,state=data+0x110;
+   e.writeMemory(toAddr(0x40000000L),new byte[0x6000]);word(e,actor+0x14,data);word(e,actor+0x10,parameters);
+   word(e,parameters+0x18,seed);word(e,parameters+0x14,Float.floatToRawIntBits(1.25f));
+   byte[] before=new byte[0x100];Arrays.fill(before,(byte)0x5a);e.writeMemory(toAddr(state),before);
+   byte[] expected=before.clone();Arrays.fill(expected,0,0x70,(byte)0);ByteBuffer.wrap(expected).putInt(0x30,seed);ByteBuffer.wrap(expected).putInt(0x2c,Float.floatToRawIntBits(1.25f));
+   for(int i=0;i<32;i++)e.writeRegister("r"+i,0);
+   e.writeRegister("r26",actor);e.writeRegister("xer_so",0);e.writeRegister(e.getPCRegister(),0x46cb4cL);boolean complete=false;
+   for(int step=0;step<512;step++){
+    long pc=e.getExecutionAddress().getOffset();if(pc==0x46cb6cL){complete=true;break;}
+    if(!e.step(monitor))throw new Exception("Cache reset failure at "+Long.toHexString(pc)+": "+e.getLastError());
+   }
+   if(!complete||e.readRegister("r27").longValue()!=state||!Arrays.equals(expected,e.readMemory(toAddr(state),before.length)))throw new Exception("Cache reset/state address mismatch");
+   return "{\"kind\":\"cache-reset\",\"seed\":"+seed+",\"passed\":true}";
+  }finally{e.dispose();}
+ }
  public void run() throws Exception {
   String[] args=getScriptArgs();if(args.length!=1)throw new Exception("Supply NEW output path");
   Path out=Paths.get(args[0]);if(Files.exists(out))throw new Exception("Existing output refused");
-  if(getInt(toAddr(0x37fcd0))!=0x2f800000||getInt(toAddr(0x37fd2c))!=0x3bde0024||getInt(toAddr(0x8339ac))!=0x80030000||getInt(toAddr(0x4691f8))!=0x3d2004b9||getInt(toAddr(0x46d07c))!=0x83bc0064)
+  if(getInt(toAddr(0x37fcd0))!=0x2f800000||getInt(toAddr(0x37fd2c))!=0x3bde0024||getInt(toAddr(0x8339ac))!=0x80030000||getInt(toAddr(0x4691f8))!=0x3d2004b9||getInt(toAddr(0x46d07c))!=0x83bc0064||getInt(toAddr(0x469774))!=0x38040070)
    throw new Exception("Unsupported native graph revision");
   List<String> rows=new ArrayList<>();rows.add(trace(0,false));rows.add(trace(1,false));rows.add(trace(2,true));
   for(int family=0;family<9;family++)for(String mode:new String[]{"first","last","missing","empty","duplicate"})rows.add(lookup(family,mode));
   for(String mode:new String[]{"first","last","missing"})rows.add(playerRouting(mode));
+  rows.add(reset(0));rows.add(reset(0x12345678));
   Files.writeString(out,"[\n"+String.join(",\n",rows)+"\n]\n",StandardOpenOption.CREATE_NEW);
   println("Native animation graph fixups/lookups: "+rows.size()+" cases passed");
  }
 }
-

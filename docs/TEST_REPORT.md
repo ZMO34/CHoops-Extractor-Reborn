@@ -1,12 +1,20 @@
 ## Dribbler keyed lookup and player routing
 
+Isolated author portable verification at7324d072658c4cf77bd551ee1fb9727fd6c1f1dc:
+**1,152 passed,10 skipped,2 deselected**; handoff, compile, CLI/offscreen Qt,
+Ruff and mypy18files pass. Subsequent cache-reset additions affect only the
+native Java harness and evidence notes; final-head verification is tracked in PR49.
+
 Graph tests **26 passed**; affected graph/source/group/library regression
 **68 passed**. Ruff E/F/I passes for the graph module and its tests.
-Native graph harness: **51 passed** (3 fixup,45 lookup,3 complete player routing).
+Native graph harness: **53 passed** (3 fixup,45 lookup,3 complete player routing,
+2 cache-clear/setup cases).
 Private real-graph lookups: **69 passed**, all60 rows plus9 missing keys.
 No uninitialized-read warning or instruction failure in the initialized successful
 runs. The first synthetic lookup run passed but exposed uninitialized xer_so;
-the harness now initializes it and the final51-case run passes without warnings.
+the harness now initializes it. The setup probe initially began after the actor
+argument move; correcting its start to0x46CB4C gives the complete native prefix.
+The final53-case run passes without uninitialized-read warnings.
 Full graph byte preservation and state-cache sentinels hold. No gameplay run.
 
 ## NBA11 graph structural and native relocation continuation
