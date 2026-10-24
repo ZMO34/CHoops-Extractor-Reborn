@@ -1,3 +1,9 @@
+Graph key research API: `anim_graph.lookup_graph_key(decoded_bytes, raw_key, family)`
+returns the first native matching row or `None`. Families0..8 and unsigned32-bit
+keys are explicit; meanings are not guessed. `inspect_graph` now reports keyed
+rows, native player/cache offsets and borrowed graph-storage lifetime. These
+are source research APIs, not roster editing or target gameplay installation.
+
 Graph research API: `choops_py.research.anim_graph.inspect_graph(decoded_bytes)`
 validates the observed NBA11 graph pointer tables and returns raw nodes, bounded
 fixups and positional native-binding slots. This expects a decoded record, not an

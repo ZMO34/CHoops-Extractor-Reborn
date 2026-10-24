@@ -2,7 +2,12 @@ import struct
 
 import pytest
 
-from choops_py.research.anim_graph import POINTER_FIELDS, STRIDES, inspect_graph
+from choops_py.research.anim_graph import (
+    POINTER_FIELDS,
+    STRIDES,
+    inspect_graph,
+    lookup_graph_key,
+)
 
 
 def fixture(nodes=2):
@@ -83,3 +88,34 @@ def test_graph_profile_and_truncation_are_not_guessed():
         inspect_graph(bytes(127))
     with pytest.raises(ValueError):
         inspect_graph(fixture()[:130])
+
+
+@pytest.mark.parametrize("family", range(9))
+def test_keyed_lookup_all_families_and_missing(family):
+    raw = fixture()
+    result = inspect_graph(raw)
+    offset = result["tables"][7 + family]["offset"]
+    struct.pack_into(">I", raw, offset, 0xFFFFFFFF)
+    found = lookup_graph_key(raw, 0xFFFFFFFF, family)
+    assert found["offset"] == offset
+    assert found["raw_words"][0] == 0xFFFFFFFF
+    assert found["pointer_targets"] == [128, 128, None]
+    assert lookup_graph_key(raw, 0xFFFFFFFE, family) is None
+
+
+def test_duplicate_key_lookup_preserves_first_row():
+    raw = bytearray(160)
+    struct.pack_into(">I", raw, 28, 2)
+    struct.pack_into(">I", raw, 92, 128 - 92 + 1)
+    for at in (128, 144):
+        struct.pack_into(">I", raw, at, 9)
+    assert lookup_graph_key(raw, 9, 0)["offset"] == 128
+    assert lookup_graph_key(raw, 9, 1) is None
+
+
+@pytest.mark.parametrize(
+    "key,family", [(-1, 0), (2**32, 0), (True, 0), (0, -1), (0, 9), (0, True)]
+)
+def test_lookup_rejects_invalid_word_or_family(key, family):
+    with pytest.raises(ValueError, match="lookup"):
+        lookup_graph_key(fixture(), key, family)

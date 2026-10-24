@@ -1,3 +1,7 @@
+NBA11 dribbler research: preserve first-match keyed graph selection, nine native
+player-key/cache routes, and the cached-row backing-graph lifetime dependency.
+Target ownership and playback integration remain unresolved.
+
 NBA11 on-court animation research: bounded graph dependency inspection and native
 relocation/binding harness for dribbler/bodyup contexts. This remains research;
 no playable graph import, target compatibility or gameplay validation is claimed.

@@ -1,3 +1,14 @@
+## Dribbler keyed lookup and player routing
+
+Graph tests **26 passed**; affected graph/source/group/library regression
+**68 passed**. Ruff E/F/I passes for the graph module and its tests.
+Native graph harness: **51 passed** (3 fixup,45 lookup,3 complete player routing).
+Private real-graph lookups: **69 passed**, all60 rows plus9 missing keys.
+No uninitialized-read warning or instruction failure in the initialized successful
+runs. The first synthetic lookup run passed but exposed uninitialized xer_so;
+the harness now initializes it and the final51-case run passes without warnings.
+Full graph byte preservation and state-cache sentinels hold. No gameplay run.
+
 ## NBA11 graph structural and native relocation continuation
 
 Isolated author verification at0a7065b02095ace7340adc6651da1140a548c853:

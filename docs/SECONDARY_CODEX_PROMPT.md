@@ -88,6 +88,35 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+## Dribbler keyed selection and player-cache lifetime
+
+Native leaf0x4691F8 reads the dribbler graph at0x4B93D2C, selects one of nine
+16-byte keyed tables (counts+0x1C..+0x3C, pointers+0x5C..+0x7C), compares raw
+32-bit keys and returns the FIRST matching row, or null. It neither deduplicates
+keys nor substitutes another family. `anim_graph.lookup_graph_key` models that
+ordering and validates explicit key/family bounds; family basketball meanings
+and the three row payload pointers remain unresolved. Inspection now retains
+these rows, unknown words and their bounded payload targets.
+
+The actual caller prefix0x46D07C..0x46D110 gets the player from actor+0x64.
+Families0..8 read player +0x100,+0x108,+0x110,+0x10C,+0x104,+0x11C,+0x114,+0x118,
++0x120 respectively, and cache returned row pointers at state+0x4C..+0x6C.
+These are native player offsets, not roster-file offsets or provider/category
+numbers. They must not be relabeled named dribble moves without more evidence.
+Cached rows point INTO the graph: backing graph storage must remain alive until
+all such caches are cleared or replaced. The actual release/invalidation path
+and corresponding CH2K8 selection/cache ownership are not yet established.
+
+The public native graph harness now passes51 cases: the earlier3 fixup cases,
+45 keyed cases (first/last/missing/empty/duplicate across all9 families), and3
+complete player-routing prefixes with actual lookup calls (first/last/missing).
+Unique per-family keys catch swapped player fields; cache sentinels check unknown
+state bytes stay unchanged. Successful runs report no undefined-register warning.
+A private supplied-graph probe checks all60 keys plus9 missing-key cases:69 pass,
+with graph bytes unchanged. Graph/source/group/library Python checks:68 passed;
+graph-specific tests26 passed. This remains source selection/lifetime evidence,
+not target graph execution, compatible animation conversion or gameplay validation.
+
 ## Native graph relocation coverage for dribbling and bodyup
 
 `research.anim_graph.inspect_graph` now validates the observed NBA11 decoded graph
@@ -1785,6 +1814,35 @@ See NBA_ROSTERS_AND_2K14.md for container and primary format references.
 
 Embedded source: docs/ANIMATION_GAMEPLAY_PORT.md
 
+## Dribbler keyed selection and player-cache lifetime
+
+Native leaf0x4691F8 reads the dribbler graph at0x4B93D2C, selects one of nine
+16-byte keyed tables (counts+0x1C..+0x3C, pointers+0x5C..+0x7C), compares raw
+32-bit keys and returns the FIRST matching row, or null. It neither deduplicates
+keys nor substitutes another family. `anim_graph.lookup_graph_key` models that
+ordering and validates explicit key/family bounds; family basketball meanings
+and the three row payload pointers remain unresolved. Inspection now retains
+these rows, unknown words and their bounded payload targets.
+
+The actual caller prefix0x46D07C..0x46D110 gets the player from actor+0x64.
+Families0..8 read player +0x100,+0x108,+0x110,+0x10C,+0x104,+0x11C,+0x114,+0x118,
++0x120 respectively, and cache returned row pointers at state+0x4C..+0x6C.
+These are native player offsets, not roster-file offsets or provider/category
+numbers. They must not be relabeled named dribble moves without more evidence.
+Cached rows point INTO the graph: backing graph storage must remain alive until
+all such caches are cleared or replaced. The actual release/invalidation path
+and corresponding CH2K8 selection/cache ownership are not yet established.
+
+The public native graph harness now passes51 cases: the earlier3 fixup cases,
+45 keyed cases (first/last/missing/empty/duplicate across all9 families), and3
+complete player-routing prefixes with actual lookup calls (first/last/missing).
+Unique per-family keys catch swapped player fields; cache sentinels check unknown
+state bytes stay unchanged. Successful runs report no undefined-register warning.
+A private supplied-graph probe checks all60 keys plus9 missing-key cases:69 pass,
+with graph bytes unchanged. Graph/source/group/library Python checks:68 passed;
+graph-specific tests26 passed. This remains source selection/lifetime evidence,
+not target graph execution, compatible animation conversion or gameplay validation.
+
 ## Native graph relocation coverage for dribbling and bodyup
 
 `research.anim_graph.inspect_graph` now validates the observed NBA11 decoded graph
@@ -2553,6 +2611,35 @@ No RPCS3, hardware run, full-game build or controller remapping was performed.
 ---
 
 Embedded source: docs/ANIMATION_RUNTIME_ADAPTER.md
+
+## Dribbler keyed selection and player-cache lifetime
+
+Native leaf0x4691F8 reads the dribbler graph at0x4B93D2C, selects one of nine
+16-byte keyed tables (counts+0x1C..+0x3C, pointers+0x5C..+0x7C), compares raw
+32-bit keys and returns the FIRST matching row, or null. It neither deduplicates
+keys nor substitutes another family. `anim_graph.lookup_graph_key` models that
+ordering and validates explicit key/family bounds; family basketball meanings
+and the three row payload pointers remain unresolved. Inspection now retains
+these rows, unknown words and their bounded payload targets.
+
+The actual caller prefix0x46D07C..0x46D110 gets the player from actor+0x64.
+Families0..8 read player +0x100,+0x108,+0x110,+0x10C,+0x104,+0x11C,+0x114,+0x118,
++0x120 respectively, and cache returned row pointers at state+0x4C..+0x6C.
+These are native player offsets, not roster-file offsets or provider/category
+numbers. They must not be relabeled named dribble moves without more evidence.
+Cached rows point INTO the graph: backing graph storage must remain alive until
+all such caches are cleared or replaced. The actual release/invalidation path
+and corresponding CH2K8 selection/cache ownership are not yet established.
+
+The public native graph harness now passes51 cases: the earlier3 fixup cases,
+45 keyed cases (first/last/missing/empty/duplicate across all9 families), and3
+complete player-routing prefixes with actual lookup calls (first/last/missing).
+Unique per-family keys catch swapped player fields; cache sentinels check unknown
+state bytes stay unchanged. Successful runs report no undefined-register warning.
+A private supplied-graph probe checks all60 keys plus9 missing-key cases:69 pass,
+with graph bytes unchanged. Graph/source/group/library Python checks:68 passed;
+graph-specific tests26 passed. This remains source selection/lifetime evidence,
+not target graph execution, compatible animation conversion or gameplay validation.
 
 ## Native graph relocation coverage for dribbling and bodyup
 
@@ -6408,6 +6495,17 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+## Dribbler keyed lookup and player routing
+
+Graph tests **26 passed**; affected graph/source/group/library regression
+**68 passed**. Ruff E/F/I passes for the graph module and its tests.
+Native graph harness: **51 passed** (3 fixup,45 lookup,3 complete player routing).
+Private real-graph lookups: **69 passed**, all60 rows plus9 missing keys.
+No uninitialized-read warning or instruction failure in the initialized successful
+runs. The first synthetic lookup run passed but exposed uninitialized xer_so;
+the harness now initializes it and the final51-case run passes without warnings.
+Full graph byte preservation and state-cache sentinels hold. No gameplay run.
 
 ## NBA11 graph structural and native relocation continuation
 
