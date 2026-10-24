@@ -1,4 +1,4 @@
-# Current support matrix — v1.21
+# Current support matrix — v1.23
 
 Supported means structurally verified by parsers and automated fixtures. No row
 certifies game/runtime compatibility. Unknown variants fail explicitly.
@@ -53,3 +53,9 @@ port, encrypted-save decryption, universal NBA roster fields or full arena shade
 emulation. Unknown reflection/fake-bump/AO/runtime palettes and universal text
 ceilings remain unestablished. See [limitations](KNOWN_LIMITATIONS.md),
 [NBA details](NBA_ROSTERS_AND_2K14.md) and [shader evidence](ARENA_SHADER_MASKS.md).
+
+## Desktop platforms
+
+Windows x64, macOS arm64 and macOS x86_64 have native packaging/check jobs.
+Mac packages require macOS 13+, are ad-hoc signed, and are not notarized.
+Linux remains a source/test target. Native checks do not certify gameplay.

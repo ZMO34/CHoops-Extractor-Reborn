@@ -10,7 +10,13 @@ def resolved_path(path):
     return Path(value)
 
 ROOT=resolved_path(sys.executable).parent if getattr(sys,'frozen',False) else resolved_path(__file__).parents[2]
-OUTPUT=ROOT/"output"
+def output_root():
+    """Keep a frozen Mac app's writable data outside its signed bundle."""
+    if getattr(sys, 'frozen', False) and sys.platform == 'darwin':
+        return Path.home()/'Library'/'Application Support'/'CHoops Studio'/'output'
+    return ROOT/'output'
+
+OUTPUT=output_root()
 def source_root(path):
     p=resolved_path(path)
     for candidate in [p,*p.parents]:

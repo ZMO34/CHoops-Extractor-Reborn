@@ -1,3 +1,5 @@
+Mac users: see [installation, data folders and platform limits](MACOS.md).
+
 # Team assets (v1.20)
 
 Use **Team Assets** for the searchable assignment list and checked S/Home/Away/

@@ -4,6 +4,9 @@ import sys
 
 
 def run():
+    if sys.argv[1:2]==['--render-smoke']:
+        from choops_py.studio.render_smoke import main as render_smoke
+        return render_smoke()
     if sys.argv[1:2]==['--audio-codec-smoke']:
         from choops_py.audio_tools.codec_smoke import main as audio_codec_smoke
         return audio_codec_smoke()

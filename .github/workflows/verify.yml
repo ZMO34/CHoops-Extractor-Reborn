@@ -1,22 +1,28 @@
 name: Verify native Python studio
 on:
   push:
-    branches: [master, 'codex/**']
+    branches: [master]
   pull_request:
   workflow_dispatch:
 permissions:
   contents: read
+concurrency:
+  group: desktop-checks-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 jobs:
   test:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest, windows-latest, macos-15, macos-15-intel]
     runs-on: ${{ matrix.os }}
     env:
       QT_QPA_PLATFORM: offscreen
+      MACOSX_DEPLOYMENT_TARGET: '13.0'
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -36,18 +42,33 @@ jobs:
         if: runner.os == 'Windows'
         shell: msys2 {0}
         run: bash tools/audio_codec/build_ffmpeg.sh
+      - name: Build macOS LGPL audio helper
+        if: runner.os == 'macOS'
+        run: bash tools/audio_codec/build_ffmpeg.sh
       - name: Build LGPL ATRAC encoder helper
-        if: runner.os == 'Windows'
+        if: runner.os != 'Linux'
         run: python tools/dev/setup.py --audio-encoder
       - name: Windows standalone build and smoke
         if: runner.os == 'Windows'
         shell: pwsh
         run: ./tools/rebuild/package_windows.ps1
-      - name: Upload verified Windows application
-        if: runner.os == 'Windows'
+      - name: macOS standalone build and native graphics smoke
+        if: runner.os == 'macOS'
+        run: .venv/bin/python tools/rebuild/package_macos.py
+      - name: Archive verified native package
+        if: runner.os != 'Linux'
+        shell: bash
+        run: |
+          if [ "$RUNNER_OS" = Windows ]; then
+            python tools/rebuild/release_archive.py
+          else
+            .venv/bin/python tools/rebuild/release_archive.py
+          fi
+      - name: Upload verified desktop release
+        if: runner.os != 'Linux'
         uses: actions/upload-artifact@v4
         with:
-          name: CHoops-Studio-windows-x64
-          path: dist/CHoops-Studio
+          name: desktop-${{ matrix.os }}
+          path: dist/release/*
           if-no-files-found: error
           retention-days: 14
