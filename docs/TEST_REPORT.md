@@ -1,3 +1,21 @@
+## Native CH motion-bundle prefix
+
+`NativeMotionBundleTrace.java`: **192 passed**, no mocked calls, stopping before
+native timing/playback. Covers counts1/5, six threshold values, explicit flag
+permission, lane policy, actor flag and guard-row bits. The observed lookahead
+read address is checked, including after the last variant. Motion/scalar outputs
+and untouched bundle bytes match. All FP/status registers are initialized; final
+run reports no undefined-read warnings or instruction failures.
+
+Python bundle tests **15 passed**; bundle/target-motion/residency/graph regression
+**92 passed**. Ruff E/F/I passes. Cases cover descending rather than sorted
+priority, flagged-neighbor clamping, selected-row scalars, explicit context,
+float32 overflow, missing lookahead bytes, malformed metadata/pointers, native
+revision, caller-index bounds, source immutability and complete target extents.
+Read-only supplied audit validates four ordinary bundles /20 variants /40 header
+references /20 distinct headers. Two special candidate types remain opaque;
+registered capacity, full dribbling coverage and donor compatibility are unproven.
+
 ## Dribbler style gate and graph-node dependency closure
 
 Isolated author verification at28974b64d29186c2a2b7d5b8b00384a625c7b5c1:

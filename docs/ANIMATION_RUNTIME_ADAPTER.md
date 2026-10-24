@@ -1,3 +1,47 @@
+## CH dribbling motion-bundle playback selection
+
+Target dribbling named setup/update paths are now traced into0x345ABC's native
+motion-bundle selector. Ordinary dribble bundles contain five24-byte variants:
+two motion pointers, a threshold, two lane-specific scalars and raw flags. The
+prefix scans variants backward, uses actor-context+0x108 as the selection value,
+and gates flagbit0 through its explicit argument. Lane selection uses an explicit
+policy and actor[+0x14] flags+0xF0 bit1; its basketball meaning remains unnamed.
+
+The native code reads the FOLLOWING row's flags even when selecting the final
+variant, before clamping the next-motion index. Future owned bundles need24
+lookahead bytes. `motion_bundle` provides bounded read-only inspection and a
+selection reference; no writer/registration is introduced. Both current and next
+motion choices use the SELECTED row's lane scalar. Null/no-eligible motions stay
+null. Timing, blending, events and full playback after this prefix remain pending.
+
+The traced ordinary rules reach four bundles /20 variants /40 pointer references,
+with20 distinct existing CH motion headers validated through the existing full
+track-extent inspector. Two special candidate types remain opaque. These are
+existing-target context counts, not donor conversions or a complete dribble
+inventory. Registered table capacity is not inferred from the four observed IDs;
+the reader's explicit index bound is an inspection limit only.
+
+Native bundle prefix:192 synthetic cases pass, including exact lookahead-read
+addresses, both pointer lanes, flagged-neighbor clamping, thresholds, selected
+scalars and unchanged bundle bytes. Python module tests15 pass; bundle/target
+motion/residency/graph regression92 pass. Source/target assets remain unchanged.
+
+The target anchors are backed by native UTF16 diagnostic labels and their TOC
+references: setup-lockup0x392378, setup-drive0x392C38, dribbler-launch0x392F1C,
+from-stand0x393B5C, update-model0x393EFC, and move-dribble0x3948A8. Labels are
+anchors, not permission to substitute unrelated clips or metadata. Routine
+0x38BD34 returns the first matching key row in a zero-terminated pointer list;
+ordinary rows hold a full-word bundle index used with stride120 at table cell
+0xA5A718. They are not motion headers or native groups. Candidate descriptor
+validation0x390440 and ordered lookup0x3907F4 precede this row lookup. Special
+kinds3/4 and downstream paired/lockup paths require separate decoding.
+
+`inspect_dribble_bundle` checks observed reader instructions and file-backed
+pointer/header/track extents for one caller-proven index. It explicitly leaves
+registered table count and donor-to-target mapping unestablished. The helper
+argument limit0..65535 is not a demonstrated native ID capacity. Float fields
+remain raw preserved values; only the selection prefix behavior is established.
+
 ## Dribbler graph style-to-node selection
 
 All60 signature registry keys in categories2..10 match the nine dribbler keyed

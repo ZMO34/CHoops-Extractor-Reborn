@@ -1,3 +1,12 @@
+Target bundle research APIs: `motion_bundle.inspect_bundle_rows(bytes, count=5)`
+requires variant rows PLUS one24-byte lookahead row. `select_bundle_rows(bytes,
+value, allow_flagged, lane_policy, actor_flag)` models only native variant/lane
+selection. `inspect_dribble_bundle(decoded_elf, caller_proven_index)` validates a
+bounded existing target bundle and its full motion dependencies; it does not
+establish the registered table length or donor mappings. These APIs write no
+files. `NativeMotionBundleTrace.java NEW_OUTPUT_JSON` verifies the native prefix
+with synthetic state in the read-only Ghidra project, without running gameplay.
+
 Dribbler research API: `anim_graph.graph_style_gate(decoded_bytes, nine_player_keys,
 candidate_node_index, bypass=False)` returns only the established source style-gate
 predicate. It does not decide full transition eligibility or target compatibility.

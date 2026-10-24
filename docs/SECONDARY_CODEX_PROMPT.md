@@ -88,6 +88,34 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+## CH dribbling motion-bundle playback selection
+
+Target dribbling named setup/update paths are now traced into0x345ABC's native
+motion-bundle selector. Ordinary dribble bundles contain five24-byte variants:
+two motion pointers, a threshold, two lane-specific scalars and raw flags. The
+prefix scans variants backward, uses actor-context+0x108 as the selection value,
+and gates flagbit0 through its explicit argument. Lane selection uses an explicit
+policy and actor[+0x14] flags+0xF0 bit1; its basketball meaning remains unnamed.
+
+The native code reads the FOLLOWING row's flags even when selecting the final
+variant, before clamping the next-motion index. Future owned bundles need24
+lookahead bytes. `motion_bundle` provides bounded read-only inspection and a
+selection reference; no writer/registration is introduced. Both current and next
+motion choices use the SELECTED row's lane scalar. Null/no-eligible motions stay
+null. Timing, blending, events and full playback after this prefix remain pending.
+
+The traced ordinary rules reach four bundles /20 variants /40 pointer references,
+with20 distinct existing CH motion headers validated through the existing full
+track-extent inspector. Two special candidate types remain opaque. These are
+existing-target context counts, not donor conversions or a complete dribble
+inventory. Registered table capacity is not inferred from the four observed IDs;
+the reader's explicit index bound is an inspection limit only.
+
+Native bundle prefix:192 synthetic cases pass, including exact lookahead-read
+addresses, both pointer lanes, flagged-neighbor clamping, thresholds, selected
+scalars and unchanged bundle bytes. Python module tests15 pass; bundle/target
+motion/residency/graph regression92 pass. Source/target assets remain unchanged.
+
 ## Dribbler graph style-to-node selection
 
 All60 signature registry keys in categories2..10 match the nine dribbler keyed
@@ -1843,6 +1871,15 @@ See NBA_ROSTERS_AND_2K14.md for container and primary format references.
 
 Embedded source: docs/ANIMATION_GAMEPLAY_PORT.md
 
+## Target dribbling playback context
+
+The named CH2K8 dribbling functions lead to a native five-variant/two-lane motion
+bundle selector. Its prefix and lookahead storage requirement are now verified;
+see [target bundle evidence](ANIMATION_RUNTIME_ADAPTER.md). Four ordinary bundles
+are validated, while special candidate types and downstream transitions/blending
+remain pending. This provides a target registration format to investigate; it
+does not install donor animations or prove their metadata correspondence.
+
 ## Dribbler style source coverage
 
 The signature bank's60 dribbling keys with empty motion references are now linked
@@ -2655,6 +2692,50 @@ No RPCS3, hardware run, full-game build or controller remapping was performed.
 ---
 
 Embedded source: docs/ANIMATION_RUNTIME_ADAPTER.md
+
+## CH dribbling motion-bundle playback selection
+
+Target dribbling named setup/update paths are now traced into0x345ABC's native
+motion-bundle selector. Ordinary dribble bundles contain five24-byte variants:
+two motion pointers, a threshold, two lane-specific scalars and raw flags. The
+prefix scans variants backward, uses actor-context+0x108 as the selection value,
+and gates flagbit0 through its explicit argument. Lane selection uses an explicit
+policy and actor[+0x14] flags+0xF0 bit1; its basketball meaning remains unnamed.
+
+The native code reads the FOLLOWING row's flags even when selecting the final
+variant, before clamping the next-motion index. Future owned bundles need24
+lookahead bytes. `motion_bundle` provides bounded read-only inspection and a
+selection reference; no writer/registration is introduced. Both current and next
+motion choices use the SELECTED row's lane scalar. Null/no-eligible motions stay
+null. Timing, blending, events and full playback after this prefix remain pending.
+
+The traced ordinary rules reach four bundles /20 variants /40 pointer references,
+with20 distinct existing CH motion headers validated through the existing full
+track-extent inspector. Two special candidate types remain opaque. These are
+existing-target context counts, not donor conversions or a complete dribble
+inventory. Registered table capacity is not inferred from the four observed IDs;
+the reader's explicit index bound is an inspection limit only.
+
+Native bundle prefix:192 synthetic cases pass, including exact lookahead-read
+addresses, both pointer lanes, flagged-neighbor clamping, thresholds, selected
+scalars and unchanged bundle bytes. Python module tests15 pass; bundle/target
+motion/residency/graph regression92 pass. Source/target assets remain unchanged.
+
+The target anchors are backed by native UTF16 diagnostic labels and their TOC
+references: setup-lockup0x392378, setup-drive0x392C38, dribbler-launch0x392F1C,
+from-stand0x393B5C, update-model0x393EFC, and move-dribble0x3948A8. Labels are
+anchors, not permission to substitute unrelated clips or metadata. Routine
+0x38BD34 returns the first matching key row in a zero-terminated pointer list;
+ordinary rows hold a full-word bundle index used with stride120 at table cell
+0xA5A718. They are not motion headers or native groups. Candidate descriptor
+validation0x390440 and ordered lookup0x3907F4 precede this row lookup. Special
+kinds3/4 and downstream paired/lockup paths require separate decoding.
+
+`inspect_dribble_bundle` checks observed reader instructions and file-backed
+pointer/header/track extents for one caller-proven index. It explicitly leaves
+registered table count and donor-to-target mapping unestablished. The helper
+argument limit0..65535 is not a demonstrated native ID capacity. Float fields
+remain raw preserved values; only the selection prefix behavior is established.
 
 ## Dribbler graph style-to-node selection
 
@@ -6589,6 +6670,24 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+## Native CH motion-bundle prefix
+
+`NativeMotionBundleTrace.java`: **192 passed**, no mocked calls, stopping before
+native timing/playback. Covers counts1/5, six threshold values, explicit flag
+permission, lane policy, actor flag and guard-row bits. The observed lookahead
+read address is checked, including after the last variant. Motion/scalar outputs
+and untouched bundle bytes match. All FP/status registers are initialized; final
+run reports no undefined-read warnings or instruction failures.
+
+Python bundle tests **15 passed**; bundle/target-motion/residency/graph regression
+**92 passed**. Ruff E/F/I passes. Cases cover descending rather than sorted
+priority, flagged-neighbor clamping, selected-row scalars, explicit context,
+float32 overflow, missing lookahead bytes, malformed metadata/pointers, native
+revision, caller-index bounds, source immutability and complete target extents.
+Read-only supplied audit validates four ordinary bundles /20 variants /40 header
+references /20 distinct headers. Two special candidate types remain opaque;
+registered capacity, full dribbling coverage and donor compatibility are unproven.
 
 ## Dribbler style gate and graph-node dependency closure
 

@@ -1,3 +1,12 @@
+## Target dribbling playback context
+
+The named CH2K8 dribbling functions lead to a native five-variant/two-lane motion
+bundle selector. Its prefix and lookahead storage requirement are now verified;
+see [target bundle evidence](ANIMATION_RUNTIME_ADAPTER.md). Four ordinary bundles
+are validated, while special candidate types and downstream transitions/blending
+remain pending. This provides a target registration format to investigate; it
+does not install donor animations or prove their metadata correspondence.
+
 ## Dribbler style source coverage
 
 The signature bank's60 dribbling keys with empty motion references are now linked

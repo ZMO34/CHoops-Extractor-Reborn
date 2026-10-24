@@ -1,3 +1,7 @@
+CH dribbling research: native-proven motion-bundle variant/lane selection,
+bounded motion-dependency inspection, and explicit adjacent-row lookahead
+storage requirement. Donor mapping, registration and full playback remain pending.
+
 NBA11 dribbler source research: link style rows to graph nodes, retain shared
 provider bindings and model native style eligibility, including bypass and
 missing-key paths. Full transitions and CH gameplay integration remain pending.
