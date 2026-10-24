@@ -1,3 +1,13 @@
+## Native shot state accessor continuation
+
+Read-only `NativeJumpGameplayTrace.java` on the supplied CH ELF: **18 passed**
+(hand0/1, style0/111/255, native stride0/1/2). The real0x2351D0 accessor and
+0x234E30 dependency execute; the previous state-pointer substitution is removed.
+All expected motion/metadata words and per-actor output match; a0x1200-byte
+sentinel confirms adjacent storage preservation. No harness instruction failure
+or uninitialized-read warning was reported. This is instruction-level evidence,
+not gameplay, allocation ownership or cross-game semantic validation.
+
 ## On-court paired-shot planar proposals and cached collection reads
 
 Read-only public API audits: **224/224 existing CH shot headers** agree within one

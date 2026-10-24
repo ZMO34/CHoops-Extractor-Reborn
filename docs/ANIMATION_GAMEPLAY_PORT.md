@@ -1,9 +1,32 @@
+## Native paired-shot state addressing
+
+The target instruction harness now executes CH accessor0x2351D0 and its real
+0x234E30 dependency rather than substituting a state pointer. For the tested
+actor +0x20 ==1 path, the address is base +288 * (actor[+0x70] * stride +subindex).
+The paired-shot initializer passes subindex0. The stride is read indirectly
+through TOC cell0xA54240; base is held at0xA54250. The actor matching the cached
+pointer at0xA54264 follows a different path and is NOT covered by this trace.
+The meaning of the stride is unresolved; it is not established as a frame index.
+
+All18 combinations of hand bit0/1, style0/111/255 and synthetic stride0/1/2 pass.
+The actual player flag getter and TOC restoration still execute. A0x1200-byte
+sentinel verifies only the six expected metadata/motion fields change in the
+state storage, including untouched adjacent slots. Per-actor +4 dispatch metadata
+is checked separately. This establishes bounded addressing and row consumption,
+not target field semantics, allocation ownership, fallback or gameplay quality.
+
+Dribbling, running/locomotion, defensive movement and rebounding are required
+conversion families alongside scoring. Paired-shot work is a shared-foundation
+case, not completion of those families. Their source playback graphs, transitions,
+events, target context and native lifetime must each be established before they
+can count as compatible conversions. NBA2K14 right-stick controls remain deferred.
+
 ## Current conversion scope: compatible on-court 5-v-5 animations
 
 The owner's latest direction narrows the earlier entire-bank goal. Convert/add
 only animations compatible with ordinary on-court 5-v-5 play: layups, dunks,
-shots (including running shots and free throws), rebounds and related gameplay
-moves. Dunk-contest, photo-op, crowd, mascot and other non-gameplay content may be
+shots (including running shots and free throws), dribbling, running/locomotion,
+defensive movement, rebounds and related gameplay moves. Dunk-contest, photo-op, crowd, mascot and other non-gameplay content may be
 omitted and must not count toward conversion progress. Unknown gameplay context
 or target compatibility remains pending, rather than silently included.
 
@@ -25,8 +48,8 @@ the final control policy is still NBA2K14 right-stick default, old layout preset
 
 ## Whole-library continuation
 
-Current scope is every donor family, including free throws, running shots and
-rebounds. See [current runtime ledger](ANIMATION_RUNTIME_ADAPTER.md) for the
+Current scope is compatible on-court donor families, including dribbling,
+running, defense, rebounds, free throws and running shots. See [current runtime ledger](ANIMATION_RUNTIME_ADAPTER.md) for the
 complete 4,705-record supplied-IFF audit and native provider routing correction.
 Provider selector20 selects serialized category 14 (203 paired entries), whereas
 selector 0 selects a separate147-entry four-pair sequence family. The paired

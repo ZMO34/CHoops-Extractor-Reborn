@@ -88,6 +88,29 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+## Native paired-shot state addressing
+
+The target instruction harness now executes CH accessor0x2351D0 and its real
+0x234E30 dependency rather than substituting a state pointer. For the tested
+actor +0x20 ==1 path, the address is base +288 * (actor[+0x70] * stride +subindex).
+The paired-shot initializer passes subindex0. The stride is read indirectly
+through TOC cell0xA54240; base is held at0xA54250. The actor matching the cached
+pointer at0xA54264 follows a different path and is NOT covered by this trace.
+The meaning of the stride is unresolved; it is not established as a frame index.
+
+All18 combinations of hand bit0/1, style0/111/255 and synthetic stride0/1/2 pass.
+The actual player flag getter and TOC restoration still execute. A0x1200-byte
+sentinel verifies only the six expected metadata/motion fields change in the
+state storage, including untouched adjacent slots. Per-actor +4 dispatch metadata
+is checked separately. This establishes bounded addressing and row consumption,
+not target field semantics, allocation ownership, fallback or gameplay quality.
+
+Dribbling, running/locomotion, defensive movement and rebounding are required
+conversion families alongside scoring. Paired-shot work is a shared-foundation
+case, not completion of those families. Their source playback graphs, transitions,
+events, target context and native lifetime must each be established before they
+can count as compatible conversions. NBA2K14 right-stick controls remain deferred.
+
 ## Paired on-court shot planar metadata investigation
 
 `research.shot_planar.inspect_pair_planar` now makes read-only root-derived
@@ -131,8 +154,8 @@ limit and strict type/span checks; it is not a process-memory guarantee.
 
 The owner's latest direction narrows the earlier entire-bank goal. Convert/add
 only animations compatible with ordinary on-court 5-v-5 play: layups, dunks,
-shots (including running shots and free throws), rebounds and related gameplay
-moves. Dunk-contest, photo-op, crowd, mascot and other non-gameplay content may be
+shots (including running shots and free throws), dribbling, running/locomotion,
+defensive movement, rebounds and related gameplay moves. Dunk-contest, photo-op, crowd, mascot and other non-gameplay content may be
 omitted and must not count toward conversion progress. Unknown gameplay context
 or target compatibility remains pending, rather than silently included.
 
@@ -233,9 +256,9 @@ active work. Native dispatch checks are instruction tests, not gameplay tests.
 
 ## Whole-library scope and provider routing correction
 
-The owner's scope is the entire NBA11 animation library: free throws, running
-shots, rebounds and every other family. No family is being discarded. Right-stick
-controls remain secondary. The four-pair category-zero work remains useful, but
+The owner's current scope is compatible on-court NBA11 animation families,
+including dribbling, running, defense, rebounding and scoring. Historical full-bank
+inventory totals do not establish eligibility. Right-stick controls remain secondary. The four-pair category-zero work remains useful, but
 must not be confused with the paired jump-shot table.
 
 Native `0x657824` takes 41 provider selector codes and routes them into 31
@@ -1710,12 +1733,35 @@ See NBA_ROSTERS_AND_2K14.md for container and primary format references.
 
 Embedded source: docs/ANIMATION_GAMEPLAY_PORT.md
 
+## Native paired-shot state addressing
+
+The target instruction harness now executes CH accessor0x2351D0 and its real
+0x234E30 dependency rather than substituting a state pointer. For the tested
+actor +0x20 ==1 path, the address is base +288 * (actor[+0x70] * stride +subindex).
+The paired-shot initializer passes subindex0. The stride is read indirectly
+through TOC cell0xA54240; base is held at0xA54250. The actor matching the cached
+pointer at0xA54264 follows a different path and is NOT covered by this trace.
+The meaning of the stride is unresolved; it is not established as a frame index.
+
+All18 combinations of hand bit0/1, style0/111/255 and synthetic stride0/1/2 pass.
+The actual player flag getter and TOC restoration still execute. A0x1200-byte
+sentinel verifies only the six expected metadata/motion fields change in the
+state storage, including untouched adjacent slots. Per-actor +4 dispatch metadata
+is checked separately. This establishes bounded addressing and row consumption,
+not target field semantics, allocation ownership, fallback or gameplay quality.
+
+Dribbling, running/locomotion, defensive movement and rebounding are required
+conversion families alongside scoring. Paired-shot work is a shared-foundation
+case, not completion of those families. Their source playback graphs, transitions,
+events, target context and native lifetime must each be established before they
+can count as compatible conversions. NBA2K14 right-stick controls remain deferred.
+
 ## Current conversion scope: compatible on-court 5-v-5 animations
 
 The owner's latest direction narrows the earlier entire-bank goal. Convert/add
 only animations compatible with ordinary on-court 5-v-5 play: layups, dunks,
-shots (including running shots and free throws), rebounds and related gameplay
-moves. Dunk-contest, photo-op, crowd, mascot and other non-gameplay content may be
+shots (including running shots and free throws), dribbling, running/locomotion,
+defensive movement, rebounds and related gameplay moves. Dunk-contest, photo-op, crowd, mascot and other non-gameplay content may be
 omitted and must not count toward conversion progress. Unknown gameplay context
 or target compatibility remains pending, rather than silently included.
 
@@ -1737,8 +1783,8 @@ the final control policy is still NBA2K14 right-stick default, old layout preset
 
 ## Whole-library continuation
 
-Current scope is every donor family, including free throws, running shots and
-rebounds. See [current runtime ledger](ANIMATION_RUNTIME_ADAPTER.md) for the
+Current scope is compatible on-court donor families, including dribbling,
+running, defense, rebounds, free throws and running shots. See [current runtime ledger](ANIMATION_RUNTIME_ADAPTER.md) for the
 complete 4,705-record supplied-IFF audit and native provider routing correction.
 Provider selector20 selects serialized category 14 (203 paired entries), whereas
 selector 0 selects a separate147-entry four-pair sequence family. The paired
@@ -2404,6 +2450,29 @@ No RPCS3, hardware run, full-game build or controller remapping was performed.
 
 Embedded source: docs/ANIMATION_RUNTIME_ADAPTER.md
 
+## Native paired-shot state addressing
+
+The target instruction harness now executes CH accessor0x2351D0 and its real
+0x234E30 dependency rather than substituting a state pointer. For the tested
+actor +0x20 ==1 path, the address is base +288 * (actor[+0x70] * stride +subindex).
+The paired-shot initializer passes subindex0. The stride is read indirectly
+through TOC cell0xA54240; base is held at0xA54250. The actor matching the cached
+pointer at0xA54264 follows a different path and is NOT covered by this trace.
+The meaning of the stride is unresolved; it is not established as a frame index.
+
+All18 combinations of hand bit0/1, style0/111/255 and synthetic stride0/1/2 pass.
+The actual player flag getter and TOC restoration still execute. A0x1200-byte
+sentinel verifies only the six expected metadata/motion fields change in the
+state storage, including untouched adjacent slots. Per-actor +4 dispatch metadata
+is checked separately. This establishes bounded addressing and row consumption,
+not target field semantics, allocation ownership, fallback or gameplay quality.
+
+Dribbling, running/locomotion, defensive movement and rebounding are required
+conversion families alongside scoring. Paired-shot work is a shared-foundation
+case, not completion of those families. Their source playback graphs, transitions,
+events, target context and native lifetime must each be established before they
+can count as compatible conversions. NBA2K14 right-stick controls remain deferred.
+
 ## Paired on-court shot planar metadata investigation
 
 `research.shot_planar.inspect_pair_planar` now makes read-only root-derived
@@ -2447,8 +2516,8 @@ limit and strict type/span checks; it is not a process-memory guarantee.
 
 The owner's latest direction narrows the earlier entire-bank goal. Convert/add
 only animations compatible with ordinary on-court 5-v-5 play: layups, dunks,
-shots (including running shots and free throws), rebounds and related gameplay
-moves. Dunk-contest, photo-op, crowd, mascot and other non-gameplay content may be
+shots (including running shots and free throws), dribbling, running/locomotion,
+defensive movement, rebounds and related gameplay moves. Dunk-contest, photo-op, crowd, mascot and other non-gameplay content may be
 omitted and must not count toward conversion progress. Unknown gameplay context
 or target compatibility remains pending, rather than silently included.
 
@@ -2512,9 +2581,9 @@ coverage, full semantic mapping, native streaming and gameplay remain unresolved
 
 ## Whole-library scope and provider routing correction
 
-The owner's scope is the entire NBA11 animation library: free throws, running
-shots, rebounds and every other family. No family is being discarded. Right-stick
-controls remain secondary. The four-pair category-zero work remains useful, but
+The owner's current scope is compatible on-court NBA11 animation families,
+including dribbling, running, defense, rebounding and scoring. Historical full-bank
+inventory totals do not establish eligibility. Right-stick controls remain secondary. The four-pair category-zero work remains useful, but
 must not be confused with the paired jump-shot table.
 
 Native `0x657824` takes 41 provider selector codes and routes them into 31
@@ -6183,6 +6252,16 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+## Native shot state accessor continuation
+
+Read-only `NativeJumpGameplayTrace.java` on the supplied CH ELF: **18 passed**
+(hand0/1, style0/111/255, native stride0/1/2). The real0x2351D0 accessor and
+0x234E30 dependency execute; the previous state-pointer substitution is removed.
+All expected motion/metadata words and per-actor output match; a0x1200-byte
+sentinel confirms adjacent storage preservation. No harness instruction failure
+or uninitialized-read warning was reported. This is instruction-level evidence,
+not gameplay, allocation ownership or cross-game semantic validation.
 
 ## On-court paired-shot planar proposals and cached collection reads
 
