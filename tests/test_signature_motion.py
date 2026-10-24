@@ -245,3 +245,25 @@ def test_malformed_source_dependencies_are_rejected(tmp_path, kind):
         struct.pack_into(">I", data, 44, 128 * 1024 * 1024 + 1)
     with pytest.raises(ValueError):
         SignatureMotionSource([("bad", bytes(data))]).tracks(0, 0)
+
+
+def test_opt_in_alias_coalescing_requires_every_decoded_byte_equal(tmp_path):
+    donor, target, raw = fixtures(tmp_path)
+    inputs = [
+        ("alias", bank(alias(raw), 2)),
+        ("copy-a", bank(raw)),
+        ("copy-b", bank(raw)),
+    ]
+    with pytest.raises(ValueError, match="missing or ambiguous"):
+        SignatureMotionSource(inputs).tracks(0, 0)
+    source = SignatureMotionSource(inputs, coalesce_identical=True)
+    _, report = source.tracks(0, 0)
+    proof = report["alias_path"][0]["equivalent_alias_targets"]
+    assert [(x["bank"], x["record"]) for x in proof] == [(1, 0), (2, 0)]
+    assert proof[0]["record_sha256"] == proof[1]["record_sha256"]
+    assert proof[0]["bank_sha256"] == source.fingerprints[1]
+    # Unknown trailing data is part of the equivalence proof too.
+    changed = inputs[:2] + [("different-tail", bank(raw + b"KEEP"))]
+    with pytest.raises(ValueError, match="not identical"):
+        SignatureMotionSource(changed, coalesce_identical=True).tracks(0, 0)
+    assert source.prepare_pose_root(0, 0, donor, target)[0]["poses"]

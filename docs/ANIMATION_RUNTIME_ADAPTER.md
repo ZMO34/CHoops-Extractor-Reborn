@@ -1,3 +1,64 @@
+## Whole-library scope and provider routing correction
+
+The owner's scope is the entire NBA11 animation library: free throws, running
+shots, rebounds and every other family. No family is being discarded. Right-stick
+controls remain secondary. The four-pair category-zero work remains useful, but
+must not be confused with the paired jump-shot table.
+
+Native `0x657824` takes 41 provider selector codes and routes them into 31
+serialized registry categories. Selector 20 uses player +0x124 and category 14;
+selector 0 uses player +0xD4 and the separate category 0 sequence family. Selector 14
+actually selects category 5. Ten selectors share category1 with separate player
+key fields. Five paired selector groups choose alternate key fields through the
+third argument; neither categories nor selector numbers are motion IDs.
+`signature_provider.py` records all bindings; the native harness passes 82 cases.
+
+Category14 contains 203 paired entries / 406 nonempty references in the supplied
+signature banks. `prepare_jump_pair` now retains both lane headers and every one
+of the nine metadata-tail words. Unknown extra tail bytes and unsupported group
+references block preparation. The category 0 four-pair preparation and fallback
+work is retained separately. All registry reports expose provider-selector codes.
+The earlier hypothetical 112+147=259 comparison is NOT the paired jump-shot
+capacity requirement: retaining 112 stock entries plus 203 category 14 entries needs
+315 IDs. The stock byte field still cannot represent this. No IDs are truncated,
+styles discarded or incorrect family appended to the stock table.
+
+Whole supplied-IFF audit covers all 4,705 identified SingleMoCap records in 11
+containers (46,937,781 stored bytes), including crowd, mascot, presentation and
+other banks. All 4,705 now pass bounded declared-track inspection: 2,263 alias
+headers, 2,441 distinct payload-record hashes and 18 channel layouts across 16/21/24
+bone declarations. Two alias conflicts are exact 6,112-byte duplicate records.
+Optional identical-record coalescing proves equality of ALL decoded bytes and
+retains every candidate's provenance; distinct or unknown-tail differences reject.
+Strict ambiguity rejection remains the default. The 3,090 canonical-family
+candidates remain separate from 1,615 other-rig records: inspection does not bypass
+conversion's canonical bind gate or invent a crowd/global bone map.
+
+The read-only `inspect-animation-library` CLI audits all supplied typed records,
+reports bounded failures and channel-family/event coverage, and protects every
+input. The single-record inspector gains explicit declared-channel/coalescing
+options. This does not discover executable-held clips or establish that unknown
+archive resources are irrelevant. Its fixed-rate pose/root size estimate is
+71,643,008 bytes before headers/events/selectors/registration and before target
+bone mapping; the largest component is 818,400 bytes. Full-library memory/streaming
+integration must address the total, rather than raising per-image guards blindly.
+
+CH gameplay initialization `0x32479C` is now exercised, beyond the preview getter:
+player +0x73 chooses a 40-byte row; player +0x84 bit25 selects the lane. Row +4/+8
+feeds state +0xD8, +0xC feeds +0xE4, +0x10 feeds +0x104, +0x14 feeds +0x48,
++0x20/+0x24 feeds motion +0x74, +0x8C is cleared, and +0x1C feeds the per-actor
+28-byte record +4. The real hand getter/thunk and TOC restoration execute in six
+synthetic native cases at indices 0/111/255. Donor category 14 lane selection at
+`0x499468`/`0x499474` passes two cases. Row field basketball meanings and automatic
+cross-game authoring remain incomplete. Stock inspection now exposes raw metadata
+words, not invented field names.
+
+Next work remains active across the whole library: native executable-held bank
+coverage, per-rig mapping, event/payload and selector semantics, target playback
+and transition contexts, wide-ID selection, and bounded loading/lifetime/streaming.
+No complete playable import or gameplay validation is claimed. Source game banks
+and executables remain unchanged; no game/emulator or automatic JB test runs.
+
 ## Native shot fallback graph and dependency closure
 
 Current priority remains animation porting; right-stick controls stay deferred.

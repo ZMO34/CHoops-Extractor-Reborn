@@ -7,7 +7,11 @@ from collections import defaultdict
 
 from ..formats.binary import Binary
 from ..formats.compression import decode
-from ..formats.motion_bind import canonical_channels, verify_canonical_bind
+from ..formats.motion_bind import (
+    canonical_channels,
+    declared_channels,
+    verify_canonical_bind,
+)
 from ..formats.motion_envelope import inspect_envelope
 from ..formats.motion_events import (
     curve_timing_contract,
@@ -36,7 +40,10 @@ class SignatureMotionSource:
     the combined declared 128-MiB limit; this is not a process/RSS guarantee.
     """
 
-    def __init__(self, banks):
+    def __init__(self, banks, *, coalesce_identical=False):
+        if type(coalesce_identical) is not bool:
+            raise ValueError("Identical-record coalescing must be an explicit boolean")
+        self.coalesce_identical = coalesce_identical
         if (
             not 1 <= len(banks) <= 32
             or sum(len(raw) for _, raw in banks) > MAX_BANK_BYTES
@@ -114,8 +121,27 @@ class SignatureMotionSource:
             key = struct.unpack_from(">I", raw, 40)[0]
             matches = self.index.get(key, [])
             if len(matches) != 1:
-                raise ValueError("Signature alias identity is missing or ambiguous")
-            current = matches[0]
+                if not self.coalesce_identical or not matches:
+                    raise ValueError("Signature alias identity is missing or ambiguous")
+                candidates = [self._record(*loc) for loc in matches]
+                if any(candidate != candidates[0] for candidate in candidates[1:]):
+                    raise ValueError(
+                        "Signature alias duplicate records are not identical"
+                    )
+                # This equivalence includes all decoded bytes, including unknown
+                # tails. No identity/hash-only or load-order winner is selected.
+                path[-1]["equivalent_alias_targets"] = [
+                    dict(
+                        bank=a,
+                        record=b,
+                        bank_sha256=self.fingerprints[a],
+                        record_sha256=hashlib.sha256(data).hexdigest(),
+                    )
+                    for (a, b), data in zip(matches, candidates)
+                ]
+                current = min(matches)
+            else:
+                current = matches[0]
         for entry in path[:-1]:
             alias = self._record(entry["bank"], entry["record"])
             if alias[8:20] != raw[8:20] or (
@@ -132,10 +158,18 @@ class SignatureMotionSource:
         return origin, raw, path
 
     def tracks(self, bank, record):
-        """Read bounded tracks/selector prefixes without routing guesses."""
+        """Read canonical-family tracks, retaining the conversion bind gate."""
+        return self._tracks(bank, record, canonical=True)
+
+    def inspect_tracks(self, bank, record):
+        """Read declared channel families without establishing target rig mapping."""
+        return self._tracks(bank, record, canonical=False)
+
+    def _tracks(self, bank, record, *, canonical):
         header, raw, path = self.resolve(bank, record)
         envelope = inspect_envelope(raw, "nba-2k11")
-        channels = canonical_channels(header, "nba-2k11")
+        channel_reader = canonical_channels if canonical else declared_channels
+        channels = channel_reader(header, "nba-2k11")
         flags, mode = struct.unpack_from(">2I", header, 16)
         if mode & 0x8000:
             raise ValueError("Unpacked signature pose mode needs a separate decoder")
@@ -237,6 +271,8 @@ class SignatureMotionSource:
             header_hex=header[:56].hex(),
             original_alias_metadata_retained=True,
             channels=channels,
+            canonical_channel_family_required=canonical,
+            target_bone_mapping_established=False,
             source_key_count=keys,
             timing_unused_final_slot_normalized=True,
             target_frame_count=ticks[-1] + 1,

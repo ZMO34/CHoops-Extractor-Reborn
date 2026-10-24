@@ -88,6 +88,72 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+## Whole-library scope and provider routing correction
+
+The owner's scope is the entire NBA11 animation library: free throws, running
+shots, rebounds and every other family. No family is being discarded. Right-stick
+controls remain secondary. The four-pair category-zero work remains useful, but
+must not be confused with the paired jump-shot table.
+
+Native `0x657824` takes 41 provider selector codes and routes them into 31
+serialized registry categories. Selector 20 uses player +0x124 and category 14;
+selector 0 uses player +0xD4 and the separate category 0 sequence family. Selector 14
+actually selects category 5. Ten selectors share category1 with separate player
+key fields. Five paired selector groups choose alternate key fields through the
+third argument; neither categories nor selector numbers are motion IDs.
+`signature_provider.py` records all bindings; the native harness passes 82 cases.
+
+Category 14 contains 203 paired entries / 406 nonempty references in the supplied
+signature banks. `prepare_jump_pair` now retains both lane headers and every one
+of the nine metadata-tail words. Unknown extra tail bytes and unsupported group
+references block preparation. The category 0 four-pair preparation and fallback
+work is retained separately. All registry reports expose provider-selector codes.
+The earlier hypothetical 112+147=259 comparison is NOT the paired jump-shot
+capacity requirement: retaining 112 stock entries plus 203 category 14 entries needs
+315 IDs. The stock byte field still cannot represent this. No IDs are truncated,
+styles discarded or incorrect family appended to the stock table.
+
+Whole supplied-IFF audit covers all 4,705 identified SingleMoCap records in 11
+containers (46,937,781 stored bytes), including crowd, mascot, presentation and
+other banks. All 4,705 now pass bounded declared-track inspection: 2,263 alias
+headers, 2,441 distinct payload-record hashes and 18 channel layouts across 16/21/24
+bone declarations. Two alias conflicts are exact 6,112-byte duplicate records.
+Optional identical-record coalescing proves equality of ALL decoded bytes and
+retains every candidate's provenance; distinct or unknown-tail differences reject.
+Strict ambiguity rejection remains the default. The 3,090 canonical-family
+candidates remain separate from 1,615 other-rig records: inspection does not bypass
+conversion's canonical bind gate or invent a crowd/global bone map.
+
+The read-only `inspect-animation-library` CLI audits all supplied typed records,
+reports bounded failures and channel-family/event coverage, and protects every
+input. The single-record inspector gains explicit declared-channel/coalescing
+options. This does not discover executable-held clips or establish that unknown
+archive resources are irrelevant. Its fixed-rate pose/root size estimate is
+71,643,008 bytes before headers/events/selectors/registration and before target
+bone mapping; the largest component is 818,400 bytes. Full-library memory/streaming
+integration must address the total, rather than raising per-image guards blindly.
+
+CH gameplay initialization `0x32479C` is now exercised, beyond the preview getter:
+player +0x73 chooses a 40-byte row; player +0x84 bit25 selects the lane. Row +4/+8
+feeds state +0xD8, +0xC feeds +0xE4, +0x10 feeds +0x104, +0x14 feeds +0x48,
++0x20/+0x24 feeds motion +0x74, +0x8C is cleared, and +0x1C feeds the per-actor
+28-byte record +4. The real hand getter/thunk and TOC restoration execute in six
+synthetic native cases at indices 0/111/255. Donor category 14 lane selection at
+`0x499468`/`0x499474` passes two cases. Row field basketball meanings and automatic
+cross-game authoring remain incomplete. Stock inspection now exposes raw metadata
+words, not invented field names.
+
+Category 14's 201 distinct payloads / 402 distinct headers (406 reference slots)
+pass the pose/root conversion audit: 5,902 authored keys exactly preserved,
+23,352 fixed frames and 3,546,552 component bytes, before any complete-motion
+metadata/event/selector construction.
+
+Next work remains active across the whole library: native executable-held bank
+coverage, per-rig mapping, event/payload and selector semantics, target playback
+and transition contexts, wide-ID selection, and bounded loading/lifetime/streaming.
+No complete playable import or gameplay validation is claimed. Source game banks
+and executables remain unchanged; no game/emulator or automatic JB test runs.
+
 ## Native shot fallback graph and dependency closure
 
 Current priority remains animation porting; right-stick controls stay deferred.
@@ -441,7 +507,7 @@ and frame order. Private checks on32 streams per game preserve decoded channels
 and reverse byte identity. This is a packed-channel converter; no playable donor
 clip, new jump-shot option, full animation system or control preset is installed.
 
-Native research locates the112-entry jump-shot playback table, its40-byte stride,
+Native research locates the 112-entry jump-shot playback table, its40-byte stride,
 paired motion pointers, shared readers and UI option maximum. New choices must
 append records and extend registration, retaining existing IDs. Simply enabling
 ID112 would read an adjacent unrelated structure. No table/EBOOT patch is applied.
@@ -1501,6 +1567,17 @@ See NBA_ROSTERS_AND_2K14.md for container and primary format references.
 
 Embedded source: docs/ANIMATION_GAMEPLAY_PORT.md
 
+## Whole-library continuation
+
+Current scope is every donor family, including free throws, running shots and
+rebounds. See [current runtime ledger](ANIMATION_RUNTIME_ADAPTER.md) for the
+complete 4,705-record supplied-IFF audit and native provider routing correction.
+Provider selector20 selects serialized category 14 (203 paired entries), whereas
+selector 0 selects a separate147-entry four-pair sequence family. The paired
+jump-shot additive capacity is 315 total IDs, not 259. Earlier research comparing
+category 0 directly with the 112-row CH jump-shot table is superseded on this point;
+its format, fallback and component-conversion evidence remains applicable.
+
 > Canonical 21-bone bind correspondence and registration allocation research
 > advanced after v1.21. See [ANIMATION_BIND_REGISTRATION.md](ANIMATION_BIND_REGISTRATION.md).
 > Full event semantics and playable donor registration remain incomplete.
@@ -2082,6 +2159,67 @@ No RPCS3, hardware run, full-game build or controller remapping was performed.
 ---
 
 Embedded source: docs/ANIMATION_RUNTIME_ADAPTER.md
+
+## Whole-library scope and provider routing correction
+
+The owner's scope is the entire NBA11 animation library: free throws, running
+shots, rebounds and every other family. No family is being discarded. Right-stick
+controls remain secondary. The four-pair category-zero work remains useful, but
+must not be confused with the paired jump-shot table.
+
+Native `0x657824` takes 41 provider selector codes and routes them into 31
+serialized registry categories. Selector 20 uses player +0x124 and category 14;
+selector 0 uses player +0xD4 and the separate category 0 sequence family. Selector 14
+actually selects category 5. Ten selectors share category1 with separate player
+key fields. Five paired selector groups choose alternate key fields through the
+third argument; neither categories nor selector numbers are motion IDs.
+`signature_provider.py` records all bindings; the native harness passes 82 cases.
+
+Category14 contains 203 paired entries / 406 nonempty references in the supplied
+signature banks. `prepare_jump_pair` now retains both lane headers and every one
+of the nine metadata-tail words. Unknown extra tail bytes and unsupported group
+references block preparation. The category 0 four-pair preparation and fallback
+work is retained separately. All registry reports expose provider-selector codes.
+The earlier hypothetical 112+147=259 comparison is NOT the paired jump-shot
+capacity requirement: retaining 112 stock entries plus 203 category 14 entries needs
+315 IDs. The stock byte field still cannot represent this. No IDs are truncated,
+styles discarded or incorrect family appended to the stock table.
+
+Whole supplied-IFF audit covers all 4,705 identified SingleMoCap records in 11
+containers (46,937,781 stored bytes), including crowd, mascot, presentation and
+other banks. All 4,705 now pass bounded declared-track inspection: 2,263 alias
+headers, 2,441 distinct payload-record hashes and 18 channel layouts across 16/21/24
+bone declarations. Two alias conflicts are exact 6,112-byte duplicate records.
+Optional identical-record coalescing proves equality of ALL decoded bytes and
+retains every candidate's provenance; distinct or unknown-tail differences reject.
+Strict ambiguity rejection remains the default. The 3,090 canonical-family
+candidates remain separate from 1,615 other-rig records: inspection does not bypass
+conversion's canonical bind gate or invent a crowd/global bone map.
+
+The read-only `inspect-animation-library` CLI audits all supplied typed records,
+reports bounded failures and channel-family/event coverage, and protects every
+input. The single-record inspector gains explicit declared-channel/coalescing
+options. This does not discover executable-held clips or establish that unknown
+archive resources are irrelevant. Its fixed-rate pose/root size estimate is
+71,643,008 bytes before headers/events/selectors/registration and before target
+bone mapping; the largest component is 818,400 bytes. Full-library memory/streaming
+integration must address the total, rather than raising per-image guards blindly.
+
+CH gameplay initialization `0x32479C` is now exercised, beyond the preview getter:
+player +0x73 chooses a 40-byte row; player +0x84 bit25 selects the lane. Row +4/+8
+feeds state +0xD8, +0xC feeds +0xE4, +0x10 feeds +0x104, +0x14 feeds +0x48,
++0x20/+0x24 feeds motion +0x74, +0x8C is cleared, and +0x1C feeds the per-actor
+28-byte record +4. The real hand getter/thunk and TOC restoration execute in six
+synthetic native cases at indices 0/111/255. Donor category 14 lane selection at
+`0x499468`/`0x499474` passes two cases. Row field basketball meanings and automatic
+cross-game authoring remain incomplete. Stock inspection now exposes raw metadata
+words, not invented field names.
+
+Next work remains active across the whole library: native executable-held bank
+coverage, per-rig mapping, event/payload and selector semantics, target playback
+and transition contexts, wide-ID selection, and bounded loading/lifetime/streaming.
+No complete playable import or gameplay validation is claimed. Source game banks
+and executables remain unchanged; no game/emulator or automatic JB test runs.
 
 ## Native shot fallback graph and dependency closure
 
@@ -5696,6 +5834,37 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 
 Embedded source: docs/TEST_REPORT.md
 
+## Whole-library and provider continuation
+
+Category 14 pose/root audit: 201 distinct payload owners / 402 distinct headers /
+406 reference slots; 5,902 authored keys preserved exactly across 23,352 fixed
+frames / 3,546,552 component bytes. All source hashes remain unchanged. This is
+component conversion only, with no fabricated target header metadata.
+
+The library audit also distinguishes valid source timelines exceeding CH's
+16-bit frame count from source-format failures; estimates remain numerical and
+do not allocate expanded images. Two additional boundary tests pass (unmapped
+mask bounds and a valid 66,049-frame source timeline that conversion rejects).
+
+Targeted source/library/provider/pair/registration/residency checks: **64 passed**.
+A separate combined provider/pair/library/source/registry/family run: **61 passed**.
+Checks cover exact duplicate equivalence including unknown tails, default
+ambiguity rejection, unmapped-rig conversion gates, family separation, full row
+word retention, byte budgets and protection of every CLI input.
+
+Read-only supplied-IFF audit: **4,705/4,705 records inspected**, 2,263 aliases,
+2,441 distinct payload hashes, 18 channel layouts, two proved duplicate-alias
+resolutions; 29,939 event rows / 11,139 covered by existing rules. Source banks'
+size/mtime remained unchanged; decoded caches/reports stay private. Numerical
+fixed-rate pose/root estimate: 71,643,008 bytes, excluding other dependencies and
+before target bone mapping. No semantic event rules were added from this audit.
+
+Native provider harness: **82 cases passed** (41 selectors, both alternate flags).
+Donor jump-pair selection: **2 passed**. CH gameplay row initialization: **6 passed**
+with real hand getter/thunk and TOC restoration, synthetic state lookup/actors and
+rows, indices 0/111/255. Incorrect handwritten opcode guard constants were corrected
+before the final runs; no original executable was patched. No gameplay runs.
+
 ## Native shot fallback continuation
 
 Portable verification in the isolated detached checkout: **1,074 passed,
@@ -5862,12 +6031,12 @@ translation counts, decoded-pose equivalence, padding/reverse-byte preservation,
 changed native consumers/ranges, TLS-safe zero-padding planning, mirror-selector
 parity and opaque-payload refusal after consumer inspection.
 
-Private read-only corpus:7,055 CH and18,831 NBA11 headers pass canonical-channel
+Private read-only corpus:7,055 CH and 18,831 NBA11 headers pass canonical-channel
 validation.9,574 NBA11 pose streams/341,823 keys/49,278,288 bytes pass conversion
 and exact reverse checks; no component-preparation errors. Of9,574 event tables,
 2,674 use only the verified subset (including empty tables),6,900 remain blocked.
 Traced payload reads pass for151 event90,1117 event92,71 event93,47 event94,
-1260 event173,23 event178 and187 event186 rows; no extent errors.
+1260 event173,23 event178 and 187 event186 rows; no extent errors.
 
 The authorized separate registration-only decoded ELF reparses at113 entries,
 preserves112 original records, TLS and adjacent label pointers, and passes an
@@ -6045,7 +6214,7 @@ NBA11 streams /341,823 frames with exact reverse bytes; all9,574 distinct donor
 timelines match rate/time-scale/duration. Resampling32 pose streams preserves644
 keys across4,642 fixed frames;33 root streams preserve keys across4,757 samples.
 Ghidra/native instructions establish frame layout, quaternion selector difference
-and the112-entry CH jump-shot table. No complete bank conversion, bone retargeting,
+and the 112-entry CH jump-shot table. No complete bank conversion, bone retargeting,
 new shot registration, control remap, native runtime or gameplay check is implied.
 RPCS3 NOT RUN; automatic/testing JB NOT BUILT. No EBOOT writes.
 

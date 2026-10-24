@@ -12,6 +12,7 @@ from ..formats.binary import Binary
 from ..formats.motion_envelope import inspect_collection
 from ..formats.standard_iff import StandardIFF
 from ..formats.standard_iff_writer import record_blocks
+from .signature_provider import registry_binding_selectors
 
 COLLECTION = 0x449E4AC7
 MOTION = 0x60900D71
@@ -100,18 +101,32 @@ def inspect_entries(raw, profile="nba-2k11"):
                 contextual_fallbacks_established=False,
                 basketball_role_names_established=False,
             )
+        jump_pair = None
+        if category == 14 and tail_bytes >= 36:
+            jump_pair = dict(
+                provider_selector=20,
+                player_key_offset=0x124,
+                slots_when_one=[0],
+                slots_when_zero=[1],
+                payload_tail_words=[b.u32(start + 24 + i * 4) for i in range(9)],
+                native_angle_read="0x4993F8/0x499C84: signed payload+0x18",
+                native_scalar_read="0x656F24: float payload+0x24",
+                target_metadata_mapping_complete=False,
+            )
         result.append(
             dict(
                 index=row["index"],
                 raw_lookup_key=key,
                 localization_key=key | 1,
                 category=category,
+                provider_selector_codes=registry_binding_selectors(category),
                 ordinal_word=ordinal,
                 raw_flag_0x10=flag,
                 references=refs,
                 tail_bytes=tail_bytes,
                 unparsed_tail_bytes=tail_bytes - (4 if family else 0),
                 shot_family=family,
+                paired_jump_shot=jump_pair,
                 payload_semantics_complete=False,
             )
         )
@@ -185,6 +200,7 @@ def inspect_banks(banks, profile="nba-2k11"):
         categories=[
             dict(
                 category=category,
+                provider_selector_codes=registry_binding_selectors(category),
                 count=len(ordinals),
                 unique_ordinals=len(set(ordinals)),
                 contiguous_from_zero=min(ordinals) == 0

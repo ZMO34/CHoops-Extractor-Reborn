@@ -211,3 +211,23 @@ resolved uint32 handles (zero means explicitly empty), all eight weighted rows,
 18 bucket rows, fixed lanes, explicit RNG samples and the context predicate
 result. `shot_cache_matches` models the native player/+0xD4 key. These Python
 research APIs establish source behavior; no new game-writing CLI is exposed.
+
+### Inspect the complete supplied IFF motion library
+
+```
+python -m choops_py.cli inspect-animation-library first.iff library.json --related-bank second.iff --coalesce-identical
+```
+
+Accepts 1..32 banks within 128 MiB stored/declared decoded limits and at most 100,000
+motion records. Coalescing is opt-in and requires equality of every decoded
+record byte; default duplicate ambiguity remains blocked. Reports count all
+supplied typed records, retain up to 256 explicit failures, and distinguish
+unmapped channel families from canonical-family candidates. Executable-held
+library coverage and complete archive discovery are explicitly false.
+
+For one record, `inspect-signature-motion` additionally accepts
+`--declared-channels` and `--coalesce-identical`. Declared-channel inspection
+never enables noncanonical conversion. `prepare_jump_pair` prepares category 14
+motion components and retains all nine row metadata words; it does not install
+unmapped row semantics. `signature_binding` exposes the distinct provider code,
+registry category and player key field. See the runtime ledger for native proof.

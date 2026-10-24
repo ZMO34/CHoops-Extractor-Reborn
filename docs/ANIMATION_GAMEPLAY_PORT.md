@@ -1,3 +1,14 @@
+## Whole-library continuation
+
+Current scope is every donor family, including free throws, running shots and
+rebounds. See [current runtime ledger](ANIMATION_RUNTIME_ADAPTER.md) for the
+complete 4,705-record supplied-IFF audit and native provider routing correction.
+Provider selector20 selects serialized category 14 (203 paired entries), whereas
+selector 0 selects a separate147-entry four-pair sequence family. The paired
+jump-shot additive capacity is 315 total IDs, not 259. Earlier research comparing
+category 0 directly with the 112-row CH jump-shot table is superseded on this point;
+its format, fallback and component-conversion evidence remains applicable.
+
 > Canonical 21-bone bind correspondence and registration allocation research
 > advanced after v1.21. See [ANIMATION_BIND_REGISTRATION.md](ANIMATION_BIND_REGISTRATION.md).
 > Full event semantics and playable donor registration remain incomplete.

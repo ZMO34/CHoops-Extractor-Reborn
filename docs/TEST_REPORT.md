@@ -1,3 +1,34 @@
+## Whole-library and provider continuation
+
+Category 14 pose/root audit: 201 distinct payload owners / 402 distinct headers /
+406 reference slots; 5,902 authored keys preserved exactly across 23,352 fixed
+frames / 3,546,552 component bytes. All source hashes remain unchanged. This is
+component conversion only, with no fabricated target header metadata.
+
+The library audit also distinguishes valid source timelines exceeding CH's
+16-bit frame count from source-format failures; estimates remain numerical and
+do not allocate expanded images. Two additional boundary tests pass (unmapped
+mask bounds and a valid 66,049-frame source timeline that conversion rejects).
+
+Targeted source/library/provider/pair/registration/residency checks: **64 passed**.
+A separate combined provider/pair/library/source/registry/family run: **61 passed**.
+Checks cover exact duplicate equivalence including unknown tails, default
+ambiguity rejection, unmapped-rig conversion gates, family separation, full row
+word retention, byte budgets and protection of every CLI input.
+
+Read-only supplied-IFF audit: **4,705/4,705 records inspected**, 2,263 aliases,
+2,441 distinct payload hashes, 18 channel layouts, two proved duplicate-alias
+resolutions; 29,939 event rows / 11,139 covered by existing rules. Source banks'
+size/mtime remained unchanged; decoded caches/reports stay private. Numerical
+fixed-rate pose/root estimate: 71,643,008 bytes, excluding other dependencies and
+before target bone mapping. No semantic event rules were added from this audit.
+
+Native provider harness: **82 cases passed** (41 selectors, both alternate flags).
+Donor jump-pair selection: **2 passed**. CH gameplay row initialization: **6 passed**
+with real hand getter/thunk and TOC restoration, synthetic state lookup/actors and
+rows, indices 0/111/255. Incorrect handwritten opcode guard constants were corrected
+before the final runs; no original executable was patched. No gameplay runs.
+
 ## Native shot fallback continuation
 
 Portable verification in the isolated detached checkout: **1,074 passed,
@@ -164,12 +195,12 @@ translation counts, decoded-pose equivalence, padding/reverse-byte preservation,
 changed native consumers/ranges, TLS-safe zero-padding planning, mirror-selector
 parity and opaque-payload refusal after consumer inspection.
 
-Private read-only corpus:7,055 CH and18,831 NBA11 headers pass canonical-channel
+Private read-only corpus:7,055 CH and 18,831 NBA11 headers pass canonical-channel
 validation.9,574 NBA11 pose streams/341,823 keys/49,278,288 bytes pass conversion
 and exact reverse checks; no component-preparation errors. Of9,574 event tables,
 2,674 use only the verified subset (including empty tables),6,900 remain blocked.
 Traced payload reads pass for151 event90,1117 event92,71 event93,47 event94,
-1260 event173,23 event178 and187 event186 rows; no extent errors.
+1260 event173,23 event178 and 187 event186 rows; no extent errors.
 
 The authorized separate registration-only decoded ELF reparses at113 entries,
 preserves112 original records, TLS and adjacent label pointers, and passes an
@@ -347,7 +378,7 @@ NBA11 streams /341,823 frames with exact reverse bytes; all9,574 distinct donor
 timelines match rate/time-scale/duration. Resampling32 pose streams preserves644
 keys across4,642 fixed frames;33 root streams preserve keys across4,757 samples.
 Ghidra/native instructions establish frame layout, quaternion selector difference
-and the112-entry CH jump-shot table. No complete bank conversion, bone retargeting,
+and the 112-entry CH jump-shot table. No complete bank conversion, bone retargeting,
 new shot registration, control remap, native runtime or gameplay check is implied.
 RPCS3 NOT RUN; automatic/testing JB NOT BUILT. No EBOOT writes.
 

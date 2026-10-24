@@ -38,7 +38,7 @@ def select_shot_pairs(entry, selector_bit):
     )
 
 
-def _entry(source, bank, collection, index):
+def _entry(source, bank, collection, index, category=0):
     if (
         any(type(v) is not int or v < 0 for v in (bank, collection, index))
         or bank >= len(source.banks)
@@ -53,8 +53,8 @@ def _entry(source, bank, collection, index):
     if len(blocks) != 1:
         raise ValueError("Shot collection must occupy one decoded block")
     rows = inspect_entries(blocks[0][3])
-    if index >= len(rows) or rows[index]["category"] != 0:
-        raise ValueError("Choose an existing category-zero shot entry")
+    if index >= len(rows) or rows[index]["category"] != category:
+        raise ValueError("Choose an existing entry in the required registry category")
     return rows[index]
 
 
@@ -93,49 +93,15 @@ def prepare_shot_family(
         if len(candidates) != 1:
             raise ValueError("Shot reference is missing or ambiguous across banks")
         locations.append(candidates[0])
-    required = {f"{loc[0]}:{loc[1]}" for loc in locations if loc is not None}
-    if not isinstance(motion_contracts, dict) or set(motion_contracts) != required:
-        raise ValueError("Contracts must cover exactly every distinct family header")
-    if any(
-        not isinstance(v, dict)
-        or "metadata" not in v
-        or set(v) - {"metadata", "auxiliary"}
-        for v in motion_contracts.values()
-    ):
-        raise ValueError("Family header contracts require explicit metadata")
-    output = bytearray()
-    offsets, components, header_indices = [], [], {}
-    for loc in locations:
-        if loc is None or loc in header_indices:
-            continue
-        at = (len(output) + 15) & ~15
-        remaining = budget - at
-        if remaining < 64:
-            raise ValueError("Complete shot family exceeds byte budget")
-        c = motion_contracts[f"{loc[0]}:{loc[1]}"]
-        image, report = translate_signature_motion(
-            source,
-            *loc,
-            donor_elf,
-            target_elf,
-            c["metadata"],
-            event_contract,
-            auxiliary_contracts=c.get("auxiliary"),
-            budget=remaining,
-        )
-        output.extend(bytes(at - len(output)))
-        output.extend(image)
-        header_indices[loc] = len(offsets)
-        offsets.append(at)
-        components.append(dict(source_bank=loc[0], source_record=loc[1], report=report))
-    if not offsets:
-        raise ValueError("Shot family has no materializable motion headers")
-    native = relocate_target_image(output, offsets, 0x20000000, source_state="relative")
-    if (
-        relocate_target_image(native, offsets, 0x20000000, source_state="native")
-        != output
-    ):
-        raise ValueError("Complete family relocation inverse failed")
+    output, offsets, components, header_indices = _compose_headers(
+        source,
+        locations,
+        donor_elf,
+        target_elf,
+        motion_contracts,
+        event_contract,
+        budget,
+    )
     slots = [None if loc is None else header_indices[loc] for loc in locations]
     return bytes(output), dict(
         schema=1,
@@ -182,3 +148,52 @@ def prepare_shot_family(
         target_playback_metadata_established=False,
         gameplay_ready=False,
     )
+
+
+def _compose_headers(
+    source, locations, donor_elf, target_elf, motion_contracts, event_contract, budget
+):
+    required = {f"{loc[0]}:{loc[1]}" for loc in locations if loc is not None}
+    if not isinstance(motion_contracts, dict) or set(motion_contracts) != required:
+        raise ValueError("Contracts must cover exactly every distinct family header")
+    if any(
+        not isinstance(v, dict)
+        or "metadata" not in v
+        or set(v) - {"metadata", "auxiliary"}
+        for v in motion_contracts.values()
+    ):
+        raise ValueError("Family header contracts require explicit metadata")
+    output = bytearray()
+    offsets, components, header_indices = [], [], {}
+    for loc in locations:
+        if loc is None or loc in header_indices:
+            continue
+        at = (len(output) + 15) & ~15
+        remaining = budget - at
+        if remaining < 64:
+            raise ValueError("Complete shot family exceeds byte budget")
+        c = motion_contracts[f"{loc[0]}:{loc[1]}"]
+        image, report = translate_signature_motion(
+            source,
+            *loc,
+            donor_elf,
+            target_elf,
+            c["metadata"],
+            event_contract,
+            auxiliary_contracts=c.get("auxiliary"),
+            budget=remaining,
+        )
+        output.extend(bytes(at - len(output)))
+        output.extend(image)
+        header_indices[loc] = len(offsets)
+        offsets.append(at)
+        components.append(dict(source_bank=loc[0], source_record=loc[1], report=report))
+    if not offsets:
+        raise ValueError("Shot family has no materializable motion headers")
+    native = relocate_target_image(output, offsets, 0x20000000, source_state="relative")
+    if (
+        relocate_target_image(native, offsets, 0x20000000, source_state="native")
+        != output
+    ):
+        raise ValueError("Complete family relocation inverse failed")
+    return bytes(output), offsets, components, header_indices

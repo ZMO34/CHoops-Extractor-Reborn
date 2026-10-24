@@ -469,3 +469,9 @@ excluded, while source/stale-edit safety columns are retained.
 - Model native four-pair fallbacks, original-presence flags and cache key.
 - Inspect typed serialized/embedded/empty fallback dependencies without initializing resources.
 - Record fallback requirements in complete-family reports; add bounded native instruction checks.
+
+### Whole-library routing and inspection
+- Cover every supplied IFF motion record with bounded declared-channel inspection; retain conversion bind gates.
+- Add opt-in byte-identical alias equivalence, library CLI audit and native provider/category mapping.
+- Separate category 14 paired motion preparation from category 0 four-pair sequences; retain all row metadata words.
+- Trace real CH gameplay row consumption and correct the paired jump-shot capacity requirement to 315 total IDs.
