@@ -6,9 +6,10 @@ select by text-record name; bone names stay independent of those bindings.
 """
 import math
 import struct
+import zlib
+from collections import Counter
 
 from ..formats.binary import Binary
-
 
 FONT = 0xbf045bdb
 COLOR = (0x6109ea5a, 0x97de0310, 0x6814845a)
@@ -95,6 +96,10 @@ def inspect_text_dependencies(parts):
         ]
         if len(set(markers)) != len(markers):
             raise ValueError('Ambiguous HUD marker in ' + name)
+        marker_hashes = {
+            marker: b.u32(bone_table + j * 48 + 36)
+            for j, marker in enumerate(markers)
+        }
         if b.u32(at + 0x84) != 1 or b.u32(at + 0xa4) != 0x20000010:
             raise ValueError('Unsupported split HUD index/stream layout')
         descriptor = b.relative(at + 0x88)
@@ -134,6 +139,8 @@ def inspect_text_dependencies(parts):
                         triangles += 1
         models[name] = dict(
             markers=markers, bones=bones, submitted_triangles=triangles,
+            marker_hashes=marker_hashes,
+            marker_hash_counts=dict(Counter(marker_hashes.values())),
         )
     rows = []
     for binding, (_, properties) in records.items():
@@ -145,9 +152,21 @@ def inspect_text_dependencies(parts):
             names.append(b.utf16(b.relative(item[0]), 'be'))
         owner, marker = names
         model = models.get(owner)
+        # Observed native bone lookup (7f9ab8) compares +36, not the name.
+        # ASCII marker hashes match case-sensitive CRC32 in supplied HUDs.
+        # Do not invent the conversion/hash contract for non-ASCII names.
+        native_marker_resolved = None
+        if marker.isascii():
+            wanted = zlib.crc32(marker.encode('ascii')) & 0xffffffff
+            native_marker_resolved = (
+                model is not None
+                and model['marker_hashes'].get(marker) == wanted
+                and model['marker_hash_counts'].get(wanted) == 1
+            )
         rows.append(dict(
             binding=binding, owner=owner, marker=marker,
             resolved=model is not None and marker in model['markers'],
+            native_marker_resolved=native_marker_resolved,
             owner_submitted_triangles=(
                 model['submitted_triangles'] if model is not None else None
             ),

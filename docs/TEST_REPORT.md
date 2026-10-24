@@ -1,3 +1,21 @@
+## Native scorebug footer revision
+
+Final focused suite: **95 passed** across footer/context instruction harnesses,
+text dependencies, layout, style and runtime audits. New-test Ruff E/F/I passes.
+Private matched v10 output: 18 fields pass native marker-hash/owner/draw checks;
+callback source matches packaged instructions; footer sibling chain, comparison
+side anchors, unchanged context/descriptor/strings/meter, ELF write allowlists and
+SELF roundtrip pass. Two IFFs prepare/preflight; ZIP CRC/checksums pass. Inferred
+span extensions are classified as exact known retained headers plus bounded zero
+alignment. No game assets or executables are committed.
+
+New footer/name callback instruction harness: 26 passed. Covers live sides,
+opponent-earned bonus, configurable threshold, null/invalid data, direct names,
+stale clearing and halftime reset. Preserves native ABI and temporary-handle
+ownership with native callees stubbed. The marker audit additionally checks stored native CRC32 identities; a new
+regression rejects a matching marker name with an invalid hash. Final suite and
+private package results follow below. No gameplay/emulator or testing JB.
+
 # Screenshot-driven scorebug text recovery
 
 Focused scorebug suite: **68 passed** with four new owner/marker/index-audit

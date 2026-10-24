@@ -1,3 +1,7 @@
+V8 is historical. The subsequent native name/footer callbacks, smaller installed
+text scales and corrected comparison provider order are documented in
+[SCOREBUG_NATIVE_V10.md](SCOREBUG_NATIVE_V10.md). Neither version is gameplay-certified.
+
 # Screenshot-driven text recovery and broadcast layout
 
 The user's 2026-10-24 gameplay screenshot shows logos and geometry but no score,

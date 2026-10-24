@@ -1,3 +1,21 @@
+# Unreleased — native scorebug footer and comparison-side correction
+
+PR #50 continues with a separate v10 executable/IFF candidate. New authored native
+callbacks supply direct live team names and current-half foul/earned-bonus rows.
+The previous city-provider assumption was wrong in ordinary modes. Bonus reads
+opponent state and loaded rule thresholds/native double-bonus logic. Native text
+matrix scales now differ by role. The comparison's home-first provider order is
+corrected and its alternate transition binding added. Six-bone topbar retained;
+main table/markers grow only for two footers, preserving recovered helpers/masks.
+
+95 focused tests pass, including 26 new callback instruction paths and a native
+marker-hash regression. Eighteen packaged fields resolve their native marker
+hashes; ELF/SELF, preservation, two-IFF preflight and ZIP CRC checks pass. Native
+external routines are stubbed. Structural
+checks and in-game certification are distinct. Possession/seed/round/region and
+comparison end logos/tint remain unsupported. No emulator or testing JB. See
+[SCOREBUG_NATIVE_V10.md](SCOREBUG_NATIVE_V10.md) for behavior and installation limits.
+
 # Unreleased — screenshot-driven scorebug text recovery
 
 The user reports v5 rendering logos/geometry but no scorebug text. V5 is

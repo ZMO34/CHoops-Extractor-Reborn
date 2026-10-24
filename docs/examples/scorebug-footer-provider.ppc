@@ -1,0 +1,176 @@
+# Authored scorebug provider. r4: 0 away, 1 home; r5: 0 footer, 1 name.
+# Entrypoint wrappers supply those values; native output DString is r3.
+mflr 0
+stdu 1, -0x180(1)
+std 0, 0x190(1)
+std 26, 0x140(1)
+std 27, 0x148(1)
+std 28, 0x150(1)
+std 29, 0x158(1)
+std 30, 0x160(1)
+std 31, 0x168(1)
+mfcr 0
+stw 0, 0x170(1)
+mr 31, 3
+mr 30, 4
+mr 29, 5
+cmpdi 7, 31, 0
+beq 7, finish
+bl 0x57f050
+nop
+mr 28, 3
+cmpwi 7, 28, 0
+beq 7, empty
+bl 0x57f064
+nop
+mr 27, 3
+cmpwi 7, 27, 0
+beq 7, empty
+cmpw 7, 27, 28
+beq 7, empty
+cmpwi 7, 29, 1
+beq 7, name
+# Current-half foul state: same state/count used by native foul popups.
+lwz 28, -0x6768(2)
+lwz 27, -0x6764(2)
+cmpwi 7, 30, 0
+bne 7, states
+mr 0, 28
+mr 28, 27
+mr 27, 0
+states:
+cmpwi 7, 28, 0
+beq 7, empty
+cmpwi 7, 27, 0
+beq 7, empty
+lwz 9, 0x28(28)
+cmpwi 7, 9, 0
+beq 7, empty
+lwz 26, 8(9)
+cmpwi 7, 26, 0
+blt 7, empty
+cmpwi 7, 26, 99
+bgt 7, empty
+lwz 9, 0x28(27)
+cmpwi 7, 9, 0
+beq 7, empty
+lwz 0, 8(9)
+cmpwi 7, 0, 0
+blt 7, empty
+cmpwi 7, 0, 99
+bgt 7, empty
+# The displayed team earns bonus from its opponent's foul state.
+# Native double-bonus predicate, including the game's overtime rule.
+mr 3, 27
+bl 0x49cae4
+ld 2, 0x28(1)
+lis 28, 0x89
+ori 28, 28, 0xb980
+cmpwi 7, 3, 0
+bne 7, format
+# Native one-and-one predicate at 3d0f48 compares count with rules +168.
+lwz 9, -0x6d70(2)
+cmpwi 7, 9, 0
+beq 7, empty
+lwz 0, 0x168(9)
+cmpwi 7, 0, 1
+blt 7, no_bonus
+lwz 9, 0x28(27)
+lwz 9, 8(9)
+cmpw 7, 9, 0
+blt 7, no_bonus
+lis 28, 0x89
+ori 28, 28, 0xb960
+b format
+no_bonus:
+lis 28, 0x89
+ori 28, 28, 0xb940
+format:
+# Persistent UTF-16 template/suffix storage. Only owning handles are on stack.
+li 0, 0
+stw 0, 0x70(1)
+stw 0, 0x74(1)
+addi 3, 1, 0x70
+lis 4, 0x89
+ori 4, 4, 0xb900
+li 5, -1
+bl 0x49e1b4
+ld 2, 0x28(1)
+addi 3, 1, 0x74
+mr 4, 28
+li 5, -1
+bl 0x49e1b4
+ld 2, 0x28(1)
+li 0, 0
+stw 26, 0x78(1)
+stw 0, 0x80(1)
+li 9, 2
+stw 9, 0x84(1)
+stw 0, 0x88(1)
+addi 9, 1, 0x78
+stw 9, 0x8c(1)
+lis 9, 0xa1
+ori 9, 9, 0x8ca0
+stw 9, 0x90(1)
+stw 0, 0x94(1)
+addi 9, 1, 0x74
+stw 9, 0x98(1)
+lis 9, 0xa1
+ori 9, 9, 0x8cd8
+stw 9, 0x9c(1)
+mr 3, 31
+addi 4, 1, 0x70
+addi 5, 1, 0x80
+bl 0x49e0e4
+ld 2, 0x28(1)
+addi 3, 1, 0x74
+bl 0x49f3a4
+ld 2, 0x28(1)
+addi 3, 1, 0x70
+bl 0x49f3a4
+ld 2, 0x28(1)
+b finish
+name:
+mr 4, 28
+cmpwi 7, 30, 0
+bne 7, selected_name
+mr 4, 27
+selected_name:
+lwz 0, 4(4)
+cmpwi 7, 0, 0
+beq 7, empty
+mr 3, 31
+bl 0x4ef92c
+nop
+b finish
+empty:
+li 0, 0
+stw 0, 0x70(1)
+addi 3, 1, 0x70
+lis 4, 0x89
+ori 4, 4, 0xb940
+li 5, -1
+bl 0x49e1b4
+ld 2, 0x28(1)
+mr 3, 31
+addi 4, 1, 0x70
+li 5, 1
+bl 0x49d604
+ld 2, 0x28(1)
+addi 3, 1, 0x70
+bl 0x49f3a4
+ld 2, 0x28(1)
+finish:
+mr 3, 31
+lwz 0, 0x170(1)
+mtcr 0
+ld 26, 0x140(1)
+ld 27, 0x148(1)
+ld 28, 0x150(1)
+ld 29, 0x158(1)
+ld 30, 0x160(1)
+ld 31, 0x168(1)
+ld 0, 0x190(1)
+mtlr 0
+addi 1, 1, 0x180
+blr

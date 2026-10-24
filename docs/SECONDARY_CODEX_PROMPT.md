@@ -88,6 +88,24 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# Unreleased — native scorebug footer and comparison-side correction
+
+PR #50 continues with a separate v10 executable/IFF candidate. New authored native
+callbacks supply direct live team names and current-half foul/earned-bonus rows.
+The previous city-provider assumption was wrong in ordinary modes. Bonus reads
+opponent state and loaded rule thresholds/native double-bonus logic. Native text
+matrix scales now differ by role. The comparison's home-first provider order is
+corrected and its alternate transition binding added. Six-bone topbar retained;
+main table/markers grow only for two footers, preserving recovered helpers/masks.
+
+95 focused tests pass, including 26 new callback instruction paths and a native
+marker-hash regression. Eighteen packaged fields resolve their native marker
+hashes; ELF/SELF, preservation, two-IFF preflight and ZIP CRC checks pass. Native
+external routines are stubbed. Structural
+checks and in-game certification are distinct. Possession/seed/round/region and
+comparison end logos/tint remain unsupported. No emulator or testing JB. See
+[SCOREBUG_NATIVE_V10.md](SCOREBUG_NATIVE_V10.md) for behavior and installation limits.
+
 # Unreleased — screenshot-driven scorebug text recovery
 
 The user reports v5 rendering logos/geometry but no scorebug text. V5 is
@@ -5421,6 +5439,24 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+## Native scorebug footer revision
+
+Final focused suite: **95 passed** across footer/context instruction harnesses,
+text dependencies, layout, style and runtime audits. New-test Ruff E/F/I passes.
+Private matched v10 output: 18 fields pass native marker-hash/owner/draw checks;
+callback source matches packaged instructions; footer sibling chain, comparison
+side anchors, unchanged context/descriptor/strings/meter, ELF write allowlists and
+SELF roundtrip pass. Two IFFs prepare/preflight; ZIP CRC/checksums pass. Inferred
+span extensions are classified as exact known retained headers plus bounded zero
+alignment. No game assets or executables are committed.
+
+New footer/name callback instruction harness: 26 passed. Covers live sides,
+opponent-earned bonus, configurable threshold, null/invalid data, direct names,
+stale clearing and halftime reset. Preserves native ABI and temporary-handle
+ownership with native callees stubbed. The marker audit additionally checks stored native CRC32 identities; a new
+regression rejects a matching marker name with an invalid hash. Final suite and
+private package results follow below. No gameplay/emulator or testing JB.
 
 # Screenshot-driven scorebug text recovery
 

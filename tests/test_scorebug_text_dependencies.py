@@ -1,4 +1,5 @@
 import struct
+import zlib
 
 import pytest
 
@@ -57,6 +58,7 @@ def scene(root_indices=(0, 1, 2), marker="gameclock"):
         pointer(model + 0x64, bones)
         for j, name in enumerate(markers):
             text(bones + j * 48 + 32, name)
+            word(bones + j * 48 + 36, zlib.crc32(name.encode('ascii')))
         word(model + 0x7C, 1)
         pointer(model + 0x80, draw)
         word(model + 0x84, 1)
@@ -76,6 +78,7 @@ def test_all_labels_report_shared_owner_draw_suppression_without_visibility_clai
     before = inspect_text_dependencies(stock)
     after = inspect_text_dependencies(suppressed)
     assert all(row["resolved"] for row in after["text"])
+    assert all(row["native_marker_resolved"] for row in after["text"])
     assert all(row["owner_submitted_triangles"] == 1 for row in before["text"])
     assert all(row["owner_submitted_triangles"] == 0 for row in after["text"])
     assert after["models"]["text_nodeMask"]["submitted_triangles"] == 1
@@ -107,3 +110,13 @@ def test_unbounded_draw_count_is_rejected_before_traversal():
     struct.pack_into(">I", header, 1024 + 0x7C, 10001)
     with pytest.raises(ValueError, match="draw count"):
         inspect_text_dependencies([bytes(header), parts[1]])
+
+
+def test_marker_name_without_matching_native_hash_does_not_pass_native_lookup():
+    parts = scene()
+    header = bytearray(parts[0])
+    struct.pack_into('>I', header, 2304 + 48 + 36, 0)
+    report = inspect_text_dependencies([bytes(header), parts[1]])
+    assert report['text'][0]['resolved']
+    assert not report['text'][0]['native_marker_resolved']
+    assert report['text'][1]['native_marker_resolved']

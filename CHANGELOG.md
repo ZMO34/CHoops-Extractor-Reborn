@@ -1,3 +1,13 @@
+## Unreleased — native scorebug footer revision
+
+- Add authored native live team-name and current-half foul/earned-bonus providers,
+  with loaded rule thresholds, opponent ownership and stale-state clearing.
+- Correct native comparison home/away placement, add its transition binding and
+  install separate text scales for score, clock, names, context and footers.
+- Audit native marker hashes as well as names; validate appended footer marker
+  identities and hierarchy links.
+- Document remaining runtime and reference-layout limits; no gameplay claim.
+
 ## Unreleased — screenshot-driven scorebug text and presentation recovery
 
 - Restore stock main text/skeleton structures and helper/mask draw indices in a

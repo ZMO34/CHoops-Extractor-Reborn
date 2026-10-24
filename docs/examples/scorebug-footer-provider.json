@@ -1,0 +1,35 @@
+{
+  "entry": "0x89a900",
+  "toc": "0xa64a94",
+  "wrappers": {
+    "away_footer": "0x89a800",
+    "home_footer": "0x89a810",
+    "away_name": "0x89a820",
+    "home_name": "0x89a830"
+  },
+  "bindings": {
+    "away_city": "away_footer",
+    "gameclock_left": "home_footer",
+    "away_ABL": "away_name",
+    "home_ABL": "home_name"
+  },
+  "descriptor_base": "0x89b800",
+  "strings": {
+    "0x89b900": "FOULS:{0}  {1}",
+    "0x89b940": "",
+    "0x89b960": "BONUS",
+    "0x89b980": "BONUS+"
+  },
+  "registry_sites": [
+    "0x4ef5d4",
+    "0x4ef654",
+    "0x4ef788",
+    "0x4ef760"
+  ],
+  "native_fouls": "state +0x28 -> +8; validated 0..99",
+  "one_and_one": "opponent counter >= current rule threshold +0x168; zero threshold disables label",
+  "double_bonus": "native 0x49cae4 opponent-state predicate",
+  "native_name": "active team +4 via 0x4ef92c",
+  "no_cache": true,
+  "gameplay_verified": false
+}
