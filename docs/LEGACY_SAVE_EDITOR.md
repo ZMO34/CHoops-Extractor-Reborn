@@ -21,12 +21,17 @@ they cannot shift data in the enclosing save. Exporting a detached USERDATA
 payload is disabled for this profile because it would omit the surrounding mode
 state.
 
-The editor changes only the confirmed roster fields. **Recruiting diagnostics…**
-now opens a read-only, searchable view of the native recruit table: HS/JUCO class,
-commitment, location ID, preference profile/weights and metadata issues. Missing
-or malformed tables are reported as unavailable; no speculative fields are
-made editable. The view does not certify available recruit slots or full interest
-and history semantics. See [LEGACY_TRANSFER_PORTAL.md](LEGACY_TRANSFER_PORTAL.md).
+The editor changes only confirmed fields. **Recruiting diagnostics…** opens a
+searchable view of the native recruit table. It can edit an occupied, active,
+uncommitted recruit's established HS/JUCO class code when the record metadata is
+recognized. Preference profiles remain read-only because the corresponding
+interest state is linked outside the roster payload. Each class edit is one undo
+step and uses the normal **Save copy** flow, preserving the enclosing Legacy save
+bytes outside the embedded roster. Names, ratings, commitment, location, interest
+pointers, blank slots, recruiting queues and unknown bytes remain read-only.
+Missing or malformed tables are reported as unavailable. This does not certify all
+Legacy save layouts or full recruiting/history semantics. See
+[LEGACY_TRANSFER_PORTAL.md](LEGACY_TRANSFER_PORTAL.md).
 
 The requested transfer portal must operate fully in game while preserving player
 statistics and historical school associations. No external save-editing, transfer

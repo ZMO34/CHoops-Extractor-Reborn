@@ -1,12 +1,12 @@
-"""Read-only CH recruit-pool and separately supplied interest-node audits.
+"""CH recruit-pool audit and bounded edits to confirmed class bits.
 
 Unknown fields remain opaque. These readers never allocate a recruit, mutate a
-roster, convert a player, or infer an enclosing Legacy interest-pool save offset.
+player, convert a player, or infer an enclosing Legacy interest-pool save offset.
 """
 
 from collections import Counter
 from hashlib import sha256
-from struct import unpack_from
+from struct import pack_into, unpack_from
 
 from ..roster.schema import detect_tables
 from .transfer_portal import native_preference_profile
@@ -109,6 +109,69 @@ def inspect_recruit_pool(payload: bytes) -> dict:
         "native_pool_insertion_installed": False,
         "gameplay_ready": False,
     }
+
+
+def edit_recruit_fields(payload: bytes, slot: int, changes: dict) -> bytes:
+    """Edit the established class field in one active, uncommitted recruit.
+
+    The class bits share a packed word with preference and commitment state.
+    Only the class mask is changed. Other recruit fields and linked state remain
+    read-only until their writers are established.
+    """
+    if type(slot) is not int:
+        raise ValueError("recruit slot must be an integer")
+    if not isinstance(changes, dict) or not changes:
+        raise ValueError("select at least one supported recruit field")
+    allowed = {"class_code"}
+    if set(changes) - allowed:
+        raise ValueError("only the established recruit class field is editable")
+    report = inspect_recruit_pool(payload)
+    if not 0 <= slot < report["allocated_slots"]:
+        raise ValueError("recruit slot is out of range")
+    row = next((item for item in report["records"] if item["slot"] == slot), None)
+    if row is None:
+        raise ValueError("blank recruit slots are not editable")
+    if row["issues"]:
+        raise ValueError("recruit metadata must be fully recognized before editing")
+    if not row["recruiting_filter_bit_2"]:
+        raise ValueError("only active recruiting records are editable")
+    if row["committed_bit"] and "class_code" in changes:
+        raise ValueError("class cannot be changed for a committed recruit")
+    if "class_code" in changes and (
+        type(changes["class_code"]) is not int
+        or not 0 <= changes["class_code"] < len(CLASS_LABELS)
+    ):
+        raise ValueError(
+            "recruit class must be one of the six established HS/JC classes"
+        )
+    start = report["pool_start"] + slot * RECRUIT_STRIDE
+    field = start + 0x40
+    before_word = unpack_from(">I", payload, field)[0]
+    after_word = before_word
+    if "class_code" in changes:
+        after_word = (after_word & ~(0xF << 21)) | (changes["class_code"] << 21)
+    if after_word == before_word:
+        return bytes(payload)
+
+    output = bytearray(payload)
+    pack_into(">I", output, field, after_word)
+    updated = bytes(output)
+    updated_report = inspect_recruit_pool(updated)
+    if updated_report["allocated_slots"] != report["allocated_slots"]:
+        raise ValueError("recruit table changed while editing")
+    updated_row = next(
+        (item for item in updated_report["records"] if item["slot"] == slot), None
+    )
+    if updated_row is None or any(
+        updated_row[key] != value for key, value in changes.items()
+    ):
+        raise ValueError("edited recruit fields did not reparse")
+    mask = 0xF << 21 if "class_code" in changes else 0
+    if (before_word ^ after_word) & ~mask:
+        raise ValueError("edit changed packed recruit bits outside the selected fields")
+    if updated[:field] != payload[:field] or updated[field + 4 :] != payload[field + 4 :]:
+        raise ValueError("edit changed bytes outside the selected recruit word")
+    return updated
 
 
 def inspect_interest_graph(

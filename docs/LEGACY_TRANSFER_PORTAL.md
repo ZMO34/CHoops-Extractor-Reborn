@@ -470,16 +470,23 @@ certify history preservation. No native patch or playable portal is installed.
 ### Legacy editor diagnostics
 
 Open a College Hoops roster or supported Legacy save, then select **Recruiting
-diagnostics…**. A resizable read-only view lists recruit slots, HS/JC class codes,
+diagnostics…**. A resizable searchable view lists recruit slots, HS/JC class codes,
 commitment, native traversal flag, location ID, preference profile and metadata
-issues. Select a row to inspect ordered preference weights and raw interest head.
-Unknown profiles/classes remain unresolved. Search and sorting never mutate data.
-Blank records are reported as reserved blank storage, not available portal slots.
-Malformed or absent tables give a local unavailable message without breaking the
-ordinary roster editor. NBA rosters do not expose this College Hoops view.
+issues. Select an active, uncommitted row with fully recognized metadata and choose
+**Edit selected recruit…** to change one of the six established HS/JC class codes.
+Preference profiles remain read-only because their school-interest state is stored
+in linked recruiting data outside the roster payload. Each class edit is one roster
+undo step and uses the normal **Save copy** flow, including for supported Legacy
+saves. The fixed-size Legacy wrapper keeps all bytes outside the embedded roster
+unchanged.
+
+Names, ratings, commitments, location IDs, traversal flags, interest pointers,
+blank slots, recruiting queues and unknown record bytes remain read-only. Blank
+records are reserved storage, not available recruit slots. This editor does not
+allocate recruits, edit the separate recruiting-state component, insert transfers,
+or establish complete recruiting/history behavior. Missing or malformed tables
+are reported as unavailable without breaking the ordinary roster editor.
 
 Inspection uses an immutable snapshot in the normal worker. Results from a changed
-source are discarded, and roster reloads close old diagnostics. There are no
-apply-transfer, sign, recruit allocation, savedata-edit or save-plan actions here.
-Full interest chains and history continuity still require separate native work;
-this view must not be treated as evidence that the portal runs in game.
+source are discarded, and roster reloads close old diagnostics. NBA rosters do not
+expose this College Hoops view.

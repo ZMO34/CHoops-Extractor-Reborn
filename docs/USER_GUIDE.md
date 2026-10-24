@@ -225,10 +225,14 @@ does not create encryption, PARAM files, or a complete console save package.
 All writers validate and reparse the result and protect the original input.
 
 The observed Legacy-mode `USERDATA` save can also be opened in Roster / Legacy
-save editor. The first supported view edits confirmed fields in its embedded
-roster. Save copy preserves the complete file and all surrounding Legacy-mode
-bytes; size-changing text edits are blocked. Mode-specific season, recruiting,
-and progression fields remain read-only until their storage is mapped.
+save editor. Save copy preserves the complete file and all surrounding Legacy-mode
+bytes; size-changing text edits are blocked. **Recruiting diagnostics…** lists the
+native recruit table. Edit a fully recognized, active, uncommitted recruit to
+change its established HS/JUCO class code. The editor preserves the packed
+preference and commitment bits. Preference profiles remain read-only because
+their school-interest state is stored in linked recruiting data outside the roster
+payload. Names, ratings, commitment, location, links, blank slots, queues and
+other Legacy-mode state remain read-only.
 
 ## Resizable 3D preview
 

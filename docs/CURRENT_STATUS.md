@@ -1,3 +1,14 @@
+# Unreleased — bounded Legacy recruit editing
+
+Recruiting diagnostics can now edit the established HS/JUCO class on an active,
+uncommitted recruit whose metadata is fully recognized. The writer changes only
+the class bits in the packed recruit word, reparses the recruit table and records
+one normal roster undo step. Save copy preserves the fixed Legacy wrapper.
+Preference profiles, names, ratings, commitments, location, interest links, blank
+slot allocation, queues and unknown fields remain read-only. This is not a full
+recruit table editor or a playable portal. Focused regression tests and portable
+verification pass; gameplay validation has not been run.
+
 # v1.23 — native macOS and Windows release packaging
 
 Added native Apple Silicon and Intel Mac app packaging alongside Windows x64.

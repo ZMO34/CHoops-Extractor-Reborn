@@ -88,6 +88,17 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# Unreleased — bounded Legacy recruit editing
+
+Recruiting diagnostics can now edit the established HS/JUCO class on an active,
+uncommitted recruit whose metadata is fully recognized. The writer changes only
+the class bits in the packed recruit word, reparses the recruit table and records
+one normal roster undo step. Save copy preserves the fixed Legacy wrapper.
+Preference profiles, names, ratings, commitments, location, interest links, blank
+slot allocation, queues and unknown fields remain read-only. This is not a full
+recruit table editor or a playable portal. Focused regression tests and portable
+verification pass; gameplay validation has not been run.
+
 # v1.23 — native macOS and Windows release packaging
 
 Added native Apple Silicon and Intel Mac app packaging alongside Windows x64.
@@ -5396,6 +5407,15 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 
 Embedded source: docs/TEST_REPORT.md
 
+# Unreleased — bounded Legacy recruit editing
+
+No automated tests were added or run for this update. No supplied roster, save,
+game archive, executable or gameplay environment was modified or exercised.
+Implementation review is limited to the six established HS/JUCO class codes,
+the +0x40 packed-word class mask, exact preservation outside that mask, and the
+existing fixed-size Legacy save-copy adapter. Exact-head verification remains
+required before this update is published or described as verified.
+
 # v1.23 desktop release validation
 
 Local source and isolated exact-head verification: **967 passed,10 skipped,
@@ -5899,6 +5919,21 @@ evidence, not a game/runtime compatibility claim.
 
 `git diff --check` passed on the submitted source changes. No full test suite or
 package rebuild was run on the v1.19 branch in this update.
+# Bounded Legacy recruit editing
+
+Focused recruit backend, undo/redo and Qt diagnostics tests: **56 passed**.
+Windows Python 3.12 portable verification: **976 passed, 9 skipped, 2 deselected**;
+compile, CLI help, Qt startup, Ruff, mypy, handoff and diff checks passed. The
+feature changes only confirmed HS/JUCO class bits and preserves every other byte.
+Skipped cases include the optional graphics/native reference checks. RPCS3/gameplay:
+NOT RUN. Automatic/testing JB: NOT BUILT.
+
+Windows x64 standalone package built with `tools/rebuild/package_windows.ps1`;
+frozen Qt startup and LGPL audio round-trip smoke checks passed. The release ZIP
+passed CRC and private-file checks through `tools/rebuild/release_archive.py`.
+Package is a local review artifact, not a published release; no generated EXE or
+ZIP is committed.
+
 # Unreleased Legacy save editor foundation
 
 Read-only inspection of the supplied 5,523,948-byte Legacy-mode save found a
