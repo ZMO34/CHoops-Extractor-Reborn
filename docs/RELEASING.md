@@ -10,7 +10,7 @@
 3. Run `python tools/dev/handoff.py`, then portable verification. Commit the final
    source and test its exact head in an isolated checkout. Publish a PR with SHA,
    commands/results, skips, risks and next action. Attach it to the active chat.
-4. Check Windows/Linux CI and review threads. Merge only with owner authorization;
+4. Check Windows/Linux/macOS CI and review threads. Merge only with owner authorization;
    release authorization in a user request can cover that specific release.
 
 ## Build Windows x64
@@ -39,7 +39,7 @@ Source DDS conversion is built in. Exclude unneeded Qt/browser modules and PyAV.
   and in durable release evidence where appropriate.
 - Tag the exact tested source commit (or an identical merged tree with explicit
   provenance). Create a draft release with honest features, limitations, commands
-  and counts. Upload the Windows ZIP/checksum; verify uploaded size/digest.
+  and counts. Upload all native desktop ZIPs/checksums; verify uploaded size/digest.
 - Publish only after source, CI, package and license gates pass. Link merged PRs
   and release in handoff comments. Both instances maintain this procedure.
 

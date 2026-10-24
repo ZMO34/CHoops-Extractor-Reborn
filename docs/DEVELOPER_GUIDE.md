@@ -24,7 +24,7 @@ The obsolete pinned Windows environment snapshot has been removed.
 verify.py excludes real_game/runtime_manual and the optional legacy native
 comparison. It runs remaining synthetic/Qt tests, source smoke, fatal-error Ruff
 checks and scoped GUI/service mypy. New setup scripts get broader lint. Legacy
-style debt is not claimed resolved. CI runs the same runner on Windows/Linux.
+style debt is not claimed resolved. CI runs the same checks on Windows/Linux and native Apple Silicon/Intel macOS.
 Native audio tests skip explicitly if the optional encoder is absent.
 
 CHOOPS_JB selects a private read-only fixture. Do not run verify_game.py --build,
@@ -98,3 +98,5 @@ and instance layouts must uniquely validate; ambiguous geometry is not guessed.
 See NBA_ROSTERS_AND_2K14.md and ANIMATION_PORTABILITY.md for reproducible evidence,
 limitations and the read-only animation survey command. Neither animation ports
 nor SDAT rebuild/signature writers are enabled.
+
+Mac packaging uses `tools/rebuild/package_macos.py`; see [release procedure](RELEASING.md).

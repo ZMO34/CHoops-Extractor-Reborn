@@ -1,4 +1,4 @@
-# CHoops Modding Studio — v1.19
+# CHoops Modding Studio — v1.23
 
 Windows/macOS desktop editor and Python CLI for the verified PS3 College Hoops 2K8,
 NBA 2K9 and NBA 2K14 asset layouts. Browse/extract archives, edit supported textures
@@ -53,7 +53,7 @@ See [workflows](docs/WORKFLOWS.md) for rosters, previews, music and builds, and
 
 Gameplay compatibility is unverified. No emulator or automatic testing-game builds
 are used in project verification. No game assets are distributed. LGPL audio
-helpers include matching sources/notices in the Windows ZIP.
+helpers include matching sources/notices in each desktop ZIP.
 
 ## Develop and contribute
 
