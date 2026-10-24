@@ -149,3 +149,41 @@ def retarget_canonical_frames(raw, header, frames, donor, target):
         missing_translations="retain-native-absent-channel-behavior",
         packed_selector_translated=True,
     )
+
+
+def declared_channels(header, profile):
+    """Bound a <=32-bone channel family without claiming a target bone map.
+
+    This supports read-only inspection of crowd/other rigs. Canonical conversion
+    still uses canonical_channels and its independent native bind proof.
+    """
+    if profile not in RIGS or len(header) < (
+        64 if profile == "college-hoops-2k8" else 56
+    ):
+        raise ValueError("Declared motion header is truncated or unsupported")
+    flags = struct.unpack_from(">I", header, 16)[0]
+    rotations, translations, bones = (
+        flags >> 12 & 63,
+        flags >> 6 & 63,
+        flags >> 18 & 63,
+    )
+    rotation_at = 4 if profile == "college-hoops-2k8" else 8
+    rmask = struct.unpack_from(">I", header, rotation_at)[0]
+    tmask = struct.unpack_from(">I", header, 12)[0]
+    if not 1 <= bones <= 32 or rmask >> bones or tmask >> bones:
+        raise ValueError("Declared channel masks exceed the bounded bone family")
+    if rotations != rmask.bit_count() or translations != tmask.bit_count():
+        raise ValueError("Declared channel counts disagree with bone masks")
+    if profile == "college-hoops-2k8" and any(
+        struct.unpack_from(">I", header, at)[0] for at in (0, 8)
+    ):
+        raise ValueError("CH extended rotation/translation mask is not established")
+    return dict(
+        rotations=rotations,
+        translations=translations,
+        declared_bones=bones,
+        rotation_mask=rmask,
+        translation_mask=tmask,
+        rotation_bones=[i for i in range(bones) if rmask >> i & 1],
+        translation_bones=[i for i in range(bones) if tmask >> i & 1],
+    )

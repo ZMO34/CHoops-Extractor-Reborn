@@ -1,3 +1,73 @@
+CH dribbling research: native-proven motion-bundle variant/lane selection,
+bounded motion-dependency inspection, and explicit adjacent-row lookahead
+storage requirement. Donor mapping, registration and full playback remain pending.
+
+NBA11 dribbler source research: link style rows to graph nodes, retain shared
+provider bindings and model native style eligibility, including bypass and
+missing-key paths. Full transitions and CH gameplay integration remain pending.
+
+NBA11 dribbler research: preserve first-match keyed graph selection, nine native
+player-key/cache routes, and the cached-row backing-graph lifetime dependency.
+Target ownership and playback integration remain unresolved.
+
+NBA11 on-court animation research: bounded graph dependency inspection and native
+relocation/binding harness for dribbler/bodyup contexts. This remains research;
+no playable graph import, target compatibility or gameplay validation is claimed.
+
+## On-court paired-shot metadata investigation
+
+- Add bounded read-only planar metadata proposals for paired gameplay shots,
+  using playback end time and mirroring; retain all compatibility gates.
+- Audit against original CH shot metadata and record native VMX validation limits.
+- Share decoded blocks for repeated collection reads without sharing mutable rows.
+
+## Compatible on-court animation scope
+
+- Target compatible ordinary 5-v-5 gameplay animations; omit non-gameplay content
+  from conversion progress.
+- Label full-bank/group reports as source inventory and retain unresolved target
+  compatibility gates in gameplay-family preparation manifests.
+
+## Grouped animation library continuation
+
+- Include embedded group members in the full-bank audit, with typed group alias
+  resolution, original member/placement metadata and source protection.
+- Bound every member header and dependency; retain standalone/group counts and
+  enforce the total header limit before reading tracks.
+- Verify native relocation/member-copy/backlink behavior; document the backing
+  group lifetime requirement without claiming playable target group integration.
+
+## Animation marker dispatch research continuation
+
+- Inventory all 192 NBA11 and 185 CH native marker dispatch entries through a
+  bounded read-only API/CLI; retain raw flags and group callbacks without
+  inferring semantic event maps.
+- Verify actual OPD transfer/argument layout in 377 bounded native cases and
+  document a target stub that needs additional donor behavior integration.
+- Keep the entire animation bank in scope and preserve all existing conversion
+  gates; no emulator/gameplay run or new executable-writing command.
+
+## Unreleased — counted selector transport
+
+- Bind serialized metadata contracts to every related donor bank, rejecting changed alias payloads under stale assertions.
+
+- Translate explicitly mapped auxiliary selector curves into extended CH headers and owned resident storage, preserving signed ticks and validated pointer extents.
+- Bound copied curves for native float32 endpoint rounding; reject overlaps, missing mappings, unknown extras and budget overflow.
+- Validate all CH stock motion/selector dependencies and 69 NBA2K14 input/controller-axis instruction cases. Full donor semantics and replacement control presets remain unfinished.
+- Correct serialized planar provenance to report decoded float32 values.
+
+## Unreleased — native residency and NBA2K14 input foundation
+
+- Add contract-gated serialized motion construction, explicit event coverage, and weighted auxiliary selector reference sampling.
+- Add bounded separate decoded-ELF resident loading and native shot publication with original-style preservation and process-lifetime storage.
+- Validate the NBA2K14 raw stick input prefix in nine instruction cases. Default right-stick controls and original preset A remain required but unimplemented; full donor playback remains gated by semantics.
+
+## Unreleased — signature-IFF source adaptation
+
+- Resolve bounded typed NBA11 signature aliases while retaining original per-header metadata and rejecting ambiguous or incompatible dependencies.
+- Add `inspect-signature-motion` JSON diagnostics and canonical-bind-gated partial pose/root preparation with record-local bounds and expansion budgets.
+- Audit all supplied signature records and preserve authored keys exactly across 456 shot payload conversions. Full native import and NBA2K14 right-stick dribbling remain unfinished.
+
 ## v1.22 — alternate discovery and combined research updates
 
 Windows extended drive/UNC path spellings are normalized consistently, fixing the
@@ -438,3 +508,19 @@ raw TXTR replacement; TXTR remains the fallback only when no DDS is present.
 SCNE replacements remain supported. CSVs use explicit binary-backed field
 whitelists: asset references, preview labels, research fields and row offsets are
 excluded, while source/stale-edit safety columns are retained.
+
+### Animation family continuation
+- Preserve all four NBA11 shot pairs and consumed control-word provenance.
+- Prepare bounded complete family images with explicit contracts; reject unknown dependencies.
+- Add native pair-selection traces; defer secondary right-stick control work.
+
+### Shot fallback dependency continuation
+- Model native four-pair fallbacks, original-presence flags and cache key.
+- Inspect typed serialized/embedded/empty fallback dependencies without initializing resources.
+- Record fallback requirements in complete-family reports; add bounded native instruction checks.
+
+### Whole-library routing and inspection
+- Cover every supplied IFF motion record with bounded declared-channel inspection; retain conversion bind gates.
+- Add opt-in byte-identical alias equivalence, library CLI audit and native provider/category mapping.
+- Separate category 14 paired motion preparation from category 0 four-pair sequences; retain all row metadata words.
+- Trace real CH gameplay row consumption and correct the paired jump-shot capacity requirement to 315 total IDs.

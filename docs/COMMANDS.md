@@ -1,3 +1,38 @@
+Target bundle research APIs: `motion_bundle.inspect_bundle_rows(bytes, count=5)`
+requires variant rows PLUS one24-byte lookahead row. `select_bundle_rows(bytes,
+value, allow_flagged, lane_policy, actor_flag)` models only native variant/lane
+selection. `inspect_dribble_bundle(decoded_elf, caller_proven_index)` validates a
+bounded existing target bundle and its full motion dependencies; it does not
+establish the registered table length or donor mappings. These APIs write no
+files. `NativeMotionBundleTrace.java NEW_OUTPUT_JSON` verifies the native prefix
+with synthetic state in the read-only Ghidra project, without running gameplay.
+
+Dribbler research API: `anim_graph.graph_style_gate(decoded_bytes, nine_player_keys,
+candidate_node_index, bypass=False)` returns only the established source style-gate
+predicate. It does not decide full transition eligibility or target compatibility.
+`inspect_graph` now includes keyed node indices, raw dribbler style selectors and
+shared provider/player-field bindings. The optional read-only Ghidra harness
+`NativeGraphStyleGateTrace.java NEW_OUTPUT_JSON` exercises distinct native
+selector/family/slot paths on synthetic memory; it launches no game.
+
+Graph key research API: `anim_graph.lookup_graph_key(decoded_bytes, raw_key, family)`
+returns the first native matching row or `None`. Families0..8 and unsigned32-bit
+keys are explicit; meanings are not guessed. `inspect_graph` now reports keyed
+rows, native player/cache offsets and borrowed graph-storage lifetime. These
+are source research APIs, not roster editing or target gameplay installation.
+
+Graph research API: `choops_py.research.anim_graph.inspect_graph(decoded_bytes)`
+validates the observed NBA11 graph pointer tables and returns raw nodes, bounded
+fixups and positional native-binding slots. This expects a decoded record, not an
+IFF container; other profiles reject. It does not decode transitions or install a
+target graph. `tools/research/NativeAnimGraphTrace.java NEW_OUTPUT_JSON` executes
+bounded source graph fixups on synthetic memory in the read-only Ghidra analysis
+project. No emulator, asset mutation or executable-writing CLI is involved.
+
+Selector transport research API (2026-10-23): `translate_signature_motion` accepts `auxiliary_contracts`, one explicit input-bound selector map per counted curve. `prepare_target_image` now includes existing CH selector prefixes; native residency validates and owns them. These remain Python research APIs without a game-writing CLI. Contract fields and limits are documented in ANIMATION_RUNTIME_ADAPTER.md.
+
+Research API update (2026-10-23): `inspect-signature-motion` includes established event-mapping coverage. Complete component construction (`translate_signature_motion`) and separate decoded-ELF residency/publication (`append_resident_image`, `install_resident_shots`) remain contract-gated Python research APIs, with no executable-writing CLI. See ANIMATION_RUNTIME_ADAPTER.md.
+
 # Donor translation research APIs
 
 `choops_py.research.donor_header.translate_donor_motion` accepts decoded donor/target
@@ -176,3 +211,96 @@ This audits class/preferences, native flags and links. It does not add transfers
 edit records, treat blank slots as safe to overwrite, repair unknown data or export
 research fields through game-data CSVs. The second node pool and remaining queue
 semantics are reported as incomplete. See LEGACY_TRANSFER_PORTAL.md.
+
+
+## Signature-IFF motion source audit
+
+`inspect-signature-motion INPUT_IFF RECORD_INDEX output/research/signature.json`
+accepts repeated `--related-bank OTHER_IFF` dependencies. The index is in INPUT_IFF;
+all banks use the observed NBA11 layout. JSON reports original alias metadata,
+typed resolution path, known source track extents and unresolved conversion gates.
+Stored and declared decoded blocks are bounded in aggregate to 128 MiB. Sources
+remain read-only; no complete motion, bank export or gameplay installation occurs.
+See ANIMATION_RUNTIME_ADAPTER.md for the partial pose/root research API.
+
+## Shot-family research API
+
+`inspect-donor-registry` reports the four shot pairs, player selector lanes and
+consumed control word separately from unknown tail bytes. Python callers can use
+`choops_py.research.shot_family.prepare_shot_family` with exact `bank:record`
+metadata/auxiliary contracts and an event contract to prepare all source slots.
+The result is a relative owned image and explicit family manifest, not installed
+playable dispatch. No new executable-writing CLI is exposed.
+
+### Shot fallback research APIs
+
+`choops_py.research.shot_fallback.inspect_shot_fallbacks(donor_elf, source=None)`
+reads the revision-bound fallback dependency tables; supply a bounded
+`SignatureMotionSource` to resolve serialized IDs across banks. It initializes
+no native resources and writes no executable. `resolve_shot_fallbacks` accepts
+resolved uint32 handles (zero means explicitly empty), all eight weighted rows,
+18 bucket rows, fixed lanes, explicit RNG samples and the context predicate
+result. `shot_cache_matches` models the native player/+0xD4 key. These Python
+research APIs establish source behavior; no new game-writing CLI is exposed.
+
+### Inspect the complete supplied IFF motion library
+
+```
+python -m choops_py.cli inspect-animation-library first.iff library.json --related-bank second.iff --coalesce-identical
+```
+
+Accepts 1..32 banks within 128 MiB stored/declared decoded limits and at most 100,000 total standalone and grouped motion headers. Coalescing is opt-in and requires equality of every decoded
+record byte; default duplicate ambiguity remains blocked. Reports count all
+supplied typed records, retain up to 256 explicit failures, and distinguish
+unmapped channel families from canonical-family candidates. Executable-held
+library coverage and complete archive discovery are explicitly false.
+
+For one record, `inspect-signature-motion` additionally accepts
+`--declared-channels` and `--coalesce-identical`. Declared-channel inspection
+never enables noncanonical conversion. `prepare_jump_pair` prepares category 14
+motion components and retains all nine row metadata words; it does not install
+unmapped row semantics. `signature_binding` exposes the distinct provider code,
+registry category and player key field. See the runtime ledger for native proof.
+
+### Inspect native motion marker dispatch
+
+```
+python -m choops_py.cli inspect-marker-dispatch decoded-analysis.elf nba-2k11 output/research/marker-dispatch.json
+```
+
+Profiles: `nba-2k11`, `college-hoops-2k8`. Reads a decoded ELF analysis copy only;
+outputs stay under project output/ and cannot overwrite the input. Reports every
+observed marker dispatch entry, its raw flags, OPD callback and grouped callback
+IDs after validating the observed revision and dependencies. This establishes
+neither cross-game event semantics nor payload portability. See
+[the event ledger](ANIMATION_EVENT_BRIDGE.md) for the verified callback ABI and
+native harness boundary. No executable writer is exposed.
+
+### Grouped motion inspection API
+
+`MotionGroupSource(SignatureMotionSource(banks)).inspect_member(bank, record,
+member)` reads an embedded member, using typed group aliases and preserving
+placement words. `canonical=True` additionally requires canonical channel masks;
+this still establishes no new bone map or gameplay registration. The library CLI
+includes these members automatically and separates standalone counts from group
+record/member counts. Missing/ambiguous owners, incompatible members and malformed
+extents fail explicitly. There is no group writer or executable installation CLI.
+
+### On-court conversion scope
+
+`inspect-animation-library` counts source inventory, including non-gameplay
+records; those counts are not eligible conversion totals. Its report now says
+`count_scope: source-inventory-only`, leaves compatible on-court conversion counts
+unset, and does not establish target compatibility. Group inspection is also
+inventory only. Actual port work targets compatible 5-v-5 gameplay; dunk-contest,
+photo-op, crowd, mascot and other non-gameplay records are excluded from progress.
+
+### On-court paired-shot planar research APIs
+
+`shot_planar.inspect_pair_planar(source, bank, collection, index)` proposes planar
+speed/X/Z from each selected category-14 lane's represented root trajectory.
+`shot_planar.audit_stock_planar(target_elf_bytes)` compares the same calculation
+against existing CH paired-shot authoring values, validating full motion extents.
+Both are read-only Python research APIs; neither writes a contract, motion or
+executable, nor counts a proposal as a compatible conversion. See the runtime
+ledger for end-time/mirror handling, numeric resolution and native VMX limits.

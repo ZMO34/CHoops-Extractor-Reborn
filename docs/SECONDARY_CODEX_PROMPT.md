@@ -88,6 +88,499 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+## CH dribbling motion-bundle playback selection
+
+Target dribbling named setup/update paths are now traced into0x345ABC's native
+motion-bundle selector. Ordinary dribble bundles contain five24-byte variants:
+two motion pointers, a threshold, two lane-specific scalars and raw flags. The
+prefix scans variants backward, uses actor-context+0x108 as the selection value,
+and gates flagbit0 through its explicit argument. Lane selection uses an explicit
+policy and actor[+0x14] flags+0xF0 bit1; its basketball meaning remains unnamed.
+
+The native code reads the FOLLOWING row's flags even when selecting the final
+variant, before clamping the next-motion index. Future owned bundles need24
+lookahead bytes. `motion_bundle` provides bounded read-only inspection and a
+selection reference; no writer/registration is introduced. Both current and next
+motion choices use the SELECTED row's lane scalar. Null/no-eligible motions stay
+null. Timing, blending, events and full playback after this prefix remain pending.
+
+The traced ordinary rules reach four bundles /20 variants /40 pointer references,
+with20 distinct existing CH motion headers validated through the existing full
+track-extent inspector. Two special candidate types remain opaque. These are
+existing-target context counts, not donor conversions or a complete dribble
+inventory. Registered table capacity is not inferred from the four observed IDs;
+the reader's explicit index bound is an inspection limit only.
+
+Native bundle prefix:192 synthetic cases pass, including exact lookahead-read
+addresses, both pointer lanes, flagged-neighbor clamping, thresholds, selected
+scalars and unchanged bundle bytes. Python module tests15 pass; bundle/target
+motion/residency/graph regression92 pass. Source/target assets remain unchanged.
+
+## Dribbler graph style-to-node selection
+
+All60 signature registry keys in categories2..10 match the nine dribbler keyed
+families, despite those registry entries having empty motion references. The
+actual motions are graph dependencies; empty registry references must not cause
+these styles to be discarded. Keyed payload pointers now resolve to bounded node
+indices:111 non-null references /104 distinct nodes in the supplied dribbler graph.
+Shared player-field bindings identify the provider/category correspondence;
+these are not named move meanings or target bindings.
+
+`graph_style_gate` models ONLY source0x46C0D4's style eligibility. Node+0x14
+selector0 bypasses this gate; selectors1..17 compare a specific cached family/slot
+with the candidate node. Missing rows/slots reject non-null candidates; transition
+flag bit13 and null candidate bypass the gate. Other transition predicates still
+apply, and the full graph execution/CH counterpart remains unresolved.
+
+Native style-gate harness72 cases pass with distinct family/slot pointers, so
+swapped routes cannot pass accidentally. A supplied-data probe executes real
+player routing and the style gate for222 configurations: all match the reference,
+124 accepted /98 rejected, with unchanged graph bytes. This includes selector-zero
+bypasses when keys are missing. No uninitialized reads reported. Python graph tests
+45 passed; graph/source/group/library regression87 passed. These are selection
+proofs, not compatible conversion counts or playable imports.
+
+## Dribbler keyed selection and player-cache lifetime
+
+Native leaf0x4691F8 reads the dribbler graph at0x4B93D2C, selects one of nine
+16-byte keyed tables (counts+0x1C..+0x3C, pointers+0x5C..+0x7C), compares raw
+32-bit keys and returns the FIRST matching row, or null. It neither deduplicates
+keys nor substitutes another family. `anim_graph.lookup_graph_key` models that
+ordering and validates explicit key/family bounds; family basketball meanings
+and the three row payload pointers remain unresolved. Inspection now retains
+these rows, unknown words and their bounded payload targets.
+
+The actual caller prefix0x46D07C..0x46D110 gets the player from actor+0x64.
+Families0..8 read player +0x100,+0x108,+0x110,+0x10C,+0x104,+0x11C,+0x114,+0x118,
++0x120 respectively, and cache returned row pointers at state+0x4C..+0x6C.
+These are native player offsets, not roster-file offsets or provider/category
+numbers. They must not be relabeled named dribble moves without more evidence.
+Cached rows point INTO the graph: backing graph storage must remain alive until
+all such caches are cleared or replaced. Native setup0x46CB4C..0x46CB6C derives
+state from actor[+0x14]+0x110 and calls0x469768. That helper clears0x70 bytes,
+including all nine caches, then copies parameter words into state+0x2C/+0x30.
+Two native cases verify this clear/seed behavior and untouched adjacent bytes.
+This establishes setup reset, not graph release or invalidation in other contexts;
+corresponding CH2K8 selection/cache ownership remains unresolved.
+
+The public native graph harness now passes53 cases: the earlier3 fixup cases,
+45 keyed cases (first/last/missing/empty/duplicate across all9 families), and3
+complete player-routing prefixes with actual lookup calls (first/last/missing),
+and2 setup reset cases.
+Unique per-family keys catch swapped player fields; cache sentinels check unknown
+state bytes stay unchanged. Successful runs report no undefined-register warning.
+A private supplied-graph probe checks all60 keys plus9 missing-key cases:69 pass,
+with graph bytes unchanged. Graph/source/group/library Python checks:68 passed;
+graph-specific tests26 passed. This remains source selection/lifetime evidence,
+not target graph execution, compatible animation conversion or gameplay validation.
+
+## Native graph relocation coverage for dribbling and bodyup
+
+`research.anim_graph.inspect_graph` now validates the observed NBA11 decoded graph
+layout: sixteen count/pointer pairs, fixed table strides, nonoverlapping tables,
+signed relative pointer bounds and positional executable motion bindings. It
+retains all nine raw node words and distinguishes the native direct-motion and
+group-first-member binding paths. Unknown node operations and transitions remain
+opaque. Other game profiles reject; no graph writer or target installation exists.
+Bounds are64MiB, one million aggregate rows and300,000 pointer fixups; these are
+inspection limits, not PS3 residency guarantees. Empty table endpoints, nulls and
+backward references are handled explicitly. No conversion count is inferred.
+
+The supplied dribbler graph passes with292 nodes /25,189 pointer fields. The
+5,956-byte `animgraph_bodyup` graph (resource0xEE6DA12B) passes with13 nodes /92
+pointer fields; all13 bind native groups, with26 canonical-mask member headers.
+Dribbler resource0x83C36981 binds292 direct native motions. The bodyup name is a
+lead for defensive interactions, not proof of exact gameplay selection semantics.
+
+`NativeAnimGraphTrace.java` executes the real0x37FC60 routine and0x8339AC helper
+without mocked calls. Three synthetic cases cover0/1/2 nodes, both binding paths,
+all pointer table classes, null/backward references, and whole-buffer preservation
+outside expected writes. All3 pass. A separate private bounded read-only probe
+also executes fixups on copies of both supplied graphs: dribbler368,721 steps,
+bodyup1,633 steps. Both outputs match the reader-derived relocation/binding image
+byte for byte, including all unknown bytes. This proves these supplied source
+fixups, not graph execution, transition semantics, target compatibility or gameplay.
+
+The supplied CH inventory reports no0x0D53D4B3 resource, and an ASCII handler-name
+search found no matching ANIMGRAPHRESOURCEHANDLER name in its ELF. These negative
+checks do not prove absence of equivalent target behavior. Target playback and
+native ownership still require tracing; copying the donor graph alone is not a
+complete loading solution. Running, defensive movement and rebounds remain required.
+
+## Dribbling graph native motion dependencies
+
+Static native tracing identifies NBA11 ANIMGRAPHRESOURCEHANDLER's fixup0x37FF80,
+which selects resource0x83C36981 and calls0x37FC60 with table0x3EF977C. The supplied
+770,144-byte dribbler graph has292 nodes at decoded offset0x80, stride36. The
+loader resolves header pointers +0x40..+0x58 through0x8339AC. Its node loop uses
+one executable table entry per node; when node +0x10 bit0 is clear it writes the
+entry into node +4. For set bit0 it instead writes node +0 and derives +4 from
+that object's +0xC. Both paths relocate node +0x18 and +0x20. This is static
+instruction evidence, not a completed native graph-loader execution test.
+
+All292 supplied dribbler nodes have bit0 clear and their executable-held motion
+headers have mask0x1DF7DD. This establishes explicit graph-to-native-motion
+references absent from an IFF-only inventory; it does not establish canonical
+bind equivalence, node operation/transition semantics or target compatibility.
+The graph and referenced native motions require joint loading/lifetime work.
+No node is counted as a converted compatible animation. Running, defensive and
+rebound playback contexts remain required and pending their own tracing.
+
+## Native paired-shot state addressing
+
+The target instruction harness now executes CH accessor0x2351D0 and its real
+0x234E30 dependency rather than substituting a state pointer. For the tested
+actor +0x20 ==1 path, the address is base +288 * (actor[+0x70] * stride +subindex).
+The paired-shot initializer passes subindex0. The stride is read indirectly
+through TOC cell0xA54240; base is held at0xA54250. The actor matching the cached
+pointer at0xA54264 follows a different path and is NOT covered by this trace.
+The meaning of the stride is unresolved; it is not established as a frame index.
+
+All18 combinations of hand bit0/1, style0/111/255 and synthetic stride0/1/2 pass.
+The actual player flag getter and TOC restoration still execute. A0x1200-byte
+sentinel verifies only the six expected metadata/motion fields change in the
+state storage, including untouched adjacent slots. Per-actor +4 dispatch metadata
+is checked separately. This establishes bounded addressing and row consumption,
+not target field semantics, allocation ownership, fallback or gameplay quality.
+
+Dribbling, running/locomotion, defensive movement and rebounding are required
+conversion families alongside scoring. Paired-shot work is a shared-foundation
+case, not completion of those families. Their source playback graphs, transitions,
+events, target context and native lifetime must each be established before they
+can count as compatible conversions. NBA2K14 right-stick controls remain deferred.
+
+## Paired on-court shot planar metadata investigation
+
+`research.shot_planar.inspect_pair_planar` now makes read-only root-derived
+proposals for category-14 paired shots, retaining both lanes and the complete
+bank-set fingerprints. It selects this established gameplay family explicitly;
+non-gameplay banks and group conversion are not included. Across the supplied
+203 entries /406 lane references every proposal passes bounded source inspection.
+These are proposals, not compatible conversion or playable-import totals.
+
+The represented-trajectory average samples ROOT POSITION AT PLAYBACK DURATION,
+not the final padded key, subtracts time zero, divides by duration, applies the
+native 1/8 position scale and mirrors X from mode bit30. Speed is the norm of the
+resulting X/Z components. Source byte-delta key times and CH fixed key times are
+handled separately. Cyclic interpretation, invalid timing/coverage, wrong rigs,
+incorrect root extents and float32 overflow reject; unknown authoring semantics
+remain unapproved. Outputs identify themselves as estimates, with no automatic
+metadata contract and no target compatibility claim.
+
+Read-only `audit_stock_planar` validates registered CH motion extents and compares
+against all224 existing paired-shot headers. All224 estimates agree with the
+stored planar X/Z within one root-step velocity resolution (0.125/duration;
+comparison epsilon1e-5), maximum per-axis error0.0471587181 native units/second.
+This supersedes the earlier naive endpoint comparison for THIS CONTEXT; it does
+not prove the original authoring algorithm or authorize estimates for running,
+rebounding or other transition contexts automatically. Root quantization and
+original authoring differences remain material limits on exact recovery.
+
+Native root routines NBA11 0x17BF4 /CH 0x2027C were inspected. A bounded synthetic
+full-root instruction probe could not execute NBA11's VMX instruction at0x17C08:
+Ghidra reports an unimplemented vectorSplatImmediateSignedByte user operation.
+No full-root native execution or VMX bit-exact claim is made. The numeric
+reference and stock corpus check remain separately identified evidence.
+
+Bulk pair inspection also exposed repeated full-bank decompression in the shared
+collection-entry helper. Collection reads now use the same bounded decoded-block
+cache as tracks; entry parsing remains fresh so a caller cannot poison later
+rows through mutation. This preserves the existing combined128-MiB decoded-byte
+limit and strict type/span checks; it is not a process-memory guarantee.
+
+## Current conversion scope: compatible on-court 5-v-5 animations
+
+The owner's latest direction narrows the earlier entire-bank goal. Convert/add
+only animations compatible with ordinary on-court 5-v-5 play: layups, dunks,
+shots (including running shots and free throws), dribbling, running/locomotion,
+defensive movement, rebounds and related gameplay moves. Dunk-contest, photo-op, crowd, mascot and other non-gameplay content may be
+omitted and must not count toward conversion progress. Unknown gameplay context
+or target compatibility remains pending, rather than silently included.
+
+Earlier full-library and grouped-header totals are SOURCE INVENTORY/FORMAT
+RESEARCH, not conversion eligibility, successfully converted gameplay actions or
+playable-import counts. The library JSON now marks this scope explicitly and
+leaves compatible conversion counts unset. Group inspection likewise does not
+count a member toward on-court conversion. The category-14 paired-shot and
+category-zero gameplay-sequence preparation manifests identify their intended
+on-court scope while retaining all unresolved target compatibility gates.
+
+The unpublished generic group-component conversion experiment was deferred;
+its private research evidence remains available. No dunk-contest/photo-op group
+conversion API or new native installation is published from that experiment.
+Broad format readers can remain as reference, but next implementation work is
+on proven gameplay contexts, event/selector and target metadata correspondence,
+then bounded native loading/ownership. Right-stick controls remain secondary;
+the final control policy is still NBA2K14 right-stick default, old layout preset A.
+
+## Grouped motion coverage and alias lifetime
+
+The full-bank audit now includes native group records, not just individually
+typed SingleMoCap records. The supplied 11 containers contain 75 groups with
+150 embedded headers in addition to 4,705 standalone headers: **4,855 inspected
+source headers**, with zero track-inspection failures. This supersedes earlier
+4,705-only inventory coverage totals. These are historical format-research
+counts, not conversion eligibility. Only compatible on-court 5-v-5 motions
+remain in conversion scope; off-court group members may be omitted.
+
+NBA11 group relocation 0x1602C fixes +4, then the first pointer of each 16-byte
+member entry at +0xC and calls motion fixup 0x15F24. Group count is at +8.
+Resolver 0x1C700 uses the FIRST member's unresolved +0x28 word to look up a group,
+then copies member dependencies through 0x11DD0 in corresponding slot order.
+The second member's zero reference ID must not become a SingleMoCap lookup.
+The native copy retains each alias header's state/mirror metadata and creates
+bidirectional +4 links between corresponding member headers. The resolver also
+links both group +4 fields. These are lifetime dependencies, not ownership
+transfer: backing groups/motions cannot be freed while referenced. Native
+backlink lifecycle and complete target group registration remain uninstalled.
+
+`MotionGroupSource` shares bounded bank decoding and retains original group and
+member provenance, placement words, per-member metadata and the owning group
+path. It rejects missing/ambiguous typed group owners, cycles, mixed packed/alias
+members, count/packing mismatches, invalid headers and dependencies intersecting
+another member's header. It never substitutes a direct clip for a group. Group
+ambiguity remains strict even when exact duplicate SingleMoCap coalescing is on.
+Placement-word semantics and synchronized target group behavior remain gated.
+The shared standalone track reader was factored without relaxing its bind gate.
+
+`inspect-animation-library` includes every group member, preserves standalone
+record counts separately, and limits total standalone+embedded headers to
+100,000 before reading tracks. The supplied audit adds 60 alias headers and 90
+conservative member-payload hashes: **2,323 alias headers /2,531 payload hashes**,
+**3,240 canonical-family candidates /1,615 other-rig headers**, and **30,055 event
+rows /11,169 covered by existing rules**. The numerical fixed-rate pose/root
+estimate becomes **78,490,456 bytes**, excluding headers/events/selectors/group
+metadata/registration and before target bind mapping. Hashes include complete
+member-tail bytes; this is conservative deduplication, not a minimal memory
+budget. Source bytes/size/mtime are unchanged. Executable-held and unknown-bank
+coverage, full semantic mapping, native streaming and gameplay remain unresolved.
+
+## Whole-bank marker dispatch continuation
+
+This dispatch inventory covers the source bank for format research. Conversion
+is limited to compatible on-court 5-v-5 animations; these table counts do not
+establish gameplay eligibility. Native caller indexing establishes
+NBA11's 192 marker entries (IDs 0..191) at 0x3E85474 and CH's 185 entries
+(IDs 0..184) at 0x8AC024. Each eight-byte entry is dispatch flags followed by an
+OPD descriptor pointer; scanning descriptor/next-word pairs misassigns flags and
+misses the last ID. Source flags 0..3 and target flags 0..6 remain distinct,
+untranslated values. Table adjacency or a shared callback is not an event map.
+
+`inspect-marker-dispatch` validates observed caller instructions, bounded table
+reads, descriptor alignment, executable callback targets and TOCs. It reports
+all entries, raw flags and callback groups without editing an executable.
+`NativeMarkerDispatchTrace.java` executes actual indexing/OPD transfer for all
+377 entries with synthetic state, stopping before each callback. NBA11 passes
+the event-row pointer/header/actor in r3/r4/r5; CH passes marker ID/header/actor
+in r3/r4/r6 and marker time in f1. CH's missing payload-pointer argument makes
+the donor's twelve-byte event ABI unsuitable for direct callback substitution.
+
+Grouped source handlers are also being traced downstream. Source IDs 151..170
+use 0x384030, gated by actor +0x20 == 1, then 0x655ED8. That handler checks actor
++0x30 <= 9 and dispatches resource hashes, with additional per-case conditions.
+CH IDs 172..183 use 0x23282C -> thunk 0x15E60 -> 0x53895C; the final target
+function is a return-only stub. This is not evidence that those donor events are
+unnecessary or have a working stock equivalent. Their native/resource behavior
+must be retained and integrated rather than silently dropped. Other source
+variant groups have additional cases beyond CH's packed variant capacity;
+equal variant numbers and similar message routes are not yet semantic proof.
+
+No additional semantic conversion rules are installed from these observations.
+No-op callbacks can still have timing-query consumers (for example source 34
+and target 33). Preserve such markers pending role proof. Event/payload and
+selector correspondence, other rigs, executable-held library coverage, target
+playback/transition metadata, wide IDs and loading/lifetime/streaming remain
+active work. Native dispatch checks are instruction tests, not gameplay tests.
+
+## Whole-library scope and provider routing correction
+
+The owner's current scope is compatible on-court NBA11 animation families,
+including dribbling, running, defense, rebounding and scoring. Historical full-bank
+inventory totals do not establish eligibility. Right-stick controls remain secondary. The four-pair category-zero work remains useful, but
+must not be confused with the paired jump-shot table.
+
+Native `0x657824` takes 41 provider selector codes and routes them into 31
+serialized registry categories. Selector 20 uses player +0x124 and category 14;
+selector 0 uses player +0xD4 and the separate category 0 sequence family. Selector 14
+actually selects category 5. Ten selectors share category1 with separate player
+key fields. Five paired selector groups choose alternate key fields through the
+third argument; neither categories nor selector numbers are motion IDs.
+`signature_provider.py` records all bindings; the native harness passes 82 cases.
+
+Category 14 contains 203 paired entries / 406 nonempty references in the supplied
+signature banks. `prepare_jump_pair` now retains both lane headers and every one
+of the nine metadata-tail words. Unknown extra tail bytes and unsupported group
+references block preparation. The category 0 four-pair preparation and fallback
+work is retained separately. All registry reports expose provider-selector codes.
+The earlier hypothetical 112+147=259 comparison is NOT the paired jump-shot
+capacity requirement: retaining 112 stock entries plus 203 category 14 entries needs
+315 IDs. The stock byte field still cannot represent this. No IDs are truncated,
+styles discarded or incorrect family appended to the stock table.
+
+Whole supplied-IFF audit covers all 4,705 identified SingleMoCap records in 11
+containers (46,937,781 stored bytes), including crowd, mascot, presentation and
+other banks. All 4,705 now pass bounded declared-track inspection: 2,263 alias
+headers, 2,441 distinct payload-record hashes and 18 channel layouts across 16/21/24
+bone declarations. Two alias conflicts are exact 6,112-byte duplicate records.
+Optional identical-record coalescing proves equality of ALL decoded bytes and
+retains every candidate's provenance; distinct or unknown-tail differences reject.
+Strict ambiguity rejection remains the default. The 3,090 canonical-family
+candidates remain separate from 1,615 other-rig records: inspection does not bypass
+conversion's canonical bind gate or invent a crowd/global bone map.
+
+The read-only `inspect-animation-library` CLI audits all supplied typed records,
+reports bounded failures and channel-family/event coverage, and protects every
+input. The single-record inspector gains explicit declared-channel/coalescing
+options. This does not discover executable-held clips or establish that unknown
+archive resources are irrelevant. Its fixed-rate pose/root size estimate is
+71,643,008 bytes before headers/events/selectors/registration and before target
+bone mapping; the largest component is 818,400 bytes. Full-library memory/streaming
+integration must address the total, rather than raising per-image guards blindly.
+
+CH gameplay initialization `0x32479C` is now exercised, beyond the preview getter:
+player +0x73 chooses a 40-byte row; player +0x84 bit25 selects the lane. Row +4/+8
+feeds state +0xD8, +0xC feeds +0xE4, +0x10 feeds +0x104, +0x14 feeds +0x48,
++0x20/+0x24 feeds motion +0x74, +0x8C is cleared, and +0x1C feeds the per-actor
+28-byte record +4. The real hand getter/thunk and TOC restoration execute in six
+synthetic native cases at indices 0/111/255. Donor category 14 lane selection at
+`0x499468`/`0x499474` passes two cases. Row field basketball meanings and automatic
+cross-game authoring remain incomplete. Stock inspection now exposes raw metadata
+words, not invented field names.
+
+Category 14's 201 distinct payloads / 402 distinct headers (406 reference slots)
+pass the pose/root conversion audit: 5,902 authored keys exactly preserved,
+23,352 fixed frames and 3,546,552 component bytes, before any complete-motion
+metadata/event/selector construction.
+
+Next work remains active across the whole library: native executable-held bank
+coverage, per-rig mapping, event/payload and selector semantics, target playback
+and transition contexts, wide-ID selection, and bounded loading/lifetime/streaming.
+No complete playable import or gameplay validation is claimed. Source game banks
+and executables remain unchanged; no game/emulator or automatic JB test runs.
+
+## Native shot fallback graph and dependency closure
+
+Current priority remains animation porting; right-stick controls stay deferred.
+NBA11 cache initializer `0x6535BC` is now traced through its fallback branches,
+and cache-key reader `0x6533C0` is established. This supersedes the older
+statement that the fallback graph itself was untraced; target role mapping,
+context predicate semantics and native target dispatch are still unresolved.
+
+- Cache identity is player pointer plus player +0xD4. Selector/context are not
+  additional keys. Resource replacement must invalidate cached pointers or retain
+  their owners; the resident process-lifetime owner remains necessary.
+- Cache +0x1C/+0x20 retain original pair0/pair1 presence, before filling fallbacks.
+  Callers of `0x653A3C`/`0x6539D8` can request these original-presence flags.
+- Missing pair0 uses eight weighted rows (`0x434F1D0`, stride20). Each row consumes
+  one RNG sample; native float32 weight/cumulative-weight must strictly exceed
+  that sample to replace the selected row. This is a reservoir pass, not a
+  single cumulative-distribution draw.
+- Missing pair1 uses unsigned player +0x1C modulo18 into `0x434F270`, stride32;
+  it replaces pair1 AND pair2 even if pair2 originally existed. The player field's
+  basketball meaning is not assumed.
+- Still-empty pair2 selects embedded `0x3F8C798`/`0x3F8C7D0` by lane. Empty pair3
+  or a true optional context predicate selects lane-specific globals at
+  `0x434F1C4`/`0x434F1CC` and resets cache +0x18 to zero. Missing context, a -1
+  context ID, and a false predicate do not force replacement. The extra generator
+  getter call on pair3 replacement remains observable even without an RNG draw.
+
+`shot_fallback.py` adds bounded resolution and read-only revision-guarded table
+inspection. Handles/predicate results/RNG samples are explicit inputs; it does
+not guess target resource identities or reimplement unproven service semantics.
+The inspector distinguishes serialized resource IDs, embedded pointers, explicit
+empty entries and ambiguous identities, retaining input fingerprints. A family
+preparation report now records original lane presence, fallback requirements and
+that fallback resources are not included in its eight-slot image.
+
+Supplied-copy closure: 92 referenced positions = 64 unique bank-backed motions
+(all resolve uniquely in the supplied signature banks and already occur among
+shot slots), 24 unique executable-held headers, and four explicit empties.
+All 24 embedded headers' pose/root components convert: 708 authored keys remain
+exact across 6,426 fixed frames / 972,972 component bytes, before deduplication.
+Source hashes are unchanged. Header references, events, selectors and metadata
+still gate complete motion construction; component success is not playability.
+
+`NativeShotFallbackTrace.java` passes 145 bounded read-only instruction cases:
+140 fallback cases across both lanes, all 16 presence masks, missing/invalid-ID/
+false/true context, modulo boundaries and reservoir thresholds; five native cache
+key cases. RNG/context service results are mocked, with original fallback
+instructions executed. A Python/native comparison agrees on all 140 motion
+vectors and RNG draw counts. Nonzero control-value preservation/reset is checked.
+Next: map CH playback contexts and integrate the complete fallback dependency set
+with resident registration, retaining original presence flags. Remaining event,
+selector, authoring metadata and style-capacity gaps still block a full port.
+
+## NBA11 shot-family preservation (animation priority)
+
+Animation porting takes priority; NBA2K14 right-stick/default-preset work is deferred.
+NBA11 native consumer `0x6535BC`, player getter `0x949CF0`, and reference
+resolver `0x656AEC` establish four paired references per category-zero entry.
+Player +0xCC bit zero selects slots 1/3/5/7; bit one selects 0/2/4/6.
+The consumed word at payload +0x60 indexes native table `0xA51564`; its full
+meaning/table bounds and target mapping remain unresolved. All 147 supplied
+styles use index zero. Only 18 styles have the first pair; all 147 have pairs
+one through three. The first pair must not be assumed to be the base shot.
+CH `0x3213B8` selects row +0x20 for a nonzero selector and +0x24 for zero.
+That proves ordering, not basketball roles or cross-game contextual equivalence.
+
+`prepare_shot_family` now prepares every nonempty direct source reference with
+explicit per-header metadata/event/auxiliary contracts. It retains all eight
+slots, four pairs and distinct alias headers, deduplicates repeated header
+references, checks the whole-family byte budget and verifies relocation inverse.
+Missing/ambiguous resources, unsupported group dependencies, unknown trailing
+bytes and incomplete/stale contracts reject the complete result. Empty slots
+remain explicit; no contextual fallbacks or target role names are invented.
+This research API does not install native family dispatch or establish playable
+metadata. Existing event/selector identity gaps and the 259-style byte-ID conflict
+remain. Next: trace contextual fallbacks and map each pair to CH playback contexts
+before binding complete donor families into the resident registration path.
+
+A bounded read-only Ghidra harness checks 14 donor cases (both selection bits,
+reference kinds 0..5, and empty optional pairs) plus two CH row-order cases.
+Only registry lookup is mocked; source selection stops before contextual
+fallback handling. No game execution or source executable writes occur.
+
+# Unreleased — selector transport and native controller-axis continuation
+
+Schema-2 serialized metadata now also requires `source_banks_sha256`, an ordered list of complete fingerprints for every supplied bank. A reproduced stale-contract bug allowed a related alias payload bank to change while the origin bank/header stayed unchanged. The full bank-set binding rejects that change; reports retain their own list copy. Earlier draft contracts missing this field must be regenerated. This closes an input-binding gap, not a semantic-mapping gap.
+
+Counted auxiliary selector curves now have a complete bounded transport path: read the consumed knot prefix, require explicit input-bound per-channel selector maps for NBA11 translation, preserve signed tick bits, serialize the extended CH header, relocate every counted pointer, and keep curves resident with their owner image. Unknown extra +0x3C dependencies and missing selector rules still block output. No automatic cross-game selector meanings were invented.
+
+The updated read-only source inspector accepts all 2,444 motions / 1,222 aliases, now including 4,016 bounded selector references. CLI reports expose consumed prefix sizes, hashes and selector values while leaving semantics unresolved. Supplied-copy checks cover all 806 NBA11 shot curves and 336 CH shot curves. All 224 stock motion headers now prepare in one 559,640-byte relative image with 168 distinct shared selector tracks. A separate in-memory decoded-ELF structural probe adds 112 stock duplicates (224 total styles), preserves the original 112, and validates all owned headers/curves, original BSS and inverse reconstruction. It is a stock-backed structural probe, not a donor gameplay import; source hashes remain unchanged.
+
+The NBA2K14 native harness now passes 69 cases: the original nine input-prefix cases plus all 30 controller-axis getter indices on ports 0 and 6. The controller vtable routes axis indices 2/3 to right X/Y; movement dispatch and the default-right-stick/original-preset-A installation remain unfinished. A separate float32 curve-endpoint regression prevents native sampling from reading one knot beyond a mathematically sufficient prefix.
+
+Current semantic gaps remain: unmapped event identities/payloads, selector resource identities, authored target metadata/variants, and the 259-style byte-ID conflict. These require proof before a playable full port can be claimed. See [ANIMATION_RUNTIME_ADAPTER.md](ANIMATION_RUNTIME_ADAPTER.md). Earlier phase notes below are historical where superseded.
+
+# Unreleased — resident native integration and NBA2K14 input research
+
+Added a contract-gated serialized signature component builder and a separate decoded-ELF resident loading/publication backend. The backend retains all 112 stock styles, owns added motion/table/name storage for process lifetime, preserves original BSS as zeros, and verifies relocation and inverse reconstruction. A supplied-copy structural probe registers one stock duplicate (113 total); it does not establish donor playback or PS3 execution. No source executable, JB, or signed SELF was changed.
+
+Event coverage across 911 distinct NBA11 shot headers: 5,358 rows, 2,642 covered by the existing seven explicit rules, and 333 complete event tables. Only 84 headers also lack unresolved auxiliary/reference/membership dependencies; target metadata still gates those records. No new event identities were guessed. The auxiliary sampler has 2,418 mathematical reference samples across 806 curves; selector resource identities remain unmapped.
+
+NBA2K14, not NBA2K11, supplies the right-stick input research. Nine bounded native instruction cases validate raw axis normalization and invalid-packet retention. Dribble move dispatch, deadzones, and control-preset installation remain unfinished. Required final policy: right-stick dribbling is default; the original button-dribble layout remains selectable as preset A. Current controls have not been changed.
+
+See [ANIMATION_RUNTIME_ADAPTER.md](ANIMATION_RUNTIME_ADAPTER.md) for implementation contracts and remaining gates. Full playable import is not complete.
+
+Earlier phase notes below are historical; the resident integration status above supersedes prior loading and lifetime gates.
+
+# Unreleased — signature-IFF motion source adapter
+
+Continued the NBA11 port from merged PR45/47 with typed cross-bank SingleMoCap
+alias resolution and a bounded serialized source adapter. Each alias retains its
+own metadata; missing/ambiguous identities, cycles, incompatible counts, truncated
+tracks and overlapping known dependencies are rejected. Added read-only CLI
+`inspect-signature-motion` and canonical-bind-gated pose/root component preparation.
+
+Supplied-copy audit: all 2,444 motions / 1,222 aliases pass known track checks.
+All 918 nonempty shot slots resolve to 911 headers / 456 payloads. Preparing those
+456 payloads produces 82,076 fixed frames; all 11,215 authored pose/root keys
+roundtrip exactly. Input executable/bank hashes remain unchanged. These are partial
+pose/root components, not complete motions or a playable import. Auxiliary selector,
+event/variant/authoring and native registration/lifetime gates remain. NBA2K14
+right-stick dribbling remains a separate unimplemented runtime-control goal.
+See [ANIMATION_RUNTIME_ADAPTER.md](ANIMATION_RUNTIME_ADAPTER.md).
+
 # v1.22 — new alternate folder discovery
 
 Windows extended drive/UNC path spellings are normalized consistently, fixing the
@@ -318,7 +811,7 @@ and frame order. Private checks on32 streams per game preserve decoded channels
 and reverse byte identity. This is a packed-channel converter; no playable donor
 clip, new jump-shot option, full animation system or control preset is installed.
 
-Native research locates the112-entry jump-shot playback table, its40-byte stride,
+Native research locates the 112-entry jump-shot playback table, its40-byte stride,
 paired motion pointers, shared readers and UI option maximum. New choices must
 append records and extend registration, retaining existing IDs. Simply enabling
 ID112 would read an adjacent unrelated structure. No table/EBOOT patch is applied.
@@ -1378,6 +1871,170 @@ See NBA_ROSTERS_AND_2K14.md for container and primary format references.
 
 Embedded source: docs/ANIMATION_GAMEPLAY_PORT.md
 
+## Target dribbling playback context
+
+The named CH2K8 dribbling functions lead to a native five-variant/two-lane motion
+bundle selector. Its prefix and lookahead storage requirement are now verified;
+see [target bundle evidence](ANIMATION_RUNTIME_ADAPTER.md). Four ordinary bundles
+are validated, while special candidate types and downstream transitions/blending
+remain pending. This provides a target registration format to investigate; it
+does not install donor animations or prove their metadata correspondence.
+
+## Dribbler style source coverage
+
+The signature bank's60 dribbling keys with empty motion references are now linked
+to keyed graph rows and111 node references /104 distinct graph nodes. They must
+not be dropped as empty styles. See the [style-to-node runtime evidence](ANIMATION_RUNTIME_ADAPTER.md)
+for provider/category correspondence and native eligibility checks. The reference
+preserves selector-zero/bypass behavior and missing-key rejection, but does not
+implement full graph transitions or establish the CH counterpart. Confirmed
+end-to-end imports remain zero; running, defense and rebounding remain required.
+
+## Dribbler keyed selection and player-cache lifetime
+
+Native leaf0x4691F8 reads the dribbler graph at0x4B93D2C, selects one of nine
+16-byte keyed tables (counts+0x1C..+0x3C, pointers+0x5C..+0x7C), compares raw
+32-bit keys and returns the FIRST matching row, or null. It neither deduplicates
+keys nor substitutes another family. `anim_graph.lookup_graph_key` models that
+ordering and validates explicit key/family bounds; family basketball meanings
+and the three row payload pointers remain unresolved. Inspection now retains
+these rows, unknown words and their bounded payload targets.
+
+The actual caller prefix0x46D07C..0x46D110 gets the player from actor+0x64.
+Families0..8 read player +0x100,+0x108,+0x110,+0x10C,+0x104,+0x11C,+0x114,+0x118,
++0x120 respectively, and cache returned row pointers at state+0x4C..+0x6C.
+These are native player offsets, not roster-file offsets or provider/category
+numbers. They must not be relabeled named dribble moves without more evidence.
+Cached rows point INTO the graph: backing graph storage must remain alive until
+all such caches are cleared or replaced. Native setup0x46CB4C..0x46CB6C derives
+state from actor[+0x14]+0x110 and calls0x469768. That helper clears0x70 bytes,
+including all nine caches, then copies parameter words into state+0x2C/+0x30.
+Two native cases verify this clear/seed behavior and untouched adjacent bytes.
+This establishes setup reset, not graph release or invalidation in other contexts;
+corresponding CH2K8 selection/cache ownership remains unresolved.
+
+The public native graph harness now passes53 cases: the earlier3 fixup cases,
+45 keyed cases (first/last/missing/empty/duplicate across all9 families), and3
+complete player-routing prefixes with actual lookup calls (first/last/missing),
+and2 setup reset cases.
+Unique per-family keys catch swapped player fields; cache sentinels check unknown
+state bytes stay unchanged. Successful runs report no undefined-register warning.
+A private supplied-graph probe checks all60 keys plus9 missing-key cases:69 pass,
+with graph bytes unchanged. Graph/source/group/library Python checks:68 passed;
+graph-specific tests26 passed. This remains source selection/lifetime evidence,
+not target graph execution, compatible animation conversion or gameplay validation.
+
+## Native graph relocation coverage for dribbling and bodyup
+
+`research.anim_graph.inspect_graph` now validates the observed NBA11 decoded graph
+layout: sixteen count/pointer pairs, fixed table strides, nonoverlapping tables,
+signed relative pointer bounds and positional executable motion bindings. It
+retains all nine raw node words and distinguishes the native direct-motion and
+group-first-member binding paths. Unknown node operations and transitions remain
+opaque. Other game profiles reject; no graph writer or target installation exists.
+Bounds are64MiB, one million aggregate rows and300,000 pointer fixups; these are
+inspection limits, not PS3 residency guarantees. Empty table endpoints, nulls and
+backward references are handled explicitly. No conversion count is inferred.
+
+The supplied dribbler graph passes with292 nodes /25,189 pointer fields. The
+5,956-byte `animgraph_bodyup` graph (resource0xEE6DA12B) passes with13 nodes /92
+pointer fields; all13 bind native groups, with26 canonical-mask member headers.
+Dribbler resource0x83C36981 binds292 direct native motions. The bodyup name is a
+lead for defensive interactions, not proof of exact gameplay selection semantics.
+
+`NativeAnimGraphTrace.java` executes the real0x37FC60 routine and0x8339AC helper
+without mocked calls. Three synthetic cases cover0/1/2 nodes, both binding paths,
+all pointer table classes, null/backward references, and whole-buffer preservation
+outside expected writes. All3 pass. A separate private bounded read-only probe
+also executes fixups on copies of both supplied graphs: dribbler368,721 steps,
+bodyup1,633 steps. Both outputs match the reader-derived relocation/binding image
+byte for byte, including all unknown bytes. This proves these supplied source
+fixups, not graph execution, transition semantics, target compatibility or gameplay.
+
+The supplied CH inventory reports no0x0D53D4B3 resource, and an ASCII handler-name
+search found no matching ANIMGRAPHRESOURCEHANDLER name in its ELF. These negative
+checks do not prove absence of equivalent target behavior. Target playback and
+native ownership still require tracing; copying the donor graph alone is not a
+complete loading solution. Running, defensive movement and rebounds remain required.
+
+## Dribbling graph native motion dependencies
+
+Static native tracing identifies NBA11 ANIMGRAPHRESOURCEHANDLER's fixup0x37FF80,
+which selects resource0x83C36981 and calls0x37FC60 with table0x3EF977C. The supplied
+770,144-byte dribbler graph has292 nodes at decoded offset0x80, stride36. The
+loader resolves header pointers +0x40..+0x58 through0x8339AC. Its node loop uses
+one executable table entry per node; when node +0x10 bit0 is clear it writes the
+entry into node +4. For set bit0 it instead writes node +0 and derives +4 from
+that object's +0xC. Both paths relocate node +0x18 and +0x20. This is static
+instruction evidence, not a completed native graph-loader execution test.
+
+All292 supplied dribbler nodes have bit0 clear and their executable-held motion
+headers have mask0x1DF7DD. This establishes explicit graph-to-native-motion
+references absent from an IFF-only inventory; it does not establish canonical
+bind equivalence, node operation/transition semantics or target compatibility.
+The graph and referenced native motions require joint loading/lifetime work.
+No node is counted as a converted compatible animation. Running, defensive and
+rebound playback contexts remain required and pending their own tracing.
+
+## Native paired-shot state addressing
+
+The target instruction harness now executes CH accessor0x2351D0 and its real
+0x234E30 dependency rather than substituting a state pointer. For the tested
+actor +0x20 ==1 path, the address is base +288 * (actor[+0x70] * stride +subindex).
+The paired-shot initializer passes subindex0. The stride is read indirectly
+through TOC cell0xA54240; base is held at0xA54250. The actor matching the cached
+pointer at0xA54264 follows a different path and is NOT covered by this trace.
+The meaning of the stride is unresolved; it is not established as a frame index.
+
+All18 combinations of hand bit0/1, style0/111/255 and synthetic stride0/1/2 pass.
+The actual player flag getter and TOC restoration still execute. A0x1200-byte
+sentinel verifies only the six expected metadata/motion fields change in the
+state storage, including untouched adjacent slots. Per-actor +4 dispatch metadata
+is checked separately. This establishes bounded addressing and row consumption,
+not target field semantics, allocation ownership, fallback or gameplay quality.
+
+Dribbling, running/locomotion, defensive movement and rebounding are required
+conversion families alongside scoring. Paired-shot work is a shared-foundation
+case, not completion of those families. Their source playback graphs, transitions,
+events, target context and native lifetime must each be established before they
+can count as compatible conversions. NBA2K14 right-stick controls remain deferred.
+
+## Current conversion scope: compatible on-court 5-v-5 animations
+
+The owner's latest direction narrows the earlier entire-bank goal. Convert/add
+only animations compatible with ordinary on-court 5-v-5 play: layups, dunks,
+shots (including running shots and free throws), dribbling, running/locomotion,
+defensive movement, rebounds and related gameplay moves. Dunk-contest, photo-op, crowd, mascot and other non-gameplay content may be
+omitted and must not count toward conversion progress. Unknown gameplay context
+or target compatibility remains pending, rather than silently included.
+
+Earlier full-library and grouped-header totals are SOURCE INVENTORY/FORMAT
+RESEARCH, not conversion eligibility, successfully converted gameplay actions or
+playable-import counts. The library JSON now marks this scope explicitly and
+leaves compatible conversion counts unset. Group inspection likewise does not
+count a member toward on-court conversion. The category-14 paired-shot and
+category-zero gameplay-sequence preparation manifests identify their intended
+on-court scope while retaining all unresolved target compatibility gates.
+
+The unpublished generic group-component conversion experiment was deferred;
+its private research evidence remains available. No dunk-contest/photo-op group
+conversion API or new native installation is published from that experiment.
+Broad format readers can remain as reference, but next implementation work is
+on proven gameplay contexts, event/selector and target metadata correspondence,
+then bounded native loading/ownership. Right-stick controls remain secondary;
+the final control policy is still NBA2K14 right-stick default, old layout preset A.
+
+## Whole-library continuation
+
+Current scope is compatible on-court donor families, including dribbling,
+running, defense, rebounds, free throws and running shots. See [current runtime ledger](ANIMATION_RUNTIME_ADAPTER.md) for the
+complete 4,705-record supplied-IFF audit and native provider routing correction.
+Provider selector20 selects serialized category 14 (203 paired entries), whereas
+selector 0 selects a separate147-entry four-pair sequence family. The paired
+jump-shot additive capacity is 315 total IDs, not 259. Earlier research comparing
+category 0 directly with the 112-row CH jump-shot table is superseded on this point;
+its format, fallback and component-conversion evidence remains applicable.
+
 > Canonical 21-bone bind correspondence and registration allocation research
 > advanced after v1.21. See [ANIMATION_BIND_REGISTRATION.md](ANIMATION_BIND_REGISTRATION.md).
 > Full event semantics and playable donor registration remain incomplete.
@@ -1682,6 +2339,43 @@ analysis copies are local, excluded from Git. No RPCS3 or testing JB is used.
 
 Embedded source: docs/ANIMATION_EVENT_BRIDGE.md
 
+## Whole-bank marker dispatch continuation
+
+This dispatch inventory covers the source bank for format research. Conversion
+is limited to compatible on-court 5-v-5 animations; these table counts do not
+establish gameplay eligibility. Native caller indexing establishes
+NBA11's 192 marker entries (IDs 0..191) at 0x3E85474 and CH's 185 entries
+(IDs 0..184) at 0x8AC024. Each eight-byte entry is dispatch flags followed by an
+OPD descriptor pointer; scanning descriptor/next-word pairs misassigns flags and
+misses the last ID. Source flags 0..3 and target flags 0..6 remain distinct,
+untranslated values. Table adjacency or a shared callback is not an event map.
+
+`inspect-marker-dispatch` validates observed caller instructions, bounded table
+reads, descriptor alignment, executable callback targets and TOCs. It reports
+all entries, raw flags and callback groups without editing an executable.
+`NativeMarkerDispatchTrace.java` executes actual indexing/OPD transfer for all
+377 entries with synthetic state, stopping before each callback. NBA11 passes
+the event-row pointer/header/actor in r3/r4/r5; CH passes marker ID/header/actor
+in r3/r4/r6 and marker time in f1. CH's missing payload-pointer argument makes
+the donor's twelve-byte event ABI unsuitable for direct callback substitution.
+
+Grouped source handlers are also being traced downstream. Source IDs 151..170
+use 0x384030, gated by actor +0x20 == 1, then 0x655ED8. That handler checks actor
++0x30 <= 9 and dispatches resource hashes, with additional per-case conditions.
+CH IDs 172..183 use 0x23282C -> thunk 0x15E60 -> 0x53895C; the final target
+function is a return-only stub. This is not evidence that those donor events are
+unnecessary or have a working stock equivalent. Their native/resource behavior
+must be retained and integrated rather than silently dropped. Other source
+variant groups have additional cases beyond CH's packed variant capacity;
+equal variant numbers and similar message routes are not yet semantic proof.
+
+No additional semantic conversion rules are installed from these observations.
+No-op callbacks can still have timing-query consumers (for example source 34
+and target 33). Preserve such markers pending role proof. Event/payload and
+selector correspondence, other rigs, executable-held library coverage, target
+playback/transition metadata, wide IDs and loading/lifetime/streaming remain
+active work. Native dispatch checks are instruction tests, not gameplay tests.
+
 > Follow-up: the explicit mirrored-selector triplet contract and additional
 > opt-in native payload reads are documented in
 > [ANIMATION_BIND_REGISTRATION.md](ANIMATION_BIND_REGISTRATION.md).
@@ -1809,6 +2503,45 @@ No RPCS3 or automatic/testing game build was run.
 ---
 
 Embedded source: docs/ANIMATION_BIND_REGISTRATION.md
+
+## Paired on-court shot planar metadata investigation
+
+`research.shot_planar.inspect_pair_planar` now makes read-only root-derived
+proposals for category-14 paired shots, retaining both lanes and the complete
+bank-set fingerprints. It selects this established gameplay family explicitly;
+non-gameplay banks and group conversion are not included. Across the supplied
+203 entries /406 lane references every proposal passes bounded source inspection.
+These are proposals, not compatible conversion or playable-import totals.
+
+The represented-trajectory average samples ROOT POSITION AT PLAYBACK DURATION,
+not the final padded key, subtracts time zero, divides by duration, applies the
+native 1/8 position scale and mirrors X from mode bit30. Speed is the norm of the
+resulting X/Z components. Source byte-delta key times and CH fixed key times are
+handled separately. Cyclic interpretation, invalid timing/coverage, wrong rigs,
+incorrect root extents and float32 overflow reject; unknown authoring semantics
+remain unapproved. Outputs identify themselves as estimates, with no automatic
+metadata contract and no target compatibility claim.
+
+Read-only `audit_stock_planar` validates registered CH motion extents and compares
+against all224 existing paired-shot headers. All224 estimates agree with the
+stored planar X/Z within one root-step velocity resolution (0.125/duration;
+comparison epsilon1e-5), maximum per-axis error0.0471587181 native units/second.
+This supersedes the earlier naive endpoint comparison for THIS CONTEXT; it does
+not prove the original authoring algorithm or authorize estimates for running,
+rebounding or other transition contexts automatically. Root quantization and
+original authoring differences remain material limits on exact recovery.
+
+Native root routines NBA11 0x17BF4 /CH 0x2027C were inspected. A bounded synthetic
+full-root instruction probe could not execute NBA11's VMX instruction at0x17C08:
+Ghidra reports an unimplemented vectorSplatImmediateSignedByte user operation.
+No full-root native execution or VMX bit-exact claim is made. The numeric
+reference and stock corpus check remain separately identified evidence.
+
+Bulk pair inspection also exposed repeated full-bank decompression in the shared
+collection-entry helper. Collection reads now use the same bounded decoded-block
+cache as tracks; entry parsing remains fresh so a caller cannot poison later
+rows through mutation. This preserves the existing combined128-MiB decoded-byte
+limit and strict type/span checks; it is not a process-memory guarantee.
 
 # Canonical bind and additive registration investigation
 
@@ -1959,6 +2692,499 @@ No RPCS3, hardware run, full-game build or controller remapping was performed.
 ---
 
 Embedded source: docs/ANIMATION_RUNTIME_ADAPTER.md
+
+## CH dribbling motion-bundle playback selection
+
+Target dribbling named setup/update paths are now traced into0x345ABC's native
+motion-bundle selector. Ordinary dribble bundles contain five24-byte variants:
+two motion pointers, a threshold, two lane-specific scalars and raw flags. The
+prefix scans variants backward, uses actor-context+0x108 as the selection value,
+and gates flagbit0 through its explicit argument. Lane selection uses an explicit
+policy and actor[+0x14] flags+0xF0 bit1; its basketball meaning remains unnamed.
+
+The native code reads the FOLLOWING row's flags even when selecting the final
+variant, before clamping the next-motion index. Future owned bundles need24
+lookahead bytes. `motion_bundle` provides bounded read-only inspection and a
+selection reference; no writer/registration is introduced. Both current and next
+motion choices use the SELECTED row's lane scalar. Null/no-eligible motions stay
+null. Timing, blending, events and full playback after this prefix remain pending.
+
+The traced ordinary rules reach four bundles /20 variants /40 pointer references,
+with20 distinct existing CH motion headers validated through the existing full
+track-extent inspector. Two special candidate types remain opaque. These are
+existing-target context counts, not donor conversions or a complete dribble
+inventory. Registered table capacity is not inferred from the four observed IDs;
+the reader's explicit index bound is an inspection limit only.
+
+Native bundle prefix:192 synthetic cases pass, including exact lookahead-read
+addresses, both pointer lanes, flagged-neighbor clamping, thresholds, selected
+scalars and unchanged bundle bytes. Python module tests15 pass; bundle/target
+motion/residency/graph regression92 pass. Source/target assets remain unchanged.
+
+The target anchors are backed by native UTF16 diagnostic labels and their TOC
+references: setup-lockup0x392378, setup-drive0x392C38, dribbler-launch0x392F1C,
+from-stand0x393B5C, update-model0x393EFC, and move-dribble0x3948A8. Labels are
+anchors, not permission to substitute unrelated clips or metadata. Routine
+0x38BD34 returns the first matching key row in a zero-terminated pointer list;
+ordinary rows hold a full-word bundle index used with stride120 at table cell
+0xA5A718. They are not motion headers or native groups. Candidate descriptor
+validation0x390440 and ordered lookup0x3907F4 precede this row lookup. Special
+kinds3/4 and downstream paired/lockup paths require separate decoding.
+
+`inspect_dribble_bundle` checks observed reader instructions and file-backed
+pointer/header/track extents for one caller-proven index. It explicitly leaves
+registered table count and donor-to-target mapping unestablished. The helper
+argument limit0..65535 is not a demonstrated native ID capacity. Float fields
+remain raw preserved values; only the selection prefix behavior is established.
+
+## Dribbler graph style-to-node selection
+
+All60 signature registry keys in categories2..10 match the nine dribbler keyed
+families, despite those registry entries having empty motion references. The
+actual motions are graph dependencies; empty registry references must not cause
+these styles to be discarded. Keyed payload pointers now resolve to bounded node
+indices:111 non-null references /104 distinct nodes in the supplied dribbler graph.
+Shared player-field bindings identify the provider/category correspondence;
+these are not named move meanings or target bindings.
+
+`graph_style_gate` models ONLY source0x46C0D4's style eligibility. Node+0x14
+selector0 bypasses this gate; selectors1..17 compare a specific cached family/slot
+with the candidate node. Missing rows/slots reject non-null candidates; transition
+flag bit13 and null candidate bypass the gate. Other transition predicates still
+apply, and the full graph execution/CH counterpart remains unresolved.
+
+Native style-gate harness72 cases pass with distinct family/slot pointers, so
+swapped routes cannot pass accidentally. A supplied-data probe executes real
+player routing and the style gate for222 configurations: all match the reference,
+124 accepted /98 rejected, with unchanged graph bytes. This includes selector-zero
+bypasses when keys are missing. No uninitialized reads reported. Python graph tests
+45 passed; graph/source/group/library regression87 passed. These are selection
+proofs, not compatible conversion counts or playable imports.
+
+The nine shared native key routes are:
+
+| Graph family | Player key offset | Provider selector | Registry category |
+|---|---|---|---|
+|0|+0x100|11|2|
+|1|+0x108|13|4|
+|2|+0x110|15|6|
+|3|+0x10C|14|5|
+|4|+0x104|12|3|
+|5|+0x11C|37|7|
+|6|+0x114|38|10|
+|7|+0x118|39|9|
+|8|+0x120|40|8|
+
+The style selector maps1/2 to family0 slots0/1;3/4/5 to family1 slots0/1/2;
+6/7/8 to family2 slots0/1/2;9/10/11 to family3 slots0/1/2;12/13 to family4
+slots0/1;14..17 to families5..8 slot0. These numbers are internal style filters,
+not button gestures, serialized registry categories or animation IDs. The graph
+reader preserves unknown words and rejects keyed pointers into node interiors or
+other tables. The gate remains a read-only source reference, not target dispatch.
+
+## Dribbler keyed selection and player-cache lifetime
+
+Native leaf0x4691F8 reads the dribbler graph at0x4B93D2C, selects one of nine
+16-byte keyed tables (counts+0x1C..+0x3C, pointers+0x5C..+0x7C), compares raw
+32-bit keys and returns the FIRST matching row, or null. It neither deduplicates
+keys nor substitutes another family. `anim_graph.lookup_graph_key` models that
+ordering and validates explicit key/family bounds; family basketball meanings
+and the three row payload pointers remain unresolved. Inspection now retains
+these rows, unknown words and their bounded payload targets.
+
+The actual caller prefix0x46D07C..0x46D110 gets the player from actor+0x64.
+Families0..8 read player +0x100,+0x108,+0x110,+0x10C,+0x104,+0x11C,+0x114,+0x118,
++0x120 respectively, and cache returned row pointers at state+0x4C..+0x6C.
+These are native player offsets, not roster-file offsets or provider/category
+numbers. They must not be relabeled named dribble moves without more evidence.
+Cached rows point INTO the graph: backing graph storage must remain alive until
+all such caches are cleared or replaced. Native setup0x46CB4C..0x46CB6C derives
+state from actor[+0x14]+0x110 and calls0x469768. That helper clears0x70 bytes,
+including all nine caches, then copies parameter words into state+0x2C/+0x30.
+Two native cases verify this clear/seed behavior and untouched adjacent bytes.
+This establishes setup reset, not graph release or invalidation in other contexts;
+corresponding CH2K8 selection/cache ownership remains unresolved.
+
+The public native graph harness now passes53 cases: the earlier3 fixup cases,
+45 keyed cases (first/last/missing/empty/duplicate across all9 families), and3
+complete player-routing prefixes with actual lookup calls (first/last/missing),
+and2 setup reset cases.
+Unique per-family keys catch swapped player fields; cache sentinels check unknown
+state bytes stay unchanged. Successful runs report no undefined-register warning.
+A private supplied-graph probe checks all60 keys plus9 missing-key cases:69 pass,
+with graph bytes unchanged. Graph/source/group/library Python checks:68 passed;
+graph-specific tests26 passed. This remains source selection/lifetime evidence,
+not target graph execution, compatible animation conversion or gameplay validation.
+
+## Native graph relocation coverage for dribbling and bodyup
+
+`research.anim_graph.inspect_graph` now validates the observed NBA11 decoded graph
+layout: sixteen count/pointer pairs, fixed table strides, nonoverlapping tables,
+signed relative pointer bounds and positional executable motion bindings. It
+retains all nine raw node words and distinguishes the native direct-motion and
+group-first-member binding paths. Unknown node operations and transitions remain
+opaque. Other game profiles reject; no graph writer or target installation exists.
+Bounds are64MiB, one million aggregate rows and300,000 pointer fixups; these are
+inspection limits, not PS3 residency guarantees. Empty table endpoints, nulls and
+backward references are handled explicitly. No conversion count is inferred.
+
+The supplied dribbler graph passes with292 nodes /25,189 pointer fields. The
+5,956-byte `animgraph_bodyup` graph (resource0xEE6DA12B) passes with13 nodes /92
+pointer fields; all13 bind native groups, with26 canonical-mask member headers.
+Dribbler resource0x83C36981 binds292 direct native motions. The bodyup name is a
+lead for defensive interactions, not proof of exact gameplay selection semantics.
+
+`NativeAnimGraphTrace.java` executes the real0x37FC60 routine and0x8339AC helper
+without mocked calls. Three synthetic cases cover0/1/2 nodes, both binding paths,
+all pointer table classes, null/backward references, and whole-buffer preservation
+outside expected writes. All3 pass. A separate private bounded read-only probe
+also executes fixups on copies of both supplied graphs: dribbler368,721 steps,
+bodyup1,633 steps. Both outputs match the reader-derived relocation/binding image
+byte for byte, including all unknown bytes. This proves these supplied source
+fixups, not graph execution, transition semantics, target compatibility or gameplay.
+
+The supplied CH inventory reports no0x0D53D4B3 resource, and an ASCII handler-name
+search found no matching ANIMGRAPHRESOURCEHANDLER name in its ELF. These negative
+checks do not prove absence of equivalent target behavior. Target playback and
+native ownership still require tracing; copying the donor graph alone is not a
+complete loading solution. Running, defensive movement and rebounds remain required.
+
+## Dribbling graph native motion dependencies
+
+Static native tracing identifies NBA11 ANIMGRAPHRESOURCEHANDLER's fixup0x37FF80,
+which selects resource0x83C36981 and calls0x37FC60 with table0x3EF977C. The supplied
+770,144-byte dribbler graph has292 nodes at decoded offset0x80, stride36. The
+loader resolves header pointers +0x40..+0x58 through0x8339AC. Its node loop uses
+one executable table entry per node; when node +0x10 bit0 is clear it writes the
+entry into node +4. For set bit0 it instead writes node +0 and derives +4 from
+that object's +0xC. Both paths relocate node +0x18 and +0x20. This is static
+instruction evidence, not a completed native graph-loader execution test.
+
+All292 supplied dribbler nodes have bit0 clear and their executable-held motion
+headers have mask0x1DF7DD. This establishes explicit graph-to-native-motion
+references absent from an IFF-only inventory; it does not establish canonical
+bind equivalence, node operation/transition semantics or target compatibility.
+The graph and referenced native motions require joint loading/lifetime work.
+No node is counted as a converted compatible animation. Running, defensive and
+rebound playback contexts remain required and pending their own tracing.
+
+## Native paired-shot state addressing
+
+The target instruction harness now executes CH accessor0x2351D0 and its real
+0x234E30 dependency rather than substituting a state pointer. For the tested
+actor +0x20 ==1 path, the address is base +288 * (actor[+0x70] * stride +subindex).
+The paired-shot initializer passes subindex0. The stride is read indirectly
+through TOC cell0xA54240; base is held at0xA54250. The actor matching the cached
+pointer at0xA54264 follows a different path and is NOT covered by this trace.
+The meaning of the stride is unresolved; it is not established as a frame index.
+
+All18 combinations of hand bit0/1, style0/111/255 and synthetic stride0/1/2 pass.
+The actual player flag getter and TOC restoration still execute. A0x1200-byte
+sentinel verifies only the six expected metadata/motion fields change in the
+state storage, including untouched adjacent slots. Per-actor +4 dispatch metadata
+is checked separately. This establishes bounded addressing and row consumption,
+not target field semantics, allocation ownership, fallback or gameplay quality.
+
+Dribbling, running/locomotion, defensive movement and rebounding are required
+conversion families alongside scoring. Paired-shot work is a shared-foundation
+case, not completion of those families. Their source playback graphs, transitions,
+events, target context and native lifetime must each be established before they
+can count as compatible conversions. NBA2K14 right-stick controls remain deferred.
+
+## Paired on-court shot planar metadata investigation
+
+`research.shot_planar.inspect_pair_planar` now makes read-only root-derived
+proposals for category-14 paired shots, retaining both lanes and the complete
+bank-set fingerprints. It selects this established gameplay family explicitly;
+non-gameplay banks and group conversion are not included. Across the supplied
+203 entries /406 lane references every proposal passes bounded source inspection.
+These are proposals, not compatible conversion or playable-import totals.
+
+The represented-trajectory average samples ROOT POSITION AT PLAYBACK DURATION,
+not the final padded key, subtracts time zero, divides by duration, applies the
+native 1/8 position scale and mirrors X from mode bit30. Speed is the norm of the
+resulting X/Z components. Source byte-delta key times and CH fixed key times are
+handled separately. Cyclic interpretation, invalid timing/coverage, wrong rigs,
+incorrect root extents and float32 overflow reject; unknown authoring semantics
+remain unapproved. Outputs identify themselves as estimates, with no automatic
+metadata contract and no target compatibility claim.
+
+Read-only `audit_stock_planar` validates registered CH motion extents and compares
+against all224 existing paired-shot headers. All224 estimates agree with the
+stored planar X/Z within one root-step velocity resolution (0.125/duration;
+comparison epsilon1e-5), maximum per-axis error0.0471587181 native units/second.
+This supersedes the earlier naive endpoint comparison for THIS CONTEXT; it does
+not prove the original authoring algorithm or authorize estimates for running,
+rebounding or other transition contexts automatically. Root quantization and
+original authoring differences remain material limits on exact recovery.
+
+Native root routines NBA11 0x17BF4 /CH 0x2027C were inspected. A bounded synthetic
+full-root instruction probe could not execute NBA11's VMX instruction at0x17C08:
+Ghidra reports an unimplemented vectorSplatImmediateSignedByte user operation.
+No full-root native execution or VMX bit-exact claim is made. The numeric
+reference and stock corpus check remain separately identified evidence.
+
+Bulk pair inspection also exposed repeated full-bank decompression in the shared
+collection-entry helper. Collection reads now use the same bounded decoded-block
+cache as tracks; entry parsing remains fresh so a caller cannot poison later
+rows through mutation. This preserves the existing combined128-MiB decoded-byte
+limit and strict type/span checks; it is not a process-memory guarantee.
+
+## Current conversion scope: compatible on-court 5-v-5 animations
+
+The owner's latest direction narrows the earlier entire-bank goal. Convert/add
+only animations compatible with ordinary on-court 5-v-5 play: layups, dunks,
+shots (including running shots and free throws), dribbling, running/locomotion,
+defensive movement, rebounds and related gameplay moves. Dunk-contest, photo-op, crowd, mascot and other non-gameplay content may be
+omitted and must not count toward conversion progress. Unknown gameplay context
+or target compatibility remains pending, rather than silently included.
+
+Earlier full-library and grouped-header totals are SOURCE INVENTORY/FORMAT
+RESEARCH, not conversion eligibility, successfully converted gameplay actions or
+playable-import counts. The library JSON now marks this scope explicitly and
+leaves compatible conversion counts unset. Group inspection likewise does not
+count a member toward on-court conversion. The category-14 paired-shot and
+category-zero gameplay-sequence preparation manifests identify their intended
+on-court scope while retaining all unresolved target compatibility gates.
+
+The unpublished generic group-component conversion experiment was deferred;
+its private research evidence remains available. No dunk-contest/photo-op group
+conversion API or new native installation is published from that experiment.
+Broad format readers can remain as reference, but next implementation work is
+on proven gameplay contexts, event/selector and target metadata correspondence,
+then bounded native loading/ownership. Right-stick controls remain secondary;
+the final control policy is still NBA2K14 right-stick default, old layout preset A.
+
+## Grouped motion coverage and alias lifetime
+
+The full-bank audit now includes native group records, not just individually
+typed SingleMoCap records. The supplied 11 containers contain 75 groups with
+150 embedded headers in addition to 4,705 standalone headers: **4,855 inspected
+source headers**, with zero track-inspection failures. This supersedes earlier
+4,705-only inventory coverage totals. These are historical format-research
+counts, not conversion eligibility. Only compatible on-court 5-v-5 motions
+remain in conversion scope; off-court group members may be omitted.
+
+NBA11 group relocation 0x1602C fixes +4, then the first pointer of each 16-byte
+member entry at +0xC and calls motion fixup 0x15F24. Group count is at +8.
+Resolver 0x1C700 uses the FIRST member's unresolved +0x28 word to look up a group,
+then copies member dependencies through 0x11DD0 in corresponding slot order.
+The second member's zero reference ID must not become a SingleMoCap lookup.
+The native copy retains each alias header's state/mirror metadata and creates
+bidirectional +4 links between corresponding member headers. The resolver also
+links both group +4 fields. These are lifetime dependencies, not ownership
+transfer: backing groups/motions cannot be freed while referenced. Native
+backlink lifecycle and complete target group registration remain uninstalled.
+
+`MotionGroupSource` shares bounded bank decoding and retains original group and
+member provenance, placement words, per-member metadata and the owning group
+path. It rejects missing/ambiguous typed group owners, cycles, mixed packed/alias
+members, count/packing mismatches, invalid headers and dependencies intersecting
+another member's header. It never substitutes a direct clip for a group. Group
+ambiguity remains strict even when exact duplicate SingleMoCap coalescing is on.
+Placement-word semantics and synchronized target group behavior remain gated.
+The shared standalone track reader was factored without relaxing its bind gate.
+
+`inspect-animation-library` includes every group member, preserves standalone
+record counts separately, and limits total standalone+embedded headers to
+100,000 before reading tracks. The supplied audit adds 60 alias headers and 90
+conservative member-payload hashes: **2,323 alias headers /2,531 payload hashes**,
+**3,240 canonical-family candidates /1,615 other-rig headers**, and **30,055 event
+rows /11,169 covered by existing rules**. The numerical fixed-rate pose/root
+estimate becomes **78,490,456 bytes**, excluding headers/events/selectors/group
+metadata/registration and before target bind mapping. Hashes include complete
+member-tail bytes; this is conservative deduplication, not a minimal memory
+budget. Source bytes/size/mtime are unchanged. Executable-held and unknown-bank
+coverage, full semantic mapping, native streaming and gameplay remain unresolved.
+
+## Whole-library scope and provider routing correction
+
+The owner's current scope is compatible on-court NBA11 animation families,
+including dribbling, running, defense, rebounding and scoring. Historical full-bank
+inventory totals do not establish eligibility. Right-stick controls remain secondary. The four-pair category-zero work remains useful, but
+must not be confused with the paired jump-shot table.
+
+Native `0x657824` takes 41 provider selector codes and routes them into 31
+serialized registry categories. Selector 20 uses player +0x124 and category 14;
+selector 0 uses player +0xD4 and the separate category 0 sequence family. Selector 14
+actually selects category 5. Ten selectors share category1 with separate player
+key fields. Five paired selector groups choose alternate key fields through the
+third argument; neither categories nor selector numbers are motion IDs.
+`signature_provider.py` records all bindings; the native harness passes 82 cases.
+
+Category14 contains 203 paired entries / 406 nonempty references in the supplied
+signature banks. `prepare_jump_pair` now retains both lane headers and every one
+of the nine metadata-tail words. Unknown extra tail bytes and unsupported group
+references block preparation. The category 0 four-pair preparation and fallback
+work is retained separately. All registry reports expose provider-selector codes.
+The earlier hypothetical 112+147=259 comparison is NOT the paired jump-shot
+capacity requirement: retaining 112 stock entries plus 203 category 14 entries needs
+315 IDs. The stock byte field still cannot represent this. No IDs are truncated,
+styles discarded or incorrect family appended to the stock table.
+
+Whole supplied-IFF audit covers all 4,705 identified SingleMoCap records in 11
+containers (46,937,781 stored bytes), including crowd, mascot, presentation and
+other banks. All 4,705 now pass bounded declared-track inspection: 2,263 alias
+headers, 2,441 distinct payload-record hashes and 18 channel layouts across 16/21/24
+bone declarations. Two alias conflicts are exact 6,112-byte duplicate records.
+Optional identical-record coalescing proves equality of ALL decoded bytes and
+retains every candidate's provenance; distinct or unknown-tail differences reject.
+Strict ambiguity rejection remains the default. The 3,090 canonical-family
+candidates remain separate from 1,615 other-rig records: inspection does not bypass
+conversion's canonical bind gate or invent a crowd/global bone map.
+
+The read-only `inspect-animation-library` CLI audits all supplied typed records,
+reports bounded failures and channel-family/event coverage, and protects every
+input. The single-record inspector gains explicit declared-channel/coalescing
+options. This does not discover executable-held clips or establish that unknown
+archive resources are irrelevant. Its fixed-rate pose/root size estimate is
+71,643,008 bytes before headers/events/selectors/registration and before target
+bone mapping; the largest component is 818,400 bytes. Full-library memory/streaming
+integration must address the total, rather than raising per-image guards blindly.
+
+CH gameplay initialization `0x32479C` is now exercised, beyond the preview getter:
+player +0x73 chooses a 40-byte row; player +0x84 bit25 selects the lane. Row +4/+8
+feeds state +0xD8, +0xC feeds +0xE4, +0x10 feeds +0x104, +0x14 feeds +0x48,
++0x20/+0x24 feeds motion +0x74, +0x8C is cleared, and +0x1C feeds the per-actor
+28-byte record +4. The real hand getter/thunk and TOC restoration execute in six
+synthetic native cases at indices 0/111/255. Donor category 14 lane selection at
+`0x499468`/`0x499474` passes two cases. Row field basketball meanings and automatic
+cross-game authoring remain incomplete. Stock inspection now exposes raw metadata
+words, not invented field names.
+
+Next work remains active across the whole library: native executable-held bank
+coverage, per-rig mapping, event/payload and selector semantics, target playback
+and transition contexts, wide-ID selection, and bounded loading/lifetime/streaming.
+No complete playable import or gameplay validation is claimed. Source game banks
+and executables remain unchanged; no game/emulator or automatic JB test runs.
+
+## Native shot fallback graph and dependency closure
+
+Current priority remains animation porting; right-stick controls stay deferred.
+NBA11 cache initializer `0x6535BC` is now traced through its fallback branches,
+and cache-key reader `0x6533C0` is established. This supersedes the older
+statement that the fallback graph itself was untraced; target role mapping,
+context predicate semantics and native target dispatch are still unresolved.
+
+- Cache identity is player pointer plus player +0xD4. Selector/context are not
+  additional keys. Resource replacement must invalidate cached pointers or retain
+  their owners; the resident process-lifetime owner remains necessary.
+- Cache +0x1C/+0x20 retain original pair0/pair1 presence, before filling fallbacks.
+  Callers of `0x653A3C`/`0x6539D8` can request these original-presence flags.
+- Missing pair0 uses eight weighted rows (`0x434F1D0`, stride20). Each row consumes
+  one RNG sample; native float32 weight/cumulative-weight must strictly exceed
+  that sample to replace the selected row. This is a reservoir pass, not a
+  single cumulative-distribution draw.
+- Missing pair1 uses unsigned player +0x1C modulo18 into `0x434F270`, stride32;
+  it replaces pair1 AND pair2 even if pair2 originally existed. The player field's
+  basketball meaning is not assumed.
+- Still-empty pair2 selects embedded `0x3F8C798`/`0x3F8C7D0` by lane. Empty pair3
+  or a true optional context predicate selects lane-specific globals at
+  `0x434F1C4`/`0x434F1CC` and resets cache +0x18 to zero. Missing context, a -1
+  context ID, and a false predicate do not force replacement. The extra generator
+  getter call on pair3 replacement remains observable even without an RNG draw.
+
+`shot_fallback.py` adds bounded resolution and read-only revision-guarded table
+inspection. Handles/predicate results/RNG samples are explicit inputs; it does
+not guess target resource identities or reimplement unproven service semantics.
+The inspector distinguishes serialized resource IDs, embedded pointers, explicit
+empty entries and ambiguous identities, retaining input fingerprints. A family
+preparation report now records original lane presence, fallback requirements and
+that fallback resources are not included in its eight-slot image.
+
+Supplied-copy closure: 92 referenced positions = 64 unique bank-backed motions
+(all resolve uniquely in the supplied signature banks and already occur among
+shot slots), 24 unique executable-held headers, and four explicit empties.
+All 24 embedded headers' pose/root components convert: 708 authored keys remain
+exact across 6,426 fixed frames / 972,972 component bytes, before deduplication.
+Source hashes are unchanged. Header references, events, selectors and metadata
+still gate complete motion construction; component success is not playability.
+
+`NativeShotFallbackTrace.java` passes 145 bounded read-only instruction cases:
+140 fallback cases across both lanes, all 16 presence masks, missing/invalid-ID/
+false/true context, modulo boundaries and reservoir thresholds; five native cache
+key cases. RNG/context service results are mocked, with original fallback
+instructions executed. A Python/native comparison agrees on all 140 motion
+vectors and RNG draw counts. Nonzero control-value preservation/reset is checked.
+Next: map CH playback contexts and integrate the complete fallback dependency set
+with resident registration, retaining original presence flags. Remaining event,
+selector, authoring metadata and style-capacity gaps still block a full port.
+
+## NBA11 shot-family preservation (animation priority)
+
+Animation porting takes priority; NBA2K14 right-stick/default-preset work is deferred.
+NBA11 native consumer `0x6535BC`, player getter `0x949CF0`, and reference
+resolver `0x656AEC` establish four paired references per category-zero entry.
+Player +0xCC bit zero selects slots 1/3/5/7; bit one selects 0/2/4/6.
+The consumed word at payload +0x60 indexes native table `0xA51564`; its full
+meaning/table bounds and target mapping remain unresolved. All 147 supplied
+styles use index zero. Only 18 styles have the first pair; all 147 have pairs
+one through three. The first pair must not be assumed to be the base shot.
+CH `0x3213B8` selects row +0x20 for a nonzero selector and +0x24 for zero.
+That proves ordering, not basketball roles or cross-game contextual equivalence.
+
+`prepare_shot_family` now prepares every nonempty direct source reference with
+explicit per-header metadata/event/auxiliary contracts. It retains all eight
+slots, four pairs and distinct alias headers, deduplicates repeated header
+references, checks the whole-family byte budget and verifies relocation inverse.
+Missing/ambiguous resources, unsupported group dependencies, unknown trailing
+bytes and incomplete/stale contracts reject the complete result. Empty slots
+remain explicit; no contextual fallbacks or target role names are invented.
+This research API does not install native family dispatch or establish playable
+metadata. Existing event/selector identity gaps and the 259-style byte-ID conflict
+remain. Next: trace contextual fallbacks and map each pair to CH playback contexts
+before binding complete donor families into the resident registration path.
+
+A bounded read-only Ghidra harness checks 14 donor cases (both selection bits,
+reference kinds 0..5, and empty optional pairs) plus two CH row-order cases.
+Only registry lookup is mocked; source selection stops before contextual
+fallback handling. No game execution or source executable writes occur.
+
+# Counted selector transport and controller-axis routing — 2026-10-23
+
+Schema-2 serialized metadata now also requires `source_banks_sha256`, an ordered list of complete fingerprints for every supplied bank. A reproduced stale-contract bug allowed a related alias payload bank to change while the origin bank/header stayed unchanged. The full bank-set binding rejects that change; reports retain their own list copy. Earlier draft contracts missing this field must be regenerated. This closes an input-binding gap, not a semantic-mapping gap.
+
+The counted pointer tails are now supported end to end for the observed selector encoding: NBA11 +0x38 → CH +0x40, four bytes per curve pointer, count from header +0x10 & 0x3F. `read_selector_prefix` always reads at least two knots, then stops at the first upper knot bracketing the final declared query. A caller-supplied bounded reader enforces record or file-backed memory limits. It never copies an inferred neighboring region wholesale. Prefixes are limited to 65,536 knots; decreasing ticks, header/track overlaps, null counted pointers and missing terminal brackets reject installation. Exact sharing between selector tracks is allowed; partial overlap is rejected.
+
+The terminal bound covers both mathematical `ceil(duration * scale * 300)` and the native single-precision multiply sequence. For duration 2.2576792240142822 and scale 2.7786645889282227, the former is 1882 but native multiplication reaches 1882.0001220703125, requiring a knot at tick 1883. This bound prevents an endpoint read past the copied prefix. It does not claim bit-exact VMX reciprocal interpolation or establish out-of-domain queries.
+
+`translate_signature_motion(..., auxiliary_contracts=[...])` requires one schema-1 contract per counted channel, containing:
+
+- `source_channel`: exact zero-based index, preserving channel order;
+- `source_curve_sha256`: hash of the consumed prefix, not an inferred padded extent;
+- `target_elf_sha256`: the same complete target executable bound by the metadata contract;
+- `channel_evidence`: bounded research assertion about channel correspondence;
+- `rules`: explicit byte-valued `source`, `target`, and nonempty `evidence` for every consumed selector identity.
+
+No default identity map is supplied. Duplicate/stale/missing/unproven rules reject conversion. Only the upper selector byte changes; every signed 24-bit tick and knot is retained. Channel/resource semantics are caller research assertions, recorded as such rather than automatically established. Unknown header references, membership and event payloads still block component construction. The serializer includes the extended header and all aligned curves in its preflight budget before pose expansion. Existing CH curves require no cross-game mapping and can be copied with their native identities.
+
+Target inspection, preparation, relocation and static residency now validate full selector prefixes as owned dependencies. The generic allocator model also benefits from the shared relocation validation. Extra +0x3C data remains unbounded and blocked. Relocation and inverse byte preservation are mandatory. The serialized metadata report now records decoded float32 planar values, correcting a provenance-only bug that previously listed the packed bytes.
+
+The updated read-only source inspector accepts all 2,444 motions / 1,222 aliases, now including 4,016 bounded selector references. CLI reports expose consumed prefix sizes, hashes and selector values while leaving semantics unresolved. Private read-only corpus evidence: 806 NBA11 consumed prefixes total 35,592 bytes, compared with 35,852 bytes in previously bounded containing regions; the remaining 260 bytes occur beyond the needed terminal brackets and their meaning is not inferred. The 336 CH header references consume 12,424 bytes. All 224 distinct CH stock headers prepare together, deduplicating 168 selector tracks and producing 559,640 relative bytes. A separate in-memory resident-publication probe adds one duplicate of every original style: 224 total registrations, all 112 original rows unchanged, 224 owned motion headers, 569,504 bytes including tables/names, and exact inverse/BSS/source-preservation checks. Added labels deliberately use a documented stock placeholder. No donor shot or gameplay result is implied.
+
+The NBA2K14 input path continues through native getter 0xB5D298 and controller method 0x8E62C (descriptor 0xE12970, vtable 0xDA77F8 slot +0x2C). The getter reads record +0x110 + 16*axis, port stride 0x310; indices 0/1 are left X/Y and 2/3 right X/Y. The snapshot loop at 0x8E4CC copies all 30 axis values into a controller snapshot. `NativeStickInputTrace.java` now executes the real controller wrapper and getter for every axis on ports 0/6 with unique values, no mock calls in those 60 cases. Together with the original nine input-prefix cases, **69 native instruction cases pass**. This establishes raw routing, not dribble move selection, camera-relative gestures, deadzones or control presets. The observed low-level postprocessor at 0xB5D888 tests left-stick thresholds; it must not be relabeled as right-stick dribble dispatch.
+
+The required final control policy remains NBA2K14 right-stick dribbling by default, with old button-dribble controls selectable as preset A. It has not yet been installed. Native instruction checks use bounded Ghidra harnesses only; RPCS3, gameplay and automatic/testing JB builds remain unrun. Earlier phase notes below are historical where superseded by this section.
+
+# Resident loading, metadata contracts, and NBA2K14 controls — 2026-10-23
+
+`translate_signature_motion` builds an owned relative CH component only with schema-2 metadata bound to source bank index, record index, complete bank hash, header hash, donor executable hash, and target executable hash. It requires explicit target mode, state bits, authored planar values, and bounded evidence for each group. These are caller research assertions, not automatic semantic proof. Unknown event IDs, opaque payloads, uncontracted auxiliary channels, header references, and membership dependencies block construction. The shared serializer validates the known target layout and relocation inverse before returning bytes.
+
+`append_resident_image` creates a separate decoded ELF. It extends the final writable nonexecutable load segment after its original memory extent, materializes original BSS as zeros, preserves existing virtual addresses and loaded bytes, shifts trailing nonloaded data/section offsets, and reparses the result. Unsupported alignment, collisions, TLS interference, unknown dependencies and byte-budget overflow are rejected. Relative/native pointer conversion and inverse reconstruction must match exactly. This is static process-lifetime ownership: no runtime allocation, eviction, rebinding or shutdown free is introduced. It is not a signed SELF installer or proof of hardware loading.
+
+`install_resident_shots` publishes the owned table through established native table/name slots and capacity instruction. It preserves the 112 stock rows and requires explicit paired header indices, 32-byte playback metadata, tagged target localization key, and evidence per added style. The byte-ID limit permits at most 144 additions; 112 + 147 = 259 is rejected rather than truncating donor styles. Original name initialization remains native; tagged added labels do not require freeing. Reports retain validated assertion copies and explicitly mark semantics and gameplay unverified. These APIs are research-only; no GUI or executable-writing CLI was added.
+
+The owner-requested separate-ELF probe installs a stock duplicate with a documented placeholder stock label: 113 total styles, 9,636 resident bytes, 9,443,216 original BSS bytes preserved, exact inverse check, and unchanged input hash. This tests structural publication only. Actual native resource lookups return borrowed pointers; the always-resident image deliberately avoids relying on an unproven resource pin/lease mechanism.
+
+`event_mapping_coverage` uses the same rules as transcoding and reports missing `(source_id, payload_word)` pairs and opaque payload IDs. Across 911 shot headers: 5,358 rows, 2,642 covered, 333 complete event tables; 84 additionally have no unresolved auxiliary/reference/membership dependencies. Unmapped IDs are 4, 18, 25, 55, 103, 114, 147, 148; opaque payload IDs include 92 and 173. These counts do not establish 84 usable shots. CH state words differ from NBA11 and authored planar values cannot be supplied by an unvalidated root-endpoint estimate.
+
+`sample_selector_curve` models weighted selector interpolation from signed 24-bit tick/8-bit selector knots. It is a mathematical reference, not bit-exact VMX reciprocal emulation or a cross-game selector-ID mapping. Across 806 bounded curves, start/midpoint/end queries pass (2,418 samples). Equal-time conflicting selectors and invalid queries are rejected.
+
+`tools/research/NativeStickInputTrace.java` executes the NBA2K14 input prefix at 0xB5DAF0 through 0xB5DD08 in a bounded Ghidra instruction harness. Only pad API/port calls are mocked. Native stores place left X/Y at record +0x110/+0x120 and right X/Y at +0x130/+0x140; port stride is 0x310, valid ports 0..6. CellPadData indices 4/5 supply right X/Y and 6/7 left X/Y. Native single-precision normalization uses reciprocal 255 and inverts Y, without imposing a new deadzone or clamping the slight center/endpoint rounding. Six valid packets on ports 0/6 and three rejected packets pass; rejection retains prior axes. ABI reference: [RPCS3 pad_types.h](https://github.com/RPCS3/rpcs3/blob/master/rpcs3/Emu/Io/pad_types.h). No RPCS3 or gameplay was launched.
+
+Remaining work: establish auxiliary resource identities and event payload semantics, prove per-shot target metadata/variants, resolve the 259-style capacity conflict, trace NBA2K14 dribble dispatch and target control consumers, then integrate the default right-stick layout with original controls selectable as preset A. Smooth transitions and gameplay accuracy require subsequent validation; the structural and instruction checks do not certify them.
+
+Earlier phase documentation below is historical. The resident backend above supersedes earlier statements that no native loading path exists; semantic and gameplay gates remain.
 
 # Runtime adapter follow-up
 
@@ -2198,7 +3424,8 @@ component from the observed NBA11 **decoded-ELF** packed family, with verified
 canonical binds and separately supplied metadata/event contracts. This goes beyond
 retaining an existing CH header, but it does not automatically discover the missing
 metadata or install the component in a native bank. The signature-IFF records and
-aliases discussed below still need their own source adapter.
+aliases were outside this ELF builder; the later serialized-source section below
+now supplies their read-only adapter and partial pose/root preparation.
 
 The builder places the source low rotation/translation masks into CH's mask words,
 retains native channel counts and rate, expands authored key deltas to fixed frames,
@@ -2333,8 +3560,95 @@ phase algorithms or the remaining mode/state semantics.
 
 Original executables and source banks remain unchanged. Ghidra's bounded instruction
 harness was run; RPCS3, hardware/gameplay and automatic/testing JB were not run.
-The full native donor loader, automatic metadata derivation, signature-bank source
-adapter/auxiliary selector mapping and playable additive shot remain unfinished.
+The full native donor loader, automatic metadata derivation, signature-bank auxiliary selector mapping and playable additive shot remain unfinished.
+The serialized source adapter below supersedes the earlier source-adapter gap.
+
+
+## Serialized signature-IFF source adapter — 2026-10-23
+
+`research.signature_motion.SignatureMotionSource` consumes 1..32 related standard
+IFF banks with combined stored and declared decoded-block limits of 128 MiB.
+It indexes only typed SingleMoCap identities. A caller chooses a bank/record
+index; aliases follow their +0x28 ID until a record with nonzero event pointer is
+reached. Missing/duplicate matches, cycles and paths beyond 4,096 records fail.
+No resource-group selection is silently substituted for a direct motion.
+
+Resolution returns the original alias header separately from the track-owning
+record. Masks, channel/rate/auxiliary counts, key count and root/packing modes
+must agree across the path. Original mirror/phase/state/timing words remain
+original metadata; the adapter does not replace them with the payload owner's
+words or claim to derive target authoring fields. Declared timing must agree
+with the borrowed key intervals. This is an offline compatibility gate, not
+installation of the game's native resource resolver.
+
+All pointers are signed record-relative offsets. Known timing/pose/root/event
+and membership extents must fit within their record, stay outside its counted
+header, and not overlap one another. Events preserve their existing payload
+inspection limits. Counted auxiliary pointers and header +4 references remain
+reported dependencies: no curve end, padding, selector meaning or complete
+payload semantics is invented. Source bank/record/payload hashes and the entire
+alias path distinguish header identity from track ownership.
+
+The native timeline consumes **keys minus one interval bytes**. The existing
+shared resampler accepts keys slots but ignores its final slot. Some supplied
+serialized records end immediately after the consumed intervals. The adapter
+reads only those intervals, appends an explicit unused zero slot in memory and
+reports `timing_unused_final_slot_normalized=true`. It never obtains that slot
+from a neighboring record. A missing consumed interval still fails bounds checks.
+
+`tracks(bank, record)` returns known source components and a diagnostic manifest.
+`prepare_pose_root(bank, record, donor_elf, target_elf, budget=...)` verifies the
+canonical executable bind, preflights expanded pose/root bytes against a 64-byte
+to 16-MiB budget, and resamples both components. Reports bind provenance to both
+complete executable fingerprints, retain the original source header, and list
+omitted header/event/auxiliary/membership dependencies. Mirror/phase transforms
+are not baked into the component arrays. Neither API produces a complete CH
+header, native resident image, installable bank or patched executable.
+
+Read-only CLI (record index is in the first bank):
+
+```
+python -m choops_py.cli inspect-signature-motion siganims_generic.iff 0 output/research/signature-motion.json --related-bank siganims_generic_extra.iff
+```
+
+The CLI writes JSON only under output/ and protects every related source from
+replacement. It reports `complete_motion=false` and `gameplay_ready=false`.
+
+Supplied two-bank audit: all **2,444** SingleMoCap records pass known track checks,
+including **1,222** aliases. Category zero retains all **918** nonempty slots,
+**458** alias slots, **911** distinct headers and **456** distinct payload owners.
+All 456 payloads prepare successfully: **82,076** fixed frames, **11,215** authored
+keys, and **12,324,180** total pose/root component bytes summed per payload without
+cross-payload deduplication. Every authored pose is reverse-transcoded at its
+original tick and equals the original bytes; authored root rows also equal their
+source bytes. Interpolated frames retain the existing offline SLERP/quantization
+limits. Both banks and both decoded executables keep their original hashes.
+
+This measured component sum has a different scope from the earlier deduplicated
+known-component projection; neither is a complete native library/heap budget.
+Header/auxiliary/events, alignment, registration, allocator overhead and all
+existing CH memory still require separate accounting.
+
+### Remaining route to full NBA11 import and NBA2K14 right-stick dribbling
+
+1. Establish auxiliary selector identities/target routing, complete event payload
+   correspondence, per-header target authoring fields and every signature variant.
+   Connect the serialized adapter to the complete component writer only when those
+   dependencies have explicit validated contracts.
+2. Finish additive native lookup/registration and reader/publication/retirement/
+   heap-lifetime synchronization. Resolve the 259-style versus byte-ID ceiling
+   without truncating IDs or replacing stock styles. Then extend beyond signature
+   shots to other motion families, interaction/ball contacts and graph consumers.
+3. Trace the supplied **PS3** NBA2K14 right-stick input consumers, normalization,
+   camera-relative interpretation, move selection, cancel/blend windows and
+   ball/hand ownership against CH's controller/animation dispatch. Existing
+   controller/dribble strings are leads, not proof of these semantics. Importing
+   clips or changing a controller default alone does not implement right-stick
+   dribbling. No NBA2K14 input adapter or control patch is supplied this phase.
+
+Native execution/gameplay acceptance remains separate from structural conversion.
+No emulator, hardware or automatic/testing JB was used. Original game inputs
+remain immutable; game-derived component arrays/reports stay private.
 
 ---
 
@@ -5357,6 +6671,273 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 
 Embedded source: docs/TEST_REPORT.md
 
+## Native CH motion-bundle prefix
+
+Isolated author verification ate95b4824ccb79f7cd0936149792d288e0411740e:
+**1,186 passed,10 skipped,2 deselected**; handoff, compile, CLI/offscreen Qt,
+Ruff and mypy18files pass. Final published-head verification is recorded in PR49.
+
+`NativeMotionBundleTrace.java`: **192 passed**, no mocked calls, stopping before
+native timing/playback. Covers counts1/5, six threshold values, explicit flag
+permission, lane policy, actor flag and guard-row bits. The observed lookahead
+read address is checked, including after the last variant. Motion/scalar outputs
+and untouched bundle bytes match. All FP/status registers are initialized; final
+run reports no undefined-read warnings or instruction failures.
+
+Python bundle tests **15 passed**; bundle/target-motion/residency/graph regression
+**92 passed**. Ruff E/F/I passes. Cases cover descending rather than sorted
+priority, flagged-neighbor clamping, selected-row scalars, explicit context,
+float32 overflow, missing lookahead bytes, malformed metadata/pointers, native
+revision, caller-index bounds, source immutability and complete target extents.
+Read-only supplied audit validates four ordinary bundles /20 variants /40 header
+references /20 distinct headers. Two special candidate types remain opaque;
+registered capacity, full dribbling coverage and donor compatibility are unproven.
+
+## Dribbler style gate and graph-node dependency closure
+
+Isolated author verification at28974b64d29186c2a2b7d5b8b00384a625c7b5c1:
+**1,171 passed,10 skipped,2 deselected**; handoff, compile, CLI/offscreen Qt,
+Ruff and mypy18files pass. Final published-head checks are recorded in PR49.
+
+Graph tests **45 passed**; affected graph/source/group/library regression
+**87 passed**. Ruff E/F/I passes. Node-boundary errors, distinct selector-family
+slots, missing keys/slots, explicit inputs, zero/null/bypass and unsupported
+selectors are covered. Supplied source graphs still pass structural inspection.
+
+`NativeGraphStyleGateTrace.java`: **72 passed**, with distinct family/slot pointers
+and initialized condition status. Private supplied-data probe: **222 passed**,
+using complete native player routing and style-gate code;124 accepted,98 rejected.
+All111 keyed node references are exercised with correct and missing-key sets.
+Graph bytes stay unchanged. No native warning/failure in successful final runs.
+This is source eligibility evidence, not a full transition or target gameplay test.
+
+## Dribbler keyed lookup and player routing
+
+Isolated author portable verification at7324d072658c4cf77bd551ee1fb9727fd6c1f1dc:
+**1,152 passed,10 skipped,2 deselected**; handoff, compile, CLI/offscreen Qt,
+Ruff and mypy18files pass. Subsequent cache-reset additions affect only the
+native Java harness and evidence notes; final-head verification is tracked in PR49.
+
+Graph tests **26 passed**; affected graph/source/group/library regression
+**68 passed**. Ruff E/F/I passes for the graph module and its tests.
+Native graph harness: **53 passed** (3 fixup,45 lookup,3 complete player routing,
+2 cache-clear/setup cases).
+Private real-graph lookups: **69 passed**, all60 rows plus9 missing keys.
+No uninitialized-read warning or instruction failure in the initialized successful
+runs. The first synthetic lookup run passed but exposed uninitialized xer_so;
+the harness now initializes it. The setup probe initially began after the actor
+argument move; correcting its start to0x46CB4C gives the complete native prefix.
+The final53-case run passes without uninitialized-read warnings.
+Full graph byte preservation and state-cache sentinels hold. No gameplay run.
+
+## NBA11 graph structural and native relocation continuation
+
+Isolated author verification at0a7065b02095ace7340adc6651da1140a548c853:
+**1,136 passed,10 skipped,2 deselected**; handoff, compile, CLI/offscreen Qt,
+Ruff and mypy18files pass. The committed native harness also passes all3 cases
+from that isolated checkout. Author verification is not independent approval.
+
+New graph parser tests: **10 passed**. Graph/source/group/library regression:
+**52 passed**. New module/tests pass Ruff E/F/I. Inputs cover mixed direct/group
+bindings, unknown-word preservation, signed/null/end pointers, overlap, nonempty
+null tables, count/fixup budgets, unsupported profiles and truncation.
+
+Native synthetic graph instruction harness: **3 passed**, no mocked calls.
+Private supplied-graph fixup probes: **2 passed**, full-byte equality against the
+reader-derived expected images (dribbler368,721 steps; bodyup1,633 steps). No
+uninitialized-read warning or instruction failure reported in successful runs.
+Original archive part sizes/mtimes unchanged; no gameplay or testing JB run.
+
+## Native shot state accessor continuation
+
+Isolated author portable verification at8311f247f78492c15861604619eee89ef830723e:
+**1,126 passed,10 skipped,2 deselected**; handoff, compile, CLI/offscreen Qt,
+Ruff and mypy18files passed. This is author verification, not independent approval.
+
+Read-only `NativeJumpGameplayTrace.java` on the supplied CH ELF: **18 passed**
+(hand0/1, style0/111/255, native stride0/1/2). The real0x2351D0 accessor and
+0x234E30 dependency execute; the previous state-pointer substitution is removed.
+All expected motion/metadata words and per-actor output match; a0x1200-byte
+sentinel confirms adjacent storage preservation. No harness instruction failure
+or uninitialized-read warning was reported. This is instruction-level evidence,
+not gameplay, allocation ownership or cross-game semantic validation.
+
+## On-court paired-shot planar proposals and cached collection reads
+
+Read-only public API audits: **224/224 existing CH shot headers** agree within one
+root-step velocity resolution (0.125/duration, epsilon1e-5); maximum planar-axis
+error0.0471587181 native units/second. **203 donor paired entries /406 lanes**
+produce bounded proposals. Original source bytes remain unchanged. These are
+metadata proposals, not eligible/compatible/playable conversion counts.
+
+The native full-root VMX probe stops at0x17C08 with Ghidra's unimplemented
+vectorSplatImmediateSignedByte operation. Native full-root execution is NOT a
+pass. Static native instruction inspection, numerical reference tests and the
+stock-corpus comparison are distinct evidence; no original authoring recovery or
+VMX bit-exact claim follows.
+
+Targeted proposal/cache/family/source/group/library checks: **83 passed**.
+Isolated author verification: **1,126 passed, 10 skipped, 2 deselected**; handoff
+freshness, compile, CLI/offscreen Qt, Ruff and mypy (18 files) pass. Tests cover cropped
+end times, mirroring, nonuniform source intervals, cyclic/timing/extent rejection,
+float32 range, paired-family selection, immutable inputs and decoded-block reuse
+with fresh mutable parsed rows.
+
+## Compatible on-court scope correction
+
+The owner narrowed conversion scope to compatible ordinary on-court 5-v-5
+animations. Earlier complete-bank/group totals remain inventory evidence only;
+they must not be interpreted as converted or compatible gameplay counts. The
+unpublished general group-component experiment was deferred, with no generic
+group conversion API or game installation published. Research readers remain.
+
+Report changes label inventory scope and unset compatible conversion counts;
+paired-shot/four-pair manifests preserve explicit target compatibility gates.
+Targeted affected checks: **37 passed**. Isolated author verification: **1,115
+passed, 10 skipped, 2 deselected**; handoff freshness, compile, CLI/offscreen Qt,
+Ruff and mypy (18 files) pass. Gameplay was not run; no testing JB was built.
+
+## Grouped motion continuation verification
+
+Read-only supplied-IFF API audit: **4,855/4,855 headers inspected** (4,705 standalone
+plus 150 members in 75 groups), zero failures. Group members include 60 alias
+headers and 90 distinct member-tail hashes; source bytes, sizes and mtimes stayed
+unchanged. Numerical pose/root estimate is now 78,490,456 bytes; this does not
+measure native working-set residency or establish target group placement.
+
+Native `NativeMotionGroupTrace.java`: **6 cases passed** (1/2/4 members, relocation
+and alias-copy modes), executing real group/motion fixups and the native
+member-copy loop. Verify original header ID/mode/state and group placement words,
+all copied dependency/tail pointers, and bidirectional motion/group backlinks.
+Final run explicitly initializes saved registers and condition state, with no
+uninitialized-register warnings. No game/emulator or testing JB run.
+
+Targeted group/library/source checks: **42 passed**. Cover all-member alias
+resolution from the first reference, typed identity separation, ambiguity,
+cycles, incompatible/mixed members, header/table/dependency bounds, unchanged
+source bytes, group-only libraries, failed-member reporting and pre-read total
+header limits. Isolated author verification: **1,115 passed, 10 skipped,
+2 deselected**; handoff freshness, compile, CLI/offscreen Qt, Ruff and mypy
+(18 files) pass. This is author verification, not independent approval.
+
+## Whole-bank marker dispatch verification
+
+Native read-only Ghidra instruction harness: **192 NBA11 + 185 CH cases passed**.
+Every observed marker index reaches its actual OPD callback with the expected
+header/actor registers, callback TOC and return address. CH additionally passes
+marker time 1.5 exactly in f1. Checks stop before callbacks: this does not verify
+all callback effects, resource ownership or game playback. Source assets and
+executables remain unchanged. Initial headless attempts with relative project
+paths were rejected before analysis; final runs used resolved absolute paths.
+
+Portable targeted parser/CLI checks: **8 passed**, covering both table endpoints,
+flags-before-descriptor layout, shared callbacks, unsupported revisions,
+unbacked/unaligned descriptors, incorrect TOCs, non-executable callbacks and
+input overwrite protection. Isolated author verification: **1,098 passed, 10 skipped, 2 deselected**;
+handoff freshness, compile, CLI/offscreen Qt, Ruff and mypy (18 files) pass.
+Earlier complete-suite counts apply to their named earlier updates.
+
+## Whole-library and provider continuation
+
+Full portable verification in the isolated detached checkout: **1,090 passed,
+10 skipped, 2 deselected**; handoff freshness, compile, CLI/offscreen Qt, Ruff and
+mypy (18 files) pass. Author verification, not independent review.
+
+Category 14 pose/root audit: 201 distinct payload owners / 402 distinct headers /
+406 reference slots; 5,902 authored keys preserved exactly across 23,352 fixed
+frames / 3,546,552 component bytes. All source hashes remain unchanged. This is
+component conversion only, with no fabricated target header metadata.
+
+The library audit also distinguishes valid source timelines exceeding CH's
+16-bit frame count from source-format failures; estimates remain numerical and
+do not allocate expanded images. Two additional boundary tests pass (unmapped
+mask bounds and a valid 66,049-frame source timeline that conversion rejects).
+
+Targeted source/library/provider/pair/registration/residency checks: **64 passed**.
+A separate combined provider/pair/library/source/registry/family run: **61 passed**.
+Checks cover exact duplicate equivalence including unknown tails, default
+ambiguity rejection, unmapped-rig conversion gates, family separation, full row
+word retention, byte budgets and protection of every CLI input.
+
+Read-only supplied-IFF audit: **4,705/4,705 records inspected**, 2,263 aliases,
+2,441 distinct payload hashes, 18 channel layouts, two proved duplicate-alias
+resolutions; 29,939 event rows / 11,139 covered by existing rules. Source banks'
+size/mtime remained unchanged; decoded caches/reports stay private. Numerical
+fixed-rate pose/root estimate: 71,643,008 bytes, excluding other dependencies and
+before target bone mapping. No semantic event rules were added from this audit.
+
+Native provider harness: **82 cases passed** (41 selectors, both alternate flags).
+Donor jump-pair selection: **2 passed**. CH gameplay row initialization: **6 passed**
+with real hand getter/thunk and TOC restoration, synthetic state lookup/actors and
+rows, indices 0/111/255. Incorrect handwritten opcode guard constants were corrected
+before the final runs; no original executable was patched. No gameplay runs.
+
+## Native shot fallback continuation
+
+Portable verification in the isolated detached checkout: **1,074 passed,
+10 skipped, 2 deselected**; compile, handoff, CLI/offscreen Qt, Ruff and mypy
+(18 files) pass. Author verification only; no independent approval.
+
+Targeted shot fallback/family/registry suite: **51 passed**. Checks retain original
+presence flags, replace existing pair2 when pair1 is missing, preserve/reset
+nonzero control words, distinguish empty dependencies, bound table extents and
+reject invalid float arithmetic. Native instruction harness: **145 passed**;
+140 fallback vectors/draw counts also match the Python model. Services are explicit
+mocks; no game execution. A first nonzero-control harness check caught an incorrect
+synthetic high-address register setup; it was corrected before the final 145-case
+run. The final harness initializes floating-point exception state.
+
+Supplied read-only dependency audit: 64 resolved serialized motions, 24 embedded
+headers, four empty positions. Embedded pose/root conversion preserves 708
+keys exactly (6,426 frames, 972,972 bytes before deduplication). Originals unchanged;
+complete event/metadata/selector conversion and gameplay remain unverified.
+
+## Shot-family continuation
+
+Portable verification in the isolated detached checkout: **1,051 passed,
+10 skipped, 2 deselected**; handoff freshness, compile, CLI/offscreen Qt, Ruff
+and mypy (18 files) pass. This is author verification, not independent approval.
+
+Targeted `tests/test_shot_family.py tests/test_donor_registry.py`: **28 passed**.
+Covers all-slot preservation, distinct alias headers, optional empty pairs,
+relocation inverse, exact/insufficient budgets, unresolved dependencies before
+expansion, stale contracts and missing consumed control words. Native bounded
+selection harness: **14 NBA11 + 2 CH cases passed**, read-only, synthetic runtime
+resources; stops before contextual fallbacks. No gameplay validation.
+
+# Selector transport and controller routing — 2026-10-23
+
+Schema-2 serialized metadata now also requires `source_banks_sha256`, an ordered list of complete fingerprints for every supplied bank. A reproduced stale-contract bug allowed a related alias payload bank to change while the origin bank/header stayed unchanged. The full bank-set binding rejects that change; reports retain their own list copy. Earlier draft contracts missing this field must be regenerated. This closes an input-binding gap, not a semantic-mapping gap.
+
+Targeted selector/header/translation/residency regressions: **92 passed**. New coverage checks prefix bounds and adjacent-data exclusion, native endpoint rounding, stale/missing/duplicate selector maps, signed tick preservation, extended header alignment, all-dependency budgets, owned static loading, unknown extras and provenance isolation. Changed files pass strict Ruff E/F/I. Portable pytest verification: **1,039 passed, 10 skipped, 2 deselected**. Exact-head full verification is recorded in PR49. The sandboxed attempt failed/stalled in subprocess checks; the same suite passed outside the sandbox. Tests and private audits remain separate evidence.
+
+The updated read-only source inspector accepts all 2,444 motions / 1,222 aliases, now including 4,016 bounded selector references. CLI reports expose consumed prefix sizes, hashes and selector values while leaving semantics unresolved. Supplied-copy audit: 806 NBA11 and 336 CH selector references pass bounded prefix reads; all 224 CH stock headers prepare together (559,640 bytes, 168 deduplicated selector tracks). The separate in-memory decoded-ELF probe registers 112 stock duplicates, 224 total styles, preserving original 112 rows/BSS/input and inverse reconstruction. No donor gameplay is established. NBA2K14 Ghidra instruction harness: **69 passed** (nine input-prefix cases plus 60 real wrapper/getter cases). No RPCS3/gameplay or testing JB was run. Earlier phase reports below retain their original counts.
+
+# Native integration and control-input research — 2026-10-23
+
+Targeted tests cover static BSS/section preservation, native table publication, explicit serialized metadata binding, event coverage, selector interpolation, and existing donor/header/loader regressions. Nine NBA2K14 instruction-harness cases pass. The separate supplied-copy decoded-ELF probe preserves 112 originals and adds one stock duplicate; no donor gameplay claim follows. Private event coverage and selector sample counts are documented in ANIMATION_RUNTIME_ADAPTER.md. No emulator/gameplay or testing JB was launched. Source portable verification: **1,026 passed, 10 skipped, 2 deselected** before the final source-to-resident regression. Final exact-head verification, including that regression, is recorded in the PR. Compile, CLI/offscreen Qt, strict changed-file Ruff, portable lint, mypy (18 files), and handoff checks passed.
+
+# Signature-IFF source adaptation — 2026-10-23
+
+`python -m pytest tests/test_signature_motion.py -q -p no:cacheprovider`:
+**19 passed**. Covers compressed/uncompressed serialized sources, exact pose/root
+components, cross-bank alias metadata retention, missing/ambiguous/wrong-type IDs,
+cycles, incompatible masks/counts/packing/timing, identity mismatch, truncated or
+overlapping tracks, missing event sentinel, decoded-size limits, budget-before-
+expansion, canonical bind rejection, omitted auxiliary semantics, keys-minus-one
+timing boundaries, CLI parity and every-related-source output protection.
+New adapter/tests pass strict Ruff E/F/I checks. Source portable verification:
+**984 passed, 10 optional skips, 2 deselected**; compile, CLI/offscreen Qt, Ruff,
+mypy and handoff checks pass. Final exact-head evidence is recorded in the PR.
+
+Private read-only audit: 2,444 motion records / 1,222 aliases pass; all 918 nonempty
+shot slots resolve to 911 headers / 456 payloads. All 456 payloads prepare with
+82,076 fixed frames / 11,215 exactly preserved authored pose and root keys.
+Summed pose/root bytes: 12,324,180, before cross-payload deduplication and without
+other motion dependencies/native overhead. Input bank/executable hashes unchanged.
+No complete motion/native loader, playable animation or right-stick control port
+is claimed. RPCS3/gameplay NOT RUN; automatic/testing JB NOT BUILT.
+
 # v1.22 alternate discovery and PR integration
 
 Targeted: `python -m pytest tests/test_team_assets.py tests/test_folder_overrides.py
@@ -5457,12 +7038,12 @@ translation counts, decoded-pose equivalence, padding/reverse-byte preservation,
 changed native consumers/ranges, TLS-safe zero-padding planning, mirror-selector
 parity and opaque-payload refusal after consumer inspection.
 
-Private read-only corpus:7,055 CH and18,831 NBA11 headers pass canonical-channel
+Private read-only corpus:7,055 CH and 18,831 NBA11 headers pass canonical-channel
 validation.9,574 NBA11 pose streams/341,823 keys/49,278,288 bytes pass conversion
 and exact reverse checks; no component-preparation errors. Of9,574 event tables,
 2,674 use only the verified subset (including empty tables),6,900 remain blocked.
 Traced payload reads pass for151 event90,1117 event92,71 event93,47 event94,
-1260 event173,23 event178 and187 event186 rows; no extent errors.
+1260 event173,23 event178 and 187 event186 rows; no extent errors.
 
 The authorized separate registration-only decoded ELF reparses at113 entries,
 preserves112 original records, TLS and adjacent label pointers, and passes an
@@ -5640,7 +7221,7 @@ NBA11 streams /341,823 frames with exact reverse bytes; all9,574 distinct donor
 timelines match rate/time-scale/duration. Resampling32 pose streams preserves644
 keys across4,642 fixed frames;33 root streams preserve keys across4,757 samples.
 Ghidra/native instructions establish frame layout, quaternion selector difference
-and the112-entry CH jump-shot table. No complete bank conversion, bone retargeting,
+and the 112-entry CH jump-shot table. No complete bank conversion, bone retargeting,
 new shot registration, control remap, native runtime or gameplay check is implied.
 RPCS3 NOT RUN; automatic/testing JB NOT BUILT. No EBOOT writes.
 

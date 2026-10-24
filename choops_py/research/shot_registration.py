@@ -63,7 +63,15 @@ def inspect_registration(raw, *, motion_extents=False):
                 from .target_motion import inspect_target_motion
 
                 motions[pointer] = inspect_target_motion(elf, pointer)
-        rows.append(dict(index=index, motions=list(pointers)))
+        rows.append(
+            dict(
+                index=index,
+                motions=list(pointers),
+                playback_metadata_words=list(
+                    struct.unpack_from(">8I", records, index * 40)
+                ),
+            )
+        )
     # The name initializer is unrolled. It writes exactly the original 112 cells
     # via R9; a separately initialized appended tagged name is not overwritten.
     if word(0x696A5C) != 0x81221838:
@@ -92,7 +100,10 @@ def inspect_registration(raw, *, motion_extents=False):
         motions=list(motions.values()),
         gameplay_ready=False,
         runtime_tested=False,
-        note="Validates observed registration structures; does not install donor motions or certify gameplay.",
+        note=(
+            "Validates observed registration structures; does not install donor "
+            "motions or certify gameplay."
+        ),
     )
 
 

@@ -28,6 +28,10 @@ def parser():
                 s.add_argument('--cache-bytes',type=int,default=256*1024)
             elif group=='related-banks':
                 s.add_argument('--related-bank',action='append',default=[])
+            elif group=='alias-equivalence':
+                s.add_argument('--coalesce-identical',action='store_true')
+            elif group=='declared-channels':
+                s.add_argument('--declared-channels',action='store_true')
             elif group=='motion-extents':
                 s.add_argument('--motion-extents',action='store_true')
             elif group=='motion-root':
@@ -97,12 +101,30 @@ def execute(a):
         if c == 'import-uniform-models':return uniform_mesh.import_folder(a.edited,a.output)
         from .archive.usrdir_reader import Archive
         return uniform_mesh.export_archive(Archive(a.source),a.output,modern=c=='modern-fit-uniforms')
-    if c == 'inspect-donor-registry':
+    if c in ('inspect-donor-registry','inspect-signature-motion','inspect-animation-library'):
         from .research.donor_registry import MAX_BANK_BYTES, inspect_banks
         paths=[Path(a.input),*(Path(p) for p in a.related_bank)]
         if len(paths)>32 or sum(p.stat().st_size for p in paths)>MAX_BANK_BYTES:
             raise ValueError('Donor signature banks exceed inspection bounds')
-        report=inspect_banks([(p.name,p.read_bytes()) for p in paths],a.profile)
+        banks=[(p.name,p.read_bytes()) for p in paths]
+        if c == 'inspect-signature-motion':
+            from .research.signature_motion import SignatureMotionSource
+            source=SignatureMotionSource(banks,coalesce_identical=a.coalesce_identical)
+            reader=source.inspect_tracks if a.declared_channels else source.tracks
+            _, report=reader(0,int(a.index,0))
+        elif c == 'inspect-animation-library':
+            from .research.motion_library import inspect_library
+            report=inspect_library(banks,coalesce_identical=a.coalesce_identical)
+        else:
+            report=inspect_banks(banks,a.profile)
+        save_json(a.output,report,sources)
+        return report
+    if c == 'inspect-marker-dispatch':
+        from .formats.embedded_motion import MAX_ELF
+        from .research.marker_dispatch import inspect_dispatch
+        if Path(a.input).stat().st_size > MAX_ELF:
+            raise ValueError('Native analysis ELF exceeds inspection bounds')
+        report=inspect_dispatch(Path(a.input).read_bytes(),a.profile)
         save_json(a.output,report,sources)
         return report
     if c == 'sample-native-motion':
