@@ -14,6 +14,7 @@ from choops_py.research.recruit_pool import (
     inspect_interest_graph,
     inspect_recruit_pool,
     inspect_recruiting_section,
+    edit_recruit_fields,
 )
 from choops_py.roster.schema import HEADER_TABLES
 
@@ -66,6 +67,67 @@ def test_native_pool_offsets_metadata_blanks_and_source_preservation():
     assert (
         not report["native_pool_insertion_installed"] and not report["gameplay_ready"]
     )
+    assert bytes(data) == before
+
+
+def editable_pool_fixture():
+    data, start = pool_fixture()
+    at = start + RECRUIT_STRIDE
+    # Keep the established preference/location values while making this record
+    # active and uncommitted for the narrowly mapped class-field writer.
+    struct.pack_into(">I", data, at + 0x40, (2 << 21) | (95 << 7))
+    return data, start, at
+
+
+def test_recruit_class_edit_preserves_every_other_bit_and_byte():
+    data, _start, at = editable_pool_fixture()
+    before = bytes(data)
+    output = edit_recruit_fields(before, 1, {"class_code": 4})
+    changed = [index for index, (left, right) in enumerate(zip(before, output)) if left != right]
+    assert all(at + 0x40 <= index < at + 0x44 for index in changed)
+    old_word = struct.unpack_from(">I", before, at + 0x40)[0]
+    new_word = struct.unpack_from(">I", output, at + 0x40)[0]
+    assert old_word ^ new_word == ((2 ^ 4) << 21)
+    row = inspect_recruit_pool(output)["records"][0]
+    assert row["class_code"] == 4 and row["preference_index"] == 95
+    assert before[: at + 0x40] == output[: at + 0x40]
+    assert before[at + 0x44 :] == output[at + 0x44 :]
+
+
+def test_recruit_class_edit_is_one_undoable_model_change():
+    from choops_py.roster.adapters import load_bytes
+    from choops_py.roster.editor_model import EditorModel
+
+    data, _start, _at = editable_pool_fixture()
+    model = EditorModel(load_bytes(bytes(data)))
+    original = bytes(model.data)
+    model.edit_recruit_fields(1, class_code=4)
+    edited = bytes(model.data)
+    assert edited != original and len(model.edits) == 1 and len(model.history) == 1
+    model.undo()
+    assert bytes(model.data) == original and model.edits == []
+    model.redo()
+    assert bytes(model.data) == edited and len(model.edits) == 1
+
+
+@pytest.mark.parametrize(
+    "case", ["blank", "inactive", "committed", "unknown_class", "unknown_profile", "bad_value"]
+)
+def test_recruit_class_edit_rejects_unsafe_records(case):
+    data, start, at = editable_pool_fixture()
+    if case == "blank":
+        data[at : at + RECRUIT_STRIDE] = bytes(RECRUIT_STRIDE)
+    elif case == "inactive":
+        data[at + 0x2D] &= ~4
+    elif case == "committed":
+        struct.pack_into(">I", data, at + 0x40, struct.unpack_from(">I", data, at + 0x40)[0] | (1 << 31))
+    elif case == "unknown_class":
+        struct.pack_into(">I", data, at + 0x40, (9 << 21) | (95 << 7))
+    elif case == "unknown_profile":
+        struct.pack_into(">I", data, at + 0x40, (2 << 21) | (127 << 7))
+    before = bytes(data)
+    with pytest.raises(ValueError):
+        edit_recruit_fields(before, 1, {"class_code": 7 if case == "bad_value" else 3})
     assert bytes(data) == before
 
 

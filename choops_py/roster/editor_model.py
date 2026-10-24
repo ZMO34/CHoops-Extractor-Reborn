@@ -261,6 +261,51 @@ class EditorModel:
             self.data=bytearray(before);self.reload();raise ToolError('roster_validation_failed',str(result['issues'][:5]))
         if self.data==before:return
         self.redo_history=[];self.history.append((before,list(self.edits)));self.edits.append({'table':table,'index':index,'field':field,'slot':slot,'old':old_value,'value':value})
+
+    def edit_recruit_fields(self, slot, **changes):
+        """Apply a bounded edit to mapped recruiting fields as one undo step."""
+        from ..research.recruit_pool import edit_recruit_fields, inspect_recruit_pool
+
+        before = bytes(self.data)
+        before_report = inspect_recruit_pool(before)
+        old_row = next(
+            (row for row in before_report["records"] if row["slot"] == slot), None
+        )
+        if old_row is None:
+            raise ToolError("recruit_slot_unavailable", "Recruit slot is blank or unavailable")
+        updated = edit_recruit_fields(before, slot, changes)
+        if updated == before:
+            return
+        old_edits = list(self.edits)
+        try:
+            self.data = bytearray(updated)
+            if not self.validate()["valid"]:
+                raise ToolError(
+                    "roster_validation_failed",
+                    "Recruit edit failed roster validation",
+                )
+            after_report = inspect_recruit_pool(self.data)
+            if after_report["allocated_slots"] != before_report["allocated_slots"]:
+                raise ToolError("recruit_table_changed", "Recruit table directory changed")
+        except Exception:
+            self.data = bytearray(before)
+            self.reload()
+            raise
+        self.history.append((before, old_edits))
+        self.redo_history = []
+        self.edits.append(
+            {
+                "table": "recruits",
+                "index": slot,
+                "field": "native_recruit_fields",
+                "old": {
+                    key: old_row[key]
+                    for key in changes
+                    if key in old_row
+                },
+                "value": dict(changes),
+            }
+        )
     def set_alternate_enabled(self, team_index, variant, enabled):
         from .uniforms import set_alternate_enabled
         before=bytes(self.data);edits=list(self.edits)

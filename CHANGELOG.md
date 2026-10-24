@@ -1,3 +1,10 @@
+# Unreleased — bounded recruit table editing
+
+- Add undoable edits for established HS/JUCO classes on recognized active, uncommitted recruits.
+- Preserve packed preference/commitment bits and all other recruit and Legacy-save bytes.
+- Keep preference profiles read-only until their linked school-interest state can be updated safely.
+- Keep names, ratings, linked recruiting state, blank-slot allocation and unknown fields read-only.
+
 # v1.23
 
 - Native macOS Apple Silicon/Intel app packages and Windows x64 release archives.

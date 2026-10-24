@@ -96,7 +96,11 @@ def test_editor_button_inspects_without_exposing_transfer_mutations(qtbot, monke
     dialog = window.recruiting_diagnostics
     assert "Recruiting records unavailable" in dialog.status.text()
     assert bytes(model.data) == before and model.edits == []
-    # No transfer, signing, applying or saving controls exist in the diagnostic view.
-    assert not dialog.findChildren(QPushButton)
+    # Only the bounded recruit-field editor is exposed; transfer/signing controls
+    # remain absent, and the edit is unavailable for this ordinary roster.
+    edit_button = next(
+        b for b in dialog.findChildren(QPushButton) if b.text() == "Edit selected recruit…"
+    )
+    assert not edit_button.isEnabled()
     window.display_roster(model)
     assert dialog.closed

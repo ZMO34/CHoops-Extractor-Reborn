@@ -1,12 +1,17 @@
-"""Read-only recruiting diagnostics; no transfer or save mutation actions."""
+"""Recruiting diagnostics and bounded edits; no transfer or allocation actions."""
 
 from hashlib import sha256
 
 from PySide6.QtWidgets import (
+    QComboBox,
     QDialog,
+    QDialogButtonBox,
+    QFormLayout,
     QLabel,
     QLineEdit,
+    QMessageBox,
     QPlainTextEdit,
+    QPushButton,
     QSplitter,
     QVBoxLayout,
 )
@@ -28,9 +33,10 @@ class RecruitingDiagnostics(QDialog):
         self.resize(1050, 650)
         layout = QVBoxLayout(self)
         notice = QLabel(
-            "Inspect recruiting records only. "
+            "Inspect recruit records and edit the confirmed class field on active, "
+            "uncommitted recruits. "
             "The in-game transfer portal is not installed. "
-            "Transfers must retain the original player's statistics and team history."
+            "Other recruit fields and linked recruiting state remain read-only."
         )
         notice.setWordWrap(True)
         layout.addWidget(notice)
@@ -41,6 +47,11 @@ class RecruitingDiagnostics(QDialog):
         self.search.setPlaceholderText("Search recruit slots, classes, and diagnostics")
         self.search.textChanged.connect(self.filter_rows)
         layout.addWidget(self.search)
+        self.edit_button = QPushButton("Edit selected recruit…")
+        self.edit_button.clicked.connect(self.edit_selected)
+        self.edit_button.setEnabled(False)
+        layout.addWidget(self.edit_button)
+        self.rows_by_slot = {}
         self.view = table()
         self.details = QPlainTextEdit()
         self.details.setReadOnly(True)
@@ -62,6 +73,7 @@ class RecruitingDiagnostics(QDialog):
 
         if self.closed:
             return
+        self.edit_button.setEnabled(False)
         if (
             self.owner.roster is not self.source
             or sha256(self.source.data).digest() != sha256(self.payload).digest()
@@ -84,6 +96,8 @@ class RecruitingDiagnostics(QDialog):
         rows = [
             dict(row, issues_text=", ".join(row["issues"])) for row in report["records"]
         ]
+        self.rows_by_slot = {row["slot"]: row for row in rows}
+        self.edit_button.setEnabled(bool(rows))
         set_rows(
             self.view,
             rows,
@@ -102,6 +116,91 @@ class RecruitingDiagnostics(QDialog):
         self.view.selectionModel().selectionChanged.connect(self.show_details)
         if rows:
             self.view.selectRow(0)
+
+    def edit_selected(self):
+        from .app import selected
+
+        if self.owner.active:
+            QMessageBox.information(
+                self, "Recruiting table", "Wait for the current task to finish."
+            )
+            return
+        if (
+            self.owner.roster is not self.source
+            or sha256(self.source.data).digest() != sha256(self.payload).digest()
+        ):
+            QMessageBox.warning(
+                self,
+                "Recruiting table changed",
+                "The roster changed after this view opened. "
+                "Reopen Recruiting diagnostics before editing.",
+            )
+            return
+        rows = selected(self.view)
+        if len(rows) != 1:
+            QMessageBox.information(self, "Recruiting table", "Select exactly one recruit.")
+            return
+        slot = rows[0]["slot"]
+        row = self.rows_by_slot.get(slot)
+        if row is None:
+            return
+
+        dialog = QDialog(self)
+        dialog.setWindowTitle(f"Edit recruit slot {slot}")
+        form = QFormLayout(dialog)
+        class_choice = QComboBox()
+        class_labels = ("HS FR", "HS SO", "HS JR", "HS SR", "JC FR", "JC SO")
+        for code, label in enumerate(class_labels):
+            class_choice.addItem(label, code)
+        class_choice.setCurrentIndex(class_choice.findData(row["class_code"]))
+        class_choice.setEnabled(
+            not row["committed_bit"]
+            and row["recruiting_filter_bit_2"]
+            and row["class_code"] in range(6)
+            and not row["issues"]
+        )
+        form.addRow("Recruit class", class_choice)
+        if row["committed_bit"]:
+            note = "Committed recruits are locked."
+        elif row["issues"]:
+            note = "This record has unresolved metadata and cannot be edited."
+        elif not row["recruiting_filter_bit_2"]:
+            note = "This record is not marked as an active recruiting entry."
+        else:
+            note = (
+                "Only the confirmed class field is editable. Names, ratings, "
+                "preferences, commitment, location and linked interest data "
+                "remain read-only."
+            )
+        note_label = QLabel(note)
+        note_label.setWordWrap(True)
+        form.addRow(note_label)
+        buttons = QDialogButtonBox(
+            QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel
+        )
+        buttons.accepted.connect(dialog.accept)
+        buttons.rejected.connect(dialog.reject)
+        form.addRow(buttons)
+        if dialog.exec() != QDialog.DialogCode.Accepted:
+            return
+
+        changes = {}
+        chosen_class = class_choice.currentData()
+        if class_choice.isEnabled() and chosen_class != row["class_code"]:
+            changes["class_code"] = chosen_class
+        if not changes:
+            return
+        try:
+            self.owner.roster.edit_recruit_fields(slot, **changes)
+        except (ValueError, IndexError) as error:
+            QMessageBox.warning(self, "Recruit edit blocked", str(error))
+            return
+
+        from .app import open_recruiting_diagnostics
+
+        self.close()
+        self.owner.display_roster(self.owner.roster)
+        open_recruiting_diagnostics(self.owner)
 
     def filter_rows(self, text):
         if self.view.model():
