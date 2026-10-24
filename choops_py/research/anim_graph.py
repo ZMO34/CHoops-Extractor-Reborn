@@ -9,6 +9,28 @@ import struct
 from itertools import pairwise
 
 from ..formats.binary import Binary
+from .signature_provider import signature_binding
+
+STYLE_SLOTS = (
+    None,
+    (0, 0),
+    (0, 1),
+    (1, 0),
+    (1, 1),
+    (1, 2),
+    (2, 0),
+    (2, 1),
+    (2, 2),
+    (3, 0),
+    (3, 1),
+    (3, 2),
+    (4, 0),
+    (4, 1),
+    (5, 0),
+    (6, 0),
+    (7, 0),
+    (8, 0),
+)
 
 MAX_GRAPH = 64 * 1024 * 1024
 MAX_ROWS = 1_000_000
@@ -73,6 +95,15 @@ def inspect_graph(raw, profile="nba-2k11"):
         )
         for i in range(9)
     ]
+    for family in keyed_tables:
+        bindings = [
+            signature_binding(i)
+            for i in range(41)
+            if signature_binding(i)["player_key_offset"] == family["player_key_offset"]
+        ]
+        if len(bindings) != 1:
+            raise ValueError("Graph player field has no unique native provider binding")
+        family["shared_player_key_binding"] = bindings[0]
     for table, fields in zip(tables, POINTER_FIELDS):
         if not fields:
             continue
@@ -81,6 +112,18 @@ def inspect_graph(raw, profile="nba-2k11"):
             targets = [pointer(offset + field) for field in fields]
             if table["index"] >= 7:
                 words = list(struct.unpack(">4I", b.slice(offset, 16)))
+                node_indices = []
+                for target in targets:
+                    delta = (
+                        None if target is None else target - (tables[0]["offset"] or 0)
+                    )
+                    if delta is not None and (
+                        delta < 0 or delta % 36 or delta // 36 >= counts[0]
+                    ):
+                        raise ValueError(
+                            "Graph keyed payload does not target a node boundary"
+                        )
+                    node_indices.append(None if delta is None else delta // 36)
                 keyed_tables[table["index"] - 7]["rows"].append(
                     dict(
                         index=row,
@@ -88,6 +131,7 @@ def inspect_graph(raw, profile="nba-2k11"):
                         raw_key=words[0],
                         raw_words=words,
                         pointer_targets=targets,
+                        node_indices=node_indices,
                     )
                 )
             if table["index"] == 0:
@@ -98,6 +142,7 @@ def inspect_graph(raw, profile="nba-2k11"):
                         offset=offset,
                         raw_words=words,
                         executable_binding_slot=row,
+                        raw_style_selector=words[5],
                         binding_kind="group-first-member"
                         if words[4] & 1
                         else "direct-motion",
@@ -112,6 +157,7 @@ def inspect_graph(raw, profile="nba-2k11"):
         keyed_tables=keyed_tables,
         keyed_lookup_policy="first-matching-raw-key-or-null",
         cached_rows_require_graph_lifetime=True,
+        style_selector_semantics_context="NBA11-dribbler-0x46C0D4",
         pointer_fixups=pointers,
         node_operation_semantics_established=False,
         transition_semantics_established=False,
@@ -135,3 +181,44 @@ def lookup_graph_key(raw, key, family):
     return next(
         (r for r in report["keyed_tables"][family]["rows"] if r["raw_key"] == key), None
     )
+
+
+def graph_style_gate(raw, player_keys, candidate, *, bypass=False):
+    """Read-only reference for ONLY native0x46C0D4 style eligibility.
+
+    Bounded synthetic native instruction cases establish this gate. All nine
+    native player keys are explicit. A null candidate, selector zero, or the observed
+    transition-flag bypass passes. Positive selectors1..17 compare the cached
+    row's corresponding node pointer; absent rows and unsupported selectors
+    reject. Other native transition predicates still apply; this is not playback.
+    """
+    if (
+        not isinstance(player_keys, (tuple, list))
+        or len(player_keys) != 9
+        or any(type(k) is not int or not 0 <= k <= 0xFFFFFFFF for k in player_keys)
+    ):
+        raise ValueError("Style gate requires nine explicit unsigned32-bit player keys")
+    if type(bypass) is not bool:
+        raise ValueError("Style gate bypass must be an explicit boolean")
+    report = inspect_graph(raw)
+    if candidate is not None and (
+        type(candidate) is not int or not 0 <= candidate < len(report["nodes"])
+    ):
+        raise ValueError("Style gate candidate must be a graph node index or None")
+    if bypass or candidate is None:
+        return True
+    selector = report["nodes"][candidate]["raw_style_selector"]
+    if selector == 0:
+        return True
+    if selector >= len(STYLE_SLOTS):
+        return False
+    family, slot = STYLE_SLOTS[selector]
+    row = next(
+        (
+            r
+            for r in report["keyed_tables"][family]["rows"]
+            if r["raw_key"] == player_keys[family]
+        ),
+        None,
+    )
+    return row is not None and row["node_indices"][slot] == candidate

@@ -1,3 +1,13 @@
+## Dribbler style source coverage
+
+The signature bank's60 dribbling keys with empty motion references are now linked
+to keyed graph rows and111 node references /104 distinct graph nodes. They must
+not be dropped as empty styles. See the [style-to-node runtime evidence](ANIMATION_RUNTIME_ADAPTER.md)
+for provider/category correspondence and native eligibility checks. The reference
+preserves selector-zero/bypass behavior and missing-key rejection, but does not
+implement full graph transitions or establish the CH counterpart. Confirmed
+end-to-end imports remain zero; running, defense and rebounding remain required.
+
 ## Dribbler keyed selection and player-cache lifetime
 
 Native leaf0x4691F8 reads the dribbler graph at0x4B93D2C, selects one of nine

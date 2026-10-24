@@ -1,3 +1,17 @@
+## Dribbler style gate and graph-node dependency closure
+
+Graph tests **45 passed**; affected graph/source/group/library regression
+**87 passed**. Ruff E/F/I passes. Node-boundary errors, distinct selector-family
+slots, missing keys/slots, explicit inputs, zero/null/bypass and unsupported
+selectors are covered. Supplied source graphs still pass structural inspection.
+
+`NativeGraphStyleGateTrace.java`: **72 passed**, with distinct family/slot pointers
+and initialized condition status. Private supplied-data probe: **222 passed**,
+using complete native player routing and style-gate code;124 accepted,98 rejected.
+All111 keyed node references are exercised with correct and missing-key sets.
+Graph bytes stay unchanged. No native warning/failure in successful final runs.
+This is source eligibility evidence, not a full transition or target gameplay test.
+
 ## Dribbler keyed lookup and player routing
 
 Isolated author portable verification at7324d072658c4cf77bd551ee1fb9727fd6c1f1dc:

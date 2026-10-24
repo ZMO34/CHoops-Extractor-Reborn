@@ -5,6 +5,8 @@ import pytest
 from choops_py.research.anim_graph import (
     POINTER_FIELDS,
     STRIDES,
+    STYLE_SLOTS,
+    graph_style_gate,
     inspect_graph,
     lookup_graph_key,
 )
@@ -119,3 +121,55 @@ def test_duplicate_key_lookup_preserves_first_row():
 def test_lookup_rejects_invalid_word_or_family(key, family):
     with pytest.raises(ValueError, match="lookup"):
         lookup_graph_key(fixture(), key, family)
+
+
+@pytest.mark.parametrize("selector", range(1, 18))
+def test_style_gate_routes_exact_family_and_slot(selector):
+    raw = fixture()
+    struct.pack_into(">I", raw, 128 + 20, selector)
+    report = inspect_graph(raw)
+    family, slot = STYLE_SLOTS[selector]
+    for table in report["keyed_tables"]:
+        row = table["rows"][0]
+        for field in (4, 8, 12):
+            struct.pack_into(
+                ">i", raw, row["offset"] + field, 164 - row["offset"] - field + 1
+            )
+    row = report["keyed_tables"][family]["rows"][0]
+    field = row["offset"] + 4 + slot * 4
+    struct.pack_into(">i", raw, field, 128 - field + 1)
+    keys = [0] * 9
+    assert graph_style_gate(raw, keys, 0)
+    keys[family] = 99
+    assert not graph_style_gate(raw, keys, 0)
+    keys[family] = 0
+    struct.pack_into(">I", raw, field, 0)
+    assert not graph_style_gate(raw, keys, 0)
+    assert graph_style_gate(raw, keys, 0, bypass=True)
+
+
+def test_style_gate_zero_null_unsupported_and_explicit_inputs():
+    raw = fixture()
+    assert graph_style_gate(raw, [9] * 9, 0)
+    struct.pack_into(">I", raw, 148, 18)
+    assert not graph_style_gate(raw, [0] * 9, 0)
+    assert graph_style_gate(raw, [0] * 9, None)
+    for keys, candidate, bypass in [
+        ([0], 0, False),
+        ([True] * 9, 0, False),
+        ([0] * 9, True, False),
+        ([0] * 9, 2, False),
+        ([0] * 9, 0, 1),
+    ]:
+        with pytest.raises(ValueError, match="Style gate"):
+            graph_style_gate(raw, keys, candidate, bypass=bypass)
+
+
+def test_keyed_node_targets_cannot_point_inside_nodes_or_other_tables():
+    raw = fixture()
+    report = inspect_graph(raw)
+    field = report["keyed_tables"][0]["rows"][0]["offset"] + 4
+    for target in [129, report["tables"][1]["offset"]]:
+        struct.pack_into(">i", raw, field, target - field + 1)
+        with pytest.raises(ValueError, match="node boundary"):
+            inspect_graph(raw)

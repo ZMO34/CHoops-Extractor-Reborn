@@ -1,3 +1,11 @@
+Dribbler research API: `anim_graph.graph_style_gate(decoded_bytes, nine_player_keys,
+candidate_node_index, bypass=False)` returns only the established source style-gate
+predicate. It does not decide full transition eligibility or target compatibility.
+`inspect_graph` now includes keyed node indices, raw dribbler style selectors and
+shared provider/player-field bindings. The optional read-only Ghidra harness
+`NativeGraphStyleGateTrace.java NEW_OUTPUT_JSON` exercises distinct native
+selector/family/slot paths on synthetic memory; it launches no game.
+
 Graph key research API: `anim_graph.lookup_graph_key(decoded_bytes, raw_key, family)`
 returns the first native matching row or `None`. Families0..8 and unsigned32-bit
 keys are explicit; meanings are not guessed. `inspect_graph` now reports keyed

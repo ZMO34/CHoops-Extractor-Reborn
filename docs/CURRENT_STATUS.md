@@ -1,3 +1,27 @@
+## Dribbler graph style-to-node selection
+
+All60 signature registry keys in categories2..10 match the nine dribbler keyed
+families, despite those registry entries having empty motion references. The
+actual motions are graph dependencies; empty registry references must not cause
+these styles to be discarded. Keyed payload pointers now resolve to bounded node
+indices:111 non-null references /104 distinct nodes in the supplied dribbler graph.
+Shared player-field bindings identify the provider/category correspondence;
+these are not named move meanings or target bindings.
+
+`graph_style_gate` models ONLY source0x46C0D4's style eligibility. Node+0x14
+selector0 bypasses this gate; selectors1..17 compare a specific cached family/slot
+with the candidate node. Missing rows/slots reject non-null candidates; transition
+flag bit13 and null candidate bypass the gate. Other transition predicates still
+apply, and the full graph execution/CH counterpart remains unresolved.
+
+Native style-gate harness72 cases pass with distinct family/slot pointers, so
+swapped routes cannot pass accidentally. A supplied-data probe executes real
+player routing and the style gate for222 configurations: all match the reference,
+124 accepted /98 rejected, with unchanged graph bytes. This includes selector-zero
+bypasses when keys are missing. No uninitialized reads reported. Python graph tests
+45 passed; graph/source/group/library regression87 passed. These are selection
+proofs, not compatible conversion counts or playable imports.
+
 ## Dribbler keyed selection and player-cache lifetime
 
 Native leaf0x4691F8 reads the dribbler graph at0x4B93D2C, selects one of nine

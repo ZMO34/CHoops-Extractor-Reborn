@@ -1,3 +1,48 @@
+## Dribbler graph style-to-node selection
+
+All60 signature registry keys in categories2..10 match the nine dribbler keyed
+families, despite those registry entries having empty motion references. The
+actual motions are graph dependencies; empty registry references must not cause
+these styles to be discarded. Keyed payload pointers now resolve to bounded node
+indices:111 non-null references /104 distinct nodes in the supplied dribbler graph.
+Shared player-field bindings identify the provider/category correspondence;
+these are not named move meanings or target bindings.
+
+`graph_style_gate` models ONLY source0x46C0D4's style eligibility. Node+0x14
+selector0 bypasses this gate; selectors1..17 compare a specific cached family/slot
+with the candidate node. Missing rows/slots reject non-null candidates; transition
+flag bit13 and null candidate bypass the gate. Other transition predicates still
+apply, and the full graph execution/CH counterpart remains unresolved.
+
+Native style-gate harness72 cases pass with distinct family/slot pointers, so
+swapped routes cannot pass accidentally. A supplied-data probe executes real
+player routing and the style gate for222 configurations: all match the reference,
+124 accepted /98 rejected, with unchanged graph bytes. This includes selector-zero
+bypasses when keys are missing. No uninitialized reads reported. Python graph tests
+45 passed; graph/source/group/library regression87 passed. These are selection
+proofs, not compatible conversion counts or playable imports.
+
+The nine shared native key routes are:
+
+| Graph family | Player key offset | Provider selector | Registry category |
+|---|---|---|---|
+|0|+0x100|11|2|
+|1|+0x108|13|4|
+|2|+0x110|15|6|
+|3|+0x10C|14|5|
+|4|+0x104|12|3|
+|5|+0x11C|37|7|
+|6|+0x114|38|10|
+|7|+0x118|39|9|
+|8|+0x120|40|8|
+
+The style selector maps1/2 to family0 slots0/1;3/4/5 to family1 slots0/1/2;
+6/7/8 to family2 slots0/1/2;9/10/11 to family3 slots0/1/2;12/13 to family4
+slots0/1;14..17 to families5..8 slot0. These numbers are internal style filters,
+not button gestures, serialized registry categories or animation IDs. The graph
+reader preserves unknown words and rejects keyed pointers into node interiors or
+other tables. The gate remains a read-only source reference, not target dispatch.
+
 ## Dribbler keyed selection and player-cache lifetime
 
 Native leaf0x4691F8 reads the dribbler graph at0x4B93D2C, selects one of nine

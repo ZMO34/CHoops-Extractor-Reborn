@@ -1,3 +1,7 @@
+NBA11 dribbler source research: link style rows to graph nodes, retain shared
+provider bindings and model native style eligibility, including bypass and
+missing-key paths. Full transitions and CH gameplay integration remain pending.
+
 NBA11 dribbler research: preserve first-match keyed graph selection, nine native
 player-key/cache routes, and the cached-row backing-graph lifetime dependency.
 Target ownership and playback integration remain unresolved.
