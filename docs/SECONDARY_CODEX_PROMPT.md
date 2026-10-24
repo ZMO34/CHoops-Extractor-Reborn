@@ -88,6 +88,38 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+## Native donor curves and reciprocal mirror ownership
+
+The executable-held donor adapter now handles counted selector curves through the
+same explicit per-channel contracts as the signature-IFF adapter. Source header
+fingerprints include56+4*count bytes, not just the fixed prefix. All tick bits and
+knots survive; selectors have no default/identity map. Target authoring assertions,
+event coverage, source context and compatibility remain separate gates.
+
+A source+4 link may be detached ONLY with an explicit peer-address/header-hash/
+evidence assertion, a reciprocal link, disjoint headers, equal masks/counts/rate,
+equal state/timing/track/selector dependencies, and mode XOR exactly0x40000000.
+The target owns independent copies of the resolved tracks; source links are not
+copied or modified. This does not support arbitrary aliases/groups or alter their
+lifetime. Unknown+0x34 dependencies remain blocked. Payload/header overlap rejects;
+exact shared selector prefixes are allowed and copied independently. Header,
+alignment, events and all selector bytes are budgeted before pose/root expansion.
+
+Supplied source dribbler audit:292 reciprocal mirror pairs pass structural checks,
+with381 bounded selector prefixes. No target authoring or selector meaning was
+asserted by that audit, and no compatible conversions are counted. Synthetic
+construction/residency checks cover0/1/2 selectors, mirror detachment, signed-tick
+preservation and inverse relocation, plus fresh-hash malformed-link/overlap cases.
+Donor/source/selector/residency/target regression:95 passed. The API is a component
+constructor; graph publication and gameplay remain unfinished.
+
+A separate shared-endpoint candidate audit finds133 exactly knot-time-aligned
+auxiliary curves and zero identical selector-byte curves. The24 observed source
+selector IDs have consistent candidate target correspondences (for example12->8),
+without conflicts in this sample. These remain correlations: full motion/palette
+identity and downstream resource semantics are unproven. No global map or automatic
+selector contract is added from this evidence.
+
 ## CH dribbling motion-bundle playback selection
 
 Target dribbling named setup/update paths are now traced into0x345ABC's native
@@ -1871,6 +1903,15 @@ See NBA_ROSTERS_AND_2K14.md for container and primary format references.
 
 Embedded source: docs/ANIMATION_GAMEPLAY_PORT.md
 
+## Executable-held native donor component construction
+
+Counted selector curves and explicitly bound reciprocal mirror headers can now
+reach owned target-component construction and the existing resident-image path.
+This closes a source-format rejection affecting all292 native dribbler headers;
+it does not establish the authoring/selector contracts needed for actual donor
+registration. The shared-curve ID correspondences remain candidates, with no
+identity map or compatible-import count. See [native curve/ownership evidence](ANIMATION_RUNTIME_ADAPTER.md).
+
 ## Target dribbling playback context
 
 The named CH2K8 dribbling functions lead to a native five-variant/two-lane motion
@@ -2692,6 +2733,38 @@ No RPCS3, hardware run, full-game build or controller remapping was performed.
 ---
 
 Embedded source: docs/ANIMATION_RUNTIME_ADAPTER.md
+
+## Native donor curves and reciprocal mirror ownership
+
+The executable-held donor adapter now handles counted selector curves through the
+same explicit per-channel contracts as the signature-IFF adapter. Source header
+fingerprints include56+4*count bytes, not just the fixed prefix. All tick bits and
+knots survive; selectors have no default/identity map. Target authoring assertions,
+event coverage, source context and compatibility remain separate gates.
+
+A source+4 link may be detached ONLY with an explicit peer-address/header-hash/
+evidence assertion, a reciprocal link, disjoint headers, equal masks/counts/rate,
+equal state/timing/track/selector dependencies, and mode XOR exactly0x40000000.
+The target owns independent copies of the resolved tracks; source links are not
+copied or modified. This does not support arbitrary aliases/groups or alter their
+lifetime. Unknown+0x34 dependencies remain blocked. Payload/header overlap rejects;
+exact shared selector prefixes are allowed and copied independently. Header,
+alignment, events and all selector bytes are budgeted before pose/root expansion.
+
+Supplied source dribbler audit:292 reciprocal mirror pairs pass structural checks,
+with381 bounded selector prefixes. No target authoring or selector meaning was
+asserted by that audit, and no compatible conversions are counted. Synthetic
+construction/residency checks cover0/1/2 selectors, mirror detachment, signed-tick
+preservation and inverse relocation, plus fresh-hash malformed-link/overlap cases.
+Donor/source/selector/residency/target regression:95 passed. The API is a component
+constructor; graph publication and gameplay remain unfinished.
+
+A separate shared-endpoint candidate audit finds133 exactly knot-time-aligned
+auxiliary curves and zero identical selector-byte curves. The24 observed source
+selector IDs have consistent candidate target correspondences (for example12->8),
+without conflicts in this sample. These remain correlations: full motion/palette
+identity and downstream resource semantics are unproven. No global map or automatic
+selector contract is added from this evidence.
 
 ## CH dribbling motion-bundle playback selection
 
@@ -6670,6 +6743,23 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+## Native donor auxiliary and reciprocal mirror extension
+
+Donor/source/auxiliary/residency/target regression: **95 passed**. Ruff E/F/I
+passes for the changed module/tests. Synthetic images with0/1/2 selectors and
+explicit mirror detachment survive native-image relocation, separate decoded-ELF
+residency validation and inverse relocation while preserving input bytes.
+Coverage includes full counted-header fingerprints, missing maps/evidence,
+nonreciprocal/self/nonmirror links, changed peer dependencies despite refreshed
+hashes, exact shared selector prefixes, overlapping payload rejection before
+expansion, signed ticks, exact budgets and selector budget failures.
+
+Supplied structural audit:292 native dribbler mirror pairs /381 bounded selector
+prefixes pass. All peer mode XORs are0x40000000. This is source structure only,
+not a real donor translation, palette semantics, gameplay or compatible conversion.
+Shared-endpoint auxiliary correlations:133 aligned curves, zero identical curves,
+24 candidate source IDs; no global map is inferred or enabled.
 
 ## Native CH motion-bundle prefix
 

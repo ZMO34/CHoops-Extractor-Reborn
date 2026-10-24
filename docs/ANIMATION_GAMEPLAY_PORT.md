@@ -1,3 +1,12 @@
+## Executable-held native donor component construction
+
+Counted selector curves and explicitly bound reciprocal mirror headers can now
+reach owned target-component construction and the existing resident-image path.
+This closes a source-format rejection affecting all292 native dribbler headers;
+it does not establish the authoring/selector contracts needed for actual donor
+registration. The shared-curve ID correspondences remain candidates, with no
+identity map or compatible-import count. See [native curve/ownership evidence](ANIMATION_RUNTIME_ADAPTER.md).
+
 ## Target dribbling playback context
 
 The named CH2K8 dribbling functions lead to a native five-variant/two-lane motion

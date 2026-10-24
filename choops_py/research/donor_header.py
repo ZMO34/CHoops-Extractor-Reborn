@@ -17,6 +17,7 @@ from ..formats.motion_frames import (
     resample_nba11_frames,
     resample_nba11_root,
 )
+from .motion_auxiliary import read_selector_prefix, transcode_selector_curve
 from .target_motion import MAX_IMAGE, relocate_target_image
 
 
@@ -76,13 +77,89 @@ def _authoring_fields(header, contract):
     return high, state, encoded
 
 
+def _detached_native_backlink(elf, address, header, contract):
+    """Allow only an explicitly asserted reciprocal mirror copy, never a group."""
+    peer = struct.unpack_from(">I", header, 4)[0]
+    assertion = contract.get("detached_backlink")
+    if not peer:
+        if assertion is not None:
+            raise ValueError("Unexpected backlink contract for an unlinked header")
+        return None
+    if (
+        not isinstance(assertion, dict)
+        or type(assertion.get("peer_address")) is not int
+        or assertion["peer_address"] != peer
+        or not isinstance(assertion.get("evidence"), str)
+        or not assertion["evidence"].strip()
+        or len(assertion["evidence"]) > 2048
+    ):
+        raise ValueError(
+            "Donor auxiliary/reference backlink needs explicit detachment evidence"
+        )
+    if peer == address or peer % 4:
+        raise ValueError("Native mirror backlink is self-referential or unaligned")
+    other = elf.read(peer, len(header))
+    if (
+        struct.unpack_from(">I", other, 4)[0] != address
+        or assertion.get("peer_header_sha256") != hashlib.sha256(other).hexdigest()
+    ):
+        raise ValueError(
+            "Native mirror backlink is not reciprocal or its fingerprint changed"
+        )
+    a, b = (
+        struct.unpack_from(">I", header, 20)[0],
+        struct.unpack_from(">I", other, 20)[0],
+    )
+    if (
+        header[8:20] != other[8:20]
+        or header[24:] != other[24:]
+        or (a ^ b) != 0x40000000
+    ):
+        raise ValueError(
+            "Native mirror backlink does not share established dependencies"
+        )
+    if address < peer + len(other) and peer < address + len(header):
+        raise ValueError("Native mirror backlink headers overlap")
+    return dict(
+        peer_address=peer,
+        peer_header_sha256=hashlib.sha256(other).hexdigest(),
+        evidence=assertion["evidence"],
+        reciprocal_mirror_dependencies_equal=True,
+        ownership="independent-target-track-copies",
+        source_link_transported=False,
+    )
+
+
+def _validate_native_ranges(spans):
+    for i, (role, start, size) in enumerate(spans):
+        for other, at, length in spans[:i]:
+            if start < at + length and at < start + size:
+                if (
+                    role.startswith("selector:")
+                    and other.startswith("selector:")
+                    and (start, size) == (at, length)
+                ):
+                    continue
+                raise ValueError(
+                    "Native donor dependencies overlap: " + role + "/" + other
+                )
+
+
 def translate_donor_motion(
-    donor, target, address, metadata_contract, event_contract, *, budget=MAX_IMAGE
+    donor,
+    target,
+    address,
+    metadata_contract,
+    event_contract,
+    *,
+    budget=MAX_IMAGE,
+    auxiliary_contracts=None,
 ):
     """Return a relative CH component, never an installable bank or EBOOT.
 
     The explicit contract is a caller research assertion, not automatically proven
-    by the serializer. Unknown auxiliary/reference layouts remain rejected.
+    by the serializer. Unclassified dependencies remain rejected. Counted curves
+    and mirror detachment need explicit, fingerprint-bound assertions.
     """
     if type(budget) is not int or not 64 <= budget <= MAX_IMAGE:
         raise ValueError("Donor component budget must be 64 bytes..16 MiB")
@@ -91,6 +168,8 @@ def translate_donor_motion(
     bind = verify_canonical_bind(donor, target)
     elf = NativeELF(donor)
     source = elf.read(address, 56)
+    selector_count = struct.unpack_from(">I", source, 16)[0] & 63
+    source = elf.read(address, 56 + 4 * selector_count)
     channels = canonical_channels(source, "nba-2k11")
     flags, mode = struct.unpack_from(">2I", source, 16)
     if mode & 0x8000:
@@ -105,6 +184,7 @@ def translate_donor_motion(
             "Metadata contract source/target executable fingerprint changed"
         )
     high, state, planar = _contract(source, address, metadata_contract)
+    backlink = _detached_native_backlink(elf, address, source, metadata_contract)
     keys, rate = mode & 0x7FFF, flags >> 24
     scale, duration = struct.unpack_from(">2f", source, 28)
     if (
@@ -117,7 +197,7 @@ def translate_donor_motion(
     ):
         raise ValueError("Invalid donor timing metadata")
     timing, poses, root, events, auxiliary = struct.unpack_from(">5I", source, 36)
-    if struct.unpack_from(">I", source, 4)[0] or flags & 63 or auxiliary:
+    if auxiliary:
         raise ValueError(
             "Donor auxiliary/reference dependencies need established extents"
         )
@@ -133,16 +213,71 @@ def translate_donor_motion(
     _, source_size = layout(channels["rotations"], channels["translations"], keys)
     _, target_size = layout(channels["rotations"], channels["translations"], frames)
     root_stride = 6 if mode & 0x80000000 else 8
-    # Reject growth before allocating expanded tracks; include alignment overhead.
-    root_at = (64 + target_size + 15) & ~15
+    if auxiliary_contracts is None:
+        auxiliary_contracts = []
+    if (
+        not isinstance(auxiliary_contracts, list)
+        or len(auxiliary_contracts) != selector_count
+    ):
+        raise ValueError(
+            "Every native auxiliary channel needs an explicit selector contract"
+        )
+    selectors, selector_reports, selector_spans = [], [], []
+    target_hash = hashlib.sha256(target).hexdigest()
+    for i, assertion in enumerate(auxiliary_contracts):
+        pointer = struct.unpack_from(">I", source, 56 + 4 * i)[0]
+        if not pointer:
+            raise ValueError("Counted native selector pointer is null")
+        curve = read_selector_prefix(
+            elf.read, pointer, duration=duration, time_scale=scale
+        )
+        translated, report = transcode_selector_curve(
+            curve,
+            assertion,
+            channel=i,
+            target_elf_sha256=target_hash,
+            duration=duration,
+            time_scale=scale,
+        )
+        selectors.append(translated)
+        selector_reports.append(report)
+        selector_spans.append((f"selector:{i}", pointer, len(curve)))
+    # Reject growth before allocating expanded tracks; include counted header/alignment.
+    pose_at = (64 + 4 * selector_count + 15) & ~15
+    root_at = (pose_at + target_size + 15) & ~15
     event_at = (root_at + frames * root_stride + 15) & ~15
     if event_at + 4 > budget:
         raise ValueError("Expanded donor component exceeds byte budget")
-    event_bytes, event_report = transcode_events(
-        inspect_events(donor, "nba-2k11", events, native=True), event_contract
-    )
+    source_events = inspect_events(donor, "nba-2k11", events, native=True)
+    event_bytes, event_report = transcode_events(source_events, event_contract)
     if event_at + len(event_bytes) > budget:
         raise ValueError("Expanded donor events exceed byte budget")
+    planned_end = event_at + len(event_bytes)
+    for curve in selectors:
+        planned_end = ((planned_end + 15) & ~15) + len(curve)
+    if planned_end > budget:
+        raise ValueError("Expanded donor selectors exceed byte budget")
+    spans = [
+        ("header", address, len(source)),
+        ("timing", timing, keys),
+        ("poses", poses, source_size),
+        ("root", root, keys * root_stride),
+        ("events", events, 12 * len(source_events["entries"]) + 4),
+        *selector_spans,
+        *(
+            (f"event-payload:{p}", p, 4)
+            for p in sorted(
+                {
+                    r["payload"]
+                    for r in source_events["entries"]
+                    if r["payload"] is not None
+                }
+            )
+        ),
+    ]
+    if backlink:
+        spans.append(("peer-header", backlink["peer_address"], len(source)))
+    _validate_native_ranges(spans)
     packed, resampling = resample_nba11_frames(
         elf.read(poses, source_size),
         deltas,
@@ -165,6 +300,7 @@ def translate_donor_motion(
         roots,
         event_bytes,
         budget,
+        selectors=selectors,
     )
     return bytes(output), dict(
         schema=1,
@@ -173,6 +309,10 @@ def translate_donor_motion(
         bytes=len(output),
         extents=extents,
         source_header_address=address,
+        source_header_bytes=len(source),
+        source_backlink_detachment=backlink,
+        auxiliary_translation=selector_reports,
+        auxiliary_extents_established=True,
         source_header_sha256=hashlib.sha256(source).hexdigest(),
         source_identifier=struct.unpack_from(">I", source)[0],
         metadata_provenance="explicit-per-header-caller-research-assertions",
@@ -194,6 +334,8 @@ def translate_donor_motion(
         resampling=resampling,
         native_loader_installed=False,
         gameplay_ready=False,
+        source_gameplay_context_established=False,
+        compatible_on_court_conversion_count=None,
     )
 
 

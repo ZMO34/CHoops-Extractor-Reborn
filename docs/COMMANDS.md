@@ -1,3 +1,13 @@
+Native donor research API: `translate_donor_motion(..., auxiliary_contracts=[...])`
+requires one existing schema1 selector contract per counted native curve. Metadata
+`source_header_sha256` binds the COMPLETE56+4*count-byte native header. For a
+reciprocal mirror link, metadata must also supply `detached_backlink` with
+`peer_address`, `peer_header_sha256` (same complete header length), and bounded
+`evidence`. Structural reciprocity, identical resolved dependencies and mirror-only
+mode difference are mandatory; arbitrary links/groups reject. Source/target ELF
+fingerprints and all authoring/event assertions remain required. The function
+returns an owned relative component, not a registered animation or executable.
+
 Target bundle research APIs: `motion_bundle.inspect_bundle_rows(bytes, count=5)`
 requires variant rows PLUS one24-byte lookahead row. `select_bundle_rows(bytes,
 value, allow_flagged, lane_policy, actor_flag)` models only native variant/lane
@@ -40,7 +50,8 @@ ELF bytes, a donor header address and separate explicit metadata/event contracts
 It returns a relative CH component and provenance manifest; it writes no files.
 Metadata contracts require full source/target and header fingerprints plus explicit
 mode/state/planar assertions and evidence. No automatic/default metadata contract,
-signature-IFF source adapter, executable installation or GUI action is supplied.
+public executable-writing CLI or GUI action is supplied. A separate signature-IFF
+adapter and contract-gated decoded-ELF residency APIs are documented above.
 `ResidentLoaderModel` is an offline callback/lease protocol with a Python-local
 registry. See [evidence, contract fields and native integration limits](ANIMATION_RUNTIME_ADAPTER.md#contract-gated-donor-header-construction).
 

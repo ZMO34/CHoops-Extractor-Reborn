@@ -1,3 +1,7 @@
+NBA11 native donor component research: counted selector transport and explicit
+reciprocal mirror detachment with full header/dependency fingerprints, overlap
+checks and residency roundtrips. No automatic selector map or gameplay claim.
+
 CH dribbling research: native-proven motion-bundle variant/lane selection,
 bounded motion-dependency inspection, and explicit adjacent-row lookahead
 storage requirement. Donor mapping, registration and full playback remain pending.

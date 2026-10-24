@@ -1,3 +1,20 @@
+## Native donor auxiliary and reciprocal mirror extension
+
+Donor/source/auxiliary/residency/target regression: **95 passed**. Ruff E/F/I
+passes for the changed module/tests. Synthetic images with0/1/2 selectors and
+explicit mirror detachment survive native-image relocation, separate decoded-ELF
+residency validation and inverse relocation while preserving input bytes.
+Coverage includes full counted-header fingerprints, missing maps/evidence,
+nonreciprocal/self/nonmirror links, changed peer dependencies despite refreshed
+hashes, exact shared selector prefixes, overlapping payload rejection before
+expansion, signed ticks, exact budgets and selector budget failures.
+
+Supplied structural audit:292 native dribbler mirror pairs /381 bounded selector
+prefixes pass. All peer mode XORs are0x40000000. This is source structure only,
+not a real donor translation, palette semantics, gameplay or compatible conversion.
+Shared-endpoint auxiliary correlations:133 aligned curves, zero identical curves,
+24 candidate source IDs; no global map is inferred or enabled.
+
 ## Native CH motion-bundle prefix
 
 Isolated author verification ate95b4824ccb79f7cd0936149792d288e0411740e:

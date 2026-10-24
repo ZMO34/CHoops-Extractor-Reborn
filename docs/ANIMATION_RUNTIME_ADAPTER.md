@@ -1,3 +1,35 @@
+## Native donor curves and reciprocal mirror ownership
+
+The executable-held donor adapter now handles counted selector curves through the
+same explicit per-channel contracts as the signature-IFF adapter. Source header
+fingerprints include56+4*count bytes, not just the fixed prefix. All tick bits and
+knots survive; selectors have no default/identity map. Target authoring assertions,
+event coverage, source context and compatibility remain separate gates.
+
+A source+4 link may be detached ONLY with an explicit peer-address/header-hash/
+evidence assertion, a reciprocal link, disjoint headers, equal masks/counts/rate,
+equal state/timing/track/selector dependencies, and mode XOR exactly0x40000000.
+The target owns independent copies of the resolved tracks; source links are not
+copied or modified. This does not support arbitrary aliases/groups or alter their
+lifetime. Unknown+0x34 dependencies remain blocked. Payload/header overlap rejects;
+exact shared selector prefixes are allowed and copied independently. Header,
+alignment, events and all selector bytes are budgeted before pose/root expansion.
+
+Supplied source dribbler audit:292 reciprocal mirror pairs pass structural checks,
+with381 bounded selector prefixes. No target authoring or selector meaning was
+asserted by that audit, and no compatible conversions are counted. Synthetic
+construction/residency checks cover0/1/2 selectors, mirror detachment, signed-tick
+preservation and inverse relocation, plus fresh-hash malformed-link/overlap cases.
+Donor/source/selector/residency/target regression:95 passed. The API is a component
+constructor; graph publication and gameplay remain unfinished.
+
+A separate shared-endpoint candidate audit finds133 exactly knot-time-aligned
+auxiliary curves and zero identical selector-byte curves. The24 observed source
+selector IDs have consistent candidate target correspondences (for example12->8),
+without conflicts in this sample. These remain correlations: full motion/palette
+identity and downstream resource semantics are unproven. No global map or automatic
+selector contract is added from this evidence.
+
 ## CH dribbling motion-bundle playback selection
 
 Target dribbling named setup/update paths are now traced into0x345ABC's native
