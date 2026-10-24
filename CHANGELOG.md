@@ -1,3 +1,10 @@
+## Compatible on-court animation scope
+
+- Target compatible ordinary 5-v-5 gameplay animations; omit non-gameplay content
+  from conversion progress.
+- Label full-bank/group reports as source inventory and retain unresolved target
+  compatibility gates in gameplay-family preparation manifests.
+
 ## Grouped animation library continuation
 
 - Include embedded group members in the full-bank audit, with typed group alias

@@ -254,3 +254,12 @@ this still establishes no new bone map or gameplay registration. The library CLI
 includes these members automatically and separates standalone counts from group
 record/member counts. Missing/ambiguous owners, incompatible members and malformed
 extents fail explicitly. There is no group writer or executable installation CLI.
+
+### On-court conversion scope
+
+`inspect-animation-library` counts source inventory, including non-gameplay
+records; those counts are not eligible conversion totals. Its report now says
+`count_scope: source-inventory-only`, leaves compatible on-court conversion counts
+unset, and does not establish target compatibility. Group inspection is also
+inventory only. Actual port work targets compatible 5-v-5 gameplay; dunk-contest,
+photo-op, crowd, mascot and other non-gameplay records are excluded from progress.

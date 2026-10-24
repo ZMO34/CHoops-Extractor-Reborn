@@ -146,5 +146,7 @@ class MotionGroupSource:
             payload_group_record_sha256=owner["record_sha256"],
             placement_words=original["members"][member]["placement_words"],
             placement_semantics_established=False, native_group_installed=False,
+            on_court_compatibility_established=False,
+            counts_toward_on_court_conversion=False,
         )
         return data, report

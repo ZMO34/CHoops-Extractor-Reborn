@@ -1,3 +1,28 @@
+## Current conversion scope: compatible on-court 5-v-5 animations
+
+The owner's latest direction narrows the earlier entire-bank goal. Convert/add
+only animations compatible with ordinary on-court 5-v-5 play: layups, dunks,
+shots (including running shots and free throws), rebounds and related gameplay
+moves. Dunk-contest, photo-op, crowd, mascot and other non-gameplay content may be
+omitted and must not count toward conversion progress. Unknown gameplay context
+or target compatibility remains pending, rather than silently included.
+
+Earlier full-library and grouped-header totals are SOURCE INVENTORY/FORMAT
+RESEARCH, not conversion eligibility, successfully converted gameplay actions or
+playable-import counts. The library JSON now marks this scope explicitly and
+leaves compatible conversion counts unset. Group inspection likewise does not
+count a member toward on-court conversion. The category-14 paired-shot and
+category-zero gameplay-sequence preparation manifests identify their intended
+on-court scope while retaining all unresolved target compatibility gates.
+
+The unpublished generic group-component conversion experiment was deferred;
+its private research evidence remains available. No dunk-contest/photo-op group
+conversion API or new native installation is published from that experiment.
+Broad format readers can remain as reference, but next implementation work is
+on proven gameplay contexts, event/selector and target metadata correspondence,
+then bounded native loading/ownership. Right-stick controls remain secondary;
+the final control policy is still NBA2K14 right-stick default, old layout preset A.
+
 ## Grouped motion coverage and alias lifetime
 
 The full-bank audit now includes native group records, not just individually

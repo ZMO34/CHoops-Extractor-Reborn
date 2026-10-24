@@ -1,3 +1,15 @@
+## Compatible on-court scope correction
+
+The owner narrowed conversion scope to compatible ordinary on-court 5-v-5
+animations. Earlier complete-bank/group totals remain inventory evidence only;
+they must not be interpreted as converted or compatible gameplay counts. The
+unpublished general group-component experiment was deferred, with no generic
+group conversion API or game installation published. Research readers remain.
+
+Report changes label inventory scope and unset compatible conversion counts;
+paired-shot/four-pair manifests preserve explicit target compatibility gates.
+Verification results are recorded after the scoped update's isolated checks.
+
 ## Grouped motion continuation verification
 
 Read-only supplied-IFF API audit: **4,855/4,855 headers inspected** (4,705 standalone
