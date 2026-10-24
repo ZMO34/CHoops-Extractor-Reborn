@@ -1,3 +1,14 @@
+# Screenshot-driven scorebug text recovery
+
+Focused scorebug suite: **68 passed** with four new owner/marker/index-audit
+regressions. New-test Ruff E/F/I passes. Private v8 checks: stock main 10-record
+text table offset, 13 bones and original root/mask indices retained; all text
+model/marker references resolve. Five scenes reparse; 257 other stock record
+prefixes exact, one 9,088-byte inferred extension equals the exact old topbar
+header. Scoped ELF/SELF, meter-specific TOC consumers and two-IFF preflight pass.
+The v5 user screenshot demonstrates missing native text despite its synthetic
+checks. No emulator/gameplay or testing JB was used; v8 visibility is unconfirmed.
+
 # Installed scorebug context provider
 
 Focused four-file scorebug suite: **64 passed**, including 35 new synthetic tests

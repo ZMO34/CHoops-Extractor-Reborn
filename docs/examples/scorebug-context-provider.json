@@ -4,8 +4,8 @@
   "descriptor": "0x89a600",
   "toc": "0xa64a94",
   "registration_stub": "0x899d00",
-  "registration_site": "0x4ef760",
-  "binding": "home_ABL",
+  "registration_site": "0x4ef5a4",
+  "binding": "home_city",
   "literal_style_flag_clear": "0x10",
   "string_base": "0x89a640",
   "strings": {
@@ -18,5 +18,7 @@
   "native_newline_format": "0x36a37fbf",
   "string_formatter_descriptor": "0xa18cd8",
   "install_scope": "owner-authorized private scorebug-only experiment",
-  "gameplay_tested": false
+  "gameplay_tested": false,
+  "registration_destination_offset": "0x4",
+  "layout_revision": 8
 }

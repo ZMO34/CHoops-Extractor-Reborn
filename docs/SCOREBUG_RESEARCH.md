@@ -536,3 +536,9 @@ See [SCOREBUG_CONTEXT_CALLBACKS.md](SCOREBUG_CONTEXT_CALLBACKS.md) for the
 owner-authorized native provider installation, source, synthetic tests, native
 string lifetime proof and preserved geometry/event behavior. Earlier no-hook
 statements describe the prior research baseline. Runtime validation remains open.
+
+## User screenshot and stock-structure text recovery
+
+See [SCOREBUG_TEXT_RECOVERY.md](SCOREBUG_TEXT_RECOVERY.md) for v5 missing-text
+evidence, shared-owner diagnostics, stock-structure restoration and reference
+comparison-strip layout. V6 remains a candidate pending native screenshots.

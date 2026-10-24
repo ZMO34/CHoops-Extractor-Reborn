@@ -1,5 +1,10 @@
 # Installed native scorebug context provider
 
+The user subsequently reported that v5 rendered no scorebug text. The current
+recovery candidate and limitations are documented in
+[SCOREBUG_TEXT_RECOVERY.md](SCOREBUG_TEXT_RECOVERY.md). Older installation claims
+below describe the superseded v5 package; current profiles use home_city.
+
 The owner requested installation after the context investigation. A separate local
 v5 experimental package now contains an installed PowerPC provider for the far-
 right `home_ABL` text binding. The public files contain newly authored assembly,

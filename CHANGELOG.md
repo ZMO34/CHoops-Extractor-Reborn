@@ -1,3 +1,12 @@
+## Unreleased — screenshot-driven scorebug text and presentation recovery
+
+- Restore stock main text/skeleton structures and helper/mask draw indices in a
+  private recovery candidate after the user's all-text-missing v5 screenshot.
+- Add a bounded read-only text-owner/marker/index audit and four regressions.
+- Add shaded reference panels, pale score cells, revised meter placement and
+  three comparison bindings above the teams. Reuse an existing marker/bone.
+- Preserve native context/event providers; runtime visibility remains unverified.
+
 ## Unreleased — native scorebug context provider
 
 - Add newly authored PPC context provider source/profile and 35 synthetic tests.

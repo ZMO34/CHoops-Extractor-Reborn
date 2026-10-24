@@ -88,6 +88,22 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# Unreleased — screenshot-driven scorebug text recovery
+
+The user reports v5 rendering logos/geometry but no scorebug text. V5 is
+superseded; its tests did not establish native text visibility. A stock-based v8
+candidate restores the main 10-record table, 13 bones, root helper/mask indices
+and core font/width semantics. A read-only dependency audit identifies the common
+suppressed Score_bug owner and reports marker/draw activity without certifying
+visibility. Context moves to home_city; ABL providers retain team names.
+
+Reference edits add shaded panels, pale score cells/dark figures, aligned native
+sixth-man fills, and text1/text2/text3 above-team comparison fields reusing the
+existing six-bone topbar. No fake foul/bonus/possession or seed/round values.
+68 focused tests, reparse/preservation and two-IFF preflight pass. Text recovery,
+popup animation/fit and palette appearance still require user gameplay evidence.
+No emulator or testing JB. See [SCOREBUG_TEXT_RECOVERY.md](SCOREBUG_TEXT_RECOVERY.md).
+
 # Unreleased — installed scorebug context provider
 
 Owner-authorized private v5 output installs a native home_ABL provider, preserving
@@ -4954,6 +4970,12 @@ owner-authorized native provider installation, source, synthetic tests, native
 string lifetime proof and preserved geometry/event behavior. Earlier no-hook
 statements describe the prior research baseline. Runtime validation remains open.
 
+## User screenshot and stock-structure text recovery
+
+See [SCOREBUG_TEXT_RECOVERY.md](SCOREBUG_TEXT_RECOVERY.md) for v5 missing-text
+evidence, shared-owner diagnostics, stock-structure restoration and reference
+comparison-strip layout. V6 remains a candidate pending native screenshots.
+
 ---
 
 Embedded source: docs/PROJECT_SOURCE_OF_TRUTH.md
@@ -5399,6 +5421,17 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+# Screenshot-driven scorebug text recovery
+
+Focused scorebug suite: **68 passed** with four new owner/marker/index-audit
+regressions. New-test Ruff E/F/I passes. Private v8 checks: stock main 10-record
+text table offset, 13 bones and original root/mask indices retained; all text
+model/marker references resolve. Five scenes reparse; 257 other stock record
+prefixes exact, one 9,088-byte inferred extension equals the exact old topbar
+header. Scoped ELF/SELF, meter-specific TOC consumers and two-IFF preflight pass.
+The v5 user screenshot demonstrates missing native text despite its synthetic
+checks. No emulator/gameplay or testing JB was used; v8 visibility is unconfirmed.
 
 # Installed scorebug context provider
 

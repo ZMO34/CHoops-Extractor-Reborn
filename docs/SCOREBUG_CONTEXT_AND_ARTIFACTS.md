@@ -1,5 +1,10 @@
 # Scorebug context and recurring line investigation
 
+The user subsequently reported that v5 rendered no scorebug text. The current
+recovery candidate and limitations are documented in
+[SCOREBUG_TEXT_RECOVERY.md](SCOREBUG_TEXT_RECOVERY.md). Older installation claims
+below describe the superseded v5 package; current profiles use home_city.
+
 Historical v2 research baseline. The subsequent installed provider and updated
 current-game key/ownership evidence are in
 [SCOREBUG_CONTEXT_CALLBACKS.md](SCOREBUG_CONTEXT_CALLBACKS.md). Statements below
