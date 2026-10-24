@@ -12,8 +12,9 @@ pass. Static native instruction inspection, numerical reference tests and the
 stock-corpus comparison are distinct evidence; no original authoring recovery or
 VMX bit-exact claim follows.
 
-Targeted proposal/cache/family/source/group/library checks passed; isolated final
-portable results are recorded after exact-head verification. Tests cover cropped
+Targeted proposal/cache/family/source/group/library checks: **83 passed**.
+Isolated author verification: **1,126 passed, 10 skipped, 2 deselected**; handoff
+freshness, compile, CLI/offscreen Qt, Ruff and mypy (18 files) pass. Tests cover cropped
 end times, mirroring, nonuniform source intervals, cyclic/timing/extent rejection,
 float32 range, paired-family selection, immutable inputs and decoded-block reuse
 with fresh mutable parsed rows.
