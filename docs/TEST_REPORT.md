@@ -1,5 +1,9 @@
 ## Native CH motion-bundle prefix
 
+Isolated author verification ate95b4824ccb79f7cd0936149792d288e0411740e:
+**1,186 passed,10 skipped,2 deselected**; handoff, compile, CLI/offscreen Qt,
+Ruff and mypy18files pass. Final published-head verification is recorded in PR49.
+
 `NativeMotionBundleTrace.java`: **192 passed**, no mocked calls, stopping before
 native timing/playback. Covers counts1/5, six threshold values, explicit flag
 permission, lane policy, actor flag and guard-row bits. The observed lookahead
