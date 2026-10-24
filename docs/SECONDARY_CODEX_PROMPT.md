@@ -5836,6 +5836,10 @@ Embedded source: docs/TEST_REPORT.md
 
 ## Whole-library and provider continuation
 
+Full portable verification in the isolated detached checkout: **1,090 passed,
+10 skipped, 2 deselected**; handoff freshness, compile, CLI/offscreen Qt, Ruff and
+mypy (18 files) pass. Author verification, not independent review.
+
 Category 14 pose/root audit: 201 distinct payload owners / 402 distinct headers /
 406 reference slots; 5,902 authored keys preserved exactly across 23,352 fixed
 frames / 3,546,552 component bytes. All source hashes remain unchanged. This is
