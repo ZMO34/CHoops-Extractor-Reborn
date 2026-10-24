@@ -6411,6 +6411,11 @@ Embedded source: docs/TEST_REPORT.md
 
 ## NBA11 graph structural and native relocation continuation
 
+Isolated author verification at0a7065b02095ace7340adc6651da1140a548c853:
+**1,136 passed,10 skipped,2 deselected**; handoff, compile, CLI/offscreen Qt,
+Ruff and mypy18files pass. The committed native harness also passes all3 cases
+from that isolated checkout. Author verification is not independent approval.
+
 New graph parser tests: **10 passed**. Graph/source/group/library regression:
 **52 passed**. New module/tests pass Ruff E/F/I. Inputs cover mixed direct/group
 bindings, unknown-word preservation, signed/null/end pointers, overlap, nonempty
