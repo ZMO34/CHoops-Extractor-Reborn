@@ -1,3 +1,56 @@
+## Native scorebug footer revision
+
+Final focused suite: **95 passed** across footer/context instruction harnesses,
+text dependencies, layout, style and runtime audits. New-test Ruff E/F/I passes.
+Private matched v10 output: 18 fields pass native marker-hash/owner/draw checks;
+callback source matches packaged instructions; footer sibling chain, comparison
+side anchors, unchanged context/descriptor/strings/meter, ELF write allowlists and
+SELF roundtrip pass. Two IFFs prepare/preflight; ZIP CRC/checksums pass. Inferred
+span extensions are classified as exact known retained headers plus bounded zero
+alignment. No game assets or executables are committed.
+
+New footer/name callback instruction harness: 26 passed. Covers live sides,
+opponent-earned bonus, configurable threshold, null/invalid data, direct names,
+stale clearing and halftime reset. Preserves native ABI and temporary-handle
+ownership with native callees stubbed. The marker audit additionally checks stored native CRC32 identities; a new
+regression rejects a matching marker name with an invalid hash. Final suite and
+private package results follow below. No gameplay/emulator or testing JB.
+
+# Screenshot-driven scorebug text recovery
+
+Focused scorebug suite: **68 passed** with four new owner/marker/index-audit
+regressions. New-test Ruff E/F/I passes. Private v8 checks: stock main 10-record
+text table offset, 13 bones and original root/mask indices retained; all text
+model/marker references resolve. Five scenes reparse; 257 other stock record
+prefixes exact, one 9,088-byte inferred extension equals the exact old topbar
+header. Scoped ELF/SELF, meter-specific TOC consumers and two-IFF preflight pass.
+The v5 user screenshot demonstrates missing native text despite its synthetic
+checks. No emulator/gameplay or testing JB was used; v8 visibility is unconfirmed.
+
+# Installed scorebug context provider
+
+Focused four-file scorebug suite: **64 passed**, including 35 new synthetic tests
+(34 instruction paths and nine sequential output transitions). New test Ruff
+E/F/I passes. The harness stubs native external functions and checks strict memory,
+ABI/TOC/CR and balanced string wrappers, including rejection of borrowed stack
+character storage. Optional Capstone/Keystone absence skips the harness.
+
+Private v5: scoped ELF edits/branch/load-extent checks and SELF roundtrip pass;
+only one four-byte style property changes in gamedata, 261 other records and all
+geometry/meter/English bytes stay exact. Both IFFs prepare/preflight. Native string
+ownership and existing newline template were verified separately from source.
+No native renderer execution, gameplay/emulator or automatic/testing JB.
+
+# Scorebug context and geometry investigation — 2026-10-23
+
+Documentation-only public update. Private source-bound candidate: 30 index spans
+across three SCNEs, all header/vertex bytes preserved, 259 other v1 records exact,
+all meter data and executable unchanged, five HUD scenes reparse. Two IFFs stage
+and preflight without a JB build. Focused Ghidra: five context consumers plus six
+dependencies, with original-instruction/switch-table checks. Full gamedata text
+inventory finds no authored text1/text2/text3/text3_b records. Native popup table
+and localization inspection remains static evidence, not live admission proof.
+No runtime context hook was installed. User-reported line cause unconfirmed.
 # v1.22 alternate discovery and PR integration
 
 Targeted: `python -m pytest tests/test_team_assets.py tests/test_folder_overrides.py

@@ -1,0 +1,65 @@
+{
+  "version": 10,
+  "main_bounds": [
+    -360,
+    -208.5,
+    360,
+    -174.5
+  ],
+  "comparison_bounds": [
+    -318,
+    -174.5,
+    94,
+    -150.5
+  ],
+  "comparison_x": {
+    "text1": -112.5,
+    "text2_home": 35.5,
+    "text3_away": -260,
+    "text3_b_away_transition": -260
+  },
+  "meter_world_spans": [
+    [
+      -278,
+      -153
+    ],
+    [
+      -72,
+      53
+    ]
+  ],
+  "meter_y": [
+    -193,
+    -191
+  ],
+  "footer_anchors": {
+    "away_city": [
+      -215,
+      -203
+    ],
+    "gameclock_left": [
+      -9,
+      -203
+    ]
+  },
+  "native_text_scales": {
+    "away_score": 0.9,
+    "home_score": 0.9,
+    "quarter": 0.5114,
+    "gameclock": 0.625,
+    "shotclock": 0.5682,
+    "away_ABL": 0.625,
+    "home_ABL": 0.625,
+    "home_city": 0.4514,
+    "away_city": 0.5,
+    "gameclock_left": 0.5,
+    "bottombar_textNode_1": 0.72,
+    "bottombar_textNode_2": 0.72
+  },
+  "main_text_count": 12,
+  "main_bones": 15,
+  "comparison_text_count": 4,
+  "comparison_bones": 6,
+  "pixel_projection_verified": false,
+  "native_visibility_verified": false
+}

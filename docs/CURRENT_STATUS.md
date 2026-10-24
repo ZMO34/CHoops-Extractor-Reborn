@@ -1,3 +1,67 @@
+# Unreleased — native scorebug footer and comparison-side correction
+
+PR #50 continues with a separate v10 executable/IFF candidate. New authored native
+callbacks supply direct live team names and current-half foul/earned-bonus rows.
+The previous city-provider assumption was wrong in ordinary modes. Bonus reads
+opponent state and loaded rule thresholds/native double-bonus logic. Native text
+matrix scales now differ by role. The comparison's home-first provider order is
+corrected and its alternate transition binding added. Six-bone topbar retained;
+main table/markers grow only for two footers, preserving recovered helpers/masks.
+
+95 focused tests pass, including 26 new callback instruction paths and a native
+marker-hash regression. Eighteen packaged fields resolve their native marker
+hashes; ELF/SELF, preservation, two-IFF preflight and ZIP CRC checks pass. Native
+external routines are stubbed. Structural
+checks and in-game certification are distinct. Possession/seed/round/region and
+comparison end logos/tint remain unsupported. No emulator or testing JB. See
+[SCOREBUG_NATIVE_V10.md](SCOREBUG_NATIVE_V10.md) for behavior and installation limits.
+
+# Unreleased — screenshot-driven scorebug text recovery
+
+The user reports v5 rendering logos/geometry but no scorebug text. V5 is
+superseded; its tests did not establish native text visibility. A stock-based v8
+candidate restores the main 10-record table, 13 bones, root helper/mask indices
+and core font/width semantics. A read-only dependency audit identifies the common
+suppressed Score_bug owner and reports marker/draw activity without certifying
+visibility. Context moves to home_city; ABL providers retain team names.
+
+Reference edits add shaded panels, pale score cells/dark figures, aligned native
+sixth-man fills, and text1/text2/text3 above-team comparison fields reusing the
+existing six-bone topbar. No fake foul/bonus/possession or seed/round values.
+68 focused tests, reparse/preservation and two-IFF preflight pass. Text recovery,
+popup animation/fit and palette appearance still require user gameplay evidence.
+No emulator or testing JB. See [SCOREBUG_TEXT_RECOVERY.md](SCOREBUG_TEXT_RECOVERY.md).
+
+# Unreleased — installed scorebug context provider
+
+Owner-authorized private v5 output installs a native home_ABL provider, preserving
+the existing renderer and geometry-v2 suppression. It selects timeout, verified
+current-game NCAA/NIT/conference tournament, same-conference matchup or branding.
+Scheduled-game participant ownership and current conference roundtrips gate
+context; no stale date/school cache is used. Native refcounted formatting avoids
+returning stack character storage. The matching SCNE clears its forced-literal
+bit; English, event queues and all meter/geometry data remain unchanged.
+
+New authored PPC source/profile and synthetic harness are public. Focused tests:
+64 passed; new-test Ruff E/F/I passes. Private scoped ELF/SELF and two-IFF preflight
+checks pass. This is an installed local experiment, not runtime certification or
+a complete multi-line popup implementation. No emulator/gameplay/testing JB.
+See [SCOREBUG_CONTEXT_CALLBACKS.md](SCOREBUG_CONTEXT_CALLBACKS.md).
+
+# Unreleased — scorebug context and line-artifact investigation
+
+Mapped native NCAA/NIT calendar predicates, season/conference/national label
+consumers and timeout calling-team selection. The current gamedata lacks authored
+text1/text2/text3/text3_b records despite registered providers: broad popup display
+coverage is not established. Added an explicit context/layer specification with
+per-feature proof requirements; no new native context hook is installed.
+
+A private correction degenerates 30 index spans in three scenes to suppress old
+frames/masks, twelve transparent surplus quads and an edge-on popup helper.
+All scene headers/vertices and 259 other v1 records remain exact; native meter
+and executable are unchanged. Two IFFs prepare/preflight. This removes identified
+geometry risks, not a certified fix for all reported lines. No emulator/gameplay
+or testing JB. See [SCOREBUG_CONTEXT_AND_ARTIFACTS.md](SCOREBUG_CONTEXT_AND_ARTIFACTS.md).
 # v1.22 — new alternate folder discovery
 
 Windows extended drive/UNC path spellings are normalized consistently, fixing the

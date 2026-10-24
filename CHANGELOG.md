@@ -1,3 +1,37 @@
+## Unreleased — native scorebug footer revision
+
+- Add authored native live team-name and current-half foul/earned-bonus providers,
+  with loaded rule thresholds, opponent ownership and stale-state clearing.
+- Correct native comparison home/away placement, add its transition binding and
+  install separate text scales for score, clock, names, context and footers.
+- Audit native marker hashes as well as names; validate appended footer marker
+  identities and hierarchy links.
+- Document remaining runtime and reference-layout limits; no gameplay claim.
+
+## Unreleased — screenshot-driven scorebug text and presentation recovery
+
+- Restore stock main text/skeleton structures and helper/mask draw indices in a
+  private recovery candidate after the user's all-text-missing v5 screenshot.
+- Add a bounded read-only text-owner/marker/index audit and four regressions.
+- Add shaded reference panels, pale score cells, revised meter placement and
+  three comparison bindings above the teams. Reuse an existing marker/bone.
+- Preserve native context/event providers; runtime visibility remains unverified.
+
+## Unreleased — native scorebug context provider
+
+- Add newly authored PPC context provider source/profile and 35 synthetic tests.
+- Document the matching private installation: timeout caller, current-game
+  NCAA/NIT/conference tournament and current conference matchup labels, guarded
+  fallback branding, native refcounted strings and retained renderer/geometry.
+- No public patcher/game binary or complete popup-coverage claim is introduced.
+
+## Unreleased — scorebug context research and geometry correction evidence
+
+- Document native tournament/timeout consumers, missing statistics bindings,
+  popup-layer logic, implementable feature dependencies and line-artifact risks.
+- Record an owner-authorized private index-only geometry candidate and structural
+  preservation/preflight results. No public game assets, patcher or claimed
+  gameplay/context implementation.
 ## v1.22 — alternate discovery and combined research updates
 
 Windows extended drive/UNC path spellings are normalized consistently, fixing the

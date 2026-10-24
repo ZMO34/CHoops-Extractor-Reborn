@@ -1,0 +1,161 @@
+{
+  "schema": 1,
+  "main_text_count": 10,
+  "main_text_table": "stock offset retained",
+  "main_skeleton_bones": 13,
+  "required_preserved_models": [
+    "Score_bug",
+    "text_nodeMask"
+  ],
+  "team_name_bindings": {
+    "away": "away_ABL",
+    "home": "home_ABL"
+  },
+  "context_binding": "home_city",
+  "context_original_marker": "player_info",
+  "comparison": {
+    "scene": "scorebug_topbar",
+    "bindings": [
+      "text1",
+      "text2",
+      "text3"
+    ],
+    "roles": [
+      "centered title",
+      "away value",
+      "home value"
+    ],
+    "existing_skeleton_bones": 6,
+    "third_marker": "text_6th_man",
+    "bounds": [
+      -318,
+      -174.5,
+      94,
+      -150.5
+    ],
+    "anchors": [
+      [
+        -112.5,
+        -166.25
+      ],
+      [
+        -260,
+        -166.25
+      ],
+      [
+        35.5,
+        -166.25
+      ]
+    ],
+    "native_visibility": true
+  },
+  "main_bounds": [
+    -360,
+    -208.5,
+    360,
+    -174.5
+  ],
+  "white_score_bounds": [
+    [
+      -148,
+      -208.5,
+      -112,
+      -174.5
+    ],
+    [
+      58,
+      -208.5,
+      94,
+      -174.5
+    ]
+  ],
+  "meter": {
+    "native_draws": 19,
+    "local_bounds": [
+      20,
+      -40,
+      145,
+      -38
+    ],
+    "native_offsets": [
+      -298,
+      -92
+    ],
+    "world_spans": [
+      [
+        -278,
+        -153
+      ],
+      [
+        -72,
+        53
+      ]
+    ],
+    "world_y": [
+      -193,
+      -191
+    ]
+  },
+  "appearance": {
+    "body_gradient": [
+      [
+        48,
+        51,
+        56
+      ],
+      [
+        9,
+        10,
+        12
+      ]
+    ],
+    "score_gradient": [
+      [
+        252,
+        253,
+        254
+      ],
+      [
+        219,
+        222,
+        226
+      ]
+    ],
+    "palette": "native materials retained, authored vertex ramp 0.100..0.165"
+  },
+  "live_footer_bonus_possession": false,
+  "text_runtime_confirmed": false,
+  "logo_quad_bounds": {
+    "brand": [
+      -353,
+      -205.5,
+      -325,
+      -177.5
+    ],
+    "away": [
+      -316,
+      -207.5,
+      -284,
+      -175.5
+    ],
+    "home": [
+      -110,
+      -207.5,
+      -78,
+      -175.5
+    ]
+  },
+  "score_anchor_y": -196.45,
+  "preview_cap_heights_px": {
+    "scores": 32,
+    "clock": 22,
+    "shot_clock": 20,
+    "period": 18,
+    "team_names": 18,
+    "context": 13,
+    "comparison_title": 18,
+    "comparison_values": 20
+  },
+  "preview_center_error_max_px": 0.5,
+  "game_font_sizes_calibrated": false
+}

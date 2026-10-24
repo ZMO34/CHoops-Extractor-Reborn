@@ -6,9 +6,10 @@ select by text-record name; bone names stay independent of those bindings.
 """
 import math
 import struct
+import zlib
+from collections import Counter
 
 from ..formats.binary import Binary
-
 
 FONT = 0xbf045bdb
 COLOR = (0x6109ea5a, 0x97de0310, 0x6814845a)
@@ -57,6 +58,123 @@ def inspect_styles(header):
         alpha=struct.unpack('>f',b.slice(alpha[0],4))[0] if alpha and alpha[1]==1 else None
         rows.append(dict(binding=name,font=font,color=values(COLOR),shadow=values(SHADOW),literal_id=literal,alpha=alpha))
     return rows
+
+
+def inspect_text_dependencies(parts):
+    """Report observed split-HUD text owners/markers and indexed draw activity.
+
+    Zero submitted triangles is diagnostic evidence, not proof that the engine
+    suppresses text. Alpha, native culling, stencil and GPU state are not modeled.
+    """
+    if len(parts) != 2:
+        raise ValueError('Text dependency audit requires a split HUD scene')
+    b, records = _records(parts[0])
+    payload = Binary(parts[1])
+    count = b.u32(0x44)
+    if count > 4096:
+        raise ValueError('HUD model count exceeds audit limit')
+    table = b.relative(0x48) if count else 0
+    b.slice(table, count * 176)
+    models = {}
+    index_budget = 0
+    bone_budget = 0
+    draw_budget = 0
+    for i in range(count):
+        at = table + i * 176
+        name = b.utf16(b.relative(at), 'be')
+        if name in models:
+            raise ValueError('Ambiguous HUD model ' + name)
+        bones = b.u32(at + 0x60)
+        bone_budget += bones
+        if bone_budget > 100000:
+            raise ValueError('HUD bone count exceeds audit limit')
+        bone_table = b.relative(at + 0x64) if bones else 0
+        b.slice(bone_table, bones * 48)
+        markers = [
+            b.utf16(b.relative(bone_table + j * 48 + 32), 'be')
+            for j in range(bones)
+        ]
+        if len(set(markers)) != len(markers):
+            raise ValueError('Ambiguous HUD marker in ' + name)
+        marker_hashes = {
+            marker: b.u32(bone_table + j * 48 + 36)
+            for j, marker in enumerate(markers)
+        }
+        if b.u32(at + 0x84) != 1 or b.u32(at + 0xa4) != 0x20000010:
+            raise ValueError('Unsupported split HUD index/stream layout')
+        descriptor = b.relative(at + 0x88)
+        vertices = b.u32(descriptor + 16)
+        index_count = b.u32(at + 0xa8)
+        index_budget += index_count
+        if index_budget > 2000000 or not 1 <= vertices <= 250000:
+            raise ValueError('HUD geometry exceeds audit limit')
+        indices = struct.unpack(
+            '>' + str(index_count) + 'H',
+            payload.slice(b.u32(at + 0xac) - 1, index_count * 2),
+        )
+        if any(x != 65535 and x >= vertices for x in indices):
+            raise ValueError('HUD index outside vertex buffer')
+        runs = b.u32(at + 0x7c)
+        if runs > 10000:
+            raise ValueError('HUD draw count exceeds audit limit')
+        draw = b.relative(at + 0x80) if runs else 0
+        b.slice(draw, runs * 48)
+        triangles = 0
+        for j in range(runs):
+            primitive, first, size = struct.unpack(
+                '>3I', b.slice(draw + j * 48, 12),
+            )
+            if primitive != 6 or first + size > index_count:
+                raise ValueError('Unsupported HUD draw/index range')
+            draw_budget += size
+            if draw_budget > 2000000:
+                raise ValueError('HUD submitted indices exceed audit limit')
+            strip = []
+            for index in indices[first:first + size]:
+                if index == 65535:
+                    strip = []
+                else:
+                    strip.append(index)
+                    if len(strip) >= 3 and len(set(strip[-3:])) == 3:
+                        triangles += 1
+        models[name] = dict(
+            markers=markers, bones=bones, submitted_triangles=triangles,
+            marker_hashes=marker_hashes,
+            marker_hash_counts=dict(Counter(marker_hashes.values())),
+        )
+    rows = []
+    for binding, (_, properties) in records.items():
+        names = []
+        for key in (0xe27ec83b, 0xae7e1958):
+            item = properties.get(key)
+            if item is None or item[1] != 3 or not b.u32(item[0]):
+                raise ValueError('Text model/marker string missing: ' + binding)
+            names.append(b.utf16(b.relative(item[0]), 'be'))
+        owner, marker = names
+        model = models.get(owner)
+        # Observed native bone lookup (7f9ab8) compares +36, not the name.
+        # ASCII marker hashes match case-sensitive CRC32 in supplied HUDs.
+        # Do not invent the conversion/hash contract for non-ASCII names.
+        native_marker_resolved = None
+        if marker.isascii():
+            wanted = zlib.crc32(marker.encode('ascii')) & 0xffffffff
+            native_marker_resolved = (
+                model is not None
+                and model['marker_hashes'].get(marker) == wanted
+                and model['marker_hash_counts'].get(wanted) == 1
+            )
+        rows.append(dict(
+            binding=binding, owner=owner, marker=marker,
+            resolved=model is not None and marker in model['markers'],
+            native_marker_resolved=native_marker_resolved,
+            owner_submitted_triangles=(
+                model['submitted_triangles'] if model is not None else None
+            ),
+        ))
+    return dict(
+        mode='read-only', text=rows, models=models,
+        runtime_visibility_verified=False,
+    )
 
 
 def edit_styles(parts, changes):
