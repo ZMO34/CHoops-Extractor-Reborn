@@ -1,5 +1,9 @@
 ## Native shot state accessor continuation
 
+Isolated author portable verification at8311f247f78492c15861604619eee89ef830723e:
+**1,126 passed,10 skipped,2 deselected**; handoff, compile, CLI/offscreen Qt,
+Ruff and mypy18files passed. This is author verification, not independent approval.
+
 Read-only `NativeJumpGameplayTrace.java` on the supplied CH ELF: **18 passed**
 (hand0/1, style0/111/255, native stride0/1/2). The real0x2351D0 accessor and
 0x234E30 dependency execute; the previous state-pointer substitution is removed.

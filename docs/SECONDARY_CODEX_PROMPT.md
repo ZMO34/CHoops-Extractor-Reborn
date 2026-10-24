@@ -88,6 +88,25 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+## Dribbling graph native motion dependencies
+
+Static native tracing identifies NBA11 ANIMGRAPHRESOURCEHANDLER's fixup0x37FF80,
+which selects resource0x83C36981 and calls0x37FC60 with table0x3EF977C. The supplied
+770,144-byte dribbler graph has292 nodes at decoded offset0x80, stride36. The
+loader resolves header pointers +0x40..+0x58 through0x8339AC. Its node loop uses
+one executable table entry per node; when node +0x10 bit0 is clear it writes the
+entry into node +4. For set bit0 it instead writes node +0 and derives +4 from
+that object's +0xC. Both paths relocate node +0x18 and +0x20. This is static
+instruction evidence, not a completed native graph-loader execution test.
+
+All292 supplied dribbler nodes have bit0 clear and their executable-held motion
+headers have mask0x1DF7DD. This establishes explicit graph-to-native-motion
+references absent from an IFF-only inventory; it does not establish canonical
+bind equivalence, node operation/transition semantics or target compatibility.
+The graph and referenced native motions require joint loading/lifetime work.
+No node is counted as a converted compatible animation. Running, defensive and
+rebound playback contexts remain required and pending their own tracing.
+
 ## Native paired-shot state addressing
 
 The target instruction harness now executes CH accessor0x2351D0 and its real
@@ -1733,6 +1752,25 @@ See NBA_ROSTERS_AND_2K14.md for container and primary format references.
 
 Embedded source: docs/ANIMATION_GAMEPLAY_PORT.md
 
+## Dribbling graph native motion dependencies
+
+Static native tracing identifies NBA11 ANIMGRAPHRESOURCEHANDLER's fixup0x37FF80,
+which selects resource0x83C36981 and calls0x37FC60 with table0x3EF977C. The supplied
+770,144-byte dribbler graph has292 nodes at decoded offset0x80, stride36. The
+loader resolves header pointers +0x40..+0x58 through0x8339AC. Its node loop uses
+one executable table entry per node; when node +0x10 bit0 is clear it writes the
+entry into node +4. For set bit0 it instead writes node +0 and derives +4 from
+that object's +0xC. Both paths relocate node +0x18 and +0x20. This is static
+instruction evidence, not a completed native graph-loader execution test.
+
+All292 supplied dribbler nodes have bit0 clear and their executable-held motion
+headers have mask0x1DF7DD. This establishes explicit graph-to-native-motion
+references absent from an IFF-only inventory; it does not establish canonical
+bind equivalence, node operation/transition semantics or target compatibility.
+The graph and referenced native motions require joint loading/lifetime work.
+No node is counted as a converted compatible animation. Running, defensive and
+rebound playback contexts remain required and pending their own tracing.
+
 ## Native paired-shot state addressing
 
 The target instruction harness now executes CH accessor0x2351D0 and its real
@@ -2449,6 +2487,25 @@ No RPCS3, hardware run, full-game build or controller remapping was performed.
 ---
 
 Embedded source: docs/ANIMATION_RUNTIME_ADAPTER.md
+
+## Dribbling graph native motion dependencies
+
+Static native tracing identifies NBA11 ANIMGRAPHRESOURCEHANDLER's fixup0x37FF80,
+which selects resource0x83C36981 and calls0x37FC60 with table0x3EF977C. The supplied
+770,144-byte dribbler graph has292 nodes at decoded offset0x80, stride36. The
+loader resolves header pointers +0x40..+0x58 through0x8339AC. Its node loop uses
+one executable table entry per node; when node +0x10 bit0 is clear it writes the
+entry into node +4. For set bit0 it instead writes node +0 and derives +4 from
+that object's +0xC. Both paths relocate node +0x18 and +0x20. This is static
+instruction evidence, not a completed native graph-loader execution test.
+
+All292 supplied dribbler nodes have bit0 clear and their executable-held motion
+headers have mask0x1DF7DD. This establishes explicit graph-to-native-motion
+references absent from an IFF-only inventory; it does not establish canonical
+bind equivalence, node operation/transition semantics or target compatibility.
+The graph and referenced native motions require joint loading/lifetime work.
+No node is counted as a converted compatible animation. Running, defensive and
+rebound playback contexts remain required and pending their own tracing.
 
 ## Native paired-shot state addressing
 
@@ -6254,6 +6311,10 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 Embedded source: docs/TEST_REPORT.md
 
 ## Native shot state accessor continuation
+
+Isolated author portable verification at8311f247f78492c15861604619eee89ef830723e:
+**1,126 passed,10 skipped,2 deselected**; handoff, compile, CLI/offscreen Qt,
+Ruff and mypy18files passed. This is author verification, not independent approval.
 
 Read-only `NativeJumpGameplayTrace.java` on the supplied CH ELF: **18 passed**
 (hand0/1, style0/111/255, native stride0/1/2). The real0x2351D0 accessor and
