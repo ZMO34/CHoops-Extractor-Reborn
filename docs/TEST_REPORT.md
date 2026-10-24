@@ -1,3 +1,16 @@
+## NBA11 graph structural and native relocation continuation
+
+New graph parser tests: **10 passed**. Graph/source/group/library regression:
+**52 passed**. New module/tests pass Ruff E/F/I. Inputs cover mixed direct/group
+bindings, unknown-word preservation, signed/null/end pointers, overlap, nonempty
+null tables, count/fixup budgets, unsupported profiles and truncation.
+
+Native synthetic graph instruction harness: **3 passed**, no mocked calls.
+Private supplied-graph fixup probes: **2 passed**, full-byte equality against the
+reader-derived expected images (dribbler368,721 steps; bodyup1,633 steps). No
+uninitialized-read warning or instruction failure reported in successful runs.
+Original archive part sizes/mtimes unchanged; no gameplay or testing JB run.
+
 ## Native shot state accessor continuation
 
 Isolated author portable verification at8311f247f78492c15861604619eee89ef830723e:

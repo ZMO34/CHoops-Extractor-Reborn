@@ -88,6 +88,39 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+## Native graph relocation coverage for dribbling and bodyup
+
+`research.anim_graph.inspect_graph` now validates the observed NBA11 decoded graph
+layout: sixteen count/pointer pairs, fixed table strides, nonoverlapping tables,
+signed relative pointer bounds and positional executable motion bindings. It
+retains all nine raw node words and distinguishes the native direct-motion and
+group-first-member binding paths. Unknown node operations and transitions remain
+opaque. Other game profiles reject; no graph writer or target installation exists.
+Bounds are64MiB, one million aggregate rows and300,000 pointer fixups; these are
+inspection limits, not PS3 residency guarantees. Empty table endpoints, nulls and
+backward references are handled explicitly. No conversion count is inferred.
+
+The supplied dribbler graph passes with292 nodes /25,189 pointer fields. The
+5,956-byte `animgraph_bodyup` graph (resource0xEE6DA12B) passes with13 nodes /92
+pointer fields; all13 bind native groups, with26 canonical-mask member headers.
+Dribbler resource0x83C36981 binds292 direct native motions. The bodyup name is a
+lead for defensive interactions, not proof of exact gameplay selection semantics.
+
+`NativeAnimGraphTrace.java` executes the real0x37FC60 routine and0x8339AC helper
+without mocked calls. Three synthetic cases cover0/1/2 nodes, both binding paths,
+all pointer table classes, null/backward references, and whole-buffer preservation
+outside expected writes. All3 pass. A separate private bounded read-only probe
+also executes fixups on copies of both supplied graphs: dribbler368,721 steps,
+bodyup1,633 steps. Both outputs match the reader-derived relocation/binding image
+byte for byte, including all unknown bytes. This proves these supplied source
+fixups, not graph execution, transition semantics, target compatibility or gameplay.
+
+The supplied CH inventory reports no0x0D53D4B3 resource, and an ASCII handler-name
+search found no matching ANIMGRAPHRESOURCEHANDLER name in its ELF. These negative
+checks do not prove absence of equivalent target behavior. Target playback and
+native ownership still require tracing; copying the donor graph alone is not a
+complete loading solution. Running, defensive movement and rebounds remain required.
+
 ## Dribbling graph native motion dependencies
 
 Static native tracing identifies NBA11 ANIMGRAPHRESOURCEHANDLER's fixup0x37FF80,
@@ -1752,6 +1785,39 @@ See NBA_ROSTERS_AND_2K14.md for container and primary format references.
 
 Embedded source: docs/ANIMATION_GAMEPLAY_PORT.md
 
+## Native graph relocation coverage for dribbling and bodyup
+
+`research.anim_graph.inspect_graph` now validates the observed NBA11 decoded graph
+layout: sixteen count/pointer pairs, fixed table strides, nonoverlapping tables,
+signed relative pointer bounds and positional executable motion bindings. It
+retains all nine raw node words and distinguishes the native direct-motion and
+group-first-member binding paths. Unknown node operations and transitions remain
+opaque. Other game profiles reject; no graph writer or target installation exists.
+Bounds are64MiB, one million aggregate rows and300,000 pointer fixups; these are
+inspection limits, not PS3 residency guarantees. Empty table endpoints, nulls and
+backward references are handled explicitly. No conversion count is inferred.
+
+The supplied dribbler graph passes with292 nodes /25,189 pointer fields. The
+5,956-byte `animgraph_bodyup` graph (resource0xEE6DA12B) passes with13 nodes /92
+pointer fields; all13 bind native groups, with26 canonical-mask member headers.
+Dribbler resource0x83C36981 binds292 direct native motions. The bodyup name is a
+lead for defensive interactions, not proof of exact gameplay selection semantics.
+
+`NativeAnimGraphTrace.java` executes the real0x37FC60 routine and0x8339AC helper
+without mocked calls. Three synthetic cases cover0/1/2 nodes, both binding paths,
+all pointer table classes, null/backward references, and whole-buffer preservation
+outside expected writes. All3 pass. A separate private bounded read-only probe
+also executes fixups on copies of both supplied graphs: dribbler368,721 steps,
+bodyup1,633 steps. Both outputs match the reader-derived relocation/binding image
+byte for byte, including all unknown bytes. This proves these supplied source
+fixups, not graph execution, transition semantics, target compatibility or gameplay.
+
+The supplied CH inventory reports no0x0D53D4B3 resource, and an ASCII handler-name
+search found no matching ANIMGRAPHRESOURCEHANDLER name in its ELF. These negative
+checks do not prove absence of equivalent target behavior. Target playback and
+native ownership still require tracing; copying the donor graph alone is not a
+complete loading solution. Running, defensive movement and rebounds remain required.
+
 ## Dribbling graph native motion dependencies
 
 Static native tracing identifies NBA11 ANIMGRAPHRESOURCEHANDLER's fixup0x37FF80,
@@ -2487,6 +2553,39 @@ No RPCS3, hardware run, full-game build or controller remapping was performed.
 ---
 
 Embedded source: docs/ANIMATION_RUNTIME_ADAPTER.md
+
+## Native graph relocation coverage for dribbling and bodyup
+
+`research.anim_graph.inspect_graph` now validates the observed NBA11 decoded graph
+layout: sixteen count/pointer pairs, fixed table strides, nonoverlapping tables,
+signed relative pointer bounds and positional executable motion bindings. It
+retains all nine raw node words and distinguishes the native direct-motion and
+group-first-member binding paths. Unknown node operations and transitions remain
+opaque. Other game profiles reject; no graph writer or target installation exists.
+Bounds are64MiB, one million aggregate rows and300,000 pointer fixups; these are
+inspection limits, not PS3 residency guarantees. Empty table endpoints, nulls and
+backward references are handled explicitly. No conversion count is inferred.
+
+The supplied dribbler graph passes with292 nodes /25,189 pointer fields. The
+5,956-byte `animgraph_bodyup` graph (resource0xEE6DA12B) passes with13 nodes /92
+pointer fields; all13 bind native groups, with26 canonical-mask member headers.
+Dribbler resource0x83C36981 binds292 direct native motions. The bodyup name is a
+lead for defensive interactions, not proof of exact gameplay selection semantics.
+
+`NativeAnimGraphTrace.java` executes the real0x37FC60 routine and0x8339AC helper
+without mocked calls. Three synthetic cases cover0/1/2 nodes, both binding paths,
+all pointer table classes, null/backward references, and whole-buffer preservation
+outside expected writes. All3 pass. A separate private bounded read-only probe
+also executes fixups on copies of both supplied graphs: dribbler368,721 steps,
+bodyup1,633 steps. Both outputs match the reader-derived relocation/binding image
+byte for byte, including all unknown bytes. This proves these supplied source
+fixups, not graph execution, transition semantics, target compatibility or gameplay.
+
+The supplied CH inventory reports no0x0D53D4B3 resource, and an ASCII handler-name
+search found no matching ANIMGRAPHRESOURCEHANDLER name in its ELF. These negative
+checks do not prove absence of equivalent target behavior. Target playback and
+native ownership still require tracing; copying the donor graph alone is not a
+complete loading solution. Running, defensive movement and rebounds remain required.
 
 ## Dribbling graph native motion dependencies
 
@@ -6309,6 +6408,19 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+## NBA11 graph structural and native relocation continuation
+
+New graph parser tests: **10 passed**. Graph/source/group/library regression:
+**52 passed**. New module/tests pass Ruff E/F/I. Inputs cover mixed direct/group
+bindings, unknown-word preservation, signed/null/end pointers, overlap, nonempty
+null tables, count/fixup budgets, unsupported profiles and truncation.
+
+Native synthetic graph instruction harness: **3 passed**, no mocked calls.
+Private supplied-graph fixup probes: **2 passed**, full-byte equality against the
+reader-derived expected images (dribbler368,721 steps; bodyup1,633 steps). No
+uninitialized-read warning or instruction failure reported in successful runs.
+Original archive part sizes/mtimes unchanged; no gameplay or testing JB run.
 
 ## Native shot state accessor continuation
 
