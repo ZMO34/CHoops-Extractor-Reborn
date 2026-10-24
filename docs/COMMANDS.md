@@ -1,3 +1,12 @@
+## Paired-rate native research
+
+`NativeMotionRateTrace.java` arguments: `nba-2k11|college-hoops-2k8 NEW_JSON`.
+Run against a read-only supported Ghidra project; existing outputs are refused.
+Synthetic inputs exercise the complete paired-rate adjustment leaf, not gameplay.
+Keep executable projects and generated reports private.
+`research.motion_timing.compare_rate_timing(source_header, target_header)` reports
+established divisor/duration/bypass changes; it is not a full playback converter.
+
 ## Motion state research harness
 
 `NativeMotionStateTrace.java` runs through Ghidra headless against a read-only

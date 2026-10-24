@@ -77,7 +77,8 @@ def test_translation_rebuilds_target_layout_tracks_and_timing_without_template(
     )
     assert before == (donor, target)
     assert r["state_consumer_comparison"]["changed_predicates"] == [
-        "mask_0x3f0_nonzero"
+        "mask_0x3f0_nonzero",
+        "bypasses_duration_rate_adjustment",
     ]
     assert not r["state_consumer_comparison"]["target_compatibility_established"]
 
@@ -405,3 +406,15 @@ def test_native_overlapping_payloads_reject_before_expansion(tmp_path, monkeypat
     monkeypatch.setattr("choops_py.research.donor_header.resample_nba11_frames", forbid)
     with pytest.raises(ValueError, match="dependencies overlap"):
         translated(raw, target, address, metadata, auxiliary_contracts=assertions)
+
+
+def test_confirmed_duration_divisor_cannot_be_changed_by_authoring(tmp_path):
+    donor, target, address = inputs(tmp_path)
+    c = contract(donor, target, address)
+    c["target_mode_high16"] = 0x2264
+    with pytest.raises(ValueError, match="duration divisor"):
+        translated(donor, target, address, c)
+    c["target_mode_high16"] = 0x2064  # zero and one have identical native divisor
+    _, report = translated(donor, target, address, c)
+    assert report["rate_timing_comparison"]["source"]["duration_divisor"] == 1
+    assert report["rate_timing_comparison"]["target"]["duration_divisor"] == 1

@@ -14,7 +14,10 @@ def test_aggregate_predicate_does_not_invent_per_bit_correspondence():
 
 def test_known_shared_endpoint_counterexample_is_not_silently_normalized():
     report = compare_motion_states(0x410, 0x400)
-    assert report["changed_predicates"] == ["mask_0x3f0_nonzero"]
+    assert report["changed_predicates"] == [
+        "mask_0x3f0_nonzero",
+        "bypasses_duration_rate_adjustment",
+    ]
     assert report["source_word"] == 0x410 and report["target_word"] == 0x400
     assert not report["observed_predicates_preserved"]
 

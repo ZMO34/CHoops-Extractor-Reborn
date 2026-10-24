@@ -1,3 +1,7 @@
+Animation port: preserve native-confirmed duration divisors during donor
+conversion and report paired-rate timing/bypass differences. Verify matching
+source/target native rate arithmetic; complete playback remains unfinished.
+
 Animation research: expose two native-tested header+0x18 predicate comparisons
 in donor translation manifests, retaining explicit target authoring and unknown
 state semantics. No automatic state mapping or playable import is introduced.

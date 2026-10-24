@@ -1,3 +1,12 @@
+## Native paired-rate normalization
+
+Native source/target leaf harness:560 passed per profile /1,120 total. Exact
+float-bit outputs match single-precision/fused reference arithmetic; source and
+target reports match, headers and output sentinels remain unchanged. No mock
+calls. Python timing/state/donor/signature/bundle regression:80 passed. Ruff E/F/I
+passes. Exact-head isolated portable verification is pending for this update.
+No emulator/gameplay run or testing JB was created.
+
 ## Native motion state predicate comparison
 
 Native synthetic harness:42 passed (21 NBA11,21 CH), no mocked calls. Tests

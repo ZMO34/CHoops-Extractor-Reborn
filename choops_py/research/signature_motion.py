@@ -30,6 +30,7 @@ from ..formats.standard_iff import StandardIFF
 from .donor_registry import COLLECTION, GROUP, MAX_BANK_BYTES, MOTION
 from .motion_auxiliary import read_selector_prefix, transcode_selector_curve
 from .motion_state import compare_motion_states
+from .motion_timing import compare_rate_timing
 from .target_motion import MAX_IMAGE
 
 
@@ -482,6 +483,7 @@ def translate_signature_motion(
             evidence={k: c["evidence"][k] for k in ("mode", "state", "planar")},
         ),
         metadata_automatically_established=False,
+        rate_timing_comparison=compare_rate_timing(header, image),
         state_consumer_comparison=compare_motion_states(
             struct.unpack_from(">I", header, 24)[0], state
         ),

@@ -19,6 +19,7 @@ from ..formats.motion_frames import (
 )
 from .motion_auxiliary import read_selector_prefix, transcode_selector_curve
 from .motion_state import compare_motion_states
+from .motion_timing import compare_rate_timing, duration_divisor
 from .target_motion import MAX_IMAGE, relocate_target_image
 
 
@@ -48,6 +49,8 @@ def _authoring_fields(header, contract):
         raise ValueError(
             "Contract changes confirmed cyclic-phase/mirror/root-stride fields"
         )
+    if duration_divisor(high << 16) != duration_divisor(source_mode):
+        raise ValueError("Contract changes confirmed duration divisor")
     velocity = contract.get("authored_planar")
     if (
         not isinstance(velocity, (list, tuple))
@@ -318,6 +321,7 @@ def translate_donor_motion(
         source_identifier=struct.unpack_from(">I", source)[0],
         metadata_provenance="explicit-per-header-caller-research-assertions",
         metadata_automatically_established=False,
+        rate_timing_comparison=compare_rate_timing(source, output),
         state_consumer_comparison=compare_motion_states(
             struct.unpack_from(">I", source, 24)[0], state
         ),

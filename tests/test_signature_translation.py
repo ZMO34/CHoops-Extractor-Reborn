@@ -60,6 +60,7 @@ def test_serialized_signature_component_matches_equivalent_elf_source(tmp_path):
         curve_timing_contract(),
     )
     assert image == expected
+    assert report["rate_timing_comparison"] == expected_report["rate_timing_comparison"]
     assert (
         report["state_consumer_comparison"]
         == expected_report["state_consumer_comparison"]
@@ -224,4 +225,15 @@ def test_metadata_contract_binds_related_alias_payload_bank(tmp_path):
             target,
             c,
             curve_timing_contract(),
+        )
+
+
+def test_signature_authoring_cannot_change_confirmed_duration_divisor(tmp_path):
+    donor, target, raw = fixtures(tmp_path)
+    source = SignatureMotionSource([("synthetic", bank(raw))])
+    c = metadata(source, donor, target)
+    c["target_mode_high16"] = 0x2264
+    with pytest.raises(ValueError, match="duration divisor"):
+        translate_signature_motion(
+            source, 0, 0, donor, target, c, curve_timing_contract()
         )

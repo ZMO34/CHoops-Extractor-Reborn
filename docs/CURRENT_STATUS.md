@@ -1,3 +1,34 @@
+## Paired playback-rate normalization
+
+NBA11 native0x119DC and CH0x24F94 apply the same paired-rate adjustment. Each
+header's mode bits24..27 select a duration divisor; nibble0 and1 both mean1.
+The effective duration is float32(header+0x20 / divisor). If EITHER header's
+state+0x18 bit4 is set, the rates pass through unchanged. Otherwise the routines
+blend each supplied rate with a rate scaled by the effective-duration ratio.
+Native arithmetic includes single-precision intermediate rounding and fused
+multiply-add. This identifies the divisor and bit4's role in THIS consumer;
+it does not establish a named action, complete state map or full playback.
+
+`NativeMotionRateTrace.java` executes the actual complete leaf in both profiles:
+560 synthetic cases EACH /1,120 total pass with exact float-bit outputs, unchanged
+headers and output sentinels. Cases cover zero/one/nontrivial/max divisors,
+unequal durations, reverse/zero rates, nonbinary rates/weights, both bypass bits,
+and weights outside0..1 (the leaf does not clamp). Source/target reports match.
+
+Both donor adapters now reject authoring that changes the confirmed effective
+duration divisor, while allowing equivalent0/1 encodings. Manifests compare
+established rate inputs without coercing authored state values. Zero or
+underflowed effective durations report a division hazard; no safety is inferred
+from finite header values alone. The state comparison now includes bit4's
+rate-adjustment bypass independently of the aggregate0x3F0 predicate.
+
+Among99 shared-endpoint candidates, all effective divisors agree,8 change bit4's
+bypass and2 change duration;90 preserve all observed rate inputs. These are
+candidate correlations, not complete clip identity or conversion approvals.
+CH dribble bundle dispatch reaches0x250AC to update existing slot rates/weights;
+new-slot creation, transition phase, timing-factor context, events, release and
+full playback integration remain pending. No compatible donor import is counted.
+
 ## Native motion state consumer comparison
 
 Header+0x18 now has two native-tested cross-game predicates: whether mask0x3F0
