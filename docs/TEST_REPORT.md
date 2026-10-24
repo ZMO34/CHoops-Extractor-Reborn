@@ -1,5 +1,9 @@
 ## Native donor auxiliary and reciprocal mirror extension
 
+Isolated author verification at7b453b9ac2f32b3c9d1657a3ce9bc9f6f12c03da:
+**1,199 passed,10 skipped,2 deselected**; handoff, compile, CLI/offscreen Qt,
+Ruff and mypy18files pass. Final published-head checks are tracked in PR49.
+
 Donor/source/auxiliary/residency/target regression: **95 passed**. Ruff E/F/I
 passes for the changed module/tests. Synthetic images with0/1/2 selectors and
 explicit mirror detachment survive native-image relocation, separate decoded-ELF
