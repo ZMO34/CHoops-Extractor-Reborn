@@ -18,6 +18,9 @@ def main():
     frame = view.grabFramebuffer()
     if not view.isValid() or view.error or frame.isNull():
         raise RuntimeError('Native OpenGL preview failed: '+view.error)
+    center = frame.pixelColor(frame.width()//2, frame.height()//2)
+    if max(center.red(), center.green(), center.blue()) < 100:
+        raise RuntimeError('Native preview did not draw the synthetic triangle')
     view.close()
     app.processEvents()
     print('Native OpenGL context, shaders and framebuffer passed')

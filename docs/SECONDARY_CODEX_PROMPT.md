@@ -91,7 +91,7 @@ Embedded source: docs/CURRENT_STATUS.md
 # v1.23 — native macOS and Windows release packaging
 
 Added native Apple Silicon and Intel Mac app packaging alongside Windows x64.
-Mac frozen-app data lives outside the bundle in Application Support. CI now
+Mac frozen-app output lives outside the bundle in Application Support. CI now
 checks both Mac architectures, bundles native LGPL audio helpers with exact
 corresponding sources/notices, and requires a real native OpenGL smoke before
 archiving. Packages include source identity, ZIP CRC and SHA-256 evidence.

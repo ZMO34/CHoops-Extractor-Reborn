@@ -12,8 +12,9 @@ documentation and the audio helpers' corresponding LGPL sources/notices.
 4. Select your source JB and overrides through Explorer as on Windows. Game files
    are not included. Keep the source game separate from output/build destinations.
 
-Caches, temporary conversions, reports and local settings are stored under
+Caches, temporary conversions and reports are stored under
 `~/Library/Application Support/CHoops Studio/output`, outside the app bundle.
+Qt preferences remain in the normal macOS user preferences location.
 Build destinations can still be selected manually. Use a writable local disk;
 leave originals immutable. Retain the ZIP's source/license directory with the
 distributed package. No Python installation or external DDS converter is required.
