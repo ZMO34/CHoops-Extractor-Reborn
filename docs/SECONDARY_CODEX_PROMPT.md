@@ -88,6 +88,17 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# Unreleased — v11 gameplay placement failure; v12 text/color/logo correction
+
+The v11 screenshot confirms backing/score cells render but main text is centered,
+team colors too dark and logos distorted. V12 moves setup ahead of main custom/
+default dispatch, uses scalar live-font position writes and routes core fields
+through native standard drawing. Event callbacks retain their path. Team panels
+now use RGB 0.85..1.0; square logo quads sample full square textures. Score text
+colors remain intact. 149 focused tests and private preservation/ELF/SELF,
+two-IFF preflight/ZIP checks pass; gameplay confirmation remains open. See
+[SCOREBUG_V12_PLACEMENT_REPAIR.md](SCOREBUG_V12_PLACEMENT_REPAIR.md).
+
 # Unreleased — v10 failed gameplay; v11 rendering repair pending verification
 
 The user confirms installing the matched v10 executable/IFFs. Its screenshot
@@ -5454,6 +5465,18 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+## V12 text dispatch, panel and logo repair
+
+149 focused tests pass with an explicit workspace pytest temporary directory.
+The initial default-temp run had 148 passes and one environment setup error;
+rerunning with the writable temp directory resolved it. Thirty-three new
+instruction/dispatch cases cover scalar live-font position consumption and
+custom/default/event routing. Ruff E/F/I passes for the new test. Private IFF
+preservation, panel/UV/winding checks, scoped ELF source matching, SELF roundtrip,
+two-IFF preparation/preflight and ZIP CRC/checksums pass. Native GPU/gameplay
+execution is not performed; the v11 screenshot is a failure, v12 remains pending.
+See [SCOREBUG_V12_PLACEMENT_REPAIR.md](SCOREBUG_V12_PLACEMENT_REPAIR.md).
 
 ## V11 screenshot-driven render repair
 

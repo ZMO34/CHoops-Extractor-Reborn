@@ -1,0 +1,57 @@
+# Main HUD setup at 4f4a48, before both custom/default draw routes.
+# r30 live font, r27 row; preserve r3/r4 and all nonvolatile registers.
+# Scalar copies avoid VMX alignment dependence. Position lives at +40.
+cmpwi 7, 27, 0
+blt 7, resume
+cmpwi 7, 27, 11
+bgt 7, resume
+mulli 10, 27, 96
+lis 9, 0x89
+ori 9, 9, 0xc800
+add 10, 10, 9
+lwz 9, 0(10)
+stw 9, 0(30)
+lwz 9, 4(10)
+stw 9, 4(30)
+lwz 9, 8(10)
+stw 9, 8(30)
+lwz 9, 12(10)
+stw 9, 12(30)
+lwz 9, 16(10)
+stw 9, 16(30)
+lwz 9, 20(10)
+stw 9, 20(30)
+lwz 9, 24(10)
+stw 9, 24(30)
+lwz 9, 28(10)
+stw 9, 28(30)
+lwz 9, 32(10)
+stw 9, 32(30)
+lwz 9, 36(10)
+stw 9, 36(30)
+lwz 9, 40(10)
+stw 9, 40(30)
+lwz 9, 44(10)
+stw 9, 44(30)
+lwz 9, 48(10)
+stw 9, 48(30)
+lwz 9, 52(10)
+stw 9, 52(30)
+lwz 9, 56(10)
+stw 9, 56(30)
+lwz 9, 60(10)
+stw 9, 60(30)
+lwz 9, 64(10)
+stw 9, 64(30)
+lwz 9, 68(10)
+stw 9, 68(30)
+lwz 9, 72(10)
+stw 9, 72(30)
+lwz 9, 76(10)
+stw 9, 76(30)
+lwz 9, 80(10)
+stw 9, 0x64(30)
+b 0x4f5b3c
+resume:
+lwz 9, 4(26)
+b 0x4f4a4c

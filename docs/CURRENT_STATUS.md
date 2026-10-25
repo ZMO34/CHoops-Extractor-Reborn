@@ -1,3 +1,14 @@
+# Unreleased — v11 gameplay placement failure; v12 text/color/logo correction
+
+The v11 screenshot confirms backing/score cells render but main text is centered,
+team colors too dark and logos distorted. V12 moves setup ahead of main custom/
+default dispatch, uses scalar live-font position writes and routes core fields
+through native standard drawing. Event callbacks retain their path. Team panels
+now use RGB 0.85..1.0; square logo quads sample full square textures. Score text
+colors remain intact. 149 focused tests and private preservation/ELF/SELF,
+two-IFF preflight/ZIP checks pass; gameplay confirmation remains open. See
+[SCOREBUG_V12_PLACEMENT_REPAIR.md](SCOREBUG_V12_PLACEMENT_REPAIR.md).
+
 # Unreleased — v10 failed gameplay; v11 rendering repair pending verification
 
 The user confirms installing the matched v10 executable/IFFs. Its screenshot

@@ -1,3 +1,15 @@
+## V12 text dispatch, panel and logo repair
+
+149 focused tests pass with an explicit workspace pytest temporary directory.
+The initial default-temp run had 148 passes and one environment setup error;
+rerunning with the writable temp directory resolved it. Thirty-three new
+instruction/dispatch cases cover scalar live-font position consumption and
+custom/default/event routing. Ruff E/F/I passes for the new test. Private IFF
+preservation, panel/UV/winding checks, scoped ELF source matching, SELF roundtrip,
+two-IFF preparation/preflight and ZIP CRC/checksums pass. Native GPU/gameplay
+execution is not performed; the v11 screenshot is a failure, v12 remains pending.
+See [SCOREBUG_V12_PLACEMENT_REPAIR.md](SCOREBUG_V12_PLACEMENT_REPAIR.md).
+
 ## V11 screenshot-driven render repair
 
 V10 failed the supplied gameplay test despite its previous 95 passing tests.

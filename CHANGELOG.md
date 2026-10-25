@@ -1,3 +1,11 @@
+## Unreleased — v12 text placement, brighter team panels and square logo mapping
+
+- Move core live-font setup before callback dispatch and use explicit scalar
+  position offsets with native standard drawing; retain event callback dispatch.
+- Replace overly dark team multipliers with a subtle 0.85..1.0 gradient.
+- Remove the non-square UV crop from square logo quads; preserve logo pixels,
+  materials and intended score text colors. Gameplay verification pending.
+
 ## Unreleased — repair failed v10 scorebug rendering
 
 - Fix reversed winding in broadcast backing/score/divider/comparison quads and

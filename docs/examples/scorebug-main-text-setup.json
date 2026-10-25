@@ -1,0 +1,98 @@
+{
+  "entry": 9027584,
+  "data": 9029632,
+  "site": 5196360,
+  "registry_rows": [
+    {
+      "role": "context",
+      "x": 294,
+      "y": -190,
+      "z": 250,
+      "scale": 0.4514
+    },
+    {
+      "role": "away_footer",
+      "x": -215,
+      "y": -202.25,
+      "z": 250,
+      "scale": 0.5
+    },
+    {
+      "role": "period",
+      "x": 117,
+      "y": -194.057,
+      "z": 250,
+      "scale": 0.5114
+    },
+    {
+      "role": "gameclock",
+      "x": 171,
+      "y": -194.625,
+      "z": 250,
+      "scale": 0.625
+    },
+    {
+      "role": "home_footer",
+      "x": -9,
+      "y": -202.25,
+      "z": 250,
+      "scale": 0.5
+    },
+    {
+      "role": "unused_right",
+      "x": 0,
+      "y": 0,
+      "z": 250,
+      "scale": 1
+    },
+    {
+      "role": "unused_middle",
+      "x": 0,
+      "y": 0,
+      "z": 250,
+      "scale": 1
+    },
+    {
+      "role": "shotclock",
+      "x": 215,
+      "y": -194.341,
+      "z": 250,
+      "scale": 0.5682
+    },
+    {
+      "role": "home_score",
+      "x": 76,
+      "y": -196,
+      "z": 250,
+      "scale": 0.9
+    },
+    {
+      "role": "away_score",
+      "x": -130,
+      "y": -196,
+      "z": 250,
+      "scale": 0.9
+    },
+    {
+      "role": "home_name",
+      "x": -11,
+      "y": -185.25,
+      "z": 250,
+      "scale": 0.625
+    },
+    {
+      "role": "away_name",
+      "x": -217,
+      "y": -185.25,
+      "z": 250,
+      "scale": 0.625
+    }
+  ],
+  "stride": 96,
+  "alpha": 1,
+  "scope": "rows 0..11 normalized then sent to native standard draw; event rows 12/13 retain custom dispatch",
+  "return_target": 5196364,
+  "displaced": "lwz r9, 4(r26)",
+  "position_storage": "font +0x40 offset; zero matrix translation",
+  "draw_target": 5200700
+}

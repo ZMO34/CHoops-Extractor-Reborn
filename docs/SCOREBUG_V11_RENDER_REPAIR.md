@@ -1,3 +1,7 @@
+> Superseded: the v11 gameplay screenshot shows backing returned but main text
+> at screen center, dark team panels and distorted logos. See
+> [the v12 correction](SCOREBUG_V12_PLACEMENT_REPAIR.md).
+
 # V10 gameplay failure and rendering repair
 
 The user supplied a v10 gameplay screenshot and confirmed copying its EBOOT and
