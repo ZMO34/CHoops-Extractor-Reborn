@@ -1,3 +1,12 @@
+## Unreleased — repair failed v10 scorebug rendering
+
+- Fix reversed winding in broadcast backing/score/divider/comparison quads and
+  add facing regressions that distinguish the failure from valid triangle counts.
+- Add a scoped native main-text draw wrapper for live font transforms, retiring
+  the overwritten SCNE-basis scaling assumption and legacy depth-mask geometry.
+- Restore source logo UV crop/neutral vertex RGBA; disable the floating sixth-man
+  label and correct dedicated meter side ordering. Gameplay verification pending.
+
 ## Unreleased — native scorebug footer revision
 
 - Add authored native live team-name and current-half foul/earned-bonus providers,

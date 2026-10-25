@@ -12,6 +12,28 @@ from ..formats.binary import Binary
 from ..formats.tool_wrapper import unwrap,wrap
 
 
+def inspect_xy_winding(vertices):
+    """Count projected facing for expanded HUD triangles, not GPU visibility."""
+    if len(vertices) > 1500000 or len(vertices) % 3:
+        raise ValueError('Invalid expanded HUD triangle count')
+    result = dict(positive=0, negative=0, edge_on=0)
+    for start in range(0, len(vertices), 3):
+        points = [tuple(point[:2]) for point in vertices[start:start + 3]]
+        if any(
+            len(p) != 2 or not all(math.isfinite(v) for v in p) for p in points
+        ):
+            raise ValueError('Invalid HUD projected vertex')
+        a, b, c = points
+        area = (b[0]-a[0])*(c[1]-a[1]) - (b[1]-a[1])*(c[0]-a[0])
+        if not math.isfinite(area):
+            raise ValueError('Invalid HUD projected area')
+        direction = (
+            'positive' if area > 1e-8 else 'negative' if area < -1e-8 else 'edge_on'
+        )
+        result[direction] += 1
+    return result
+
+
 def edit_scene(parts, profile):
     if not isinstance(profile,dict) or set(profile)-{'parts','text','disable_text'}:
         raise ValueError('Profile requires parts/text keys; select one scene profile object')

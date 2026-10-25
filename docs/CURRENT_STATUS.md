@@ -1,3 +1,18 @@
+# Unreleased — v10 failed gameplay; v11 rendering repair pending verification
+
+The user confirms installing the matched v10 executable/IFFs. Its screenshot
+shows missing backing/score plates and main text, distorted logos and a floating
+sixth-man label. V10 is superseded. Confirmed opposite quad winding is repaired;
+new auditing catches facing, not just triangle count. Native tracing also shows
+SCNE basis edits are overwritten by the marker-pose copy, so v11 supplies live
+font matrices at the dedicated default-main-text call. Legacy mask draws are
+retired; native logo UV crop restored; floating sixth-man label disabled.
+
+113 focused tests, eight facing checks, preservation/ELF/SELF and two-IFF
+preflight pass. The matched v11 candidate is supplied for user gameplay checking.
+The task remains open; native visibility and meter placement are not certified.
+See [SCOREBUG_V11_RENDER_REPAIR.md](SCOREBUG_V11_RENDER_REPAIR.md).
+
 # Unreleased — native scorebug footer and comparison-side correction
 
 PR #50 continues with a separate v10 executable/IFF candidate. New authored native

@@ -1,3 +1,7 @@
+V10 failed the user's matched executable/IFF gameplay test. This document is
+historical; use [SCOREBUG_V11_RENDER_REPAIR.md](SCOREBUG_V11_RENDER_REPAIR.md) for
+confirmed regressions, repairs and the pending native verification status.
+
 # Live footer and reference scorebug revision
 
 V10 is the next separate, owner-authorized executable/IFF package after the

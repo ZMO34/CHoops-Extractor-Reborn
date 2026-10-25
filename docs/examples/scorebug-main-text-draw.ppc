@@ -1,0 +1,30 @@
+# Scope: default main scorebug text call at 4f5b44 only.
+# r3 live font style, r4 owning provider string, r27 registry row.
+# Tail-call keeps native LR/stack/TOC import behavior; v0 is volatile.
+cmpwi 7, 27, 0
+blt 7, original
+cmpwi 7, 27, 11
+bgt 7, original
+mulli 9, 27, 80
+lis 10, 0x89
+ori 10, 10, 0xc800
+add 9, 9, 10
+li 10, 0
+lvx 0, 9, 10
+stvx 0, 3, 10
+li 10, 16
+lvx 0, 9, 10
+stvx 0, 3, 10
+li 10, 32
+lvx 0, 9, 10
+stvx 0, 3, 10
+li 10, 48
+lvx 0, 9, 10
+stvx 0, 3, 10
+li 10, 64
+lvx 0, 9, 10
+stvx 0, 3, 10
+lfs 0, 60(9)
+stfs 0, 0x64(3)
+original:
+b 0x49ce24

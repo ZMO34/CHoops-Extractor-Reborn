@@ -1,3 +1,15 @@
+## V11 screenshot-driven render repair
+
+V10 failed the supplied gameplay test despite its previous 95 passing tests.
+The matched executable and both IFFs were installed, per user confirmation.
+The new focused suite passes **113 tests**, including 16 live-font-draw wrapper
+instruction cases and two winding regressions. New-test Ruff E/F/I passes.
+Private repair: all eight rewritten quads have exactly two stock-facing triangles;
+logo UV crop and source RGBA checked; three SCNEs changed, all other record slices
+exact; scoped ELF writes, SELF roundtrip and two-IFF preflight pass. ZIP CRC passes.
+No native graphics/gameplay execution; user verification is pending. See
+[SCOREBUG_V11_RENDER_REPAIR.md](SCOREBUG_V11_RENDER_REPAIR.md).
+
 ## Native scorebug footer revision
 
 Final focused suite: **95 passed** across footer/context instruction harnesses,
