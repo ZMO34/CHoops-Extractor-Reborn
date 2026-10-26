@@ -1,3 +1,12 @@
+# Ghidra HUD cross-check and MRKS style inspection
+
+Completed PS3 setup, full auto-analysis and syscall identification in the local
+Ghidra project. Applied descriptor-based TOC contexts; exact-veneer inlining aids
+some pointer recovery but complex switches/repeated calls still need instruction
+checks. Added a bounded read-only MRKS style inspector, validated on four vanilla
+records (15/9/2/2 styles). The alternate name formatter exists; normal-game
+activation remains unproven. No candidate package or game-asset changes.
+
 # Backend research tools and streetdata lead
 
 The Research page now opens output/research/backend-tools for the portable Ghidra

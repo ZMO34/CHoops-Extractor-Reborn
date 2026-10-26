@@ -1,3 +1,16 @@
+# MRKS and native-analysis follow-up
+
+Exact-head focused scorebug suite: **143 passed**, including nine MRKS cases.
+New-reader/test Ruff E/F/I, generated handoff and diff checks pass.
+
+MRKS reader synthetic regression cases cover native/case hash distinctions,
+unknown bindings, repeated first-match lookups, corrupt table/scene extents,
+non-finite geometry and source-byte preservation. Four original MRKS records
+parse read-only (15/9/2/2 styles); source archive reads compare unchanged.
+Ghidra full analysis succeeds in 211 seconds; syscall script finds 126 callers
+following filename-case correction. Decompiler output retains limitations and
+is not runtime evidence. No emulator/full JB and no candidate packaging.
+
 # Research tools setup verification
 
 Offscreen Qt smoke: Research-tab button resolves and opens the expected folder
@@ -7,7 +20,8 @@ official release lengths and SHA-256 digests; verified ZIPs were removed after
 extraction. Java 25.0.4.1 and Ghidra headless startup work. The extension script
 folder is discovered by Ghidra. The decoded vanilla analysis ELF imported and
 saved successfully with PowerPC:BE:64:A2ALT-32addr/default and -noanalysis.
-Automatic analysis and PS3 script execution are not yet validated.
+This initial import-only observation is superseded by the completed-analysis
+follow-up above. TOC/decompiler limitations remain documented.
 Backend findings in the streetdata section are disassembly evidence pending
 Ghidra cross-checks, not gameplay verification. No emulator or full JB.
 

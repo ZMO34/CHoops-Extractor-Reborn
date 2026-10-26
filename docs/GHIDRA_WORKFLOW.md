@@ -35,7 +35,10 @@ compiler `default`). Before normal auto-analysis, follow the extension's
 AnalyzePs3Binary instructions. The upstream README requires adding r2 to the
 unaffected register list in PowerPC/data/languages/ppc_64_32.cspec. Record this
 local tool adjustment, retaining a baseline for comparison. Run auto-analysis
-then DefinePs3Syscalls. Relocations and some Cell instructions have limitations.
+then DefinePS3Syscalls. The supplied release names the file
+DefinePs3Syscalls.java but declares public class DefinePS3Syscalls; locally rename
+the file to match the class exactly if loading fails. No script source edit is
+needed for that correction. Relocations and some Cell instructions have limitations.
 
 For reconstructed decoded ELFs, independently validate section mapping, OPD and
 TOC first; do not assume script success proves correct dataflow. This title has
@@ -54,10 +57,29 @@ Current target: cross-check the alternate scorebug loader/provider paths and fin
 an existing IFF-controlled activation bridge for automatic roster team names.
 See SCOREBUG_IFF_ONLY_AUDIT.md; names remain unfinished and packaging is held.
 
-## Setup verification
+## Verified analysis setup
 
 All three archives matched upstream lengths and SHA-256 digests. Headless startup
 discovers the installed PS3 script directory. The decoded vanilla analysis ELF
-imports and saves with the specified language and -noanalysis. This establishes
-tool startup/import only; PS3 script execution, TOC context and decompiler results
-still require separate validation before treating output as backend evidence.
+imports and saves with the specified language. AnalyzePs3Binary completed, full
+auto-analysis completed in 211 seconds, and the corrected syscall-script filename
+runs successfully (126 syscall callers). No emulator was run.
+
+The upstream setup applies the first TOC globally. This game has two observed
+TOCs, 0xA54AC8 and 0xA64A94; a separate local script applies context intervals
+from 35,073 unique aligned descriptor entries in the validated OPD section.
+There are no conflicting TOCs for those entry points in this scan. Context
+intervals are an analysis aid, not proof that every non-descriptor helper shares
+the preceding entry's TOC. Check each investigated function's instructions.
+
+A further database-only experiment marks 3,796 exact TOC save/switch veneers
+inline. The four-instruction pattern saves r2 at stack +0x28, adjusts r2 and
+branches without link. This improves pointer recovery in parts of the HUD
+update and name formatter. Some repeated calls still fail to inline; large
+switches also remain unresolved. Do not promote bogus stack-relative pointers
+or decompiler warnings into field semantics. Cross-check machine instructions.
+
+Targeted decompilation was collected for the main/alternate HUD initializers and
+updates, normal name gate, alternate name formatter, resource selector and
+special-mode setup. Raw exports and logs remain local. decompileCompleted=true
+means an export was produced; it does not establish correct control/dataflow.

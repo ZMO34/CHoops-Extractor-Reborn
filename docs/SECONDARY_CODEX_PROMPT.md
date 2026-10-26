@@ -88,6 +88,15 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# Ghidra HUD cross-check and MRKS style inspection
+
+Completed PS3 setup, full auto-analysis and syscall identification in the local
+Ghidra project. Applied descriptor-based TOC contexts; exact-veneer inlining aids
+some pointer recovery but complex switches/repeated calls still need instruction
+checks. Added a bounded read-only MRKS style inspector, validated on four vanilla
+records (15/9/2/2 styles). The alternate name formatter exists; normal-game
+activation remains unproven. No candidate package or game-asset changes.
+
 # Backend research tools and streetdata lead
 
 The Research page now opens output/research/backend-tools for the portable Ghidra
@@ -5507,6 +5516,19 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 
 Embedded source: docs/TEST_REPORT.md
 
+# MRKS and native-analysis follow-up
+
+Exact-head focused scorebug suite: **143 passed**, including nine MRKS cases.
+New-reader/test Ruff E/F/I, generated handoff and diff checks pass.
+
+MRKS reader synthetic regression cases cover native/case hash distinctions,
+unknown bindings, repeated first-match lookups, corrupt table/scene extents,
+non-finite geometry and source-byte preservation. Four original MRKS records
+parse read-only (15/9/2/2 styles); source archive reads compare unchanged.
+Ghidra full analysis succeeds in 211 seconds; syscall script finds 126 callers
+following filename-case correction. Decompiler output retains limitations and
+is not runtime evidence. No emulator/full JB and no candidate packaging.
+
 # Research tools setup verification
 
 Offscreen Qt smoke: Research-tab button resolves and opens the expected folder
@@ -5516,7 +5538,8 @@ official release lengths and SHA-256 digests; verified ZIPs were removed after
 extraction. Java 25.0.4.1 and Ghidra headless startup work. The extension script
 folder is discovered by Ghidra. The decoded vanilla analysis ELF imported and
 saved successfully with PowerPC:BE:64:A2ALT-32addr/default and -noanalysis.
-Automatic analysis and PS3 script execution are not yet validated.
+This initial import-only observation is superseded by the completed-analysis
+follow-up above. TOC/decompiler limitations remain documented.
 Backend findings in the streetdata section are disassembly evidence pending
 Ghidra cross-checks, not gameplay verification. No emulator or full JB.
 

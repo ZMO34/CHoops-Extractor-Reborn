@@ -224,3 +224,39 @@ resource and is read outside the HUD. It is not established as a cosmetic or
 IFF-controlled selector. No flags, resources or executable bytes were changed.
 These findings are read-only disassembly evidence pending Ghidra cross-checks;
 activation of this existing name provider in normal college gameplay is unresolved.
+
+## Ghidra cross-check and bounded MRKS reader
+
+The restored Ghidra project now has completed PS3 setup, full auto-analysis and
+syscall identification. Descriptor-based TOC contexts and database-only inlining
+of exact TOC veneers improve the native pseudocode. The alternate resource
+selector and formatter conclusions above agree with inspected instruction flow;
+repeated-call inlining and some switch reconstruction remain incomplete. The
+normal initializer still loads SCNE directly; renaming a MRKS binding does not
+change that controller into the alternate MRKS provider registry.
+
+`choops_py.research.scorebug_mrks.inspect_styles` now reads the observed wrapper
+without writing it. It bounds the style count/table and embedded scene location,
+reports font, flags, color, matrix, model/bone hashes, literal ID, both binding
+CRCs and opaque words. Name matching is an explicit small dictionary; unknown
+hashes remain unknown, and lower-case CRC mismatches are reported. This reader
+locates embedded SCNE but does not certify its complete structure or activation.
+
+Read-only corpus: streetdata score_bug has 15 styles; gamedataextra scorebug_xenon
+has nine; global nav_itemselected and nav_item have two each. The global records
+contain repeated lookup hashes, so the reader retains both rows and reports
+first-match indices rather than treating valid repeated styles as corruption.
+The native lookup walks from the beginning. None of those duplicate global
+bindings is established as a home/away roster provider.
+
+A bounded string/uppercase-CRC match against the original decoded executable
+finds 13 of streetdata's 15 style names. home_rank and away_rank match the
+explicit conventional spellings but have no matching executable string in that
+scan, and are absent from the observed alternate provider registry. The two
+additional scorebug_xenon hashes also have no matching executable string there.
+This is negative evidence for those specific names, not proof of no rank code.
+
+No name activation bridge was installed or demonstrated. Existing IFF candidate
+geometry, native popup triggers and exact roster colors remain as recorded;
+packaging stays held until automatic names work. Next investigate controller
+selection/data-binding consumers, not another guessed binding rename.

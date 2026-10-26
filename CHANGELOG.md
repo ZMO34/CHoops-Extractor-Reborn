@@ -1,3 +1,9 @@
+# Unreleased — MRKS text evidence
+
+- Add bounded read-only inspection of embedded scorebug MRKS styles and hash identities.
+- Record Ghidra analysis/TOC caveats and cross-check alternate roster-name providers.
+- Keep automatic names and candidate packaging explicitly unfinished.
+
 # Unreleased — backend research tools
 
 - Add Research-tab access to the local Ghidra/PS3 tools folder.
