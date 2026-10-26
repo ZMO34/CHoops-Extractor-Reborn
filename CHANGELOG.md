@@ -1,3 +1,9 @@
+# Unreleased — separate SCNE provider identity
+
+- Report and edit the generic-overlay provider property independently of text-record names.
+- Preserve owner/marker identities and opaque words; reject missing, mistyped or shared properties.
+- Author an internal two-school-name component while keeping activation and packaging held.
+
 # Unreleased — Director data-logic research
 
 - Add bounded read-only DRCT reference/group/string indexing and command-index decoding.

@@ -1,3 +1,13 @@
+# Compact school-name SCNE component authored internally
+
+Added independent guarded provider-identity editing and reporting. A private
+player_name component now binds two existing markers to team1city/team2city,
+with smaller centered text, dark shadows and old card artwork hidden. Four text
+bones and all 20 source animation rows are retained. The component remains outside
+the archive candidate: no Director activation is installed, names are not yet
+proven in gameplay, and packaging stays held. Focused suite: 178 passed.
+See DIRECTOR_RESEARCH.md and SCOREBUG_RESEARCH.md.
+
 # Existing Director overlay request traced
 
 Identified a concrete starting-lineup request with away/home contexts, duration

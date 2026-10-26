@@ -3,7 +3,7 @@ import struct
 import pytest
 
 from choops_py.formats.binary import Binary
-from choops_py.modding.scorebug_text import edit_styles,inspect_styles
+from choops_py.modding.scorebug_text import edit_styles, inspect_styles
 
 
 def fixture():
@@ -107,3 +107,58 @@ def test_native_width_fit_preserves_literal_and_alignment_flags():
     for width in [0,-1,4097,1.5,float('nan')]:
         with pytest.raises(ValueError,match='width'):
             edit_styles(source,{'message':{'max_width':width}})
+
+
+def provider_fixture():
+    source = fixture()
+    h = bytearray(source[0])
+    struct.pack_into('>I', h, 1200, 7)
+    struct.pack_into('>II', h, 1424, 3, 0x7714781f)
+    value = 'team1city\0'.encode('utf-16-be')
+    h[1800:1800 + len(value)] = value
+    struct.pack_into('>I', h, 1408, 1800 - 1408 + 1)
+    h[196:200] = bytes.fromhex('12345678')
+    h[1432:1440] = bytes.fromhex('1122334455667788')
+    return [bytes(h), source[1]]
+
+
+def test_provider_identity_is_independent_of_record_name_owner_and_marker():
+    source = provider_fixture()
+    result, _ = edit_styles(source, {'message': {
+        'binding': 'home_display', 'provider': 'team2city',
+    }})
+    row = inspect_styles(result[0])[0]
+    assert row['binding'] == 'home_display'
+    assert row['provider'] == 'team2city'
+    assert Binary(result[0]).utf16(Binary(result[0]).relative(1248), 'be') == 'message'
+    changed = set(range(192, 196)) | set(range(1408, 1412))
+    assert all(a == b for i, (a, b) in enumerate(zip(source[0], result[0])) if i not in changed)
+    assert result[1] == source[1]
+    assert source == provider_fixture()
+
+
+def test_provider_edits_require_an_unshared_typed_property():
+    with pytest.raises(ValueError, match='Missing string provider'):
+        edit_styles(fixture(), {'message': {'provider': 'team2city'}})
+    h, payload = provider_fixture()
+    wrong = bytearray(h)
+    struct.pack_into('>I', wrong, 1424, 0)
+    with pytest.raises(ValueError, match='Missing string provider'):
+        edit_styles([bytes(wrong), payload], {'message': {'provider': 'team2city'}})
+    shared = bytearray(h)
+    shared[272:416] = shared[128:272]
+    shared[1700:1714] = 'second\0'.encode('utf-16-be')
+    struct.pack_into('>I', shared, 0x4c, 2)
+    struct.pack_into('>I', shared, 336, 1700 - 336 + 1)
+    struct.pack_into('>I', shared, 352, 1200 - 352 + 1)
+    with pytest.raises(ValueError, match='shared'):
+        edit_styles([bytes(shared), payload], {'message': {'provider': 'team2city'}})
+
+
+def test_provider_noop_and_invalid_value_guards():
+    source = provider_fixture()
+    assert edit_styles(source, {})[0] == source
+    assert inspect_styles(source[0])[0]['provider'] == 'team1city'
+    for value in ['', 'bad\nprovider', None, 'a' * 129]:
+        with pytest.raises(ValueError):
+            edit_styles(source, {'message': {'provider': value}})

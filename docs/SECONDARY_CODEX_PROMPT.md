@@ -88,6 +88,16 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# Compact school-name SCNE component authored internally
+
+Added independent guarded provider-identity editing and reporting. A private
+player_name component now binds two existing markers to team1city/team2city,
+with smaller centered text, dark shadows and old card artwork hidden. Four text
+bones and all 20 source animation rows are retained. The component remains outside
+the archive candidate: no Director activation is installed, names are not yet
+proven in gameplay, and packaging stays held. Focused suite: 178 passed.
+See DIRECTOR_RESEARCH.md and SCOREBUG_RESEARCH.md.
+
 # Existing Director overlay request traced
 
 Identified a concrete starting-lineup request with away/home contexts, duration
@@ -4941,7 +4951,7 @@ Confirmed style keys from the read-only loader:
 
 | Key | Purpose / observed value |
 | --- | --- |
-| 0x7714781F | Default localized text key, not font alias |
+| 0x7714781F | Provider identity hashed by the loader; separate from row/marker names |
 | 0xBF045BDB | Font alias, e.g. Stratum2 22 32 |
 | 0x6109EA5A / 0x97DE0310 / 0x6814845A | Main RGB components, 222 each |
 | 0x53C67207 / 0x661F09B0 / 0x7DFC668B | Shadow RGB components, 10 each |
@@ -5163,6 +5173,30 @@ statements describe the prior research baseline. Runtime validation remains open
 See [SCOREBUG_TEXT_RECOVERY.md](SCOREBUG_TEXT_RECOVERY.md) for v5 missing-text
 evidence, shared-owner diagnostics, stock-structure restoration and reference
 comparison-strip layout. V6 remains a candidate pending native screenshots.
+
+
+## IFF-only provider identity editing
+
+The developer API now distinguishes `binding` (the SCNE text-record name) from
+`provider` (string property 0x7714781F). `inspect_styles` reports both. For example,
+`edit_styles(parts, {'text_team1name': {'provider': 'team2city'}})` changes only
+that provider property's pointer, appending an aligned UTF-16 string. It preserves
+the record name, owner/marker strings, opaque row words, property metadata and
+vertex/index payload. Missing, wrongly typed or shared provider properties and
+invalid strings are rejected. Reparse remains mandatory. No new editor mode is
+introduced.
+
+This matters for generic overlay rendering at 0x197D9C: the loader hashes the
+provider property and the renderer looks it up in the selected overlay table.
+Changing the record name alone does not select a different generic provider.
+Conversely, the main HUD's fixed provider loop uses its own record-name lookup.
+Neither edit registers a new callback, transfers a table between controllers,
+changes lifecycle, or bypasses the regular scorebug name gate.
+
+A private `player_name` component now uses its existing four-bone text owner and
+two existing markers for away/home school providers. Native draw activation is
+not installed. See DIRECTOR_RESEARCH.md; this component is not a completed or
+packaged scorebug and is not a claim of native text visibility.
 
 ---
 
@@ -5609,6 +5643,20 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+# SCNE provider identity and held name-component verification
+
+Focused scorebug/Director/text suite: **178 passed**. It now includes all 10
+text-style cases, including three new provider-property cases. F/I lint passes
+for the changed text helper/tests. Handoff/diff checks pass.
+
+Private component: both school providers, separate record/owner/bone identities,
+marker hashes, font/width/color/opacity styles and four-bone pose extents reparse.
+All 20 original animation rows remain exact; no skeleton growth. Declared card
+strip indices are degenerate while restart markers and vertex attributes remain
+preserved. No Director request or name-component archive override is installed.
+This is not native visibility, permanence, projection or popup-coexistence proof.
+No emulator, full JB or package was created; gameplay names remain unfinished.
 
 # Director request follow-up verification
 

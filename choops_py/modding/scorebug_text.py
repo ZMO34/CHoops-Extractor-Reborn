@@ -1,8 +1,9 @@
 """Bounded PS3 SCNE text bindings and authored font-style properties.
 
 Style entries serialize a 16-byte value followed by type/key/reserved words.
-They are not key/value records starting at the type word. Runtime text callbacks
-select by text-record name; bone names stay independent of those bindings.
+They are not key/value records starting at the type word. Main HUD callbacks use
+text-record names; generic overlays use the separate provider identity property.
+Neither edit registers a callback. Owner and bone identities stay independent.
 """
 import math
 import struct
@@ -12,6 +13,7 @@ from collections import Counter
 from ..formats.binary import Binary
 
 FONT = 0xbf045bdb
+PROVIDER = 0x7714781f
 COLOR = (0x6109ea5a, 0x97de0310, 0x6814845a)
 SHADOW = (0x53c67207, 0x661f09b0, 0x7dfc668b)
 
@@ -56,7 +58,12 @@ def inspect_styles(header):
                 literal=(int(hi)<<16)|int(lo)|1
         alpha=properties.get(0xad44372a)
         alpha=struct.unpack('>f',b.slice(alpha[0],4))[0] if alpha and alpha[1]==1 else None
-        rows.append(dict(binding=name,font=font,color=values(COLOR),shadow=values(SHADOW),literal_id=literal,alpha=alpha))
+        provider=None
+        if PROVIDER in properties:
+            value,kind=properties[PROVIDER]
+            if kind!=3:raise ValueError('Provider identity is not a string property')
+            provider=b.utf16(b.relative(value),'be') if b.u32(value) else ''
+        rows.append(dict(binding=name,provider=provider,font=font,color=values(COLOR),shadow=values(SHADOW),literal_id=literal,alpha=alpha))
     return rows
 
 
@@ -182,7 +189,7 @@ def edit_styles(parts, changes):
     b,records=_records(parts[0]);out=bytearray(parts[0]);names=set(records);report=[]
     for name,change in changes.items():
         if name not in records:raise ValueError('Unknown SCNE text binding '+name)
-        if set(change)-{'font','binding','literal_id','align','alpha','color','max_width'}:raise ValueError('Unsupported SCNE text style edit')
+        if set(change)-{'font','binding','provider','literal_id','align','alpha','color','max_width'}:raise ValueError('Unsupported SCNE text style edit')
         at,properties=records[name]
         if 'max_width' in change:
             width=change['max_width'];limit=properties.get(0x11fa397c);flags=properties.get(0x72b6694d)
@@ -206,14 +213,15 @@ def edit_styles(parts, changes):
                 if prop is None or prop[1]!=kind:raise ValueError('Missing typed text '+option+' property')
                 if sum(1 for _,props in records.values() if props.get(key)==prop)!=1:raise ValueError('Text '+option+' property is shared')
                 struct.pack_into('>f' if kind==1 else '>I',out,prop[0],value)
-        for option in ('font','binding'):
+        for option in ('font','binding','provider'):
             if option not in change:continue
             value=change[option]
             if not isinstance(value,str) or not 1<=len(value)<=128 or any(ord(c)<32 for c in value):raise ValueError('Invalid SCNE text string')
-            if option=='font':
-                if FONT not in properties or properties[FONT][1]!=3:raise ValueError('Missing string font property')
-                field=properties[FONT][0]
-                if sum(1 for _,props in records.values() if FONT in props and props[FONT][0]==field)!=1:raise ValueError('Font property is shared by another text record')
+            if option in ('font','provider'):
+                key=FONT if option=='font' else PROVIDER
+                if key not in properties or properties[key][1]!=3:raise ValueError('Missing string '+option+' property')
+                field=properties[key][0]
+                if sum(1 for _,props in records.values() if key in props and props[key][0]==field)!=1:raise ValueError(option.capitalize()+' property is shared by another text record')
             else:
                 if value in names and value!=name:raise ValueError('SCNE text binding already exists')
                 names.discard(name);names.add(value);field=at+64

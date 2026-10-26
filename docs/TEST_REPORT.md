@@ -1,3 +1,17 @@
+# SCNE provider identity and held name-component verification
+
+Focused scorebug/Director/text suite: **178 passed**. It now includes all 10
+text-style cases, including three new provider-property cases. F/I lint passes
+for the changed text helper/tests. Handoff/diff checks pass.
+
+Private component: both school providers, separate record/owner/bone identities,
+marker hashes, font/width/color/opacity styles and four-bone pose extents reparse.
+All 20 original animation rows remain exact; no skeleton growth. Declared card
+strip indices are degenerate while restart markers and vertex attributes remain
+preserved. No Director request or name-component archive override is installed.
+This is not native visibility, permanence, projection or popup-coexistence proof.
+No emulator, full JB or package was created; gameplay names remain unfinished.
+
 # Director request follow-up verification
 
 Instruction checks distinguish float bit reinterpretation from a decompiler cast,

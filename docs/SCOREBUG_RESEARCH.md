@@ -350,7 +350,7 @@ Confirmed style keys from the read-only loader:
 
 | Key | Purpose / observed value |
 | --- | --- |
-| 0x7714781F | Default localized text key, not font alias |
+| 0x7714781F | Provider identity hashed by the loader; separate from row/marker names |
 | 0xBF045BDB | Font alias, e.g. Stratum2 22 32 |
 | 0x6109EA5A / 0x97DE0310 / 0x6814845A | Main RGB components, 222 each |
 | 0x53C67207 / 0x661F09B0 / 0x7DFC668B | Shadow RGB components, 10 each |
@@ -572,3 +572,27 @@ statements describe the prior research baseline. Runtime validation remains open
 See [SCOREBUG_TEXT_RECOVERY.md](SCOREBUG_TEXT_RECOVERY.md) for v5 missing-text
 evidence, shared-owner diagnostics, stock-structure restoration and reference
 comparison-strip layout. V6 remains a candidate pending native screenshots.
+
+
+## IFF-only provider identity editing
+
+The developer API now distinguishes `binding` (the SCNE text-record name) from
+`provider` (string property 0x7714781F). `inspect_styles` reports both. For example,
+`edit_styles(parts, {'text_team1name': {'provider': 'team2city'}})` changes only
+that provider property's pointer, appending an aligned UTF-16 string. It preserves
+the record name, owner/marker strings, opaque row words, property metadata and
+vertex/index payload. Missing, wrongly typed or shared provider properties and
+invalid strings are rejected. Reparse remains mandatory. No new editor mode is
+introduced.
+
+This matters for generic overlay rendering at 0x197D9C: the loader hashes the
+provider property and the renderer looks it up in the selected overlay table.
+Changing the record name alone does not select a different generic provider.
+Conversely, the main HUD's fixed provider loop uses its own record-name lookup.
+Neither edit registers a new callback, transfers a table between controllers,
+changes lifecycle, or bypasses the regular scorebug name gate.
+
+A private `player_name` component now uses its existing four-bone text owner and
+two existing markers for away/home school providers. Native draw activation is
+not installed. See DIRECTOR_RESEARCH.md; this component is not a completed or
+packaged scorebug and is not a claim of native text visibility.

@@ -143,3 +143,31 @@ request evidence must not be confused with fully recovered script grammar.
 Safe authoring still requires proven body boundaries, activation ownership,
 ordinary-popup coexistence and cancellation behavior. No name-layer asset or
 Director command modification is installed in this pass.
+
+
+## Compact school-name component, held for activation research
+
+The original player_name SCNE has three text records and a four-bone text owner
+b_EndQuarter. Its record text_team1city already uses provider team1city; record
+text_team1name uses team1name. The private component retains those record and bone
+names, changing only the latter provider to team2city. The original playername
+field is alpha zero. Both school fields use white text, dark shadows, centered
+alignment and a native width limit. The text-owner scale is 0.25; Stratum2 40
+produces an intended cap height of 13.25 authored world units and a 126-unit
+maximum width. Pen centers target X -217 / -11, Y -172.875 before animation and
+native projection. Actual native appearance is not verified.
+
+The component preserves all 20 source animation rows and the four-bone owner;
+no skeleton or pose-array growth. Existing animation offsets can still affect
+entrance/exit appearance. Original card artwork is hidden by degenerate declared
+triangle-strip indices, preserving restart markers and all vertex attributes.
+Both text marker hashes resolve to the unchanged source bones. The component is
+not installed into the current archive candidate, packaged or provided as a
+usable test build. No Director mutation is installed. Persistent activation and
+three-slot coexistence remain required before this can satisfy gameplay names.
+
+The shared developer text-style helper now writes the provider property with
+bounds/type/alias guards, independently of record/owner/bone identities. Three
+new synthetic cases exercise that separation and preservation, malformed/shared
+property refusal and invalid-value/no-op behavior. Focused suite including all
+text-style cases: 178 passed. This is source/format verification, not game output.
