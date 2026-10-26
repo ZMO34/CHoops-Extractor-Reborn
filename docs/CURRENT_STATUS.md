@@ -1,3 +1,13 @@
+# Unreleased — automatic scorebug names remain blocked
+
+The owner requires working names before packaging, exact roster colors, and no
+EBOOT/uniform changes. Additional inline-markup and compiled-shader input audits
+have not supplied a usable current-team selector. Color-only atlas selection is
+ambiguous (443 rows, 318 primary RGB values), so no color encoding is installed.
+All candidate work remains unpackaged and unverified in game. This is not a
+completion claim; a working IFF name binding/example remains the missing bridge.
+See [the follow-up audit](SCOREBUG_IFF_ONLY_AUDIT.md).
+
 # Unreleased — IFF-only scorebug audit; names unresolved
 
 The reported pregame crash supersedes v10/v11/v12 deployment guidance. The owner

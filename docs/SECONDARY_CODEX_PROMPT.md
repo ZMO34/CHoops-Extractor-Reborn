@@ -88,6 +88,16 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# Unreleased — automatic scorebug names remain blocked
+
+The owner requires working names before packaging, exact roster colors, and no
+EBOOT/uniform changes. Additional inline-markup and compiled-shader input audits
+have not supplied a usable current-team selector. Color-only atlas selection is
+ambiguous (443 rows, 318 primary RGB values), so no color encoding is installed.
+All candidate work remains unpackaged and unverified in game. This is not a
+completion claim; a working IFF name binding/example remains the missing bridge.
+See [the follow-up audit](SCOREBUG_IFF_ONLY_AUDIT.md).
+
 # Unreleased — IFF-only scorebug audit; names unresolved
 
 The reported pregame crash supersedes v10/v11/v12 deployment guidance. The owner
@@ -5487,6 +5497,16 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+# Additional read-only scorebug shader evidence
+
+Private bounded scans: 286 SCNE / 289 shader entries / 142 material uniform
+semantics, plus 816 serialized Cg revision-6 program instances in four selected
+vanilla UI/HUD banks; no parse errors. Main Cg inputs and 11 vertex instructions
+were decoded read-only. These are scoped metadata findings, not proof that all
+engine globals are mapped, nor gameplay/name-rendering validation. Exact-color
+palette collision analysis rejects the proposed color-only selector; no palette,
+shader, executable or uniform edit was installed. Candidate remains unpackaged.
 
 # IFF-only scorebug evidence follow-up
 

@@ -146,3 +146,61 @@ IFF overrides, replacing prior scorebug overrides. An already patched executable
 is not corrected by installing IFFs. Do not deploy v10/v11/v12 executables as
 verified repairs. Runtime evidence is required before calling the current visual
 candidate ready. Automatic roster names and permanent counters remain open.
+
+## Follow-up: markup, exact colors and shader selectors
+
+The owner requires names before any candidate packaging and explicitly keeps
+roster colors exact. No candidate ZIP or replacement executable is produced.
+
+The separate font-markup callback registry at `0x12A9B8` has two observed direct
+registration call sites: `0x12A0F4` and `0x12AFF4`. The style initializer installs
+LINK, U, /U, B, /B and C:COL through `0x12A824`; icon handlers use `0x12A754`.
+This establishes styling/icon callbacks, not current-team text substitution.
+
+An alternate roster-generated name atlas selected by the live team color was
+investigated, not installed. The source's 443 team rows have 318 distinct primary
+RGB values and 52 duplicate-color groups. Identical colors cannot select different
+names in a color-only shader. Encoding unique keys into RGB would violate the
+owner's exact-color requirement, so no roster colors were changed.
+
+Native color getter `0x77F38` reads runtime +1A8/+1A9/+1AA through
+`0x763DD8`, `0x763DEC` and `0x76390C`, then supplies opaque alpha. The root roster
+team pointer resolves to logical row +30, mapping these bytes to logical +1D8,
+palette slot 14. The scorebug's `0x4EEC48` updates DiffuseColor; this is RGB data,
+not a separate row identifier. The main shader's second material uniform has
+semantic 0xEB42E56E and authored (1,1,0,0); its precise role is not asserted.
+
+A bounded material-declaration scan parsed 286 SCNE headers, 289 shader entries
+and 142 distinct uniform semantics across vanilla gamedata, gamedataextra,
+global and legacy, with no parse errors. None of the checked conventional
+TeamID/TeamIndex/SchoolID/PaletteIndex spellings matched a declared semantic.
+Negative guessed-name matches are not proof of absence under other names.
+
+The embedded main scorebug Cg revision-6 programs are now parsed directly:
+vertex profile 7003 has eight parameters and 176 bytes of microcode; fragment
+profile 7004 has three parameters and 48 bytes of microcode. Reflected vertex
+inputs are position, base texture coordinates, vertex color and blend indices.
+Outputs are position, UV and color, with one internal constant. The fragment
+inputs are UV and color. The 11 vertex instructions read the corresponding
+attributes, material constants C465/C466, internal C467, indexed transform rows
+C40..42, and projection rows C0..3. No usable roster identifier is established.
+Register-field interpretation follows the open-source
+[RPCS3 vertex-program definitions](https://github.com/RPCS3/rpcs3/blob/master/rpcs3/Emu/RSX/Program/RSXVertexProgram.h);
+no emulator was launched.
+
+Scanning bounded revision-6 Cg headers in those four banks parsed 816 serialized
+program instances without errors. No reflected parameter name or semantic
+contained team, school or palette. This includes repeated/shared program data,
+not 816 unique shaders. Reflection does not describe every unreferenced built-in
+register or prove that every possible custom renderer mechanism is absent.
+No shader or unknown register was patched on speculation.
+
+The remaining blocker is an established IFF-controlled bridge from current team
+to a name/unique selector in normal gameplay. The known city/ABL text bridge is
+native-gated; card controllers have separate state; markup and the audited shader
+path do not provide a substitute. A working original-executable IFF example or
+new native data-binding evidence could reopen this investigation. The other
+developer's screenshot of an MRKS score_bug is not that evidence by itself:
+the supplied vanilla/V5 resources do not establish that main-HUD record. The
+actual differing resource would be needed to investigate that specific lead.
+The goal is unfinished; no compliant automatic-name feature has been delivered.

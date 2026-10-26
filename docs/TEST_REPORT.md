@@ -1,3 +1,13 @@
+# Additional read-only scorebug shader evidence
+
+Private bounded scans: 286 SCNE / 289 shader entries / 142 material uniform
+semantics, plus 816 serialized Cg revision-6 program instances in four selected
+vanilla UI/HUD banks; no parse errors. Main Cg inputs and 11 vertex instructions
+were decoded read-only. These are scoped metadata findings, not proof that all
+engine globals are mapped, nor gameplay/name-rendering validation. Exact-color
+palette collision analysis rejects the proposed color-only selector; no palette,
+shader, executable or uniform edit was installed. Candidate remains unpackaged.
+
 # IFF-only scorebug evidence follow-up
 
 New focused synthetic suite: 17 passed (pose identity/count/alignment/storage
