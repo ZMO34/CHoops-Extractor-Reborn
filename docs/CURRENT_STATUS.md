@@ -1,4 +1,16 @@
-# Required-name impasse after lifecycle and direct-command audit
+# Expanded executable search: additional scorebug-message route
+
+Owner requested a broader read-only executable search. Indexed 39,100 recovered
+functions and whole-image branches/descriptors/TOC references. New instruction-
+checked lead: ungated home/away school-name getters 50D350/50D3D0 feed the actual
+scorebug message formatter; Director command 3D reaches its separate four-channel
+queue. A six-bone comparison-name component is authored internally, outside the
+candidate. Lifetime, channel-3 priority over player-stat channel 2 and preservation
+of native popups must be resolved before promotion. No executable/asset-candidate
+change or package. See SCOREBUG_EXECUTABLE_ROUTES.md for scope, evidence, other
+renderer/menu/arena leads and limits. Required names remain unfinished.
+
+# Previous required-name impasse before the expanded search
 
 The full scorebug task remains unfinished. The same required-name blocker has
 persisted through the component, overlay-lifecycle and direct-command follow-ups:

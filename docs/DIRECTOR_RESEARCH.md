@@ -5,6 +5,11 @@ The current investigation includes data-driven logic beyond SCNE styling, while
 keeping the executable immutable. Nothing in this document certifies a working
 persistent name layer or authorizes writing an unknown script format.
 
+The expanded executable search identifies a separate Director 0x3D route into
+the native scorebug message system, outside the generic overlay definitions
+below. See SCOREBUG_EXECUTABLE_ROUTES.md for its verified operand form, ungated
+home/away getters and unresolved message-channel priority conflict.
+
 ## Native evidence and resource structure
 
 Vanilla Director.iff contains one DRCT record named director. Its decoded part

@@ -1,4 +1,21 @@
-# Required-name completion audit: not achieved
+# Expanded executable-search verification
+
+Whole-image inventory: 39,100 functions / 40,288 nonoverlapping body ranges;
+169,501 direct-branch patterns, with 21,424 outside recovered function bodies;
+59,983 checked TOC lwz reads. These are lead counts, not exhaustive path proof.
+Fresh Ghidra exports and instructions connect the ungated current-team getters,
+message formatting, Director 3D's eight-byte operands and separate queue storage.
+A narrow existing group-44 request, arguments, termination and padding reparse.
+
+Held comparison-name component: six owner bones, all marker hashes resolved,
+source zero-animation count and vertex attributes exact; localization IDs/extents and
+unrelated bytes exact. Private contract/template suite: 21 passed. Analysis ELF
+and current candidate hashes unchanged. Handoff/diff checks pass. No public source
+change; prior 178-test result applies to unchanged code. Channel priority and
+native appearance remain unverified; no installation, package or EBOOT change.
+See SCOREBUG_EXECUTABLE_ROUTES.md.
+
+# Previous required-name completion audit: not achieved
 
 Revalidated the current candidate manifest, unchanged two-IFF hashes, held request
 probe, normal-mode name gate, native overlay wait predicate and published command

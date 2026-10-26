@@ -88,7 +88,19 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
-# Required-name impasse after lifecycle and direct-command audit
+# Expanded executable search: additional scorebug-message route
+
+Owner requested a broader read-only executable search. Indexed 39,100 recovered
+functions and whole-image branches/descriptors/TOC references. New instruction-
+checked lead: ungated home/away school-name getters 50D350/50D3D0 feed the actual
+scorebug message formatter; Director command 3D reaches its separate four-channel
+queue. A six-bone comparison-name component is authored internally, outside the
+candidate. Lifetime, channel-3 priority over player-stat channel 2 and preservation
+of native popups must be resolved before promotion. No executable/asset-candidate
+change or package. See SCOREBUG_EXECUTABLE_ROUTES.md for scope, evidence, other
+renderer/menu/arena leads and limits. Required names remain unfinished.
+
+# Previous required-name impasse before the expanded search
 
 The full scorebug task remains unfinished. The same required-name blocker has
 persisted through the component, overlay-lifecycle and direct-command follow-ups:
@@ -5676,7 +5688,24 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 
 Embedded source: docs/TEST_REPORT.md
 
-# Required-name completion audit: not achieved
+# Expanded executable-search verification
+
+Whole-image inventory: 39,100 functions / 40,288 nonoverlapping body ranges;
+169,501 direct-branch patterns, with 21,424 outside recovered function bodies;
+59,983 checked TOC lwz reads. These are lead counts, not exhaustive path proof.
+Fresh Ghidra exports and instructions connect the ungated current-team getters,
+message formatting, Director 3D's eight-byte operands and separate queue storage.
+A narrow existing group-44 request, arguments, termination and padding reparse.
+
+Held comparison-name component: six owner bones, all marker hashes resolved,
+source zero-animation count and vertex attributes exact; localization IDs/extents and
+unrelated bytes exact. Private contract/template suite: 21 passed. Analysis ELF
+and current candidate hashes unchanged. Handoff/diff checks pass. No public source
+change; prior 178-test result applies to unchanged code. Channel priority and
+native appearance remain unverified; no installation, package or EBOOT change.
+See SCOREBUG_EXECUTABLE_ROUTES.md.
+
+# Previous required-name completion audit: not achieved
 
 Revalidated the current candidate manifest, unchanged two-IFF hashes, held request
 probe, normal-mode name gate, native overlay wait predicate and published command
