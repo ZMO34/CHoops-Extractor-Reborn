@@ -89,3 +89,13 @@ scene/comparison checks pass, three real clone/donor word comparisons pass, and
 source-bound preflight prepares the exact two candidate files. No full JB,
 emulator run, ZIP, or new test package was created. Required names and native
 appearance are still unverified.
+
+
+## Follow-up: school-name preference and Director commands
+
+The owner prefers school names, retaining nicknames as a fallback. Subsequent
+research finds an overlay school-name formatter and actual Director command
+operations for pending overlay selection, context, duration and submission.
+This supersedes the earlier purely undecoded-DRCT status; it does not yet prove
+persistent activation or safe script writing. See DIRECTOR_RESEARCH.md for exact
+functions, table identities, reader API and verification limits.

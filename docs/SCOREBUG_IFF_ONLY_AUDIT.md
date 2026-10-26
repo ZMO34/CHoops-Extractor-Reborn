@@ -484,3 +484,14 @@ The private clone helper now preserves unexplained text-row word +0x44 instead
 of overwriting it with a new-binding CRC. Regenerated candidate passes 21 local
 scene/comparison checks, three donor-word comparisons and exact two-IFF preflight.
 This preservation correction does not establish native text appearance.
+
+
+## Director command and school-name follow-up
+
+A real data-logic lead is now established: Director commands can reset, select,
+contextualize and submit native overlays and supply their duration. The school-name
+formatter is distinct from the opening nickname provider. The new read-only DRCT
+inspector indexes the original resource, but does not write or execute command
+streams. Activation phase, operand boundaries and cancellation/coexistence remain
+unresolved; names are not completed. See DIRECTOR_RESEARCH.md. No new candidate
+asset changes or packaging in this pass. The full goal remains active.

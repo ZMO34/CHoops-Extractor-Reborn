@@ -88,6 +88,16 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# School-name and Director logic routes under investigation
+
+School names remain preferred, with nicknames accepted as fallback. Identified a
+separate overlay school-name formatter and native Director commands for selecting,
+contextualizing and submitting overlays, including a duration setter. Added a
+bounded read-only DRCT pointer/command-index inspector; vanilla parses 98 groups
+and 6,517 record references. Persistent gameplay activation/cancellation and safe
+script authoring remain unresolved. No Director data was patched or package made.
+See DIRECTOR_RESEARCH.md. Focused suite: 168 passed, including 16 new reader cases.
+
 # Pregame nickname source identified
 
 Owner accepts nicknames and supplied the Wildcats / Flyers graphic. Located its
@@ -5589,6 +5599,20 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+# Director reader and school-name research verification
+
+Focused scorebug + Director suite: **168 passed**, including 16 new Director
+reader cases. New-source Ruff E/F/I passes. Vanilla decoded DRCT parses 1,430
+leading references, 78 strings, 98 non-null groups and 6,517 record references;
+source bytes remain unchanged. Native command-table rows, descriptor targets,
+request-field offsets and school-name resolution were checked with Ghidra and
+instructions. Sixty-two observed switch references were added only to the local
+analysis database; decompiler switch recovery still has limits.
+
+The Director reader never executes or writes commands, and does not infer operand
+boundaries. No Director override, new asset candidate, full JB, emulator run or
+package was produced. These tests do not prove permanent gameplay names.
 
 # Pregame nickname route and clone preservation checks
 

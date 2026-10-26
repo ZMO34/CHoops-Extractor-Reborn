@@ -1,3 +1,9 @@
+# Unreleased — Director data-logic research
+
+- Add bounded read-only DRCT reference/group/string indexing and command-index decoding.
+- Trace overlay duration/context/submission commands and a separate school-name formatter.
+- Keep unknown operands unwritable and persistent scorebug names explicitly unfinished.
+
 # Unreleased — native-timed sixth-man meter reskin
 
 - Add a guarded IFF-only monochrome meter recolor while preserving native fill/pulse brightness timing and alpha.

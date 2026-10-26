@@ -1,3 +1,17 @@
+# Director reader and school-name research verification
+
+Focused scorebug + Director suite: **168 passed**, including 16 new Director
+reader cases. New-source Ruff E/F/I passes. Vanilla decoded DRCT parses 1,430
+leading references, 78 strings, 98 non-null groups and 6,517 record references;
+source bytes remain unchanged. Native command-table rows, descriptor targets,
+request-field offsets and school-name resolution were checked with Ghidra and
+instructions. Sixty-two observed switch references were added only to the local
+analysis database; decompiler switch recovery still has limits.
+
+The Director reader never executes or writes commands, and does not infer operand
+boundaries. No Director override, new asset candidate, full JB, emulator run or
+package was produced. These tests do not prove permanent gameplay names.
+
 # Pregame nickname route and clone preservation checks
 
 Read-only CDF inventory: 21 overlay scenes; opening_intro_a has exactly three
