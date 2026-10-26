@@ -468,3 +468,19 @@ semantics and all string-node variants are not claimed fully documented.
 No guessed pointers, executable changes or arbitrary function dispatch were
 installed. Mandatory automatic names remain unfinished. The internal candidate
 is unchanged and unpackaged; no testing JB or emulator run was created.
+
+
+## Owner-identified pregame nickname source
+
+The owner accepts roster nicknames and supplied the Wildcats / Flyers intro
+screenshot. The exact opening_intro_a SCNE is now identified in the CDF-backed
+overlaycache pair, with three text fields and native provider 0x70EE00 reading
+runtime team +0x0C. Its binding table, typed team context and native exit timing
+are traced in [SCOREBUG_PREGAME_NAMES.md](SCOREBUG_PREGAME_NAMES.md). This is a
+new concrete source lead, not proof of permanent HUD activation. Names remain
+required and unfinished; no executable change or candidate package.
+
+The private clone helper now preserves unexplained text-row word +0x44 instead
+of overwriting it with a new-binding CRC. Regenerated candidate passes 21 local
+scene/comparison checks, three donor-word comparisons and exact two-IFF preflight.
+This preservation correction does not establish native text appearance.

@@ -88,6 +88,15 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# Pregame nickname source identified
+
+Owner accepts nicknames and supplied the Wildcats / Flyers graphic. Located its
+opening_intro_a SCNE in the overlaycache IFF/CDF pair and traced roster-nickname
+provider 0x70EE00, typed context selection and native exit timing. Permanent
+IFF-controlled HUD activation is not established. See SCOREBUG_PREGAME_NAMES.md.
+Internal clone metadata preservation corrected; candidate regenerated and exact
+two-IFF preflight passes. No package, executable change or completed-name claim.
+
 # SCNE localization route checked; names still unresolved
 
 Traced SCNE style-property loading and the actual string expansion/formatter.
@@ -5580,6 +5589,19 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+# Pregame nickname route and clone preservation checks
+
+Read-only CDF inventory: 21 overlay scenes; opening_intro_a has exactly three
+text fields. Original provider table CRCs match those binding names. Ghidra and
+instruction checks identify the nickname field at runtime team +0x0C and descriptor
+owned exit timing. Persistent gameplay activation is unverified.
+
+Private scene/comparison suite: 21 passed. Three real cloned text-row +0x44 words
+match their source donors after removing a speculative CRC overwrite. Rebuilt
+internal vanilla-based candidate passes exact-byte, source-bound two-IFF preflight.
+No emulator, full JB or package. Documentation handoff/diff checks pass. Prior
+152 public source tests are unchanged and do not verify these native graphics.
 
 # SCNE localization research verification
 

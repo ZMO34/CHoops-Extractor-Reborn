@@ -1,3 +1,16 @@
+# Pregame nickname route and clone preservation checks
+
+Read-only CDF inventory: 21 overlay scenes; opening_intro_a has exactly three
+text fields. Original provider table CRCs match those binding names. Ghidra and
+instruction checks identify the nickname field at runtime team +0x0C and descriptor
+owned exit timing. Persistent gameplay activation is unverified.
+
+Private scene/comparison suite: 21 passed. Three real cloned text-row +0x44 words
+match their source donors after removing a speculative CRC overwrite. Rebuilt
+internal vanilla-based candidate passes exact-byte, source-bound two-IFF preflight.
+No emulator, full JB or package. Documentation handoff/diff checks pass. Prior
+152 public source tests are unchanged and do not verify these native graphics.
+
 # SCNE localization research verification
 
 Read-only Ghidra exports completed for style loading, font/string expansion,

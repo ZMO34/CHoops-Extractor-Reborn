@@ -1,3 +1,12 @@
+# Pregame nickname source identified
+
+Owner accepts nicknames and supplied the Wildcats / Flyers graphic. Located its
+opening_intro_a SCNE in the overlaycache IFF/CDF pair and traced roster-nickname
+provider 0x70EE00, typed context selection and native exit timing. Permanent
+IFF-controlled HUD activation is not established. See SCOREBUG_PREGAME_NAMES.md.
+Internal clone metadata preservation corrected; candidate regenerated and exact
+two-IFF preflight passes. No package, executable change or completed-name claim.
+
 # SCNE localization route checked; names still unresolved
 
 Traced SCNE style-property loading and the actual string expansion/formatter.
