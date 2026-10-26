@@ -1,3 +1,16 @@
+# IFF-only scorebug — required name bridge remains an impasse
+
+The restored Ghidra investigation now covers controller string consumers,
+main fixed-provider dispatch and literal/formatter argument flow. None supplies
+an IFF-controlled normal-game roster-name bridge. The streetdata MRKS lead is
+inspected; alternate styles do not activate that controller's lifecycle.
+Automatic names remain required and unfinished; no candidate is packaged.
+Original executable, uniform routing and exact roster colors remain untouched.
+A working original-executable IFF naming example or new controller evidence is
+needed to advance this specific blocker. See the completion/impasse audit in
+[SCOREBUG_IFF_ONLY_AUDIT.md](SCOREBUG_IFF_ONLY_AUDIT.md). Visual and optional
+counter/rank requirements are not silently dropped or declared complete.
+
 # Ghidra HUD cross-check and MRKS style inspection
 
 Completed PS3 setup, full auto-analysis and syscall identification in the local

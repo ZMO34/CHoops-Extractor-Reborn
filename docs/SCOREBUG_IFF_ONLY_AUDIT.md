@@ -260,3 +260,68 @@ No name activation bridge was installed or demonstrated. Existing IFF candidate
 geometry, native popup triggers and exact roster colors remain as recorded;
 packaging stays held until automatic names work. Next investigate controller
 selection/data-binding consumers, not another guessed binding rename.
+
+## Controller consumers and literal/format path audit
+
+Aligned pointer-reference scans of the decoded original find two UTF-16-BE
+home_city strings: 0x124B22B8 is referenced by main TOC slot 0xA5DD54, and
+0x124D7BC8 by alternate table row 0x1267CA00. away_city similarly has main
+0xA5DD60 and alternate 0x1267CA28 consumers. Main ABL strings reference
+0xA5DDB0/0xA5DDB4. No additional controller was identified by these particular
+string-pointer references. This does not exclude computed hashes or unknown
+spellings; it does close the proposed shared-name alias route for these tables.
+
+The main draw loop at 0x4F4858..0x4F490C calls the native descriptor in each of
+14 fixed rows before looking up its SCNE style. Style naming selects the row's
+presentation, not a new provider. Alternate initialization, update and shutdown
+all apply context selection; normal shutdown 0x71BD10 delegates to 0x4EE160.
+MRKS presence or a copied style does not establish alternate lifecycle activation.
+
+Ghidra exports plus instruction checks trace literal rendering through 0x9D048:
+it copies the supplied string, replaces it with the style +A8 value when flag
+0x10 is set, and passes it to 0x9C1EC/0x9C360. Flags 1/2 apply the existing case
+formatting with that one supplied string; they do not supply current-team data.
+String copy 0x1E0EA4 preserves odd tagged IDs or clones even node pointers.
+Formatter construction 0x1E2A8C uses the caller-provided argument count/table;
+callback descriptors there are native arguments, not SCNE/localization bindings.
+No current-home/away callback was established through this literal path. Branding
+uses the fixed literal mechanism; changing its spelling cannot make names dynamic.
+
+The name formatter's 0x1E1610 -> 0x1E2634 path wraps the supplied team +4 text
+pointer with a measured length (type-4 string node). Do not confuse this pointer
+with a localization ID or treat an on-disk literal ID as an active-team pointer.
+
+The HUD support helpers examined here add no new persistent counter provider:
+0x4EE1A4 sets the main active flag, 0x4EDF60 clears a HUD state field, 0x4F24F0
+updates existing comparison visibility/placement, and 0x4F215C adjusts existing
+transforms for clock presentation. Their decompiled forms retain the documented
+TOC/switch limitations; no speculative resource flag was written.
+
+## Current completion/impasse audit
+
+The internal candidate still contains only gamedata.iff and english.iff plus its
+validation/preflight records. Preflight passes, but gameplay_verified is false
+and native_name_gates_unresolved is true. No replacement EBOOT, uniform override
+or package exists in this candidate. Original EBOOT and decoded analysis ELF
+remain unchanged against their local recorded hashes.
+
+The required automatic roster names are not achieved. Existing main providers
+suppress them in normal contexts; alternate providers require an unestablished
+lifecycle/selection bridge. The audited shared-card, literal/format, inline-tag
+and material/shader paths have not supplied that bridge. Color-key encoding
+violates the owner's exact-color requirement and is excluded, as are uniform
+routing and executable edits. These constraints remain in force.
+
+Geometry/backing/shading, native score/clock/period styles, one-line branding,
+comparison layout and sixth-man placement are authored with static preservation
+checks, but have no native appearance/transition verification. Permanent
+foul/bonus/timeout rows and conditional rankings have no established continuously
+updated IFF binding. Neither synthetic tests nor the Ghidra database prove those
+features complete. The full objective is not achieved and must not be relabeled
+as a completed visual-only scorebug.
+
+The current investigation is at an impasse on the required name bridge. A working
+original-executable IFF example that renders current-team names, or new native
+resource/controller evidence showing such a bridge, would provide a concrete
+next step. The streetdata example has now been inspected; its styles alone do
+not provide that evidence. Candidate packaging remains held.

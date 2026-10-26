@@ -88,6 +88,19 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# IFF-only scorebug — required name bridge remains an impasse
+
+The restored Ghidra investigation now covers controller string consumers,
+main fixed-provider dispatch and literal/formatter argument flow. None supplies
+an IFF-controlled normal-game roster-name bridge. The streetdata MRKS lead is
+inspected; alternate styles do not activate that controller's lifecycle.
+Automatic names remain required and unfinished; no candidate is packaged.
+Original executable, uniform routing and exact roster colors remain untouched.
+A working original-executable IFF naming example or new controller evidence is
+needed to advance this specific blocker. See the completion/impasse audit in
+[SCOREBUG_IFF_ONLY_AUDIT.md](SCOREBUG_IFF_ONLY_AUDIT.md). Visual and optional
+counter/rank requirements are not silently dropped or declared complete.
+
 # Ghidra HUD cross-check and MRKS style inspection
 
 Completed PS3 setup, full auto-analysis and syscall identification in the local
@@ -5515,6 +5528,16 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+# Controller/literal research evidence
+
+Additional targeted Ghidra exports complete for HUD lifecycle/support helpers,
+main draw and string/literal/formatter functions. Original EBOOT and analysis
+ELF hashes match the local baseline. Candidate validation/preflight re-read:
+name gates unresolved, gameplay unverified, exactly two IFFs and no package.
+These are read-only findings, not another gameplay test or feature completion.
+No source changes to the previously tested reader; prior 143-test evidence is
+unchanged. This documentation update checks handoff generation and diff hygiene.
 
 # MRKS and native-analysis follow-up
 

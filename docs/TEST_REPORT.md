@@ -1,3 +1,13 @@
+# Controller/literal research evidence
+
+Additional targeted Ghidra exports complete for HUD lifecycle/support helpers,
+main draw and string/literal/formatter functions. Original EBOOT and analysis
+ELF hashes match the local baseline. Candidate validation/preflight re-read:
+name gates unresolved, gameplay unverified, exactly two IFFs and no package.
+These are read-only findings, not another gameplay test or feature completion.
+No source changes to the previously tested reader; prior 143-test evidence is
+unchanged. This documentation update checks handoff generation and diff hygiene.
+
 # MRKS and native-analysis follow-up
 
 Exact-head focused scorebug suite: **143 passed**, including nine MRKS cases.
