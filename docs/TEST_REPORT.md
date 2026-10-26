@@ -1,3 +1,19 @@
+# IFF-only scorebug evidence follow-up
+
+New focused synthetic suite: 17 passed (pose identity/count/alignment/storage
+corruption and localization preservation/alias/overlap/source/argument rejection).
+Command: `.venv/Scripts/python.exe -m pytest tests/test_scorebug_pose.py
+tests/test_scorebug_localization.py -q -p no:cacheprovider`.
+Combined focused suite: 134 passed across the two new files and existing
+text-dependency/winding/context/footer/main-draw/main-setup harness tests.
+New-source Ruff E/F/I, generated handoff and diff checks pass. Existing native
+harness tests use stubs; they do not revalidate failed executable deployment.
+Private local authoring checks: 21 passed; candidate face/pose/header/preservation
+assertions and source-bound two-IFF preflight pass. Preflight returns exact candidate
+bytes with no padding changes. This is not a native graphics test, emulator run,
+full JB build or proof of automatic names. See SCOREBUG_IFF_ONLY_AUDIT.md for the
+full scope and superseded runtime assumptions.
+
 ## V12 text dispatch, panel and logo repair
 
 149 focused tests pass with an explicit workspace pytest temporary directory.

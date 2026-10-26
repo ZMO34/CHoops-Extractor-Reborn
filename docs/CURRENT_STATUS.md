@@ -1,3 +1,14 @@
+# Unreleased — IFF-only scorebug audit; names unresolved
+
+The reported pregame crash supersedes v10/v11/v12 deployment guidance. The owner
+requires the original EBOOT and excludes uniform-logo name workarounds. New
+read-only pose validation detects insufficient matrix storage in v11; a bounded
+comparison-template helper preserves original IDs and unrelated token bytes.
+The private vanilla-based IFF candidate passes static checks and two-IFF preflight,
+but automatic team names, permanent counters/ranks and native appearance remain
+unresolved. Shared UI and font-tag providers do not establish a HUD name route.
+See [the current evidence and requirement ledger](SCOREBUG_IFF_ONLY_AUDIT.md).
+
 # Unreleased — v11 gameplay placement failure; v12 text/color/logo correction
 
 The v11 screenshot confirms backing/score cells render but main text is centered,

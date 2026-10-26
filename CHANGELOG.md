@@ -1,3 +1,10 @@
+# Unreleased — IFF-only scorebug research correction
+
+- Supersede failed executable deployment guidance with an IFF-only evidence ledger.
+- Add read-only HUD pose-storage checks and guarded comparison-template formatting.
+- No automatic roster names, permanent counters, new native callbacks or runtime
+  certification are claimed. Original EBOOT and uniform resources remain untouched.
+
 ## Unreleased — v12 text placement, brighter team panels and square logo mapping
 
 - Move core live-font setup before callback dispatch and use explicit scalar

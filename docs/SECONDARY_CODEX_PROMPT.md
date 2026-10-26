@@ -88,6 +88,17 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# Unreleased — IFF-only scorebug audit; names unresolved
+
+The reported pregame crash supersedes v10/v11/v12 deployment guidance. The owner
+requires the original EBOOT and excludes uniform-logo name workarounds. New
+read-only pose validation detects insufficient matrix storage in v11; a bounded
+comparison-template helper preserves original IDs and unrelated token bytes.
+The private vanilla-based IFF candidate passes static checks and two-IFF preflight,
+but automatic team names, permanent counters/ranks and native appearance remain
+unresolved. Shared UI and font-tag providers do not establish a HUD name route.
+See [the current evidence and requirement ledger](SCOREBUG_IFF_ONLY_AUDIT.md).
+
 # Unreleased — v11 gameplay placement failure; v12 text/color/logo correction
 
 The v11 screenshot confirms backing/score cells render but main text is centered,
@@ -4475,6 +4486,17 @@ format limits.
 
 Embedded source: docs/SCOREBUG_RESEARCH.md
 
+## Current IFF-only scope supersedes executable test guidance
+
+The reported pregame crash supersedes v10/v11/v12 deployment guidance. The owner
+requires the original EBOOT and excludes uniform-logo name workarounds. New
+read-only pose validation detects insufficient matrix storage in v11; a bounded
+comparison-template helper preserves original IDs and unrelated token bytes.
+The private vanilla-based IFF candidate passes static checks and two-IFF preflight,
+but automatic team names, permanent counters/ranks and native appearance remain
+unresolved. Shared UI and font-tag providers do not establish a HUD name route.
+See [the current evidence and requirement ledger](SCOREBUG_IFF_ONLY_AUDIT.md).
+
 # Native text contract findings — combined experiment correction
 
 Ghidra with PS3 OPD-derived TOC context corroborates these native contracts:
@@ -5465,6 +5487,22 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+# IFF-only scorebug evidence follow-up
+
+New focused synthetic suite: 17 passed (pose identity/count/alignment/storage
+corruption and localization preservation/alias/overlap/source/argument rejection).
+Command: `.venv/Scripts/python.exe -m pytest tests/test_scorebug_pose.py
+tests/test_scorebug_localization.py -q -p no:cacheprovider`.
+Combined focused suite: 134 passed across the two new files and existing
+text-dependency/winding/context/footer/main-draw/main-setup harness tests.
+New-source Ruff E/F/I, generated handoff and diff checks pass. Existing native
+harness tests use stubs; they do not revalidate failed executable deployment.
+Private local authoring checks: 21 passed; candidate face/pose/header/preservation
+assertions and source-bound two-IFF preflight pass. Preflight returns exact candidate
+bytes with no padding changes. This is not a native graphics test, emulator run,
+full JB build or proof of automatic names. See SCOREBUG_IFF_ONLY_AUDIT.md for the
+full scope and superseded runtime assumptions.
 
 ## V12 text dispatch, panel and logo repair
 
