@@ -1,3 +1,9 @@
+# Unreleased — backend research tools
+
+- Add Research-tab access to the local Ghidra/PS3 tools folder.
+- Document routine Ghidra workflow and the vanilla streetdata MRKS/name-provider lead.
+- Automatic scorebug names remain unfinished; no candidate packaged.
+
 # Unreleased — IFF-only scorebug research correction
 
 - Supersede failed executable deployment guidance with an IFF-only evidence ledger.

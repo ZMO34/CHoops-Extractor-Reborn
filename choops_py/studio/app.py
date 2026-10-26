@@ -18,9 +18,10 @@ from PySide6.QtCore import (
     Qt,
     QThreadPool,
     QTimer,
+    QUrl,
     Signal,
 )
-from PySide6.QtGui import QAction, QImage, QPixmap, QColor
+from PySide6.QtGui import QAction, QImage, QPixmap, QColor, QDesktopServices
 from PySide6.QtWidgets import (
     QApplication,
     QComboBox,
@@ -2395,6 +2396,10 @@ class Window(QMainWindow):
             "First 4 KiB of the selected asset. Unknown audio, CDAN and roster fields remain read-only; no codecs or geometry writers are inferred.",
         )
 
+        tools_button = QPushButton("Open backend tools folder (Ghidra / PS3 scripts)")
+        tools_button.clicked.connect(self.open_backend_tools)
+        layout.addWidget(tools_button)
+
         self.hex = QPlainTextEdit()
 
         self.hex.setReadOnly(True)
@@ -2402,6 +2407,15 @@ class Window(QMainWindow):
         self.hex.setStyleSheet("font-family: Consolas, monospace;")
 
         layout.addWidget(self.hex)
+
+    def open_backend_tools(self):
+        tools_path = OUTPUT / "research" / "backend-tools"
+        try:
+            tools_path.mkdir(parents=True, exist_ok=True)
+            if not QDesktopServices.openUrl(QUrl.fromLocalFile(str(tools_path.resolve()))):
+                raise OSError("The system could not open the backend tools folder")
+        except OSError as exc:
+            self.show_error(str(exc))
 
     def create_diagnostics(self):
 

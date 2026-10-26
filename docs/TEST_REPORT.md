@@ -1,3 +1,16 @@
+# Research tools setup verification
+
+Offscreen Qt smoke: Research-tab button resolves and opens the expected folder
+through a mocked system opener (pass). Pose/localization regression suite: 17
+passed. Ghidra, matching PS3 extension and portable JDK archives all matched
+official release lengths and SHA-256 digests; verified ZIPs were removed after
+extraction. Java 25.0.4.1 and Ghidra headless startup work. The extension script
+folder is discovered by Ghidra. The decoded vanilla analysis ELF imported and
+saved successfully with PowerPC:BE:64:A2ALT-32addr/default and -noanalysis.
+Automatic analysis and PS3 script execution are not yet validated.
+Backend findings in the streetdata section are disassembly evidence pending
+Ghidra cross-checks, not gameplay verification. No emulator or full JB.
+
 # Additional read-only scorebug shader evidence
 
 Private bounded scans: 286 SCNE / 289 shader entries / 142 material uniform

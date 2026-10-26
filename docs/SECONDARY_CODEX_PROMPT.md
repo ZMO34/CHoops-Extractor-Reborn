@@ -88,6 +88,15 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# Backend research tools and streetdata lead
+
+The Research page now opens output/research/backend-tools for the portable Ghidra
+and matching PS3 extension. Use Ghidra regularly and publish backend evidence;
+see [GHIDRA_WORKFLOW.md](GHIDRA_WORKFLOW.md). Vanilla streetdata.iff supplies the
+previously missing score_bug MRKS. An alternate native name formatter is identified,
+but its activation in normal college gameplay remains unresolved. Names are not
+done; no candidate packaging, executable edits or runtime certification.
+
 # Unreleased — automatic scorebug names remain blocked
 
 The owner requires working names before packaging, exact roster colors, and no
@@ -5497,6 +5506,19 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+# Research tools setup verification
+
+Offscreen Qt smoke: Research-tab button resolves and opens the expected folder
+through a mocked system opener (pass). Pose/localization regression suite: 17
+passed. Ghidra, matching PS3 extension and portable JDK archives all matched
+official release lengths and SHA-256 digests; verified ZIPs were removed after
+extraction. Java 25.0.4.1 and Ghidra headless startup work. The extension script
+folder is discovered by Ghidra. The decoded vanilla analysis ELF imported and
+saved successfully with PowerPC:BE:64:A2ALT-32addr/default and -noanalysis.
+Automatic analysis and PS3 script execution are not yet validated.
+Backend findings in the streetdata section are disassembly evidence pending
+Ghidra cross-checks, not gameplay verification. No emulator or full JB.
 
 # Additional read-only scorebug shader evidence
 

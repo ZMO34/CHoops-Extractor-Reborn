@@ -13,6 +13,12 @@ current handoff; dated historical research is supporting evidence.
 - Every update maintains documentation: current status, changed format evidence,
   user/CLI instructions where applicable, and exact verification results. Follow
   the PR template. Record unresolved questions instead of inventing semantics.
+- Use Ghidra regularly for game-backend research. Record language/compiler and
+  TOC setup, function addresses, cross-references, evidence and unresolved
+  assumptions in maintained research docs; publish reviewable findings through
+  GitHub PRs. Keep Ghidra distributions, projects and game-derived exports local
+  under output/research/backend-tools, outside Git. Analysis never authorizes
+  executable edits or emulator runs.
 - NEVER launch RPCS3, automate it, or run emulator/gameplay tests. Do not create
   automatic/testing JB folders. Use synthetic fixtures, Python checks, read-only
   supplied inputs and Qt/packaged startup checks. The user builds JB manually.

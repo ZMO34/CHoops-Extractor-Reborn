@@ -196,11 +196,31 @@ register or prove that every possible custom renderer mechanism is absent.
 No shader or unknown register was patched on speculation.
 
 The remaining blocker is an established IFF-controlled bridge from current team
-to a name/unique selector in normal gameplay. The known city/ABL text bridge is
-native-gated; card controllers have separate state; markup and the audited shader
-path do not provide a substitute. A working original-executable IFF example or
-new native data-binding evidence could reopen this investigation. The other
-developer's screenshot of an MRKS score_bug is not that evidence by itself:
-the supplied vanilla/V5 resources do not establish that main-HUD record. The
-actual differing resource would be needed to investigate that specific lead.
-The goal is unfinished; no compliant automatic-name feature has been delivered.
+to a name/unique selector in normal gameplay. The known main city/ABL text bridge
+is native-gated; card controllers have separate state; markup and the audited
+shader path do not provide a substitute. No compliant automatic-name feature
+has been delivered; the candidate remains unpackaged.
+
+## Streetdata MRKS discovery (supersedes the missing-source lead)
+
+The owner identified vanilla streetdata.iff. Its score_bug MRKS record
+(case-sensitive identity 0x42265DEF) decompresses to 16,860 bytes and embeds SCNE
+at +0xAE0. Fifteen 176-byte text styles include home_city, away_city, home_rank
+and away_rank. The SCNE itself has zero text records: these styles belong to the
+MRKS wrapper. Native lookup 0x9B2D0 compares uppercase binding CRC at style +0xA0;
++A4 holds the case-sensitive CRC. Merely searching text strings missed this.
+
+The alternate initializer 0x71D1F8 loads MRKS or falls back to SCNE. Its resource
+selector 0x718BDC requests scorebug_xenon, scorebug or blackjack_score_bug by
+context; a direct request for streetdata's score_bug identity is not established.
+Its 24-row provider registry at 0x1267CA00 includes home_city -> 0x71BC94 and
+away_city -> 0x71BBD4. Both can reach formatter 0x719038, which populates a name
+from current-team +4 without the normal main-HUD suppression helper. The rank
+styles are not entries in this registry; live rankings are unproven.
+
+Normal contexts delegate initialization to 0x4F2818 and update to 0x4F313C.
+Global-state +0x1AC is one alternate-path condition but also selects the blackjack
+resource and is read outside the HUD. It is not established as a cosmetic or
+IFF-controlled selector. No flags, resources or executable bytes were changed.
+These findings are read-only disassembly evidence pending Ghidra cross-checks;
+activation of this existing name provider in normal college gameplay is unresolved.

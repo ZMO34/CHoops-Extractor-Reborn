@@ -1,3 +1,12 @@
+# Backend research tools and streetdata lead
+
+The Research page now opens output/research/backend-tools for the portable Ghidra
+and matching PS3 extension. Use Ghidra regularly and publish backend evidence;
+see [GHIDRA_WORKFLOW.md](GHIDRA_WORKFLOW.md). Vanilla streetdata.iff supplies the
+previously missing score_bug MRKS. An alternate native name formatter is identified,
+but its activation in normal college gameplay remains unresolved. Names are not
+done; no candidate packaging, executable edits or runtime certification.
+
 # Unreleased — automatic scorebug names remain blocked
 
 The owner requires working names before packaging, exact roster colors, and no
