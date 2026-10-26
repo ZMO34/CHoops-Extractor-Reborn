@@ -38,8 +38,10 @@ script disassembly.
 Dispatcher 0x77D2C0 branches through 62 argument-shape categories. Instruction
 checks establish category 1 calls without operands, category 2 consumes the
 numeric reader 0x5A9D4 and category 4 consumes one byte through 0x5A79C before
-calling its registered descriptor. Other categories and numeric operand encoding
-are not fully decoded. Ghidra initially omitted most switch destinations;
+calling its registered descriptor. Other categories are not fully decoded. Numeric reader 0x5A9D4 calls the
+four-byte big-endian reader 0x5A864, stores the returned word and loads it as an
+IEEE float (instruction check at 0x5A9E8/0x5A9EC), rather than numerically
+converting the integer as one decompiler view suggests. Ghidra initially omitted most switch destinations;
 62 instruction-verified computed edges were added to the analysis database only.
 Its function-body coverage improved, but the decompiler still reports an
 unrecovered switch. Instruction checks, not decompileCompleted, support the claims.
@@ -104,3 +106,40 @@ malformed counts and alignment. The real vanilla resource parses read-only.
 The focused scorebug plus Director suite has 168 passing cases, including 16 new
 Director cases. Native appearance and persistent names remain unverified; no
 emulator, full JB or candidate package is created.
+
+
+## Existing request sequence and further limits
+
+A concrete record in group 187 contains this decoded overlay sequence: a wait
+operation (0x158), pending-request reset, context 0x88, context 0x87, duration
+5.0, definition 4, submission, then stream termination. Definition 4 is the
+native starting_lineup resource. Context selector 0x87 branches through
+0x2E78F0 -> 0x57F050 (home); 0x88 branches through 0x2E7920 -> 0x57F064 (away).
+Thus this request supplies away context first, home second. The native event
+callback 0x2C9508 requests event 187 through 0x3F7424. The complete phase ownership
+and later cleanup of this particular event are not yet established.
+
+Command 0x158 has an initial callback returning 1 (0x199740), and a follow-up
+callback (0x199754) checking overlay activity. Program runner 0x5AAD0 distinguishes
+first execution and resumed execution through 0x5A764. This supports a wait/yield
+interpretation of the sequence, rather than treating every command as a one-time
+immediate call. No wait or scheduling operation was removed.
+
+Native definition 25 selects GAMEDATA / player_name, uses the broad table at
+0x953558 containing school/city bindings, and has a very large default duration.
+Its original SCNE has team-city, nickname and player-name fields. That makes it
+a resource to investigate for a compact school-name layer; it is not yet a
+persistent gameplay consumer with both contexts. Definition 4's table at
+0x95324C also has the school/city providers. Definition 3 (opening_intro_a) has
+its separate three-row nickname/arena table. These tables cannot be freely
+interchanged by renaming SCNE fields.
+
+An experimental local scan inferred operand widths from native case blocks to
+locate further request candidates. It encounters invalid command-map indices and
+incomplete streams; apparent termination alone does not validate a disassembly.
+It remains local, read-only and provisional, and is not the public reader's
+contract or an accepted script writer. The verified primitive decoder and narrow
+request evidence must not be confused with fully recovered script grammar.
+Safe authoring still requires proven body boundaries, activation ownership,
+ordinary-popup coexistence and cancellation behavior. No name-layer asset or
+Director command modification is installed in this pass.

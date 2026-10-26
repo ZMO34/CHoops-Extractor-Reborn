@@ -1,3 +1,14 @@
+# Director request follow-up verification
+
+Instruction checks distinguish float bit reinterpretation from a decompiler cast,
+and resolve context operands 0x87/0x88 through the current home/away getters.
+Matched a narrow existing request sequence to native definition 4 and traced
+its event-187 callback. Inspected definition 25's resource/table/default duration.
+Whole-stream experimental scan failures remain explicit and do not validate
+script authoring. No source/candidate assets changed in this docs-only follow-up;
+prior exact-HEAD 168-test evidence remains applicable to the unchanged code.
+Handoff and diff checks pass; native names/persistence remain unverified.
+
 # Director reader and school-name research verification
 
 Focused scorebug + Director suite: **168 passed**, including 16 new Director

@@ -1,3 +1,13 @@
+# Existing Director overlay request traced
+
+Identified a concrete starting-lineup request with away/home contexts, duration
+and submission, plus native event 187 callback. Confirmed numeric operands are
+four-byte float bit patterns. Native player_name is a potential long-duration
+resource using the broader school-name table. Persistent gameplay coexistence,
+script activation and safe authoring remain unproven; no asset edits in this pass.
+Provisional whole-stream scans have failures and are not treated as valid scripts.
+See DIRECTOR_RESEARCH.md. School names remain preferred; names are unfinished.
+
 # School-name and Director logic routes under investigation
 
 School names remain preferred, with nicknames accepted as fallback. Identified a

@@ -88,6 +88,16 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# Existing Director overlay request traced
+
+Identified a concrete starting-lineup request with away/home contexts, duration
+and submission, plus native event 187 callback. Confirmed numeric operands are
+four-byte float bit patterns. Native player_name is a potential long-duration
+resource using the broader school-name table. Persistent gameplay coexistence,
+script activation and safe authoring remain unproven; no asset edits in this pass.
+Provisional whole-stream scans have failures and are not treated as valid scripts.
+See DIRECTOR_RESEARCH.md. School names remain preferred; names are unfinished.
+
 # School-name and Director logic routes under investigation
 
 School names remain preferred, with nicknames accepted as fallback. Identified a
@@ -5599,6 +5609,17 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+# Director request follow-up verification
+
+Instruction checks distinguish float bit reinterpretation from a decompiler cast,
+and resolve context operands 0x87/0x88 through the current home/away getters.
+Matched a narrow existing request sequence to native definition 4 and traced
+its event-187 callback. Inspected definition 25's resource/table/default duration.
+Whole-stream experimental scan failures remain explicit and do not validate
+script authoring. No source/candidate assets changed in this docs-only follow-up;
+prior exact-HEAD 168-test evidence remains applicable to the unchanged code.
+Handoff and diff checks pass; native names/persistence remain unverified.
 
 # Director reader and school-name research verification
 
