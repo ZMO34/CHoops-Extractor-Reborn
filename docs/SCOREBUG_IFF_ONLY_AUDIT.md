@@ -432,3 +432,39 @@ address-looking words are not sufficient evidence of a callable function.
 The next unresolved distinction is whether any original live-game UI consumer
 can legally receive a roster-capable binding table through data. These frontend
 findings do not yet solve the scorebug's mandatory team-name requirement.
+
+
+## SCNE literal and localization expansion follow-up
+
+Further original-executable Ghidra analysis follows the actual SCNE style loader
+0x6A8A8 rather than treating a property string as a script binding. At 0x6AC50 it
+reads property 0x7714781F and hashes its text into runtime style +0xA0/+0xA4.
+Property 0x11FA397C supplies maximum width at +0x60. With flag 0x10, the two
+numeric components of property 0x92F9B3F9 form the odd localization ID at +0xA8.
+These operations do not resolve a roster callback descriptor. Instruction reads
+cross-check the property constants and destination offsets.
+
+The standard draw path 0x9D048 copies the provider string, substitutes that fixed
+ID when flag 0x10 is set, then calls 0x9C1EC and 0x9C360. Text expansion reaches
+0x1224C0 -> 0x1E3374 -> 0x1E1118. The latter distinguishes odd localization IDs
+from even allocated string nodes. Localization lookup 0x1DF2D4 walks registered
+text banks and uses 0x1DF258; it returns a stored string or TEXT_NOT_FOUND.
+No current-team selector is an argument to this lookup.
+
+Allocated-node expansion 0x1E2D70 handles nested strings, localization nodes and
+raw text, then formats a populated argument list with 0x7CC918. That formatter
+parses a decimal argument index, optional signed alignment width and optional
+format suffix. It bounds the index against argument-count +4, fetches 12-byte
+argument rows and invokes the supplied descriptor. It does not resolve an
+arbitrary callback name embedded in a placeholder. Argument construction remains
+the native caller's responsibility, as observed in 0x1E2A8C. Thus adding a
+literal such as {0} or a roster-property name to a SCNE does not itself add the
+missing current-team argument.
+
+These scoped findings reject the inspected localization-template workaround;
+they do not prove every unknown game data format incapable of logic. Ghidra's
+hidden-return and inlined-veneer recovery is imperfect, so exact token opcode
+semantics and all string-node variants are not claimed fully documented.
+No guessed pointers, executable changes or arbitrary function dispatch were
+installed. Mandatory automatic names remain unfinished. The internal candidate
+is unchanged and unpackaged; no testing JB or emulator run was created.

@@ -88,6 +88,14 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# SCNE localization route checked; names still unresolved
+
+Traced SCNE style-property loading and the actual string expansion/formatter.
+Fixed localization IDs and decimal placeholders do not register roster callbacks;
+placeholder arguments are native caller data. Exact functions and evidence limits
+are recorded in SCOREBUG_IFF_ONLY_AUDIT.md. No candidate asset change or package;
+required automatic roster names remain unfinished and the goal remains active.
+
 # Regular HUD routing and layout bindings verified statically
 
 Original normal-game loading resolves GAMEDATA / scorebug_bottombar / SCNE.
@@ -5572,6 +5580,15 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+# SCNE localization research verification
+
+Read-only Ghidra exports completed for style loading, font/string expansion,
+localization-bank lookup, allocated-node expansion and decimal-placeholder
+formatting. Instruction checks confirm style property hashes/destination offsets,
+node-type byte access and localization-bank traversal. No game file or candidate
+was modified. Documentation-only handoff/diff checks pass; prior source test
+results are unchanged and do not verify automatic names or native rendering.
 
 # Regular HUD and LAYT research verification
 

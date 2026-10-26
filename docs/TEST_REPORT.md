@@ -1,3 +1,12 @@
+# SCNE localization research verification
+
+Read-only Ghidra exports completed for style loading, font/string expansion,
+localization-bank lookup, allocated-node expansion and decimal-placeholder
+formatting. Instruction checks confirm style property hashes/destination offsets,
+node-type byte access and localization-bank traversal. No game file or candidate
+was modified. Documentation-only handoff/diff checks pass; prior source test
+results are unchanged and do not verify automatic names or native rendering.
+
 # Regular HUD and LAYT research verification
 
 Original resource IDs were recomputed and matched to vanilla records and the
