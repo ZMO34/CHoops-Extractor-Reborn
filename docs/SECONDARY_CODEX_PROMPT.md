@@ -90,6 +90,11 @@ Embedded source: docs/CURRENT_STATUS.md
 
 # Name-overlay activation probe held after lifecycle cross-check
 
+Follow-up direct-command search distinguishes scorebug visibility commands from
+text assignment and a separate nearby queue. No checked command supplies names
+to fixed HUD fields. The bounded scan does not prove absence of every possible
+route; exact native targets and limits are recorded in DIRECTOR_RESEARCH.md.
+
 The exact no-expiry duration is FLT_MAX, not -1. An internal five-byte Director
 request probe now uses the correct sentinel and school-name component, but it
 cannot be promoted: timed/all-overlay waits count it, and native play-call popups
@@ -5655,6 +5660,12 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 Embedded source: docs/TEST_REPORT.md
 
 # Name-overlay lifecycle verification
+
+Follow-up: inspected 473 consecutive accepted native dispatch rows and direct
+call paths of up to three functions into the HUD address range. Fresh Ghidra
+exports and instruction checks distinguish the visibility-counter commands and
+separate queue from main-name assignment. This scan omits indirect/deeper paths
+and is not proof that no data route exists. No candidate/source code changed.
 
 Fresh Ghidra exports and instruction checks confirm the FLT_MAX countdown
 sentinel, timed/all-active wait predicates, filtered and explicit cancellation,

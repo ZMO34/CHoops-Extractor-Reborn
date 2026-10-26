@@ -1,5 +1,10 @@
 # Name-overlay activation probe held after lifecycle cross-check
 
+Follow-up direct-command search distinguishes scorebug visibility commands from
+text assignment and a separate nearby queue. No checked command supplies names
+to fixed HUD fields. The bounded scan does not prove absence of every possible
+route; exact native targets and limits are recorded in DIRECTOR_RESEARCH.md.
+
 The exact no-expiry duration is FLT_MAX, not -1. An internal five-byte Director
 request probe now uses the correct sentinel and school-name component, but it
 cannot be promoted: timed/all-overlay waits count it, and native play-call popups

@@ -218,3 +218,35 @@ pending-request wrappers, cross-checked against instructions with the documented
 PowerPC/TOC setup. No executable changes or emulator runs. Required persistent
 school names remain unfinished; the probe must not be promoted on structural
 checks alone.
+
+## Direct Director-to-HUD command search
+
+A read-only scan of the native dispatch table found 473 consecutive entries
+with accepted category/descriptor shapes before the first rejected row. This is
+an inspected prefix, not an independently recovered table-length declaration.
+An OPD-based, instruction-aligned direct-branch scan searched paths of at most
+three functions into the nearby HUD address range 0x4EE000..0x4F9000. That address
+range contains several controllers; an address hit is not a scorebug text setter.
+
+Fresh Ghidra exports and instruction checks distinguish the immediate hits:
+
+| Command | Native target | Observed writes/use |
+| --- | --- | --- |
+| 0x39 | 0x4F60A4 | Inserts a numeric item into an eight-entry list at 0x12C7F420, skipping duplicates |
+| 0x41 | 0x4EE47C | Resolves a native team and sets a side-state flag; no string assignment |
+| 0x42 | 0x4EE4F4 | Decrements the nonzero scorebug suppression counter at root +0x0C |
+| 0x43 | 0x4EE520 | Increments that counter, then invokes 0x706BAC |
+| 0x57 | 0x4F65A8 | Populates separate queue state rooted at 0x12C7F3F0 using a resolved object, timer, numeric fields and geometry calculations |
+
+0x4EE1C0 checks the suppression counter at 0x4EE218/0x4EE220. The 0x42/0x43
+pair therefore changes scorebug visibility, not the normal-mode school-name
+provider gate. The separate queue root is also distinct from the fixed main
+text registry at 0x12C7E2A0. Short paths from commands 0x154/0x156 reach that
+separate queue's getters through 0x732B20 / 0x4A77A0 / 0x4A7674; those hits do not
+establish writes to main city/name strings.
+
+None of these checked hits supplies a Director command that assigns a roster
+name to the existing fixed scorebug fields. This is a bounded negative finding:
+indirect dispatch, deeper paths and unclassified data remain outside its scope.
+No commands, counters or visibility flags were modified. A direct HUD setter
+cannot be assumed merely because a dispatch target is near the HUD code.

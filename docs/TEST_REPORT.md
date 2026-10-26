@@ -1,5 +1,11 @@
 # Name-overlay lifecycle verification
 
+Follow-up: inspected 473 consecutive accepted native dispatch rows and direct
+call paths of up to three functions into the HUD address range. Fresh Ghidra
+exports and instruction checks distinguish the visibility-counter commands and
+separate queue from main-name assignment. This scan omits indirect/deeper paths
+and is not proof that no data route exists. No candidate/source code changed.
+
 Fresh Ghidra exports and instruction checks confirm the FLT_MAX countdown
 sentinel, timed/all-active wait predicates, filtered and explicit cancellation,
 and slot reuse by definitions 13/14. Corrected the private probe's earlier -1
