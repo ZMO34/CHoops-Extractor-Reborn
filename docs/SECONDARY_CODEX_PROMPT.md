@@ -88,6 +88,23 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# Required-name impasse after lifecycle and direct-command audit
+
+The full scorebug task remains unfinished. The same required-name blocker has
+persisted through the component, overlay-lifecycle and direct-command follow-ups:
+no verified IFF-controlled binding supplies persistent roster names in ordinary
+gameplay. The checked main callbacks suppress strings; the separate component
+has no safe proven lifetime alongside native waits and popup slot replacement.
+No evidence-backed next mutation is identified. Further progress needs new
+binding/lifecycle evidence, such as a working original-executable IFF name example;
+this is not a proof that every unknown mechanism is impossible.
+
+Keep the original scope and constraints: school names preferred, nicknames allowed,
+no executable/uniform/roster-color changes, and no packaging before names work.
+The internal candidate/component and protected output/builds remain preserved.
+Authored visuals are not native-render verified; permanent counters/ranks and
+completed-test-folder delivery remain unresolved. Research is on draft PR #50.
+
 # Name-overlay activation probe held after lifecycle cross-check
 
 Follow-up direct-command search distinguishes scorebug visibility commands from
@@ -5658,6 +5675,16 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+# Required-name completion audit: not achieved
+
+Revalidated the current candidate manifest, unchanged two-IFF hashes, held request
+probe, normal-mode name gate, native overlay wait predicate and published command
+audit. Names remain absent from the deployable candidate; the probe explicitly
+lacks gameplay/coexistence verification. Static tests do not satisfy that missing
+feature or native appearance. No executable, uniform, roster-color, protected
+build or candidate changes in this audit. Full completion and packaging stay held.
+Handoff/diff checks pass; public source is unchanged from the 178-test result.
 
 # Name-overlay lifecycle verification
 

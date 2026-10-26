@@ -1,3 +1,13 @@
+# Required-name completion audit: not achieved
+
+Revalidated the current candidate manifest, unchanged two-IFF hashes, held request
+probe, normal-mode name gate, native overlay wait predicate and published command
+audit. Names remain absent from the deployable candidate; the probe explicitly
+lacks gameplay/coexistence verification. Static tests do not satisfy that missing
+feature or native appearance. No executable, uniform, roster-color, protected
+build or candidate changes in this audit. Full completion and packaging stay held.
+Handoff/diff checks pass; public source is unchanged from the 178-test result.
+
 # Name-overlay lifecycle verification
 
 Follow-up: inspected 473 consecutive accepted native dispatch rows and direct
