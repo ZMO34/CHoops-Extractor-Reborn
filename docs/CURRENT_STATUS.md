@@ -1,3 +1,13 @@
+# Name-overlay activation probe held after lifecycle cross-check
+
+The exact no-expiry duration is FLT_MAX, not -1. An internal five-byte Director
+request probe now uses the correct sentinel and school-name component, but it
+cannot be promoted: timed/all-overlay waits count it, and native play-call popups
+cancel or replace its slots. Scene animation length does not override native
+exit timing. Original EBOOT and the two-IFF candidate remain unchanged. No package
+or working-name claim; persistent names remain unfinished. Fresh Ghidra and
+instruction evidence is recorded in DIRECTOR_RESEARCH.md.
+
 # Compact school-name SCNE component authored internally
 
 Added independent guarded provider-identity editing and reporting. A private

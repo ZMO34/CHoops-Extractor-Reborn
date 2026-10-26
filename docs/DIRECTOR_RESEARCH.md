@@ -67,7 +67,8 @@ countdown decrement for its sentinel value and can hold the entrance plateau.
 This exposes a genuine data-command route to investigate lifetime, rather than
 an asset-only animation extension. An existing correctly bounded script using
 these commands, its activation phase and cancellation behavior still need tracing.
-No duration, slot, program or command stream has been patched.
+The later internal request probe below changes two proven fields in a separate
+output. No Director override is installed in the deployable candidate.
 
 There are three native overlay slots. A long-lived name overlay must coexist
 with their replacement/cancellation behavior and the game's ordinary popups.
@@ -171,3 +172,49 @@ bounds/type/alias guards, independently of record/owner/bone identities. Three
 new synthetic cases exercise that separation and preservation, malformed/shared
 property refusal and invalid-value/no-op behavior. Focused suite including all
 text-style cases: 178 passed. This is source/format verification, not game output.
+
+## Lifetime and cancellation cross-check: activation probe rejected for promotion
+
+Instruction checks and a fresh Ghidra export establish the exact countdown
+sentinel: constant 0xA52460 has float bits 0x7F7FFFFF, the maximum finite float.
+0x1935F4 compares the remaining duration with this value; unequal values are
+decremented at 0x193664. A negative duration requests cancellation at 0x193678.
+**-1 is a request-initialization default, not the active no-expiry sentinel.**
+An earlier private probe used -1 before this cross-check; it was corrected and
+was never installed, packaged or presented as a working candidate.
+
+| Operation | Instruction-checked behavior | Consequence for a permanent name layer |
+| --- | --- | --- |
+| Timed-overlay wait, command 0x158 | Follow-up 0x199754 calls 0x192904; active instances with remaining duration >= approximately 0.05 are counted | FLT_MAX names keep this wait pending until another path cancels them |
+| All-overlay wait, command 0x159 | Follow-up 0x1997AC calls 0x192958; every active instance is counted | A different countdown value does not exempt a live name layer |
+| Filtered cancellation, 0x192E5C | Checks active state, kind and +0x290; a special kind-2 case also checks +0x26C | Does not protect against explicit slot cancellation or replacement |
+| Play-call popup, 0x7180DC | Cancels slot 0 with 0x192C7C, removes side slot 1/2 with 0x192F7C, then submits its own request | Slot 0 is not a permanent reserved name slot; side slots are also reused |
+| Slot submission, 0x194820 | A selected occupied slot is cleaned up before copying the new request | Choosing another slot alone does not establish coexistence |
+
+The play-call path selects definitions 13/14 (overlay_nba9/overlay_nba10), not
+definitions 5/6 for substitutions. It supplies one team context. Repurposing that
+popup would also require proving the second team's context and preserving the
+original popup behavior; it does not automatically restore two names.
+
+SCNE animation extension does not establish a second lifetime mechanism.
+Cancellation 0x192C7C starts an exit phase using definition timing; 0x196E14 reads
+definition +0x54 and 0x196E48 reads +0x54 plus +0x58. The update eventually cleans
+up the instance. Those timing fields belong to the registered native definition
+table, not the scene's authored animation length. Visibility wrappers 0x1995F0 /
+0x199644 call 0x192BE0 / 0x192BF8; they do not change the wait-counting rules.
+No safe data-owned exemption or independent gameplay name lifetime is proven.
+
+The private probe starts from vanilla Director and the exactly matched group-187
+request. It changes only the four-byte duration operand to FLT_MAX and the
+one-byte definition operand from 4 to 25. Decoded length, complete pointer index
+and all other decoded bytes are exact; the output archive reparses. This is a
+five-byte bounded experiment in a separate local output, not a general DRCT
+writer or a valid gameplay solution. It remains outside the archive candidate.
+Removing global waits, looping the entire pregame event, using nonfinite timer
+values or suppressing normal popup cleanup is not an established solution.
+
+Verification: fresh exports of the wait/countdown/cancellation functions and
+pending-request wrappers, cross-checked against instructions with the documented
+PowerPC/TOC setup. No executable changes or emulator runs. Required persistent
+school names remain unfinished; the probe must not be promoted on structural
+checks alone.

@@ -1,3 +1,18 @@
+# Name-overlay lifecycle verification
+
+Fresh Ghidra exports and instruction checks confirm the FLT_MAX countdown
+sentinel, timed/all-active wait predicates, filtered and explicit cancellation,
+and slot reuse by definitions 13/14. Corrected the private probe's earlier -1
+assumption before any installation. Its five decoded-byte changes, equal length,
+unchanged pointer index/unrelated bytes and archive reparse pass; these checks do
+not make its lifecycle safe. It remains outside the installable candidate.
+
+This is a documentation/research follow-up with no public parser/writer change;
+the prior 178-test result applies to unchanged source. Handoff/diff checks pass.
+No emulator/gameplay test, full JB, executable edit or package was made. Required
+permanent names remain unfinished. See DIRECTOR_RESEARCH.md for the rejected
+promotion and the exact evidence limits.
+
 # SCNE provider identity and held name-component verification
 
 Focused scorebug/Director/text suite: **178 passed**. It now includes all 10

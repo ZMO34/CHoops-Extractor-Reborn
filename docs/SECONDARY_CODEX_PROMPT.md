@@ -88,6 +88,16 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# Name-overlay activation probe held after lifecycle cross-check
+
+The exact no-expiry duration is FLT_MAX, not -1. An internal five-byte Director
+request probe now uses the correct sentinel and school-name component, but it
+cannot be promoted: timed/all-overlay waits count it, and native play-call popups
+cancel or replace its slots. Scene animation length does not override native
+exit timing. Original EBOOT and the two-IFF candidate remain unchanged. No package
+or working-name claim; persistent names remain unfinished. Fresh Ghidra and
+instruction evidence is recorded in DIRECTOR_RESEARCH.md.
+
 # Compact school-name SCNE component authored internally
 
 Added independent guarded provider-identity editing and reporting. A private
@@ -5643,6 +5653,21 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+# Name-overlay lifecycle verification
+
+Fresh Ghidra exports and instruction checks confirm the FLT_MAX countdown
+sentinel, timed/all-active wait predicates, filtered and explicit cancellation,
+and slot reuse by definitions 13/14. Corrected the private probe's earlier -1
+assumption before any installation. Its five decoded-byte changes, equal length,
+unchanged pointer index/unrelated bytes and archive reparse pass; these checks do
+not make its lifecycle safe. It remains outside the installable candidate.
+
+This is a documentation/research follow-up with no public parser/writer change;
+the prior 178-test result applies to unchanged source. Handoff/diff checks pass.
+No emulator/gameplay test, full JB, executable edit or package was made. Required
+permanent names remain unfinished. See DIRECTOR_RESEARCH.md for the rejected
+promotion and the exact evidence limits.
 
 # SCNE provider identity and held name-component verification
 
