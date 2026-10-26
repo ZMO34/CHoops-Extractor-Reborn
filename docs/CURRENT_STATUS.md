@@ -1,3 +1,14 @@
+# Regular HUD routing and layout bindings verified statically
+
+Original normal-game loading resolves GAMEDATA / scorebug_bottombar / SCNE.
+Streetdata's score_bug MRKS is a different resource and is not established as
+active in regular 5-on-5. The candidate already targets the correct gamedata
+scene. LAYT template initialization inherits native caller bindings; copying a
+menu template does not establish its callbacks in the HUD. Teamcompare has
+additional full-name providers, but their HUD activation remains unresolved.
+No new asset changes or package in this research pass; goal remains active.
+See [SCOREBUG_IFF_ONLY_AUDIT.md](SCOREBUG_IFF_ONLY_AUDIT.md).
+
 # Resumed IFF-only work — native-timed monochrome sixth-man strip
 
 Added a guarded meter recolor using the original 19 DiffuseColor animation

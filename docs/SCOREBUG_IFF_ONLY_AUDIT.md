@@ -373,3 +373,62 @@ preflight accepts its exact two IFF bytes. No full JB or package was created.
 Automatic names remain mandatory and unfinished; permanent counters/rank routes
 remain unresolved. The resumed goal remains active with this concrete meter
 implementation progress; the earlier impasse audit is not a completion claim.
+
+## Regular 5-on-5 resource routing confirmation
+
+The normal HUD path at 0x71D998 delegates to 0x4F2818. Its main resource getter
+0x4EE710 calls 0x841810 with namespace 0x3DF16510, record 0x3E691786 and type
+0xE26C9B5D. Those equal CRC32("GAMEDATA"), CRC32("scorebug_bottombar") and
+CRC32("SCNE"); the original gamedata.iff contains that exact record and type.
+This is direct static evidence for the traced regular-game route.
+
+Streetdata's score_bug is a different identity (0x42265DEF), type MRKS. The
+alternate selector 0x718BDC requests scorebug_xenon, scorebug or
+blackjack_score_bug, not that exact streetdata name. No normal 5-on-5 loader
+request for streetdata's MRKS has been established. Its name/rank styles are
+reference material, not proof that ordinary gameplay consumes them. The current
+candidate edits gamedata's real main scorebug; no streetdata override is included.
+This is original-executable analysis, not an emulator capture of live loading.
+
+## LAYT and frontend-binding investigation
+
+Read-only inventory of frontend, frontend_sync, global, gamedata and gamedataextra
+finds 135 LAYT records. Relevant examples include teamcompare, offball_play,
+on_court_players, heat_check, freethrow_meter and team_matchup. Scene nodes refer
+to SCNE/MRKS artwork; template nodes refer to nested LAYT resources. No fields
+were patched on the basis of guessed layout flags.
+
+The native initializer 0x12E4F8 copies binding pointers from its caller's second
+argument into the layout root. Nested-template calls reuse that same argument.
+Consequently, merely nesting teamcompare or teamcard artwork in another layout
+does not select that screen's native binding table. A layout transplant has not
+established an always-visible HUD with its own roster callbacks.
+
+A useful additional provider does exist: teamcompare's text table at 0x12510FC4
+uses descriptor 0xA0CFD0 -> 0x8FBB8. Selectors 6/7 correspond to text_teamaway
+(0xA3583DDB) and text_teamhome (0x74D193DA). Their branch targets 0x8FF50/0x8FFCC
+read the current away/home team through 0x57F064/0x57F050, then wrap team +0 text.
+These fields are absent from the original teamcompare_backdrop SCNE's text rows.
+They are real frontend name providers, but not additions to the main HUD's fixed
+14-row registry, and no normal-HUD activation bridge is installed.
+
+Initializer 0x12E4F8 can also resolve a binding-record +8 ID through 0x12C730.
+Registrar 0x12BE84 hashes a name and stores its descriptor in a global pair table.
+The observed direct registration calls at 0xC2E74 register four callbacks:
+Skin Scene Callback (0xC333C), Skin Scene Callback - Pop When Done (0xC2DB8),
+Registration Text Callback (0xC3174), and Dismiss Text Callback (0xC3258).
+The skin callbacks control scene visibility; none of these inspected handlers
+supplies current-team names. Direct-call enumeration does not prove there are
+no indirect registrations. Scanned type-0 scene nodes in the 135 LAYTs have zero
+serialized lists at +3C/+40/+44/+48; a safe authored name-binding example has not
+been found. Unknown layout/callback fields remain read-only.
+
+Ghidra exports for this work were checked against descriptor entry boundaries.
+An address-like descriptor field that landed inside 0x5DFC28's body was rejected;
+the temporary inferred function was removed from the analysis database. The local
+export helper now refuses to create an undefined entry unless OPD-backed. Raw
+address-looking words are not sufficient evidence of a callable function.
+
+The next unresolved distinction is whether any original live-game UI consumer
+can legally receive a roster-capable binding table through data. These frontend
+findings do not yet solve the scorebug's mandatory team-name requirement.

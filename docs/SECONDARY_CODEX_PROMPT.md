@@ -88,6 +88,17 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# Regular HUD routing and layout bindings verified statically
+
+Original normal-game loading resolves GAMEDATA / scorebug_bottombar / SCNE.
+Streetdata's score_bug MRKS is a different resource and is not established as
+active in regular 5-on-5. The candidate already targets the correct gamedata
+scene. LAYT template initialization inherits native caller bindings; copying a
+menu template does not establish its callbacks in the HUD. Teamcompare has
+additional full-name providers, but their HUD activation remains unresolved.
+No new asset changes or package in this research pass; goal remains active.
+See [SCOREBUG_IFF_ONLY_AUDIT.md](SCOREBUG_IFF_ONLY_AUDIT.md).
+
 # Resumed IFF-only work — native-timed monochrome sixth-man strip
 
 Added a guarded meter recolor using the original 19 DiffuseColor animation
@@ -4541,6 +4552,15 @@ format limits.
 
 Embedded source: docs/SCOREBUG_RESEARCH.md
 
+## Normal-game source confirmation
+
+The traced regular 5-on-5 loader requests GAMEDATA / scorebug_bottombar / SCNE,
+matching the original gamedata.iff record. Streetdata's score_bug MRKS is an
+unconfirmed alternate/reference lead, not a proven normal-game source. The
+current candidate already edits gamedata. LAYT/frontend providers are being
+investigated separately; their existence does not activate names in the HUD.
+See the routing and LAYT evidence in SCOREBUG_IFF_ONLY_AUDIT.md.
+
 ## Current meter implementation follow-up
 
 The internal IFF-only candidate now uses a guarded monochrome sixth-man strip.
@@ -5552,6 +5572,16 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+# Regular HUD and LAYT research verification
+
+Original resource IDs were recomputed and matched to vanilla records and the
+native resource-loader arguments. Read-only inventory covers 135 LAYT records
+in five selected UI/HUD banks. Ghidra and instruction checks trace binding-table
+inheritance, teamcompare name branches and the observed callback registrar.
+Unproven mid-function decompilation was rejected; no game input was changed.
+This is static evidence, not native rendering or an automatic-name test.
+Documentation-only update: handoff/diff checks; prior 152 source tests unchanged.
 
 # Sixth-man animation recolor verification
 

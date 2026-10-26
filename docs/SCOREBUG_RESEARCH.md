@@ -1,3 +1,12 @@
+## Normal-game source confirmation
+
+The traced regular 5-on-5 loader requests GAMEDATA / scorebug_bottombar / SCNE,
+matching the original gamedata.iff record. Streetdata's score_bug MRKS is an
+unconfirmed alternate/reference lead, not a proven normal-game source. The
+current candidate already edits gamedata. LAYT/frontend providers are being
+investigated separately; their existence does not activate names in the HUD.
+See the routing and LAYT evidence in SCOREBUG_IFF_ONLY_AUDIT.md.
+
 ## Current meter implementation follow-up
 
 The internal IFF-only candidate now uses a guarded monochrome sixth-man strip.

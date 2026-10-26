@@ -1,3 +1,13 @@
+# Regular HUD and LAYT research verification
+
+Original resource IDs were recomputed and matched to vanilla records and the
+native resource-loader arguments. Read-only inventory covers 135 LAYT records
+in five selected UI/HUD banks. Ghidra and instruction checks trace binding-table
+inheritance, teamcompare name branches and the observed callback registrar.
+Unproven mid-function decompilation was rejected; no game input was changed.
+This is static evidence, not native rendering or an automatic-name test.
+Documentation-only update: handoff/diff checks; prior 152 source tests unchanged.
+
 # Sixth-man animation recolor verification
 
 Focused scorebug suite: **152 passed** (the prior 143 cases plus nine meter
