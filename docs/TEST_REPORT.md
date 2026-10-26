@@ -1,3 +1,24 @@
+# Sixth-man animation recolor verification
+
+Focused scorebug suite: **152 passed** (the prior 143 cases plus nine meter
+cases). New module/test Ruff E/F/I, handoff generation and diff checks pass.
+
+New cases: `python -m pytest tests/test_scorebug_meter.py -q -p no:cacheprovider`.
+The full focused invocation also includes test_scorebug_mrks, pose, localization,
+text_dependencies, winding, context_provider, footer_provider, main_text_draw and
+main_text_setup. Historical native harnesses use stubs and do not certify the
+failed executable variants or actual graphics rendering.
+
+Nine new synthetic cases cover unequal RGB boundaries, sampling before/at/after
+keys, exact preservation outside curve pointers, source immutability, and refusal
+of unknown flags, looping, nonconstant cubic terms, altered alpha, invalid times,
+missing material links and truncation. Real candidate: all 19 native material
+links match; curves reparse and preserve clamped peak brightness at every union
+boundary and interval midpoint. Vertex/index bytes remain exact. Bone rests are
+identity; all animations bind colors, supporting the static strip bounds.
+The regenerated candidate passes source-bound exact-byte two-IFF preflight.
+No emulator, full JB or package. Gameplay/text/name visibility remains unverified.
+
 # Controller/literal research evidence
 
 Additional targeted Ghidra exports complete for HUD lifecycle/support helpers,

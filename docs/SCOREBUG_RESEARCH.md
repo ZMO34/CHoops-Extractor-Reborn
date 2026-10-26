@@ -1,3 +1,13 @@
+## Current meter implementation follow-up
+
+The internal IFF-only candidate now uses a guarded monochrome sixth-man strip.
+The original 19 material animation bindings and brightness/pulse timing remain;
+only RGB curve arrays are redirected to authored grayscale data. The actual
+identity rest bones and color-only tracks support static inside-cell bounds.
+Source-bound two-IFF preflight passes; native appearance remains unverified.
+Automatic team names are still required and unresolved, so no package is made.
+See the resumed selector/meter section in SCOREBUG_IFF_ONLY_AUDIT.md.
+
 ## Current IFF-only scope supersedes executable test guidance
 
 The reported pregame crash supersedes v10/v11/v12 deployment guidance. The owner

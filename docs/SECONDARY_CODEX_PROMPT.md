@@ -88,6 +88,20 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# Resumed IFF-only work — native-timed monochrome sixth-man strip
+
+Added a guarded meter recolor using the original 19 DiffuseColor animation
+bindings. Appended grayscale curves preserve native peak-brightness steps,
+alpha, activation and fill/pulse timing; vertices and other source bytes stay
+unchanged outside 19 curve-pointer fields. Regenerated the internal candidate;
+exact two-IFF source-bound preflight passes. Static affine placement stays
+inside the intended team cells. Native appearance remains unverified.
+
+Selector provenance now shows coupled native match-mode setup, with no cosmetic
+IFF switch established. Automatic roster names are still required and unfinished;
+no package, executable, uniform or roster-color change. The resumed goal remains
+active. Details: [SCOREBUG_IFF_ONLY_AUDIT.md](SCOREBUG_IFF_ONLY_AUDIT.md).
+
 # IFF-only scorebug — required name bridge remains an impasse
 
 The restored Ghidra investigation now covers controller string consumers,
@@ -4527,6 +4541,16 @@ format limits.
 
 Embedded source: docs/SCOREBUG_RESEARCH.md
 
+## Current meter implementation follow-up
+
+The internal IFF-only candidate now uses a guarded monochrome sixth-man strip.
+The original 19 material animation bindings and brightness/pulse timing remain;
+only RGB curve arrays are redirected to authored grayscale data. The actual
+identity rest bones and color-only tracks support static inside-cell bounds.
+Source-bound two-IFF preflight passes; native appearance remains unverified.
+Automatic team names are still required and unresolved, so no package is made.
+See the resumed selector/meter section in SCOREBUG_IFF_ONLY_AUDIT.md.
+
 ## Current IFF-only scope supersedes executable test guidance
 
 The reported pregame crash supersedes v10/v11/v12 deployment guidance. The owner
@@ -5528,6 +5552,27 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+# Sixth-man animation recolor verification
+
+Focused scorebug suite: **152 passed** (the prior 143 cases plus nine meter
+cases). New module/test Ruff E/F/I, handoff generation and diff checks pass.
+
+New cases: `python -m pytest tests/test_scorebug_meter.py -q -p no:cacheprovider`.
+The full focused invocation also includes test_scorebug_mrks, pose, localization,
+text_dependencies, winding, context_provider, footer_provider, main_text_draw and
+main_text_setup. Historical native harnesses use stubs and do not certify the
+failed executable variants or actual graphics rendering.
+
+Nine new synthetic cases cover unequal RGB boundaries, sampling before/at/after
+keys, exact preservation outside curve pointers, source immutability, and refusal
+of unknown flags, looping, nonconstant cubic terms, altered alpha, invalid times,
+missing material links and truncation. Real candidate: all 19 native material
+links match; curves reparse and preserve clamped peak brightness at every union
+boundary and interval midpoint. Vertex/index bytes remain exact. Bone rests are
+identity; all animations bind colors, supporting the static strip bounds.
+The regenerated candidate passes source-bound exact-byte two-IFF preflight.
+No emulator, full JB or package. Gameplay/text/name visibility remains unverified.
 
 # Controller/literal research evidence
 

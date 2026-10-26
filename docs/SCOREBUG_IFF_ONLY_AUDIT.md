@@ -102,8 +102,8 @@ The meter's native side offsets remain -185/-337, with Y -153. Authored instance
 X scale is 206/152, translation is `-11 - scale*(-185+80)`, local center 80,
 width `100/scale`, and Y bounds [-40.5,-38.5]. Predicted final spans are
 home [-61,39], away [-267,-167], Y [-193.5,-191.5], inside their name cells.
-These predictions require native validation. Activation, runtime colors and all
-19 segment draws remain native. The floating sixth-man header is disabled.
+These predictions require native validation. Activation and all 19 segment
+draws remain native; the later meter recolor below replaces only RGB curves. The floating sixth-man header is disabled.
 
 ## Literal and popup formatting
 
@@ -325,3 +325,51 @@ original-executable IFF example that renders current-team names, or new native
 resource/controller evidence showing such a bridge, would provide a concrete
 next step. The streetdata example has now been inspected; its styles alone do
 not provide that evidence. Candidate packaging remains held.
+
+## Resumed selector provenance and sixth-man implementation
+
+Ghidra references identify two direct observed writes to match-state +0x138:
+0x2B0304 clears it during 0x2B02B8 teardown, and 0x2B0788 sets it during
+0x2B06B4 initialization. The setter also changes +D0/+D8, +19C, +1A0, +1A4,
++1A8, +21C/+220/+224 and selects records from native table 0x1256CEC0.
+Those records include side/player-count data and coordinate arrays. Native
+0x5D63A0 calls it and then 0x5D5DEC; 0x65C9C0 also sets the other alternate
+predicate through 0x2B177C. These are coupled match-mode setup paths, not an
+established cosmetic IFF selector. No mode flag was changed.
+
+The normal name gate's +2C source has observed writes in 0x5CC898 (2),
+0x5CC8F0 (0) and 0x5CE15C (1). The last also resets and constructs per-team
+state. Its exact phase meaning is not asserted here. This trace does not prove
+an IFF-owned switch or authorize modifying saves/gameplay to force names.
+
+The sixth-man strip now has a concrete IFF-only reskin. All 19 material
+DiffuseColor animation references resolve uniquely to the 19 animation IDs.
+Native 0x82E3B0 selects four channels from flags 0x00F0088F: RGB use scalar
+curves and alpha is constant. 0x82E194 samples N cubic intervals with N+1 time
+boundaries. Every observed RGB interval has zero cubic/quadratic/linear terms;
+its fourth coefficient is the held value. This is a color track, not a bone
+translation. The implementation refuses nonconstant curves, looped/unknown
+layouts, nonfinite values, mismatched bindings or different alpha.
+
+`choops_py.modding.scorebug_meter.reskin_meter` appends aligned monochrome
+RGB curves using the union of the original channel boundaries and the clamped
+maximum native RGB value at each interval. This preserves the visible peak
+brightness/fill/pulse steps while replacing green/red color changes with white
+and dark states. Alpha, output buffers, shader/material bindings, activation,
+thresholds and native timing arguments are retained. Only the 19 curve-array
+pointers change in the original header extent; every other original byte and
+the complete vertex/index part remain exact. The real candidate adds 6,048
+header bytes before archive recompression. No new callbacks or executable edits.
+
+Ghidra 0x76A714 resets poses, samples these color animations, applies side offsets
+and composes with the instance through 0x829D40/0x7F8D08. The candidate's 21 bone
+rest transforms are identity and its 19 animations bind only color. The authored
+vertex/owner transform plus native offsets gives home X about [-61,39], away
+[-267,-167], Y [-193.5,-191.5]; color changes cannot move those vertices. This
+strengthens the static placement evidence, but is not GPU/gameplay verification.
+
+The private vanilla-based candidate was regenerated and source-bound editor
+preflight accepts its exact two IFF bytes. No full JB or package was created.
+Automatic names remain mandatory and unfinished; permanent counters/rank routes
+remain unresolved. The resumed goal remains active with this concrete meter
+implementation progress; the earlier impasse audit is not a completion claim.

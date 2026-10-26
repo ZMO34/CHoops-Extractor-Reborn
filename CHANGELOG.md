@@ -1,3 +1,9 @@
+# Unreleased — native-timed sixth-man meter reskin
+
+- Add a guarded IFF-only monochrome meter recolor while preserving native fill/pulse brightness timing and alpha.
+- Validate original material/animation bindings and retain unrelated header and vertex bytes.
+- Trace alternate-HUD selector provenance; automatic team names remain unresolved and packaging is held.
+
 # Unreleased — MRKS text evidence
 
 - Add bounded read-only inspection of embedded scorebug MRKS styles and hash identities.

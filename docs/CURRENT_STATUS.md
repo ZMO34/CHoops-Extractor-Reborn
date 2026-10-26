@@ -1,3 +1,17 @@
+# Resumed IFF-only work — native-timed monochrome sixth-man strip
+
+Added a guarded meter recolor using the original 19 DiffuseColor animation
+bindings. Appended grayscale curves preserve native peak-brightness steps,
+alpha, activation and fill/pulse timing; vertices and other source bytes stay
+unchanged outside 19 curve-pointer fields. Regenerated the internal candidate;
+exact two-IFF source-bound preflight passes. Static affine placement stays
+inside the intended team cells. Native appearance remains unverified.
+
+Selector provenance now shows coupled native match-mode setup, with no cosmetic
+IFF switch established. Automatic roster names are still required and unfinished;
+no package, executable, uniform or roster-color change. The resumed goal remains
+active. Details: [SCOREBUG_IFF_ONLY_AUDIT.md](SCOREBUG_IFF_ONLY_AUDIT.md).
+
 # IFF-only scorebug — required name bridge remains an impasse
 
 The restored Ghidra investigation now covers controller string consumers,
