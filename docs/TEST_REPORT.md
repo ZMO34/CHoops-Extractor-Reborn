@@ -1079,3 +1079,12 @@ countdown and the comparison gate. The Director unit suite passes 24 tests;
 handoff consistency and diff whitespace checks pass. These are static checks,
 not gameplay verification. No IFF candidate, EBOOT, roster or game build changed.
 
+# Alternate team-name renderer research follow-up
+
+Fresh Ghidra exports cover five shared-renderer callers and their underlying
+text/alternate-HUD paths. Instructions independently confirm 0x1DD618 ->
+0x1DD3AC, 0x1DD428 -> 0x1E0EA4, 0x1DD6F8 -> 0x1DCC90 and the normal-branch
+0x71BF54 -> 0x4F442C. Director unit tests and handoff consistency checks pass;
+these are static checks rather than a gameplay test. The original ELF and game
+assets remain unchanged.
+

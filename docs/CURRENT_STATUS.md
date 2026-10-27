@@ -1,3 +1,15 @@
+# Team-name alternate renderer follow-up
+
+Fresh Ghidra tracing checked five apparent alternate team/text/draw graph
+intersections. They share 0x1DD578, which accepts a caller-supplied caption and
+uses a separate progress presentation; a graph connection to team getters does
+not prove those captions are school names or that this presentation is active
+throughout gameplay. Rechecked alternate HUD 0x71BE3C: under its ordinary
+documented branch it delegates to regular HUD 0x4F442C, so copying alternate
+styles does not select its distinct name callbacks. A safe IFF-only activation
+bridge remains unproven. No game asset, EBOOT, roster or existing build changed.
+See SCOREBUG_EXECUTABLE_ROUTES.md for conditions and limitations.
+
 # Team-name overlay slot follow-up
 
 The stock generic-overlay reset initializes its requested slot to 0. The checked

@@ -430,6 +430,38 @@ or runtime-visibility claim is made.
 
 ## Other whole-image leads
 
+### Follow-up: shared rendering ancestry is not a name binding
+
+The whole-image graph produced several additional apparent intersections between
+home/away team getters, text construction and 0x9D048: 0x5A64A0, 0x5AD990,
+0x5D1138, 0x5D1664 and 0x65EF40. Fresh Ghidra exports show that each calls the
+shared 0x1DD578 presentation routine. At 0x1DD618 that routine passes its
+caller-supplied first argument to 0x1DD3AC; the latter copies that supplied text
+into its own ring at 0x1DD428. 0x1DD578 later invokes 0x1DCC90 at 0x1DD6F8.
+Those graph intersections do not establish that the caller-supplied text is a
+school name, nor that this owner runs as a persistent gameplay scorebug layer.
+The 0x5D1664 caller builds labels inside a bounded multi-stage operation and calls
+0x5CC974; 0x5D1138 includes an input-checked loop through the same progress path.
+These are useful leads for their own presentations, not an IFF-only bridge from
+the two teams to two permanent scorebug labels.
+
+We also rechecked the alternate-HUD draw entry 0x71BE3C. In the normal branch,
+when global +0x138 is zero, its context helper returns zero, the mode is outside
+the special cases and global +0x1AC is zero, 0x71BF54 calls the regular HUD draw
+0x4F442C. The alternate name registry is consequently not activated by copying
+its styles into the regular scene in that branch. The native resource selector
+0x718BDC chooses blackjack_score_bug when its helper says so, scorebug for modes
+7/8, and scorebug_xenon otherwise. A gameplay-safe IFF switch to that alternate
+controller remains unestablished. Context helpers and indirect calls limit the
+scope of these conclusions; they do not rule out an unknown alternative path.
+
+These checks use the read-only original ELF and the existing PowerPC big-endian
+Ghidra project with descriptor-specific TOCs. Exports for the five callers,
+0x1DD578, 0x1DD3AC, 0x1DCC90, 0x71BE3C, 0x71D1F8 and 0x718BDC were refreshed.
+The graph is a lead finder, not proof that all edges execute in the same frame.
+No scene, EBOOT, roster or uniform asset is changed, and no name layer is claimed
+to work in gameplay.
+
 | Route | Checked evidence | Remaining limit |
 | --- | --- | --- |
 | Separate player-card renderer | 0x1A59C -> 0x217B10 -> 0x217540; reads current team +0 school text and +0x0C nickname, draws through 0x214FD0 -> 0x9D048 | Root 0x12A863B0 selects one team from a supplied player's side; state 2, time handling and source object govern display |

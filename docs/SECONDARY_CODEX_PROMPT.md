@@ -88,6 +88,18 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# Team-name alternate renderer follow-up
+
+Fresh Ghidra tracing checked five apparent alternate team/text/draw graph
+intersections. They share 0x1DD578, which accepts a caller-supplied caption and
+uses a separate progress presentation; a graph connection to team getters does
+not prove those captions are school names or that this presentation is active
+throughout gameplay. Rechecked alternate HUD 0x71BE3C: under its ordinary
+documented branch it delegates to regular HUD 0x4F442C, so copying alternate
+styles does not select its distinct name callbacks. A safe IFF-only activation
+bridge remains unproven. No game asset, EBOOT, roster or existing build changed.
+See SCOREBUG_EXECUTABLE_ROUTES.md for conditions and limitations.
+
 # Team-name overlay slot follow-up
 
 The stock generic-overlay reset initializes its requested slot to 0. The checked
@@ -6899,3 +6911,12 @@ pass. Fresh Ghidra exports cover reset, submission, cancellation, allocation,
 countdown and the comparison gate. The Director unit suite passes 24 tests;
 handoff consistency and diff whitespace checks pass. These are static checks,
 not gameplay verification. No IFF candidate, EBOOT, roster or game build changed.
+
+# Alternate team-name renderer research follow-up
+
+Fresh Ghidra exports cover five shared-renderer callers and their underlying
+text/alternate-HUD paths. Instructions independently confirm 0x1DD618 ->
+0x1DD3AC, 0x1DD428 -> 0x1E0EA4, 0x1DD6F8 -> 0x1DCC90 and the normal-branch
+0x71BF54 -> 0x4F442C. Director unit tests and handoff consistency checks pass;
+these are static checks rather than a gameplay test. The original ELF and game
+assets remain unchanged.
