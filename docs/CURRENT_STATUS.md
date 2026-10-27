@@ -1,3 +1,18 @@
+# Team-name overlay slot follow-up
+
+The stock generic-overlay reset initializes its requested slot to 0. The checked
+startup lineup request does not override that slot, while ten bounded group-16
+substitution request leads explicitly select slot 1 (home) or slot 2 (away).
+Submission first asks the native cancellation routine to clear the selected slot,
+then submits the new request. This corrects the earlier broad assumption that
+substitution requests use the default slot; they do not. Neither selecting slot 0
+nor either side slot establishes permanent safe names: existing lineup, other
+overlay requests and playcall cancellation can use these slots, and global waits
+count active instances. A read-only audit checks eight native instructions and
+the eleven bounded request sequences. Ghidra exports cover reset, submission,
+cancellation and slot allocation. No name component is installed; no EBOOT,
+roster, uniform, protected build or gameplay changes. See DIRECTOR_RESEARCH.md.
+
 # Team-name provider correction and held short-school component
 
 The owner narrowed the current investigation to team names. Fresh Ghidra,

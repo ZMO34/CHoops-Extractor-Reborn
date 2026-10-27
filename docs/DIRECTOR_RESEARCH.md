@@ -97,6 +97,35 @@ with their replacement/cancellation behavior and the game's ordinary popups.
 The presence of a duration setter alone does not establish that coexistence.
 The regular scorebug still uses its separate fixed-provider registry.
 
+### Slot selection follow-up
+
+Ghidra and instruction checks refine the conflict: 0x1993C0 resets the pending
+request via 0x194568 -> 0x19546C, whose 0x1954AC stores zero at request +0.
+Command 0x16D writes the requested slot there (0x199710). The original group-187
+starting-lineup transaction has no 0x16D, so it uses slot 0. Ten bounded group-16
+substitution leads explicitly use 0x16D: five definition-5 home requests choose
+slot 1, and five definition-6 away requests choose slot 2. Their decoded streams
+terminate cleanly; the group-wide scan is still a lead generator, not a proof of
+all game events or invocation timing.
+
+On a valid pending submission, 0x199510 calls 0x192C7C for the selected slot
+before 0x194820. Depending on its current state, 0x192C7C begins cancellation or
+cleans an occupant. The latter can also clean an occupied slot while installing
+the replacement. Therefore the checked substitution requests threaten names in
+slots 1/2, not the default slot 0. Slot 0 is still not established as a safe
+permanent home: the checked lineup request uses it, direct playcall paths cancel
+it, and the global waits described below include active slots. A request with
+slot -1 scans for a free slot or a replaceable slot and can fail if none is
+available; it is not an independent fourth layer. These are native lifecycle
+observations, not a claim that any held name scene renders during gameplay.
+
+The read-only local audit asserts eight instruction shapes, both relevant TOC
+pointer values, all ten complete substitution lead sequences, and the previously
+validated lineup transaction. Ghidra exports for 0x19546C, 0x199510, 0x192C7C,
+0x194820, 0x193448 and 0x4EE374 were refreshed in the local analysis project.
+The original PS3 ELF remains read-only; PPC64 big-endian descriptor TOCs remain
+0xA54AC8 / 0xA64A94. No executable or game asset is edited by this audit.
+
 ## Corrected generic name, city and nickname providers
 
 In the generic overlay registry, team1city / team2city bind to descriptor

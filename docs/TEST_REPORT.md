@@ -1070,3 +1070,12 @@ optional native DLL when it is absent. Historical per-release detail is in
 The Windows package requires startup, CLI, audio round trip, lazy SDAT dependency
 checks, ZIP integrity and checksum verification. No RPCS3/gameplay, real/testing
 JB, EBOOT writes or copyrighted assets in Git. See [testing policy](TESTING.md).
+# Name overlay slot research follow-up
+
+Read-only local audit: eight native instruction assertions, two TOC pointers,
+ten bounded substitution lead sequences and the checked startup lineup sequence
+pass. Fresh Ghidra exports cover reset, submission, cancellation, allocation,
+countdown and the comparison gate. The Director unit suite passes 24 tests;
+handoff consistency and diff whitespace checks pass. These are static checks,
+not gameplay verification. No IFF candidate, EBOOT, roster or game build changed.
+
