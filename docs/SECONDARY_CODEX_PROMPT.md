@@ -94,11 +94,25 @@ Owner requested a broader read-only executable search. Indexed 39,100 recovered
 functions and whole-image branches/descriptors/TOC references. New instruction-
 checked lead: ungated home/away school-name getters 50D350/50D3D0 feed the actual
 scorebug message formatter; Director command 3D reaches its separate four-channel
-queue. A six-bone comparison-name component is authored internally, outside the
-candidate. Lifetime, channel-3 priority over player-stat channel 2 and preservation
-of native popups must be resolved before promotion. No executable/asset-candidate
-change or package. See SCOREBUG_EXECUTABLE_ROUTES.md for scope, evidence, other
-renderer/menu/arena leads and limits. Required names remain unfinished.
+queue. A six-bone comparison-name component and a guarded startup-request probe
+are authored internally, outside the candidate. The latter retains the original
+transaction and archive physical extent; only one record reference redirects to
+a 40-byte appended copy containing the added request. Private combined checks:
+37 passed.
+
+Confirmed priority 3 > 2 > 1: persistent comparison names would also hide injuries,
+not only player-stat messages. Independently checked ten complete injury scripts,
+their following actions, a matching generic-overlay player selector (166=3,
+different from 3D=10), and subtitle setter 15F. This is a separate finite-popup
+lead; no injury scene, literal-table extension or activation installed. Also
+traced comparison selector 11 to fouls and 23 to the live timeout getter; current-
+period foul/reset semantics and combined counters remain unverified. Lifetime,
+popup coexistence and native appearance must be resolved before promotion.
+
+No executable/asset-candidate change or package. See SCOREBUG_EXECUTABLE_ROUTES.md
+for scope, evidence, other renderer/menu/arena leads and limits. Required names
+remain unfinished. The prior impasse below is historical and superseded by these
+new concrete leads, not a current claim that no next investigation exists.
 
 # Previous required-name impasse before the expanded search
 
@@ -5699,10 +5713,24 @@ A narrow existing group-44 request, arguments, termination and padding reparse.
 
 Held comparison-name component: six owner bones, all marker hashes resolved,
 source zero-animation count and vertex attributes exact; localization IDs/extents and
-unrelated bytes exact. Private contract/template suite: 21 passed. Analysis ELF
-and current candidate hashes unchanged. Handoff/diff checks pass. No public source
-change; prior 178-test result applies to unchanged code. Channel priority and
-native appearance remain unverified; no installation, package or EBOOT change.
+unrelated bytes exact. Private contract/template suite: 21 passed. Scoped Director
+container suite: 16 passed; combined run: **37 passed**. Covers preserved source
+bytes/header/program, one redirected group pointer, compressed/uncompressed
+reparse, EOF-clipped backreference extension, capacity/unknown-layout refusal and
+continued rejection by the public generic growth writer. The private real-input
+startup probe reparses within the original physical extent; it remains uninstalled.
+
+Read-only injury audit independently verifies ten complete group-127 transactions,
+including following 1F/29 actions, termination/padding and same-player selector
+mapping. No injury program changed. Checked constant propagation of the native
+straight-line initializer recovers 24 comparison captions; selected foul/timeout
+accessors were instruction-checked. Fresh Ghidra exports plus selected actor
+switch edges support these routes; decompiler switch recovery remains incomplete.
+
+Analysis ELF and current candidate hashes unchanged. No public source change;
+prior 178-test result applies to unchanged code. Confirmed priority 3 > 2 > 1 is
+a coexistence conflict, not a verified fix. Native appearance/lifetime remain
+unverified; no installation, package or EBOOT change.
 See SCOREBUG_EXECUTABLE_ROUTES.md.
 
 # Previous required-name completion audit: not achieved

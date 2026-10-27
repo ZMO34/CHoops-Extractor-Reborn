@@ -4,11 +4,25 @@ Owner requested a broader read-only executable search. Indexed 39,100 recovered
 functions and whole-image branches/descriptors/TOC references. New instruction-
 checked lead: ungated home/away school-name getters 50D350/50D3D0 feed the actual
 scorebug message formatter; Director command 3D reaches its separate four-channel
-queue. A six-bone comparison-name component is authored internally, outside the
-candidate. Lifetime, channel-3 priority over player-stat channel 2 and preservation
-of native popups must be resolved before promotion. No executable/asset-candidate
-change or package. See SCOREBUG_EXECUTABLE_ROUTES.md for scope, evidence, other
-renderer/menu/arena leads and limits. Required names remain unfinished.
+queue. A six-bone comparison-name component and a guarded startup-request probe
+are authored internally, outside the candidate. The latter retains the original
+transaction and archive physical extent; only one record reference redirects to
+a 40-byte appended copy containing the added request. Private combined checks:
+37 passed.
+
+Confirmed priority 3 > 2 > 1: persistent comparison names would also hide injuries,
+not only player-stat messages. Independently checked ten complete injury scripts,
+their following actions, a matching generic-overlay player selector (166=3,
+different from 3D=10), and subtitle setter 15F. This is a separate finite-popup
+lead; no injury scene, literal-table extension or activation installed. Also
+traced comparison selector 11 to fouls and 23 to the live timeout getter; current-
+period foul/reset semantics and combined counters remain unverified. Lifetime,
+popup coexistence and native appearance must be resolved before promotion.
+
+No executable/asset-candidate change or package. See SCOREBUG_EXECUTABLE_ROUTES.md
+for scope, evidence, other renderer/menu/arena leads and limits. Required names
+remain unfinished. The prior impasse below is historical and superseded by these
+new concrete leads, not a current claim that no next investigation exists.
 
 # Previous required-name impasse before the expanded search
 

@@ -59,6 +59,7 @@ unrecovered switch. Instruction checks, not decompileCompleted, support the clai
 | 0x15B | 1 | 0x199510 | Submit pending request through 0x194820 |
 | 0x15C | 1 | 0x1997F0 | Invoke overlay cancellation filter 0x192E5C |
 | 0x15D | 1 | 0x199850 | Invoke all-slot reset 0x1930A4 |
+| 0x15F | 0 | 0x199F64 | Set subtitle at pending request +0x54 from a two-byte literal-table index |
 | 0x163 | 2 | 0x1996F8 | Write pending request duration |
 | 0x166 | 4 | 0x199400 | Resolve and append typed player/team context |
 | 0x16D | 4 | 0x199710 | Write selected overlay slot |

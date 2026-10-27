@@ -1,3 +1,9 @@
+# Unreleased — expanded scorebug executable research
+
+- Trace ungated school-name comparison getters, Director queue activation and live foul/timeout values.
+- Validate a held startup-request probe; document injury/player-stat priority conflicts and a separate injury-overlay lead.
+- Keep executable, candidate and protected builds unchanged; native names and packaging remain unfinished.
+
 # Unreleased — separate SCNE provider identity
 
 - Report and edit the generic-overlay provider property independently of text-record names.

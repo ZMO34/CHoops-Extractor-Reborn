@@ -91,6 +91,37 @@ activation phase of event 44 remains unproven. The example proves the command
 boundary/argument form, not permission to repurpose that event or a persistent
 name implementation. No Director mutation for this new route is installed.
 
+The verified argument order is message ID, statistic selector, actor selector,
+repeat count, statistic period/context, duration seconds, an unresolved native
+presentation subtype, and an unresolved flag. Actor selectors at most 100 use
+0x56509C; larger selectors use 0x564D28. Do not interchange these selectors with
+generic overlay command 0x166's different context namespace.
+
+### Internal startup-request probe
+
+A separate, uninstalled probe copies group 187's verified starting-lineup
+transaction, retaining its 12-byte scheduler header, wait/reset, away/home
+contexts, original five-second duration, definition 4, submission and termination.
+It appends 0x3D with arguments [37,23,108,255,0,255,0,0] before the terminator.
+The old transaction remains intact; only one group record reference redirects
+to the appended copy. Leading references, literal indices, token map, other
+groups and every unrelated original byte remain exact. The decoded resource
+grows by 40 bytes. This is a finite nominal 65,025-second request, not proof of
+uninterrupted display, event-phase ownership or surviving every scene transition.
+
+The public writer still rejects generic DRCT growth. A private, narrowly guarded
+container experiment accepts only this copied transaction, one redirected pointer
+and the known request shape in a sole DRCT block at logical offset zero. It
+retains the source's physical archive extent and reparses the exact new resource.
+It does not expose an arbitrary script writer or relocate unknown resource types.
+Recompression retains verified prefix tokens and appends literals; a formerly
+EOF-clipped backreference must be shortened/re-encoded before appending data.
+The generic greedy recompressor did not fit this source's physical capacity.
+Synthetic refusal/round-trip/EOF regression tests cover the scoped alternative.
+
+The archive and decoded probe remain private research outputs, separate from
+the two-IFF candidate. They are neither an installation nor a packaged candidate.
+
 ### Lifetime and coexistence still need resolution
 
 The message system has four channels, distinct from the three generic overlay
@@ -99,10 +130,12 @@ conditions permit, resets duration on expiry, decrements its repeat count and
 advances/removes entries. Larger finite duration/repeat requests are a lead to
 investigate; an uninterrupted lifetime is not proved by the integer fields.
 
-There is a concrete conflict: 0x509C54 prefers a nonempty channel 3 over channel 2.
+There is a concrete conflict: 0x509C54 prefers a nonempty channel 3 over channel 2,
+then falls back to channel 1.
 Messages 5..36 in the inspected table use channel 2, while 37/38 use channel 3.
-Keeping a comparison permanently selected can therefore hide ordinary player
-stat messages. That must be resolved before promotion. Generic overlay wait
+Injury message IDs 64..76 use channel 1, and run report 77 also uses channel 1.
+Keeping a comparison permanently selected can therefore hide both ordinary player
+stat messages and injuries. That must be resolved before promotion. Generic overlay wait
 counting is a different subsystem, but its absence here does not prove that no
 other wait, reset or scene transition affects message display.
 
@@ -110,6 +143,62 @@ The next investigation is the message channel's activation, reset, arbitration
 and script-trigger ownership, plus preserving the requested statistic popups.
 The eight-byte command and six-bone component provide a narrower concrete lead
 than repeatedly extending the generic overlay timer.
+
+### Injury coexistence: another data-driven route to investigate
+
+Ten complete group-127 injury transactions have now been independently decoded
+through their termination and zero padding using instruction-verified operand
+widths. Each retains the native prefix commands 18B/18C/181, four 17C commands
+and 18F; then requests 3D with actor 10, one repeat and six seconds. There are
+also **1F and 29 commands after the injury request**. A replacement that assumes
+the request is the transaction's last action would discard native behavior.
+IDs 72/75/76 were not located by this bounded check; that is not proof that the
+other injuries lack triggers. The broader provisional scanner is still incomplete.
+
+A possible separate finite overlay can retain the injured player and expose a
+subtitle without occupying comparison channel 3:
+
+| Required part | Instruction-checked route |
+| --- | --- |
+| Current injury actor | 3D actor 10 -> 0x565388 -> 0x49EEE4 -> 0x2E6248 |
+| Same actor for generic overlays | 166 selector **3** -> 0x713030 -> the same accessor |
+| Shared event context | 0x3F8020 reads running program +0x1C; 0x5B238 returns program +0x10 and 0x712EF4 reads its +0x0C |
+| Generic subtitle provider | Registry row 0x953F54 -> descriptor 0xA41768 -> 0x71073C, active instance +0x54 |
+| Subtitle setter | Command **15F**, 0x199F64, pending field 0x12948E38 = request +0x54 |
+| Literal operand | Category 0 -> 0x5AA08 -> two-byte literal index via 0x5A7E8 |
+
+Command 15E writes a different field; copying actor 10 into command 166 would
+also select a different player accessor. These distinctions are important when
+preserving context. Existing generic scenes have player-name/subtitle bindings,
+but a compact alternate injury scene, literal-table extension and activation
+have not been installed or verified. No injury transaction was changed in this
+audit. Player-stat channel 2 still needs its own coexistence solution.
+
+### Additional live statistic routes
+
+The school-name comparison also has a genuine native value argument. A checked
+straight-line initializer at 0x50AAD0..0x50B1E4 supplies 24 caption entries;
+constant propagation of its actual loads/stores agrees with selected Ghidra
+exports and the vanilla localization. The 12-byte statistic mapping is at
+0x125A3668. Useful entries include:
+
+| Comparison selector | Native statistic code for game contexts | Interpretation supported by the route |
+| --- | --- | --- |
+| 11 | 15 | Foul statistic; team accessor descriptor 0xA13788 -> 0x1624D8 |
+| 23 | 72 | Timeouts; descriptor 0xA1B850 -> 0x229468 reads the selected side's live timeout object |
+
+0x50D25C / 0x50D208 force the current home/away team before 0x50CE38 formats
+the value. Period/context 0 passes period 0 to the native stat accessor;
+context 5 obtains the current native period selector from 0x12C18CA0 +0x14.
+This is a useful lead for current-period foul totals, not yet proof that every
+half/overtime reset matches the desired bonus rules. The timeout getter itself
+does not consume a period argument. Selector 13 is turnovers, **not timeouts**.
+
+The original side template can carry both school name and this one value. The
+held name-only component deliberately omits that value. A single comparison
+request does not supply simultaneous independent foul, timeout, rank and bonus
+fields; no completed combined permanent row is claimed. Priority, projection,
+text sizing and native display still require resolution.
 
 ## Held comparison-name component
 
@@ -145,8 +234,15 @@ or runtime-visibility claim is made.
 
 The private component reparses, marker/pose bounds and animation-count checks pass;
 unrelated localization/vertex bytes remain preserved. The existing private
-scene-contract/comparison-template suite passes **21 tests**. Public source is
-unchanged from the prior 178-test result. Native helpers are not gameplay tests.
+scene-contract/comparison-template suite passes **21 tests**. The scoped private
+Director container suite passes **16 tests**; combined run: **37 passed**. The
+read-only injury audit checks ten full transactions, and the caption initializer
+inventory checks all 24 caption entries. Fresh Ghidra exports cover actor,
+subtitle and statistic routes. Added 100/38 instruction-verified actor-switch
+edges to the analysis database only; the decompiler still does not recover these
+switches, so the selected cases are supported by instructions, not its completion
+flag. Public source is unchanged from the prior 178-test result. These helpers
+are not gameplay tests.
 
 Analysis ELF and current two-IFF candidate hashes remain exact. No EBOOT, uniform,
 roster color, protected build, emulator or full JB changes. Names, permanent

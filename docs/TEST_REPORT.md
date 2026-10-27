@@ -9,10 +9,24 @@ A narrow existing group-44 request, arguments, termination and padding reparse.
 
 Held comparison-name component: six owner bones, all marker hashes resolved,
 source zero-animation count and vertex attributes exact; localization IDs/extents and
-unrelated bytes exact. Private contract/template suite: 21 passed. Analysis ELF
-and current candidate hashes unchanged. Handoff/diff checks pass. No public source
-change; prior 178-test result applies to unchanged code. Channel priority and
-native appearance remain unverified; no installation, package or EBOOT change.
+unrelated bytes exact. Private contract/template suite: 21 passed. Scoped Director
+container suite: 16 passed; combined run: **37 passed**. Covers preserved source
+bytes/header/program, one redirected group pointer, compressed/uncompressed
+reparse, EOF-clipped backreference extension, capacity/unknown-layout refusal and
+continued rejection by the public generic growth writer. The private real-input
+startup probe reparses within the original physical extent; it remains uninstalled.
+
+Read-only injury audit independently verifies ten complete group-127 transactions,
+including following 1F/29 actions, termination/padding and same-player selector
+mapping. No injury program changed. Checked constant propagation of the native
+straight-line initializer recovers 24 comparison captions; selected foul/timeout
+accessors were instruction-checked. Fresh Ghidra exports plus selected actor
+switch edges support these routes; decompiler switch recovery remains incomplete.
+
+Analysis ELF and current candidate hashes unchanged. No public source change;
+prior 178-test result applies to unchanged code. Confirmed priority 3 > 2 > 1 is
+a coexistence conflict, not a verified fix. Native appearance/lifetime remain
+unverified; no installation, package or EBOOT change.
 See SCOREBUG_EXECUTABLE_ROUTES.md.
 
 # Previous required-name completion audit: not achieved
