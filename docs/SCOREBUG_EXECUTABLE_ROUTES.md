@@ -465,6 +465,7 @@ to work in gameplay.
 | Route | Checked evidence | Remaining limit |
 | --- | --- | --- |
 | Separate player-card renderer | 0x1A59C -> 0x217B10 -> 0x217540; reads current team +0 school text and +0x0C nickname, draws through 0x214FD0 -> 0x9D048 | Root 0x12A863B0 selects one team from a supplied player's side; state 2, time handling and source object govern display |
+| Sixth-man meter numeric text | 0x76A714 calls 0x53AAB4 with the side index, supplies its float to 0x7D0444 and draws the resulting text | The checked path formats a numeric meter value; it does not pass a team-name string or establish an IFF-selectable name provider |
 | Its lifecycle | 0x214C6C selects state/source/scene; 0x214DB8 clears state, scene and source; 0x21442C advances scene/time | Not an independently proved permanent two-team layer; parking it may interfere with its presentation owner |
 | Alternate contextual formatter | 0x719E98 uses current-team getters and can call 0x76520C or read team +4 depending on native state | Descriptor 0xA41CA0 is in the alternate registry at 0x1267CB1C; not an activation bridge to the regular HUD |
 | Additional location descriptor reference | 0x76520C descriptor 0xA446A0 occurs at 0x9E8C90 and is referenced by native node/table data | Following parent data reaches CoachMenu_MenuFlowAcceptCoachContractMenu; this is location text, not a school-name binding |

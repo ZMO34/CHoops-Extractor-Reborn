@@ -1088,3 +1088,11 @@ text/alternate-HUD paths. Instructions independently confirm 0x1DD618 ->
 these are static checks rather than a gameplay test. The original ELF and game
 assets remain unchanged.
 
+# Name overlay non-finite duration investigation
+
+A private read-only check passes 11 native instruction assertions and a host
+quiet-NaN unordered-comparison model. Fresh Ghidra exports trace the two active
+counts and their direct indexed consumers, with context-sensitive effects.
+These checks do not emulate PS3 floating-point state or establish gameplay
+behavior; no non-finite value or other game asset was written.
+

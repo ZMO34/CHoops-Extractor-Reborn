@@ -88,6 +88,17 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# Team-name overlay lifetime follow-up
+
+Investigated whether a special duration could keep a name overlay out of the
+game's wait logic. Static IEEE comparison analysis suggests a quiet NaN could
+evade the timed-overlay count and expiration test, but the separate all-active
+counter ignores duration. Ghidra identified additional all-active consumers in
+timer, Director and presentation predicates, in addition to known slot reuse.
+NaN propagation and runtime behavior are unverified, and the idea is not safe
+to install. No IFF, executable, roster, uniform or game build changed. See
+DIRECTOR_RESEARCH.md for the instruction-level conditions and limits.
+
 # Team-name alternate renderer follow-up
 
 Fresh Ghidra tracing checked five apparent alternate team/text/draw graph
@@ -6920,3 +6931,11 @@ text/alternate-HUD paths. Instructions independently confirm 0x1DD618 ->
 0x71BF54 -> 0x4F442C. Director unit tests and handoff consistency checks pass;
 these are static checks rather than a gameplay test. The original ELF and game
 assets remain unchanged.
+
+# Name overlay non-finite duration investigation
+
+A private read-only check passes 11 native instruction assertions and a host
+quiet-NaN unordered-comparison model. Fresh Ghidra exports trace the two active
+counts and their direct indexed consumers, with context-sensitive effects.
+These checks do not emulate PS3 floating-point state or establish gameplay
+behavior; no non-finite value or other game asset was written.

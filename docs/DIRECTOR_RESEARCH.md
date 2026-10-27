@@ -126,6 +126,31 @@ validated lineup transaction. Ghidra exports for 0x19546C, 0x199510, 0x192C7C,
 The original PS3 ELF remains read-only; PPC64 big-endian descriptor TOCs remain
 0xA54AC8 / 0xA64A94. No executable or game asset is edited by this audit.
 
+### Non-finite duration hypothesis and wider active-overlay consumers
+
+A quiet NaN duration is a theoretical way to evade the *timed* count, not an
+approved solution. The category-2 float reader 0x5A9D4 loads its bits as a float;
+0x1996F8 stores the resulting value in the pending duration. Assuming an ordinary
+IEEE unordered comparison and successful propagation to the active instance,
+0x19292C..38 does not count NaN as greater than or equal to 0.05. At
+0x1935F8..0x193604 NaN compares unequal to the FLT_MAX sentinel and is not less
+than zero; subtraction at 0x193664 would retain a NaN. Eleven instruction checks
+and a host-side quiet-NaN comparison model support that narrow prediction, not a
+claim about PS3 floating-point exception state or live rendering.
+
+Crucially, the independent 0x192958 counter checks slot activity without looking
+at duration. Fresh Ghidra exports reveal consumers beyond Director command 0x159:
+0x44C30 and 0x44CDC advance or reset separate timers according to that count;
+0x3F71B8 and 0x3F74F4 compare counts around Director work; 0x774360 uses the
+count in a predicate called by 0x772FB0 and 0x7737E4. These calls have their own
+conditional branches, so their exact gameplay effects depend on context. A
+permanent NaN layer remains visible to those consumers and to slot cancellation;
+it can also alter timing behavior. The partial Director lead scan saw no decoded
+0x159 occurrence, but that scan is incomplete and cannot eliminate indirect or
+other all-active consumers. NaN is outside the established authored-duration
+contract and may create further numerical or animation issues. No NaN is written
+to an IFF, no candidate is created, and this route is not considered safe.
+
 ## Corrected generic name, city and nickname providers
 
 In the generic overlay registry, team1city / team2city bind to descriptor
