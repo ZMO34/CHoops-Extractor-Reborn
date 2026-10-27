@@ -1,3 +1,29 @@
+# Team-name provider correction and held short-school component
+
+The owner narrowed the current investigation to team names. Fresh Ghidra,
+instruction and vanilla-roster checks show `team1city` / `team2city` normally
+resolve location, not school names. In the checked 443-team source, the raw
+location string differs from both short and full school strings for 399 teams.
+The prior city-bound name component is therefore unsuitable.
+
+The generic overlay table also has `team1name` / `team2name`: 0x711EE8 ->
+0x711BA0 -> 0x711A80 reads the current team's short school-name pointer (+0).
+The standard ROST logical team row's native anchor is +0x30; +4 is abbreviation,
++8 full school name, +0x0C plural mascot. Short and full strings differ exactly
+for 142 nonempty source rows. Existing comparison getters also use short name.
+The checked startup request supplies away then home contexts. A separate held
+SCNE component now uses the two correct generic short-name providers, with stock
+20 animation rows and four-bone text owner; marker/provider checks and static
+mesh inspection pass. It has not been installed or gameplay-tested.
+
+This corrects source semantics but does not solve persistence: the regular HUD
+name providers remain gated, the comparison owner is disabled after setup, and
+generic persistent overlays interact with native waits and three-slot reuse.
+No executable, roster, uniform, current test-folder or protected build changes.
+See SCOREBUG_EXECUTABLE_ROUTES.md and DIRECTOR_RESEARCH.md. Targeted validation
+and private source-audit details are in TEST_REPORT.md.
+Targeted scene/text/pose/Director validation: 69 passed.
+
 # Partial IFF-only visual test prepared; comparison activation gate confirmed
 
 The current owner goal explicitly requests a testable partial folder when dynamic

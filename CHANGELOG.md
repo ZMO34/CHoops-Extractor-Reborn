@@ -1,3 +1,9 @@
+# Unreleased — team-name provider correction
+
+- Trace separate short-school, abbreviation, full-school, mascot and location sources.
+- Correct the generic city provider's prior school-name interpretation; document the actual `team1name` / `team2name` short-school callbacks.
+- Prepare a held two-name component for further activation research; persistent gameplay coexistence remains unproven.
+
 # Unreleased — partial IFF-only visual test
 
 - Prepare local two-archive visual overrides with manifest, source-bound preflight and manual checklist.

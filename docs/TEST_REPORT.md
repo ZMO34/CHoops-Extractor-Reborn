@@ -1,3 +1,30 @@
+# Team-name provenance and held component verification
+
+Read-only original-roster and native-code checks locate the standard team table
+anchor at logical row +0x30, stride 704. Current team offsets +0 / +4 / +8 / +0xC
+correspond to short school, abbreviation, school and plural nickname fields.
+Among 443 source teams, 142 have different nonempty short/full strings by exact
+comparison. The independently followed location-table route resolves all 443;
+for 399 the raw location differs from both short and school strings. These counts
+are data-specific, include whitespace in comparisons, and do not certify every
+game mode. Seventeen native instruction checks cover the table/stride, conditional
+selected-team copy, short-name getters, abbreviation fallback and location route.
+
+Fresh Ghidra exports cover 0x580D04, 0x1BBB58, 0x711EE8, 0x711BA0,
+0x711A80, 0x70938C, 0x76520C, 0x75C7D8, 0x75C6CC, 0x1BCAEC and 0x75BA30;
+descriptor TOCs and selected instructions were cross-checked. Broad overlay table
+rows and selector 0/1 values match short-name provider identities. The new held
+component reparses, its two existing markers resolve to team1name/team2name,
+its four-bone owner and 20 animation rows stay intact, and static mesh inspection
+reports no warnings. None of these checks establishes persistent activation,
+correct gameplay rendering or safe slot/wait coexistence. Source roster/EBOOT,
+partial-test IFFs and protected builds remain unchanged.
+
+Targeted synthetic checks: **69 passed**, covering the scene contract, comparison
+template, text-style/provider edits, text dependencies, pose validation and
+Director reader. This is independent of the private real-input roster audit and
+does not certify gameplay or activate the held component.
+
 # Partial visual delivery and final portable verification
 
 `tools/dev/verify.py` passes: **1,155 passed, 9 skipped, 2 deselected** in the

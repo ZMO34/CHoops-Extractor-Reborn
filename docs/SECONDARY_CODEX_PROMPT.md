@@ -88,6 +88,32 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# Team-name provider correction and held short-school component
+
+The owner narrowed the current investigation to team names. Fresh Ghidra,
+instruction and vanilla-roster checks show `team1city` / `team2city` normally
+resolve location, not school names. In the checked 443-team source, the raw
+location string differs from both short and full school strings for 399 teams.
+The prior city-bound name component is therefore unsuitable.
+
+The generic overlay table also has `team1name` / `team2name`: 0x711EE8 ->
+0x711BA0 -> 0x711A80 reads the current team's short school-name pointer (+0).
+The standard ROST logical team row's native anchor is +0x30; +4 is abbreviation,
++8 full school name, +0x0C plural mascot. Short and full strings differ exactly
+for 142 nonempty source rows. Existing comparison getters also use short name.
+The checked startup request supplies away then home contexts. A separate held
+SCNE component now uses the two correct generic short-name providers, with stock
+20 animation rows and four-bone text owner; marker/provider checks and static
+mesh inspection pass. It has not been installed or gameplay-tested.
+
+This corrects source semantics but does not solve persistence: the regular HUD
+name providers remain gated, the comparison owner is disabled after setup, and
+generic persistent overlays interact with native waits and three-slot reuse.
+No executable, roster, uniform, current test-folder or protected build changes.
+See SCOREBUG_EXECUTABLE_ROUTES.md and DIRECTOR_RESEARCH.md. Targeted validation
+and private source-audit details are in TEST_REPORT.md.
+Targeted scene/text/pose/Director validation: 69 passed.
+
 # Partial IFF-only visual test prepared; comparison activation gate confirmed
 
 The current owner goal explicitly requests a testable partial folder when dynamic
@@ -5777,6 +5803,33 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 ---
 
 Embedded source: docs/TEST_REPORT.md
+
+# Team-name provenance and held component verification
+
+Read-only original-roster and native-code checks locate the standard team table
+anchor at logical row +0x30, stride 704. Current team offsets +0 / +4 / +8 / +0xC
+correspond to short school, abbreviation, school and plural nickname fields.
+Among 443 source teams, 142 have different nonempty short/full strings by exact
+comparison. The independently followed location-table route resolves all 443;
+for 399 the raw location differs from both short and school strings. These counts
+are data-specific, include whitespace in comparisons, and do not certify every
+game mode. Seventeen native instruction checks cover the table/stride, conditional
+selected-team copy, short-name getters, abbreviation fallback and location route.
+
+Fresh Ghidra exports cover 0x580D04, 0x1BBB58, 0x711EE8, 0x711BA0,
+0x711A80, 0x70938C, 0x76520C, 0x75C7D8, 0x75C6CC, 0x1BCAEC and 0x75BA30;
+descriptor TOCs and selected instructions were cross-checked. Broad overlay table
+rows and selector 0/1 values match short-name provider identities. The new held
+component reparses, its two existing markers resolve to team1name/team2name,
+its four-bone owner and 20 animation rows stay intact, and static mesh inspection
+reports no warnings. None of these checks establishes persistent activation,
+correct gameplay rendering or safe slot/wait coexistence. Source roster/EBOOT,
+partial-test IFFs and protected builds remain unchanged.
+
+Targeted synthetic checks: **69 passed**, covering the scene contract, comparison
+template, text-style/provider edits, text dependencies, pose validation and
+Director reader. This is independent of the private real-input roster audit and
+does not certify gameplay or activate the held component.
 
 # Partial visual delivery and final portable verification
 

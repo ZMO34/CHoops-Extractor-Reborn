@@ -1,5 +1,14 @@
 # IFF-only scorebug: current evidence and limits
 
+**Name-field correction:** the standard ROST team anchor begins at logical row
++0x30. Current-team +0 is the short school name; +4 is the abbreviation; +8 is
+the full school-name field; +0x0C is the plural nickname. The generic `team1city`
+/ `team2city` providers normally resolve location strings, not school names. A
+separate held component uses the verified `team1name` / `team2name` short-school
+providers; its safe persistent activation is still unproven. This supersedes
+earlier descriptions of the city-bound component as school names. See
+SCOREBUG_EXECUTABLE_ROUTES.md for the roster and instruction cross-check.
+
 **Current delivery:** [SCOREBUG_TEST.md](SCOREBUG_TEST.md) documents the separate
 experimental partial visual test. It follows the current goal's instruction to
 deliver testable progress despite blocked dynamics, superseding the historical
@@ -40,7 +49,7 @@ text record name. Adding an arbitrary SCNE name does not register a provider.
 `home_city` and `home_ABL` use `0x4EF9A4`; away counterparts use `0x4EFABC`.
 They call `0x4EED80`, which usually delegates to `0x4EEB3C`. In normal game
 contexts this returns success without filling a string, skipping the existing
-fallback `0x4EF92C` that reads the current team's native name field at +4.
+fallback `0x4EF92C` that reads the current team's abbreviation field at +4.
 Thus merely changing binding spelling, font, opacity or position does not fix it.
 Earlier documentation describing ABL slots as null providers is superseded by
 this original-input analysis.

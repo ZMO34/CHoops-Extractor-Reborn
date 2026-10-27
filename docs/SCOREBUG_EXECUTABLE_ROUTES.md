@@ -1,5 +1,59 @@
 # Expanded read-only executable search for scorebug alternatives
 
+## Corrected school-name sources and held component
+
+The current owner request narrows this follow-up to team names. A read-only
+standard-roster cross-check and fresh Ghidra exports distinguish four text fields
+that earlier notes grouped too broadly as school names. The ROST team table's
+native relocated pointer targets logical row +0x30, with 0x2C0-byte stride.
+The editor's corresponding fields map as follows:
+
+| Native team pointer offset | ROST logical-row offset | Field |
+| --- | --- | --- |
+| +0x00 | +0x30 | Short school name |
+| +0x04 | +0x34 | Abbreviation |
+| +0x08 | +0x38 | School name |
+| +0x0C | +0x3C | Plural mascot/nickname |
+
+0x1BBB58 reads the native roster table pointer and uses the 0x2C0 stride.
+Conditional initialization 0x580D04 copies 0x2C0 bytes from each selected team
+context pointer into the current home/away storage. These relationships describe
+the checked standard-roster profile; selection and values in every game mode
+still need runtime evidence. The roster cross-check resolves 443 teams; 142 have
+different nonempty short and full school strings (exact comparison, including
+spaces). Thus +0 is a **short school name**, often appropriate for broadcast,
+not necessarily the full-school field. 0x50D350 / 0x50D3D0 read +0; the
+main-HUD 0x4EF92C fallback reads +4, the abbreviation in this profile.
+
+The earlier generic `team1city` / `team2city` component is not a school-name
+solution. Its default provider 0x70E7FC -> 0x76520C uses team +0x15A to index a
+separate 16-byte location table through 0x1BCAEC. 0x75C6CC / 0x75BA30 wrap that
+location text; 0x75C7D8 may format it further. In the supplied roster, the
+underlying location text matches neither short nor full school strings for 399
+of 443 teams. Exact-string matches do not prove semantic identity, and explicit
+nickname/mode branches remain. Do not use city fields as a team-name substitute.
+
+There is a better generic-overlay source: table 0x953558 rows 0x9537E0 and
+0x953834 bind `team1name` / `team2name` through 0xA41810 -> 0x711EE8 with
+selectors 0 / 1. 0x711EE8 -> 0x711BA0 invokes descriptor 0xA417D8 -> 0x711A80,
+which obtains the selected team through 0x70938C and wraps +0, the short-school
+field in the checked profile. The native definition-25 branch supplies width 0,
+skipping the helper's additional width-specific draw while retaining the provider
+call. The checked startup context order is away then home; other callers must
+provide appropriate contexts independently.
+
+A separate held `player_name` SCNE component now binds its two existing markers
+to `team1name` / `team2name`, rather than to city fields. It retains all 20 source
+animation rows and the four-bone text owner, hides old card artwork by bounded
+index edits, resolves both markers/providers, and yields no static mesh warnings.
+Seventeen native instruction assertions and the read-only roster audit support
+the field mapping; fresh Ghidra exports cover copy, callbacks and context. The
+component is not installed. Generic overlay waits count persistent instances and
+native popups cancel or reuse the three slots; an IFF-controlled persistent
+activation that preserves those behaviors remains unproven. The comparison path
+also remains gated as described below. No executable, roster, uniform or existing
+test-delivery bytes were changed, and no runtime rendering is claimed.
+
 The owner requested searching beyond the previously checked HUD and generic
 overlay paths. This pass finds a concrete additional Director-to-scorebug-message
 route and ungated current-team name getters. It does not establish a completed
@@ -60,8 +114,8 @@ callbacks remain separate. Its observed IDs 78..82 are game-point, clear-ball,
 uncleared-ball, 10-second and fouled-out messages, not a continuous two-name
 formatter. Do not turn a transient one-team violation into persistent names.
 
-Native 0x50D350 obtains the current home team through 0x57F050, reads its first
-text pointer (+0), wraps it through 0x1E1610 and assigns the result. Native
+Native 0x50D350 obtains the current home team through 0x57F050, reads its short
+school-name text pointer (+0), wraps it through 0x1E1610 and assigns the result. Native
 0x50D3D0 does the corresponding operation for the away team through 0x57F064.
 Neither passes through the main HUD's 0x4EEB3C name-suppression gate. A third
 getter, 0x50D450, selects the opponent relative to a message's supplied team.
@@ -381,8 +435,8 @@ or runtime-visibility claim is made.
 | Separate player-card renderer | 0x1A59C -> 0x217B10 -> 0x217540; reads current team +0 school text and +0x0C nickname, draws through 0x214FD0 -> 0x9D048 | Root 0x12A863B0 selects one team from a supplied player's side; state 2, time handling and source object govern display |
 | Its lifecycle | 0x214C6C selects state/source/scene; 0x214DB8 clears state, scene and source; 0x21442C advances scene/time | Not an independently proved permanent two-team layer; parking it may interfere with its presentation owner |
 | Alternate contextual formatter | 0x719E98 uses current-team getters and can call 0x76520C or read team +4 depending on native state | Descriptor 0xA41CA0 is in the alternate registry at 0x1267CB1C; not an activation bridge to the regular HUD |
-| Additional school-name descriptor reference | 0x76520C descriptor 0xA446A0 occurs at 0x9E8C90 and is referenced by native node/table data | Following parent data reaches CoachMenu_MenuFlowAcceptCoachContractMenu; no IFF-controlled HUD invocation established |
-| Other direct school-name caller | 0xA3468 calls 0x76520C through a TOC veneer | Associated native menu data identifies MemoryCardMenu_Delete; not a persistent game HUD |
+| Additional location descriptor reference | 0x76520C descriptor 0xA446A0 occurs at 0x9E8C90 and is referenced by native node/table data | Following parent data reaches CoachMenu_MenuFlowAcceptCoachContractMenu; this is location text, not a school-name binding |
+| Other direct location caller | 0xA3468 calls 0x76520C through a TOC veneer | Associated native menu data identifies MemoryCardMenu_Delete; not a persistent school-name HUD |
 | Arena graphics | 0x5611AC selects jumbotron_team_%03d.iff / generic variants and passes them to 0x560E28 | Shows asset selection, not roster-font rendering or a usable scorebug texture binding; no arena assets modified |
 
 ## Verification and delivery state

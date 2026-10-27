@@ -1,5 +1,13 @@
 # Pregame nickname overlay investigation
 
+**Name-source correction:** later roster and native checks show the generic
+`team1city` / `team2city` provider normally supplies geographic location, not
+school name. The broad generic table separately offers short-school-name
+`team1name` / `team2name` providers; their persistent gameplay activation remains
+unproven. See SCOREBUG_EXECUTABLE_ROUTES.md and DIRECTOR_RESEARCH.md. The
+pregame-specific `team1namerecord` / `team2namerecord` providers below still
+read plural nicknames; their similar names do not make the two tables identical.
+
 The owner accepts automatic roster nicknames as well as school names. Their
 screenshot shows Wildcats / Flyers below two logo towers, with the arena name
 below. This is a different scene from the frontend team_matchup LAYT screen.
@@ -94,7 +102,7 @@ appearance are still unverified.
 ## Follow-up: school-name preference and Director commands
 
 The owner prefers school names, retaining nicknames as a fallback. Subsequent
-research finds an overlay school-name formatter and actual Director command
+research finds a location formatter and actual Director command
 operations for pending overlay selection, context, duration and submission.
 This supersedes the earlier purely undecoded-DRCT status; it does not yet prove
 persistent activation or safe script writing. See DIRECTOR_RESEARCH.md for exact

@@ -1,5 +1,15 @@
 # Director command resource: read-only research
 
+**Name-source correction:** the previously described `team1city` / `team2city`
+school-name interpretation is wrong. A fresh roster-to-native trace shows those
+providers normally resolve geographic city/state text. The 0x953558 provider table
+also contains `team1name` / `team2name`, which use 0x711EE8 -> 0x711BA0 ->
+0x711A80 and read current-team +0: the roster's short school-name field. A new
+held component uses those two bindings. It remains uninstalled because persistent
+overlay lifetime, native waits and slot coexistence are still unresolved. The
+details and field cross-check are in SCOREBUG_EXECUTABLE_ROUTES.md. References
+below to the older city-bound component describe historical experiments only.
+
 The scorebug owner prefers school names, accepting nicknames only as a fallback.
 The current investigation includes data-driven logic beyond SCNE styling, while
 keeping the executable immutable. Nothing in this document certifies a working
@@ -87,22 +97,33 @@ with their replacement/cancellation behavior and the game's ordinary popups.
 The presence of a duration setter alone does not establish that coexistence.
 The regular scorebug still uses its separate fixed-provider registry.
 
-## School-name provider rather than nickname fallback
+## Corrected generic name, city and nickname providers
 
 In the generic overlay registry, team1city / team2city bind to descriptor
 0xA41690 -> 0x70E7FC. Observed rows include 0x953264 / 0x95327C and
 0x953804 / 0x953858, with selectors 0/1. Except for its explicit state branches,
-0x70E7FC calls 0x76520C, using the runtime team's u16 roster identity at +0x15A.
+0x70E7FC calls 0x76520C, using the runtime team's u16 location index at +0x15A.
 That resolves through 0x75C7D8 -> 0x75C6CC -> 0x1BCAEC -> 0x75BA30.
-The last wraps the resolved roster row's first text pointer. The formatter can
+The last wraps the resolved location row's first text pointer. The formatter can
 add a prefix based on that row's flags; this is not the nickname +0x0C pointer.
 One definition-specific branch (index 9) does use the nickname instead, and
 0x5CCADC == 1 is another explicit branch. These conditions must remain part of
 compatibility analysis. The opening_intro_a table itself does not bind these city
 fields, so simply adding them to that scene is insufficient.
 
-This establishes a school-name provider for further data-controller work. It
-does not establish that its callback table can be used permanently in gameplay.
+The actual short-school providers use separate `team1name` / `team2name` rows
+at 0x9537E0 / 0x953834 in the broad table, with selector 0 / 1. Both use
+0xA41810 -> 0x711EE8 -> 0x711BA0 and descriptor 0xA417D8 -> 0x711A80. The
+latter resolves typed team context via 0x70938C and wraps team +0. For native
+definition 25, 0x711EE8 selects its default zero-width argument, so 0x711BA0 calls
+the underlying text provider without its separate width-specific drawing branch.
+The selectors consume contexts supplied by the request; the checked original
+startup transaction supplies away first and home second. No assumption about
+every other activation caller is made.
+
+The old city-bound component is unsuitable for automatic school names. Neither
+the corrected short-school providers nor their table establish permanent gameplay
+activation or safe coexistence with native waits and popup slots.
 The existing opening nickname route is documented in SCOREBUG_PREGAME_NAMES.md.
 
 ## Reader API and verification
@@ -165,13 +186,13 @@ ordinary-popup coexistence and cancellation behavior. No name-layer asset or
 Director command modification is installed in this pass.
 
 
-## Compact school-name component, held for activation research
+## Historical city-bound component, held for activation research
 
 The original player_name SCNE has three text records and a four-bone text owner
 b_EndQuarter. Its record text_team1city already uses provider team1city; record
 text_team1name uses team1name. The private component retains those record and bone
 names, changing only the latter provider to team2city. The original playername
-field is alpha zero. Both school fields use white text, dark shadows, centered
+field is alpha zero. Both city fields use white text, dark shadows, centered
 alignment and a native width limit. The text-owner scale is 0.25; Stratum2 40
 produces an intended cap height of 13.25 authored world units and a 126-unit
 maximum width. Pen centers target X -217 / -11, Y -172.875 before animation and
