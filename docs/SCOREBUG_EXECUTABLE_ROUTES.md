@@ -34,6 +34,32 @@ The original executable and analysis ELF remain unchanged.
 
 ## Strongest new route: the scorebug message system
 
+**Visibility follow-up:** the name getters below are real, but the comparison
+owner is disabled after initialization. The structural probe work below is
+historical evidence, not a working activation route. Native 0x4F2818 initially
+sets main root 0x12C7EF60 +8 from its loaded topbar pointer, then calls 0x4EDF60
+at 0x4F2D14. That four-instruction helper loads the root, stores zero at +8 and
+returns. Nonzero-message activation 0x4EE374 checks +8 before setting phase +0x28.
+Parent draw 0x4F442C also tests +8 in both preparation and topbar-render paths.
+
+Fresh Ghidra exports cover 4EDF60, 4EE374, 4F2818, 4F313C and 4F442C. Six narrow
+instruction assertions independently check the load/store/call/activation gate.
+The existing whole-image index has one mapped pointer into root..root+12, the
+TOC root pointer A5DCE0. Checked root-load owners reveal initialization and the
+clear, with no established enable setter. Stores to offset 8 in alternate-root
+or statistic structures must not be confused with this main flag. 4EE244 is a
+predicate, 4EE1A4 sets +4, and Director 3E/3F/40 helpers are no-ops; none reenables
+this owner. This search does not cover every computed/indirect reference and
+therefore does not prove universal impossibility. It does establish that the
+authored queue/startup probe alone is insufficient and must stay uninstalled.
+
+The partial visual test consequently retains stock scorebug_topbar and comparison
+templates, with no Director/overlaycache probes. Required dynamic features remain
+explicitly unresolved; see [test delivery](SCOREBUG_TEST.md). Native core channel-0
+callbacks remain separate. Its observed IDs 78..82 are game-point, clear-ball,
+uncleared-ball, 10-second and fouled-out messages, not a continuous two-name
+formatter. Do not turn a transient one-team violation into persistent names.
+
 Native 0x50D350 obtains the current home team through 0x57F050, reads its first
 text pointer (+0), wraps it through 0x1E1610 and assigns the result. Native
 0x50D3D0 does the corresponding operation for the away team through 0x57F064.

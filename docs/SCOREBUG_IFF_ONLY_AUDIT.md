@@ -1,5 +1,14 @@
 # IFF-only scorebug: current evidence and limits
 
+**Current delivery:** [SCOREBUG_TEST.md](SCOREBUG_TEST.md) documents the separate
+experimental partial visual test. It follows the current goal's instruction to
+deliver testable progress despite blocked dynamics, superseding the historical
+no-testing-folder hold below. Its three SCNE edits preserve stock comparison
+resources/templates; only the branding literal changes English. The older
+four-scene internal candidate and protected builds remain intact. Names and
+native gameplay appearance are not claimed complete. The comparison enable gate
+is now confirmed in SCOREBUG_EXECUTABLE_ROUTES.md; held startup probes are excluded.
+
 This supersedes deployment guidance for the experimental v10/v11/v12 executable
 packages. The owner reports a pregame crash after replacing EBOOT and requires
 an original executable. No further executable patch or uniform-logo name route

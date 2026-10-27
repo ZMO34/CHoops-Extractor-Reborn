@@ -1,4 +1,34 @@
-# Expanded executable search: additional scorebug-message route
+# Partial IFF-only visual test prepared; comparison activation gate confirmed
+
+The current owner goal explicitly requests a testable partial folder when dynamic
+features remain blocked. Local output/scorebug-test now supplies exactly two IFF
+overrides, source-bound staging metadata, checksums/preservation manifest, manual
+instructions and a native-atlas offline preview. This supersedes the earlier
+indefinite testing-folder hold; it does not claim completed names or gameplay.
+Only three vanilla SCNEs change: main body, sixth-man meter and floating meter
+header. Stock comparison SCNE and both original templates are restored. All
+21,637 original English table entries/storage remain exact apart from their
+validated eight-byte relocation; only the isolated brand literal is added.
+
+Fresh Ghidra/instructions identify a decisive limit of the queued-name probe:
+4F2818 calls 4EDF60 at 4F2D14, clearing main root 12C7EF60+8 after setup.
+4EE374 activation and 4F442C preparation/draw both check that flag. The checked
+root references establish no native IFF-controlled enabler. This is a bounded
+negative finding, not proof that every unknown route is impossible. Held probes
+remain outside the test. No Director, overlaycache or executable replacement.
+
+Source-bound preflight returns both exact staged IFF byte streams. Resource
+identities/bone counts, 259 untouched gamedata record prefixes, logo square/full
+UV/neutral-tint contracts, original popup alphas and English preservation pass.
+Native rendering remains unverified. Names, permanent counters/ranks, contextual
+branding and actual possession binding are explicitly blocked/unproven. Native
+queues/triggers remain unchanged. Protected builds and prior candidate retained.
+See SCOREBUG_TEST.md for manual testing and SCOREBUG_EXECUTABLE_ROUTES.md for
+the new gate. Portable verification: 1,155 passed, 9 skipped, 2 deselected;
+configured smoke/lint/type/compile/handoff checks pass. Environment retry details
+and verification limits are recorded in TEST_REPORT.md.
+
+# Historical expanded search and held probes before the visibility audit
 
 Owner requested a broader read-only executable search. Indexed 39,100 recovered
 functions and whole-image branches/descriptors/TOC references. New instruction-

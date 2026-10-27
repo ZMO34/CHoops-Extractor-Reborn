@@ -1,3 +1,10 @@
+# Experimental IFF-only scorebug
+
+The local partial visual test and manual application/checklist are documented in
+[SCOREBUG_TEST.md](SCOREBUG_TEST.md). Use the original executable; dynamic names
+and permanent counters/ranks/possession are explicitly unresolved. No gameplay
+verification or replacement EBOOT is included.
+
 # Team assets (v1.20)
 
 Use **Team Assets** for the searchable assignment list and checked S/Home/Away/

@@ -88,7 +88,37 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
-# Expanded executable search: additional scorebug-message route
+# Partial IFF-only visual test prepared; comparison activation gate confirmed
+
+The current owner goal explicitly requests a testable partial folder when dynamic
+features remain blocked. Local output/scorebug-test now supplies exactly two IFF
+overrides, source-bound staging metadata, checksums/preservation manifest, manual
+instructions and a native-atlas offline preview. This supersedes the earlier
+indefinite testing-folder hold; it does not claim completed names or gameplay.
+Only three vanilla SCNEs change: main body, sixth-man meter and floating meter
+header. Stock comparison SCNE and both original templates are restored. All
+21,637 original English table entries/storage remain exact apart from their
+validated eight-byte relocation; only the isolated brand literal is added.
+
+Fresh Ghidra/instructions identify a decisive limit of the queued-name probe:
+4F2818 calls 4EDF60 at 4F2D14, clearing main root 12C7EF60+8 after setup.
+4EE374 activation and 4F442C preparation/draw both check that flag. The checked
+root references establish no native IFF-controlled enabler. This is a bounded
+negative finding, not proof that every unknown route is impossible. Held probes
+remain outside the test. No Director, overlaycache or executable replacement.
+
+Source-bound preflight returns both exact staged IFF byte streams. Resource
+identities/bone counts, 259 untouched gamedata record prefixes, logo square/full
+UV/neutral-tint contracts, original popup alphas and English preservation pass.
+Native rendering remains unverified. Names, permanent counters/ranks, contextual
+branding and actual possession binding are explicitly blocked/unproven. Native
+queues/triggers remain unchanged. Protected builds and prior candidate retained.
+See SCOREBUG_TEST.md for manual testing and SCOREBUG_EXECUTABLE_ROUTES.md for
+the new gate. Portable verification: 1,155 passed, 9 skipped, 2 deselected;
+configured smoke/lint/type/compile/handoff checks pass. Environment retry details
+and verification limits are recorded in TEST_REPORT.md.
+
+# Historical expanded search and held probes before the visibility audit
 
 Owner requested a broader read-only executable search. Indexed 39,100 recovered
 functions and whole-image branches/descriptors/TOC references. New instruction-
@@ -4693,6 +4723,16 @@ format limits.
 
 Embedded source: docs/SCOREBUG_RESEARCH.md
 
+## Current partial visual test
+
+The current goal requests a test folder even if dynamic features remain blocked.
+See [SCOREBUG_TEST.md](SCOREBUG_TEST.md) for the local two-IFF test, restored stock
+comparison resources, exact preservation results and manual checklist. This
+supersedes earlier indefinite delivery holds below. Fresh Ghidra checks show the
+comparison-name owner is explicitly disabled after setup; a queued request alone
+does not enable its draw path. Names/counters/ranks/possession remain unproven.
+No EBOOT/Director/uniform/roster changes or native gameplay claim.
+
 ## Normal-game source confirmation
 
 The traced regular 5-on-5 loader requests GAMEDATA / scorebug_bottombar / SCNE,
@@ -5738,7 +5778,51 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 
 Embedded source: docs/TEST_REPORT.md
 
-# Current CDF scene validation and combined-probe verification
+# Partial visual delivery and final portable verification
+
+`tools/dev/verify.py` passes: **1,155 passed, 9 skipped, 2 deselected** in the
+portable synthetic pytest stage. Handoff consistency, compileall, CLI help,
+offscreen Studio smoke, both configured Ruff checks, mypy (18 files) and diff
+checks also pass. Real-game/runtime-manual cases and the optional legacy native
+comparison remain excluded by the portable runner. No executable/gameplay test
+or full JB was created. Public application/test code is unchanged in this
+delivery follow-up; the new tracked changes are documentation.
+
+Environment-specific retries are not hidden passes: the first sandboxed broad
+run encountered hard-link WinError 5 and was interrupted after it stopped advancing.
+A fail-fast diagnostic reproduced the extraction permission error (285 passed,
+1 failed). A permitted run with a workspace-output basetemp finished with
+1,153 passed, 2 failed, 9 skipped, 2 deselected: two output-protection tests assume
+their tmp_path lies outside project output. The final permitted run used a new,
+checked system-temp directory and all configured checks passed. No application
+or test logic was weakened to accommodate these environment failures.
+
+Private source audit/preflight passes for the separate `output/scorebug-test/`:
+
+- Exactly gamedata.iff (9,649,482 bytes) and english.iff (1,848,014 bytes);
+  source-bound preflight returns their exact staged bytes.
+- Three changed SCNEs; main/meter/header bone counts and all resource identities
+  preserved. 259 other gamedata record prefixes remain exact, with only classified
+  retained-header/zero-alignment suffixes where inferred spans include them.
+- Stock comparison scene parts are byte-exact. English validate_extension proves
+  preservation of all original 21,637 entries, pointer relocation and token pool;
+  only the isolated branding literal is added. Stock comparison templates stay exact.
+- Square 32×32 logo quads, complete UVs, neutral RGB/material tint and retained
+  approximately .999 vertex alpha; existing popup alphas remain stock.
+- Six instruction assertions verify comparison init-clear/activation gating.
+  Fresh Ghidra exports cover init, update, draw and gating functions. The bounded
+  reference search is not an exhaustive impossibility proof.
+- Offline SCNE/native-atlas preview inspected at the authored width-fit scale;
+  it uses sample values and explicitly labels absent runtime logo/fill/palette
+  behavior. It is not native appearance or gameplay evidence.
+
+Prior internal candidate/analysis ELF hashes remain exact. Protected builds,
+roster colors, uniforms and source JB remain preserved. No held Director/injury
+probe is included. Names, permanent counters/ranks, contextual branding and actual
+possession binding are explicitly unresolved. See SCOREBUG_TEST.md for the manual
+owner checklist and the local consolidated checksum/preservation manifest.
+
+# Historical CDF scene validation and combined-probe verification
 
 Public targeted run: **41 passed** (14 CDF/import and 27 Director/audit cases).
 Ten new CDF cases include a synthetic growing pair built and reparsed with new

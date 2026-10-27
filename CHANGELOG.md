@@ -1,4 +1,11 @@
-# Unreleased — expanded scorebug executable research
+# Unreleased — partial IFF-only visual test
+
+- Prepare local two-archive visual overrides with manifest, source-bound preflight and manual checklist.
+- Retain stock comparison scene/templates; add only the branding literal to English.
+- Confirm native comparison activation/draw flag is cleared after setup; keep held name probes uninstalled.
+- Mark names, permanent counters/ranks, contextual branding and possession unproven; retain original executable and protected builds.
+
+# Historical expanded scorebug executable research before visibility audit
 
 - Validate variable compressed SCNE chunks against CDF block maxima using native type words.
 - Assemble held paired injury and combined Director probes with preserved logical layouts and archive plans.

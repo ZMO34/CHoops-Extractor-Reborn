@@ -1,3 +1,13 @@
+## Current partial visual test
+
+The current goal requests a test folder even if dynamic features remain blocked.
+See [SCOREBUG_TEST.md](SCOREBUG_TEST.md) for the local two-IFF test, restored stock
+comparison resources, exact preservation results and manual checklist. This
+supersedes earlier indefinite delivery holds below. Fresh Ghidra checks show the
+comparison-name owner is explicitly disabled after setup; a queued request alone
+does not enable its draw path. Names/counters/ranks/possession remain unproven.
+No EBOOT/Director/uniform/roster changes or native gameplay claim.
+
 ## Normal-game source confirmation
 
 The traced regular 5-on-5 loader requests GAMEDATA / scorebug_bottombar / SCNE,

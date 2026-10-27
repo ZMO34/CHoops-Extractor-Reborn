@@ -1,4 +1,48 @@
-# Current CDF scene validation and combined-probe verification
+# Partial visual delivery and final portable verification
+
+`tools/dev/verify.py` passes: **1,155 passed, 9 skipped, 2 deselected** in the
+portable synthetic pytest stage. Handoff consistency, compileall, CLI help,
+offscreen Studio smoke, both configured Ruff checks, mypy (18 files) and diff
+checks also pass. Real-game/runtime-manual cases and the optional legacy native
+comparison remain excluded by the portable runner. No executable/gameplay test
+or full JB was created. Public application/test code is unchanged in this
+delivery follow-up; the new tracked changes are documentation.
+
+Environment-specific retries are not hidden passes: the first sandboxed broad
+run encountered hard-link WinError 5 and was interrupted after it stopped advancing.
+A fail-fast diagnostic reproduced the extraction permission error (285 passed,
+1 failed). A permitted run with a workspace-output basetemp finished with
+1,153 passed, 2 failed, 9 skipped, 2 deselected: two output-protection tests assume
+their tmp_path lies outside project output. The final permitted run used a new,
+checked system-temp directory and all configured checks passed. No application
+or test logic was weakened to accommodate these environment failures.
+
+Private source audit/preflight passes for the separate `output/scorebug-test/`:
+
+- Exactly gamedata.iff (9,649,482 bytes) and english.iff (1,848,014 bytes);
+  source-bound preflight returns their exact staged bytes.
+- Three changed SCNEs; main/meter/header bone counts and all resource identities
+  preserved. 259 other gamedata record prefixes remain exact, with only classified
+  retained-header/zero-alignment suffixes where inferred spans include them.
+- Stock comparison scene parts are byte-exact. English validate_extension proves
+  preservation of all original 21,637 entries, pointer relocation and token pool;
+  only the isolated branding literal is added. Stock comparison templates stay exact.
+- Square 32×32 logo quads, complete UVs, neutral RGB/material tint and retained
+  approximately .999 vertex alpha; existing popup alphas remain stock.
+- Six instruction assertions verify comparison init-clear/activation gating.
+  Fresh Ghidra exports cover init, update, draw and gating functions. The bounded
+  reference search is not an exhaustive impossibility proof.
+- Offline SCNE/native-atlas preview inspected at the authored width-fit scale;
+  it uses sample values and explicitly labels absent runtime logo/fill/palette
+  behavior. It is not native appearance or gameplay evidence.
+
+Prior internal candidate/analysis ELF hashes remain exact. Protected builds,
+roster colors, uniforms and source JB remain preserved. No held Director/injury
+probe is included. Names, permanent counters/ranks, contextual branding and actual
+possession binding are explicitly unresolved. See SCOREBUG_TEST.md for the manual
+owner checklist and the local consolidated checksum/preservation manifest.
+
+# Historical CDF scene validation and combined-probe verification
 
 Public targeted run: **41 passed** (14 CDF/import and 27 Director/audit cases).
 Ten new CDF cases include a synthetic growing pair built and reparsed with new
