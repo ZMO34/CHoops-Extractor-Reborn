@@ -1,4 +1,37 @@
-# Current Director sentinel and held injury-component verification
+# Current CDF scene validation and combined-probe verification
+
+Public targeted run: **41 passed** (14 CDF/import and 27 Director/audit cases).
+Ten new CDF cases include a synthetic growing pair built and reparsed with new
+chunk content, original native offsets and unchanged source bank/data verified.
+Failure cases cover either capacity, false NAME labels over non-SCNE type words,
+compressed-stream corruption and short raw chunks. A guarded decoder test proves
+that oversized declarations are rejected before allocating decompressed output.
+Existing texture import cases
+remain passing. F lint passes for the changed builder; F/I passes for the new
+tests. Initial legacy tmp_path setup failed in the sandbox's default temp root;
+the complete rerun passed with a fresh workspace-local basetemp.
+
+Private container/component run: **44 passed**, including seven same-logical-size
+paired-scene checks and the previous 16 Director / 21 scene-template checks.
+The real-input paired injury probe preserves the entire original CDF as a prefix,
+native resource words/logical offsets and unrelated metadata. Its two fonts reuse
+existing spans; decoded part sizes remain 12,244 / 12,248. Four instances/bone
+counts, three providers and six animation rows remain exact. No preview warnings.
+
+The combined Director probe retains every original program/action and original
+literal index/stream, plus ten status strings and the startup name request.
+Sole-resource base zero, three permitted outer size fields, exact NAME trailer,
+bounded physical growth (6,144 bytes) and decoded-content reparse pass. A read-only
+vanilla archive plan accepts five existing replacements, four relocated assets,
+one in-place metadata asset and unchanged source entry count. No actual JB build
+or installable-candidate modification. Runtime appearance/coexistence remain
+unverified; static checks do not complete names or possession.
+
+Fresh Ghidra/instructions confirm startup home selector 102 and fixed home/away
+school sources for native message 38. Native text-pose/cached-offset handling
+remains a runtime-placement caveat; speculative offsets were not applied.
+
+# Earlier Director sentinel and held injury-component verification
 
 Director/read-only audit suite: **27 passed**. Eight new cases cover the native
 single-byte EOF sentinel, avoiding a fictitious command formed from trailing

@@ -5,7 +5,6 @@ import shutil
 import struct
 import uuid
 import hashlib
-from pathlib import Path
 from .usrdir_reader import Archive
 from .hash_names import hash_name,replacement_hash
 from .manifests import build_destination as safe_output
@@ -58,10 +57,21 @@ def asset_payload(name,data,changes):
         if b.u32(16)!=2 or b.relative(20)!=40:raise ValueError('Unsupported CDF block layout')
         sizes=(b.u32(52),b.u32(84))
         if any(not 0<n<=128*1024*1024 for n in sizes):raise ValueError('CDF logical block exceeds limit')
+        # Observed scene banks advertise the largest chunk in each block, not
+        # a uniform size for every scene. Identify the profile from native
+        # resource words, never from the editable NAME trailer.
+        scene_chunks=bool(pair.records) and all(
+            r['primary_words'][1]==0xe26c9b5d and r['primary_words'][2]==2
+            for r in pair.records
+        )
         for r in pair.records:
             for prefix,size in zip(('header','payload'),sizes):
                 offset=r[prefix+'_offset'];length=r[prefix+'_length']
-                decode(cdf[offset:offset+length],size)
+                raw=cdf[offset:offset+length]
+                if scene_chunks and raw[:4]==bytes.fromhex('0e4837c3'):
+                    if not 0<Binary(raw).u32(4)<=size:raise ValueError('CDF scene chunk exceeds declared block capacity')
+                    decode(raw)
+                else:decode(raw,size)
         return cdf if name.lower().endswith('.cdf') else iff
     result=meaningful_iff(data);validate_payload(result);return result
 

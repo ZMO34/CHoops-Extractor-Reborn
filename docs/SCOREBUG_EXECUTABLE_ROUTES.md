@@ -104,7 +104,11 @@ generic overlay command 0x166's different context namespace.
 A separate, uninstalled probe copies group 187's verified starting-lineup
 transaction, retaining its 12-byte scheduler header, wait/reset, away/home
 contexts, original five-second duration, definition 4, submission and termination.
-It appends 0x3D with arguments [37,23,108,255,0,255,0,0] before the terminator.
+It appends 0x3D with arguments [37,23,102,255,0,255,0,0] before the terminator.
+The startup actor now uses instruction-checked selector 102: 0x564D28's table
+case reaches 0x564ED0 -> 0x57F050. Selector 101 reaches the away getter; 108 instead
+uses event accessor 0x2E7950. The existing group-44 request retains its original
+108. The team's context precheck remains native; no selector registration changes.
 The old transaction remains intact; only one group record reference redirects
 to the appended copy. Leading references, literal indices, token map, other
 groups and every unrelated original byte remain exact. The decoded resource
@@ -178,10 +182,11 @@ subtitle without occupying comparison channel 3:
 
 Command 15E writes a different field; copying actor 10 into command 166 would
 also select a different player accessor. These distinctions are important when
-preserving context. Existing generic scenes have player-name/subtitle bindings,
-but a compact alternate injury scene, literal-table extension and activation
-have not been installed or verified. No injury transaction was changed in this
-audit. Player-stat channel 2 still needs its own coexistence solution.
+preserving context. Existing generic scenes have player-name/subtitle bindings.
+The compact scene and request components below remain uninstalled and lack
+native verification. Every original injury transaction remains intact; only
+selected references in the probe redirect to copied, extended transactions.
+Player-stat channel 2 still needs its own coexistence solution.
 
 ### Held injury scene and request components
 
@@ -196,7 +201,16 @@ subtitle fields use Stratum2 25. This is authored placement, not native projecti
 or simultaneous-popup collision verification. Other consumers of violation_a
 would share this reskin.
 
-A decoded-only request component copies the ten checked injury programs and
+The two font aliases now reuse their distinct existing string spans in place;
+the header stays exactly 12,244 decoded bytes and the payload 12,248. This avoids
+changing the CDF resource's logical size or offsets. A paired container probe
+appends only recompressed physical chunks and redirects the selected descriptor.
+All original CDF bytes remain an exact prefix; all native resource words/logical
+offsets, unrelated descriptors, metadata and animation rows remain exact. Both
+parts reparse to the authored component. No generic logical SCNE growth is enabled
+by this private adapter.
+
+A request component copies the ten checked injury programs and
 adds reset/context/15F subtitle/six-second duration/definition-26/submission after
 their existing 3D injury requests. It retains every original command, scheduler
 header, original program and following action. Exactly the selected group-127
@@ -205,13 +219,55 @@ are appended through a new literal table; all 78 original indices and exact
 UTF-16 streams are copied, using forward references. Every unrelated original
 resource byte remains exact and the pointer index reparses.
 
-This is **not an archive override**: the straightforward stored encoding exceeds
-the original Director physical extent. It must pass a separate container-growth
-and archive-builder review before installation. No public arbitrary DRCT writer,
-injury activation, CDF override or candidate change is installed. The remaining
+The component now also has a complete, uninstalled Director IFF probe. A combined
+variant adds the independently checked startup name transaction at the end of
+that resource, retaining all old programs, ten literal additions and all unrelated
+source bytes. The combined decoded resource is 487,752 bytes; the physical IFF is
+202,752 bytes, 6,144 larger than the source extent. Its sole DRCT resource remains
+at logical offset zero. Only the three observed outer size fields change; the
+NAME trailer remains exact and the result reparses to the verified decoded data.
+This does not enable a public arbitrary DRCT writer.
+
+Read-only planning against vanilla accepts all five existing-asset replacements:
+the two current candidate IFFs plus the held Director and overlaycache pair.
+Four assets relocate and the IFF metadata fits in place; no asset identities or
+source entry count are added. This is a plan, **not a built JB** or installed
+candidate. No injury activation, CDF override or candidate change is installed. The remaining
 unlocated injury types, run report and leader/stat panels still need consideration;
 the duplicate native channel-1 report would also remain visible if the name layer
 did not activate.
+
+### CDF scene capacity correction in the builder
+
+The vanilla overlaycache pair has 21 SCNE records with varying decoded chunk
+sizes. Its block descriptors advertise maxima: 121,494 header bytes and 1,499,440
+payload bytes, matching the largest observed chunks. The old builder required
+each chunk to equal the maximum, so it rejected this valid scene bank.
+
+Validation now permits smaller H7-wrapped chunks only when **every native resource
+type word** is SCNE (0xE26C9B5D) and has two offsets. Each decoded chunk must be
+nonempty and within its declared block maximum, checked before decompression.
+Editable NAME labels cannot
+activate this profile. Other resource profiles and uncompressed chunks retain
+their existing exact-size checks; compressed-stream bounds remain strict. The
+texture-slot writer is unchanged. Synthetic cases cover capacity failures, false
+NAME labels, corruption, existing texture imports and a growing paired-asset
+roundtrip with original source/data preservation.
+
+### Team ordering and native text-placement checks
+
+Fresh exports/instructions confirm that message 38 uses the same fixed current-
+home/current-away school getters as message 37: provider-table +8/+0x0C, with
+value providers +0x28/+0x2C. Its normal timeout request therefore does not change
+the name sources to an actor-relative ordering. No timeout event is rewritten.
+
+The topbar draw path 0x4F5220..0x4F5270 copies the resolved SCNE text pose, adds
+the cached slot's X offset and adds 250 to Z. The slot constructor at 0x4EF400
+initially clears those offsets. The 0x4F24F0 column adjuster is conditional on
+finding the named divider instances; channel number alone is not enough to
+assume its computed shifts apply. Do not bake speculative column compensation
+into authored markers. Final projection and applicable runtime scene gates remain
+unverified; the component still records authored placement before native handling.
 
 ### Refined read-only command leads
 
@@ -308,17 +364,19 @@ or runtime-visibility claim is made.
 The private component reparses, marker/pose bounds and animation-count checks pass;
 unrelated localization/vertex bytes remain preserved. The existing private
 scene-contract/comparison-template suite passes **21 tests**. The scoped private
-Director container suite passes **16 tests**; combined run: **37 passed**. The
+Director container suite passes **16 tests**. The private paired-scene container
+suite adds **7 tests**; combined private run: **44 passed**. The
 read-only injury audit checks ten full transactions, and the caption initializer
 inventory checks all 24 caption entries. Fresh Ghidra exports cover actor,
 subtitle and statistic routes. Added 100/38 instruction-verified actor-switch
 edges to the analysis database only; the decompiler still does not recover these
 switches, so the selected cases are supported by instructions, not its completion
-flag. Public source now adds only the bounded native stream-sentinel helper;
-Director/audit tests: **27 passed**, including eight new sentinel regression/bounds
-cases. F/I lint passes for the changed helper/tests. The prior 178-test result is
-historical, not a fresh test of this new API. The held injury scene and decoded
-request reparse with provider/animation/bone/source-preservation checks. These
+flag. Public Director/audit plus CDF/import suites: **41 passed**, including ten
+new CDF cases and the earlier eight sentinel regression/bounds cases. F lint
+passes for the changed builder; F/I lint passes for the new tests. The prior
+178-test result is historical, not a fresh test of this update. The held paired
+injury scene and combined Director IFF reparse with provider/animation/bone/source-
+preservation checks. The five-asset archive plan succeeds without building a JB. These
 helpers are not gameplay tests.
 
 Analysis ELF and current two-IFF candidate hashes remain exact. No EBOOT, uniform,

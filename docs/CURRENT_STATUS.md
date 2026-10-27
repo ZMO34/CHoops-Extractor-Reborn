@@ -19,13 +19,23 @@ traced comparison selector 11 to fouls and 23 to the live timeout getter; curren
 period foul/reset semantics and combined counters remain unverified. Lifetime,
 popup coexistence and native appearance must be resolved before promotion.
 
-Follow-up now authors a separate violation_a injury component with centered
-player/status fields, shaded geometry, unchanged providers/bones and six animation
-rows. A decoded request component retains all ten checked original events/actions
-and literal indices while adding finite popup requests and return-status strings.
-Its compressed size exceeds the original physical extent; no archive/CDF override
-or activation is installed. Shared violation-scene consumers and popup collisions
-remain unverified.
+Follow-up now has uninstalled injury IFF/CDF and combined Director probes. The
+violation_a reskin keeps the original decoded part sizes by reusing two font-string
+spans; native resource words/logical offsets, providers/bones and six animation
+rows stay exact. Only physical compressed chunks append to the CDF; all old CDF
+bytes remain an exact prefix. The combined Director retains every original injury
+and startup action, adds ten finite injury requests/status strings and the name
+request, and reparses with 6,144 bytes of bounded physical growth. Startup now uses
+instruction-checked home selector 102; existing timeout requests stay untouched.
+
+Fixed builder validation for the observed all-SCNE CDF profile: compressed chunk
+sizes may vary within block maxima; native type/count words identify it, not NAME
+labels. Other profiles retain exact-size checks. Public targeted suites: 41 passed;
+private component/container suites: 44 passed. Read-only planning accepts five
+existing-asset replacements with four relocations and no new identities/count.
+No JB build, candidate promotion or activation. Shared violation-scene consumers,
+native visibility/lifetime and popup collisions remain unverified. Message 38's
+school getters were confirmed fixed to home/away, preserving name ordering.
 
 Corrected the read-only scan's shared-reader joins and native one-byte stream
 sentinel (5A708). Added bounded is_stream_end API and eight regression/bounds

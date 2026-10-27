@@ -91,6 +91,13 @@ internal names from case-sensitive CRC32 IDs: arena, floor, uniform artwork,
 jersey/shorts cloth shapes and numbered logos. Unknown IDs remain numeric and
 unknown types remain unknown. Authored name tables still take precedence.
 CDF metadata recognizes the standard TXTR hash as well as the older CDF variant.
+Observed two-block SCNE CDF banks use varying H7 chunk lengths within the block
+descriptor maxima. Builder validation recognizes this only when all native type
+words are SCNE and each resource has two offsets; decoded chunks must be nonempty
+and no larger than the corresponding maximum. NAME labels cannot enable this
+profile. Other types and uncompressed chunks keep exact-size validation. This
+does not enable a generic CDF scene-growth writer; see SCOREBUG_EXECUTABLE_ROUTES.md
+for the same-logical-size private probe and its limits.
 SCNE previews accept declared half4/float4 UV fields (first two UV components) and
 half4 vertex colors; complete declared attribute extents stay bounds checked.
 The NBA arena's half4 declarations are the read-only evidence for this extension.

@@ -1,5 +1,7 @@
 # Unreleased — expanded scorebug executable research
 
+- Validate variable compressed SCNE chunks against CDF block maxima using native type words.
+- Assemble held paired injury and combined Director probes with preserved logical layouts and archive plans.
 - Add bounded native byte-sentinel inspection to prevent misreading Director stream endings.
 - Author held finite injury scene/request components and record the new possession-arrow requirement.
 - Trace ungated school-name comparison getters, Director queue activation and live foul/timeout values.

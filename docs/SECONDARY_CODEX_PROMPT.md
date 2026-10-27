@@ -109,13 +109,23 @@ traced comparison selector 11 to fouls and 23 to the live timeout getter; curren
 period foul/reset semantics and combined counters remain unverified. Lifetime,
 popup coexistence and native appearance must be resolved before promotion.
 
-Follow-up now authors a separate violation_a injury component with centered
-player/status fields, shaded geometry, unchanged providers/bones and six animation
-rows. A decoded request component retains all ten checked original events/actions
-and literal indices while adding finite popup requests and return-status strings.
-Its compressed size exceeds the original physical extent; no archive/CDF override
-or activation is installed. Shared violation-scene consumers and popup collisions
-remain unverified.
+Follow-up now has uninstalled injury IFF/CDF and combined Director probes. The
+violation_a reskin keeps the original decoded part sizes by reusing two font-string
+spans; native resource words/logical offsets, providers/bones and six animation
+rows stay exact. Only physical compressed chunks append to the CDF; all old CDF
+bytes remain an exact prefix. The combined Director retains every original injury
+and startup action, adds ten finite injury requests/status strings and the name
+request, and reparses with 6,144 bytes of bounded physical growth. Startup now uses
+instruction-checked home selector 102; existing timeout requests stay untouched.
+
+Fixed builder validation for the observed all-SCNE CDF profile: compressed chunk
+sizes may vary within block maxima; native type/count words identify it, not NAME
+labels. Other profiles retain exact-size checks. Public targeted suites: 41 passed;
+private component/container suites: 44 passed. Read-only planning accepts five
+existing-asset replacements with four relocations and no new identities/count.
+No JB build, candidate promotion or activation. Shared violation-scene consumers,
+native visibility/lifetime and popup collisions remain unverified. Message 38's
+school getters were confirmed fixed to home/away, preserving name ordering.
 
 Corrected the read-only scan's shared-reader joins and native one-byte stream
 sentinel (5A708). Added bounded is_stream_end API and eight regression/bounds
@@ -1335,6 +1345,13 @@ internal names from case-sensitive CRC32 IDs: arena, floor, uniform artwork,
 jersey/shorts cloth shapes and numbered logos. Unknown IDs remain numeric and
 unknown types remain unknown. Authored name tables still take precedence.
 CDF metadata recognizes the standard TXTR hash as well as the older CDF variant.
+Observed two-block SCNE CDF banks use varying H7 chunk lengths within the block
+descriptor maxima. Builder validation recognizes this only when all native type
+words are SCNE and each resource has two offsets; decoded chunks must be nonempty
+and no larger than the corresponding maximum. NAME labels cannot enable this
+profile. Other types and uncompressed chunks keep exact-size validation. This
+does not enable a generic CDF scene-growth writer; see SCOREBUG_EXECUTABLE_ROUTES.md
+for the same-logical-size private probe and its limits.
 SCNE previews accept declared half4/float4 UV fields (first two UV components) and
 half4 vertex colors; complete declared attribute extents stay bounds checked.
 The NBA arena's half4 declarations are the read-only evidence for this extension.
@@ -5721,7 +5738,40 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 
 Embedded source: docs/TEST_REPORT.md
 
-# Current Director sentinel and held injury-component verification
+# Current CDF scene validation and combined-probe verification
+
+Public targeted run: **41 passed** (14 CDF/import and 27 Director/audit cases).
+Ten new CDF cases include a synthetic growing pair built and reparsed with new
+chunk content, original native offsets and unchanged source bank/data verified.
+Failure cases cover either capacity, false NAME labels over non-SCNE type words,
+compressed-stream corruption and short raw chunks. A guarded decoder test proves
+that oversized declarations are rejected before allocating decompressed output.
+Existing texture import cases
+remain passing. F lint passes for the changed builder; F/I passes for the new
+tests. Initial legacy tmp_path setup failed in the sandbox's default temp root;
+the complete rerun passed with a fresh workspace-local basetemp.
+
+Private container/component run: **44 passed**, including seven same-logical-size
+paired-scene checks and the previous 16 Director / 21 scene-template checks.
+The real-input paired injury probe preserves the entire original CDF as a prefix,
+native resource words/logical offsets and unrelated metadata. Its two fonts reuse
+existing spans; decoded part sizes remain 12,244 / 12,248. Four instances/bone
+counts, three providers and six animation rows remain exact. No preview warnings.
+
+The combined Director probe retains every original program/action and original
+literal index/stream, plus ten status strings and the startup name request.
+Sole-resource base zero, three permitted outer size fields, exact NAME trailer,
+bounded physical growth (6,144 bytes) and decoded-content reparse pass. A read-only
+vanilla archive plan accepts five existing replacements, four relocated assets,
+one in-place metadata asset and unchanged source entry count. No actual JB build
+or installable-candidate modification. Runtime appearance/coexistence remain
+unverified; static checks do not complete names or possession.
+
+Fresh Ghidra/instructions confirm startup home selector 102 and fixed home/away
+school sources for native message 38. Native text-pose/cached-offset handling
+remains a runtime-placement caveat; speculative offsets were not applied.
+
+# Earlier Director sentinel and held injury-component verification
 
 Director/read-only audit suite: **27 passed**. Eight new cases cover the native
 single-byte EOF sentinel, avoiding a fictitious command formed from trailing
