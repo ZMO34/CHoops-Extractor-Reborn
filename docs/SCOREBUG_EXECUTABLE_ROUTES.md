@@ -85,7 +85,9 @@ eight-byte command.
 
 A narrow real-data example is verified independently of the provisional wider
 script scan: group 44, record 80940, next record 80964. Its body at +12 decodes
-0x3D with bytes [38,23,108,1,0,5,0,0], then token 0 and one zero padding byte.
+0x3D with bytes [38,23,108,1,0,5,0,0], then a zero-byte stream sentinel and two
+zero padding bytes. This corrects the earlier index-decoder interpretation of
+two bytes as token 0 and one byte as padding: 0x5A708 checks one byte first.
 The native shuffle supplies repeat count 1 and duration 5 seconds. The complete
 activation phase of event 44 remains unproven. The example proves the command
 boundary/argument form, not permission to repurpose that event or a persistent
@@ -139,6 +141,13 @@ stat messages and injuries. That must be resolved before promotion. Generic over
 counting is a different subsystem, but its absence here does not prove that no
 other wait, reset or scene transition affects message display.
 
+Channel 0 is separate: the checked core popup providers explicitly request that
+channel, rather than using 0x509C54. It includes the native points/general-stat
+messages and foul/violation messages 39..63. The channel-2 conflict concerns the
+additional leader/stat-line/foul-situation panels in 5..36; it does not mean that
+every points, foul or rebound popup is blocked. The generic injury announcement
+63 also uses channel 0; the detailed injury/return-status messages use channel 1.
+
 The next investigation is the message channel's activation, reset, arbitration
 and script-trigger ownership, plus preserving the requested statistic popups.
 The eight-byte command and six-bone component provide a narrower concrete lead
@@ -173,6 +182,70 @@ preserving context. Existing generic scenes have player-name/subtitle bindings,
 but a compact alternate injury scene, literal-table extension and activation
 have not been installed or verified. No injury transaction was changed in this
 audit. Player-stat channel 2 still needs its own coexistence solution.
+
+### Held injury scene and request components
+
+A separate component now reskins vanilla OVERLAYCACHE / violation_a, native
+definition 26 in the 0x1267BB04 table (stride 0x7C). Its entry 0x1267C79C uses
+the broad text-provider table at +0x38 = 0x953558. The component keeps all four
+instances, their original bone counts, all three provider identities and all six
+animation rows. It hides the jersey-number field and old textured artwork,
+retains the original untextured background's material fade, and authors a slight
+dark gradient over X [-301,84], Y [-173,-151]. Separate centered player-name and
+subtitle fields use Stratum2 25. This is authored placement, not native projection
+or simultaneous-popup collision verification. Other consumers of violation_a
+would share this reskin.
+
+A decoded-only request component copies the ten checked injury programs and
+adds reset/context/15F subtitle/six-second duration/definition-26/submission after
+their existing 3D injury requests. It retains every original command, scheduler
+header, original program and following action. Exactly the selected group-127
+record pointers redirect to the copies. Ten authored injury/return-status strings
+are appended through a new literal table; all 78 original indices and exact
+UTF-16 streams are copied, using forward references. Every unrelated original
+resource byte remains exact and the pointer index reparses.
+
+This is **not an archive override**: the straightforward stored encoding exceeds
+the original Director physical extent. It must pass a separate container-growth
+and archive-builder review before installation. No public arbitrary DRCT writer,
+injury activation, CDF override or candidate change is installed. The remaining
+unlocated injury types, run report and leader/stat panels still need consideration;
+the duplicate native channel-1 report would also remain visible if the name layer
+did not activate.
+
+### Refined read-only command leads
+
+The earlier provisional scanner missed operand readers after shared dispatcher
+joins. Instruction checks now follow the joined paths, including category 15's
+u16 plus byte, category 16's literal index plus signed u16, category 55's two u16s
+plus signed u16, and category 41's flag-controlled signed-u16 operands. Native
+0x5A708 checks a one-byte zero sentinel before command-index decoding. A bounded
+public is_stream_end helper now exposes that separate preflight; it does not
+discover boundaries or interpret operands.
+
+The refined private scan has 6,419 zero-tail terminations and 98 terminations
+with nonzero trailing data across the 6,517 referenced records; no former
+truncation/index error remains. It finds 99 3D leads, with no message IDs 5..36
+in those leads. These are still caller-derived +12 starts and inferred record
+ends. Nonzero tails, indirect/runtime sources and unclassified metadata prevent
+claiming a complete script disassembly or proving channel 2 unused. Selected
+transactions must continue to be checked independently before mutation.
+
+## Possession arrow added to the required layout
+
+The owner added a possession arrow to the objective. Reserve a small indicator
+in each team's lower row, immediately before its score cell, clear of the sixth-
+man strips: planned away X [-166,-156], home X [40,50], Y [-204,-198]. Its active
+side needs a genuine alternating-possession source; current ball control alone
+would not prove the college possession-arrow state.
+
+The checked bottom-bar pCone1 is a 540-expanded-vertex, two-material ring/glare
+mesh with initially transparent diffuse alpha, not evidence of a driven arrow.
+The native arrow asset request at 0x2BFB58 belongs to the drill-challenge renderer
+(source-path evidence and separate resource root), not a regular-scorebug binding.
+Some high-half CRC candidates do not construct the complete requested hash and
+must not be counted as matches. No static, permanently active or guessed-side
+arrow was added. A reliable possession binding/trigger remains required.
 
 ### Additional live statistic routes
 
@@ -241,8 +314,12 @@ inventory checks all 24 caption entries. Fresh Ghidra exports cover actor,
 subtitle and statistic routes. Added 100/38 instruction-verified actor-switch
 edges to the analysis database only; the decompiler still does not recover these
 switches, so the selected cases are supported by instructions, not its completion
-flag. Public source is unchanged from the prior 178-test result. These helpers
-are not gameplay tests.
+flag. Public source now adds only the bounded native stream-sentinel helper;
+Director/audit tests: **27 passed**, including eight new sentinel regression/bounds
+cases. F/I lint passes for the changed helper/tests. The prior 178-test result is
+historical, not a fresh test of this new API. The held injury scene and decoded
+request reparse with provider/animation/bone/source-preservation checks. These
+helpers are not gameplay tests.
 
 Analysis ELF and current two-IFF candidate hashes remain exact. No EBOOT, uniform,
 roster color, protected build, emulator or full JB changes. Names, permanent

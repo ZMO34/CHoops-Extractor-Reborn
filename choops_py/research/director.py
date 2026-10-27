@@ -88,11 +88,28 @@ def inspect_director(data):
     )
 
 
+def is_stream_end(data, position, end):
+    """Check the native byte sentinel at a caller-proven command boundary.
+
+    5AAD0 calls 5A708 before dispatch: zero is end-of-stream, even when there is
+    no second byte for the command-index reader. This does not discover command
+    boundaries, validate an entire program, execute commands or modify data.
+    """
+    b = _binary(data)
+    if type(position) is not int or type(end) is not int:
+        raise ValueError("Director stream bounds must be integers")
+    if not 0 <= position < end <= len(data):
+        raise ValueError("Invalid Director stream extent")
+    return b.slice(position, 1) == bytes(1)
+
+
 def decode_command(data, position, end):
     """Decode one index at a caller-proven position, not a whole program.
 
     Operand bytes may look like commands. The caller must supply a verified
     command boundary and stream end; this helper cannot establish either one.
+    Call is_stream_end first when following native program control flow; the
+    byte sentinel is separate from this command-index decoder.
     """
     b = _binary(data)
     if type(position) is not int or type(end) is not int:

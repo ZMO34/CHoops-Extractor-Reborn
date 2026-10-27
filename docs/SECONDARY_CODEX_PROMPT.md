@@ -109,6 +109,25 @@ traced comparison selector 11 to fouls and 23 to the live timeout getter; curren
 period foul/reset semantics and combined counters remain unverified. Lifetime,
 popup coexistence and native appearance must be resolved before promotion.
 
+Follow-up now authors a separate violation_a injury component with centered
+player/status fields, shaded geometry, unchanged providers/bones and six animation
+rows. A decoded request component retains all ten checked original events/actions
+and literal indices while adding finite popup requests and return-status strings.
+Its compressed size exceeds the original physical extent; no archive/CDF override
+or activation is installed. Shared violation-scene consumers and popup collisions
+remain unverified.
+
+Corrected the read-only scan's shared-reader joins and native one-byte stream
+sentinel (5A708). Added bounded is_stream_end API and eight regression/bounds
+cases; Director/audit suite: 27 passed, F/I lint passes. Refined leads: 6,419 zero
+tails, 98 nonzero tails, 99 message requests, none for channel-2 IDs 5..36. These
+are not complete whole-script proof. Core points/general-stat/foul providers use
+separate channel 0; the priority conflict does not suppress every core popup.
+
+The objective now also requires a possession arrow. Lower-row positions are
+reserved in the authored plan. The checked pCone1 glare mesh and drill arrow asset
+do not establish a scorebug possession binding; no guessed/static arrow installed.
+
 No executable/asset-candidate change or package. See SCOREBUG_EXECUTABLE_ROUTES.md
 for scope, evidence, other renderer/menu/arena leads and limits. Required names
 remain unfinished. The prior impasse below is historical and superseded by these
@@ -5702,7 +5721,35 @@ see [uniform mesh editing](UNIFORM_MESH_EDITING.md). No arbitrary topology/NBA w
 
 Embedded source: docs/TEST_REPORT.md
 
-# Expanded executable-search verification
+# Current Director sentinel and held injury-component verification
+
+Director/read-only audit suite: **27 passed**. Eight new cases cover the native
+single-byte EOF sentinel, avoiding a fictitious command formed from trailing
+metadata, source preservation, nonzero command starts and invalid/noninteger
+bounds. F/I lint passes for choops_py/research/director.py and tests/test_director.py.
+Fresh Ghidra export and instructions at 5A708 agree with the byte preflight.
+
+Private injury scene: decoded SCNE reparse, unchanged three providers, four
+instances/bone counts, six exact animation rows, resolved text markers and preview
+without warnings. Geometry/text positions are authored, not native verified.
+Private decoded injury request: ten copied programs retain every original
+command/header/following action; 78 original literal indices/streams preserved;
+ten added status strings and selected pointer changes reparse. Unrelated original
+resource bytes exact. Compressed output exceeds original physical capacity; no
+archive/CDF installation or candidate change. No runtime coexistence claim.
+
+Refined read-only scan follows joined argument-reader paths and the byte sentinel:
+6,419 zero-tail and 98 nonzero-tail terminations over 6,517 references, 99 3D leads,
+none for 5..36. No former decode exception remains, but inferred starts/ends and
+nonzero tails mean this is not a complete script validator or proof of unused code.
+Core channel-0 callbacks are separate from the confirmed 3 > 2 > 1 arbitration.
+
+Possession-arrow requirement recorded; checked glare/drill assets do not provide
+a verified native HUD binding. No arrow rendering claim. Original executable,
+roster colors, source assets and protected builds remain unchanged. No emulator,
+full JB or package. Prior 178-test source result is historical for the new API.
+
+# Earlier expanded executable-search verification
 
 Whole-image inventory: 39,100 functions / 40,288 nonoverlapping body ranges;
 169,501 direct-branch patterns, with 21,424 outside recovered function bodies;

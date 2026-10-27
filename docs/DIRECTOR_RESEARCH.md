@@ -37,6 +37,12 @@ it appends another byte as a 16-bit index; 0x59700 supplies that threshold check
 0x59724 resolves the index through the u16 command map. This indexes a native
 12-byte dispatch table at 0x1270BF80; the encoded byte is not the command number.
 The vanilla threshold is 1. Operand boundaries must be established separately.
+Before invoking that index decoder, program runner 0x5AAD0 calls 0x5A708, which
+tests **one byte** at the current command boundary for zero. This is the native
+stream sentinel, not a two-byte command-map index. A final single zero byte is
+sufficient; bytes after that sentinel are not dispatched. Earlier descriptions
+of a decoded token 0 plus padding must be read with this distinction.
+
 Searching for matching byte values inside arbitrary operands is not a valid
 script disassembly.
 
@@ -106,6 +112,13 @@ references, strings, groups and opaque metadata. decode_command(data, position,
 end) decodes one command at a caller-proven boundary; it does not discover the
 boundary, parse arbitrary operands, execute code or modify data. No GUI writer or
 CLI script-patching action is exposed.
+
+is_stream_end(data, position, end) performs the separate native byte-sentinel
+check at a caller-proven boundary. Call it before decode_command when following
+VM control flow. It accepts a final single zero byte, preserves the source, and
+rejects invalid or noninteger bounds. It does not find boundaries or certify a
+whole script. Treating a zero byte plus following metadata as an extended index
+can otherwise produce a fictitious command or a truncation error.
 
 Synthetic tests cover repeated-reference preservation, short/extended indices,
 truncated operands, invalid stream bounds, missing/out-of-range pointers,

@@ -19,6 +19,25 @@ traced comparison selector 11 to fouls and 23 to the live timeout getter; curren
 period foul/reset semantics and combined counters remain unverified. Lifetime,
 popup coexistence and native appearance must be resolved before promotion.
 
+Follow-up now authors a separate violation_a injury component with centered
+player/status fields, shaded geometry, unchanged providers/bones and six animation
+rows. A decoded request component retains all ten checked original events/actions
+and literal indices while adding finite popup requests and return-status strings.
+Its compressed size exceeds the original physical extent; no archive/CDF override
+or activation is installed. Shared violation-scene consumers and popup collisions
+remain unverified.
+
+Corrected the read-only scan's shared-reader joins and native one-byte stream
+sentinel (5A708). Added bounded is_stream_end API and eight regression/bounds
+cases; Director/audit suite: 27 passed, F/I lint passes. Refined leads: 6,419 zero
+tails, 98 nonzero tails, 99 message requests, none for channel-2 IDs 5..36. These
+are not complete whole-script proof. Core points/general-stat/foul providers use
+separate channel 0; the priority conflict does not suppress every core popup.
+
+The objective now also requires a possession arrow. Lower-row positions are
+reserved in the authored plan. The checked pCone1 glare mesh and drill arrow asset
+do not establish a scorebug possession binding; no guessed/static arrow installed.
+
 No executable/asset-candidate change or package. See SCOREBUG_EXECUTABLE_ROUTES.md
 for scope, evidence, other renderer/menu/arena leads and limits. Required names
 remain unfinished. The prior impasse below is historical and superseded by these

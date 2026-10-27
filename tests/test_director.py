@@ -2,7 +2,7 @@ import struct
 
 import pytest
 
-from choops_py.research.director import decode_command, inspect_director
+from choops_py.research.director import decode_command, inspect_director, is_stream_end
 
 
 def fixture():
@@ -59,6 +59,34 @@ def test_decodes_short_and_extended_indices_at_explicit_boundaries():
     assert decode_command(h, 0x702, 0x703)["token"] == 0x15B
     with pytest.raises(ValueError, match="Truncated"):
         decode_command(h, 0x700, 0x701)
+
+
+def test_native_end_sentinel_needs_only_one_byte():
+    h = fixture()
+    assert is_stream_end(h, len(h) - 1, len(h))
+    with pytest.raises(ValueError, match="Truncated"):
+        decode_command(h, len(h) - 1, len(h))
+
+
+def test_native_end_prevents_decoding_bytes_after_the_sentinel():
+    h = bytearray(fixture())
+    h[0x700:0x703] = bytes([0, 9, 0xFF])
+    before = bytes(h)
+    assert is_stream_end(h, 0x700, 0x703)
+    # Reading an index without the VM's preflight would misread this as 15B.
+    assert decode_command(h, 0x700, 0x703)["token"] == 0x15B
+    assert h == before
+
+
+def test_native_end_does_not_search_inside_a_command_operand():
+    h = fixture()
+    assert not is_stream_end(h, 0x700, 0x703)
+
+
+@pytest.mark.parametrize("position,end", [(-1, 1), (0, 0), (1, 0xC01), (True, 2), (1, False)])
+def test_native_end_rejects_invalid_stream_bounds(position, end):
+    with pytest.raises(ValueError):
+        is_stream_end(fixture(), position, end)
 
 
 @pytest.mark.parametrize("case", [

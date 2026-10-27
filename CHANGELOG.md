@@ -1,5 +1,7 @@
 # Unreleased — expanded scorebug executable research
 
+- Add bounded native byte-sentinel inspection to prevent misreading Director stream endings.
+- Author held finite injury scene/request components and record the new possession-arrow requirement.
 - Trace ungated school-name comparison getters, Director queue activation and live foul/timeout values.
 - Validate a held startup-request probe; document injury/player-stat priority conflicts and a separate injury-overlay lead.
 - Keep executable, candidate and protected builds unchanged; native names and packaging remain unfinished.
