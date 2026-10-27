@@ -462,6 +462,31 @@ The graph is a lead finder, not proof that all edges execute in the same frame.
 No scene, EBOOT, roster or uniform asset is changed, and no name layer is claimed
 to work in gameplay.
 
+### Follow-up: alternate-controller game-state writers
+
+A bounded, read-only search for stores to the global game-state fields used by
+the name and controller gates produced candidate writes; aliases, indirect
+stores and control-flow coverage are incomplete. Selected candidates were
+cross-checked in Ghidra and with instructions. 0x2B06B4 sets global +0x138 to
+1 at 0x2B0788, but also initializes a separate context structure, selects an
+indexed native table and writes other game-state fields. 0x2B02B8 clears that
+flag along with several related fields. These are broader context transitions,
+not established scorebug-scene settings.
+
+The separate predicate 0x2B1764 reads +0xA14 of a different global structure;
+0x2B177C writes it. A checked path 0x65C9C0 sets that field to 1, then invokes
+0x5D63A0 -> 0x2B06B4. The corresponding 0x5D640C path clears the contextual
+state. Neither sequence establishes that the normal 5-on-5 match can use that
+context without changing game behavior. Separately, 0x5C2870 sets game mode 4,
+writes its argument to +0xCC and changes several other fields; satisfying the
+main name gate through that mode is not shown to be an IFF-only HUD choice.
+
+Ten instruction checks, two exact TOC-veneer target checks and two global-pointer
+checks pass. Ghidra exports cover these writers and selected callers. This is a
+bounded investigation, not proof that all possible resource-controlled mode
+paths are absent. No mode, EBOOT, resource or game build was changed; automatic
+names in the normal scorebug remain unfinished.
+
 | Route | Checked evidence | Remaining limit |
 | --- | --- | --- |
 | Separate player-card renderer | 0x1A59C -> 0x217B10 -> 0x217540; reads current team +0 school text and +0x0C nickname, draws through 0x214FD0 -> 0x9D048 | Root 0x12A863B0 selects one team from a supplied player's side; state 2, time handling and source object govern display |

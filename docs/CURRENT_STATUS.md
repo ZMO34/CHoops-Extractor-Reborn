@@ -1,3 +1,13 @@
+# Team-name alternate context follow-up
+
+Traced native writers and callers for alternate-HUD and name-gate state. A path
+sets global +0x138 and a separate +0xA14 context predicate, but also initializes
+other game state and a table-selected context. A second path sets game mode 4 and
+several related fields. Neither is established as a cosmetic IFF-controlled
+switch for a normal 5-on-5 game. Ten instruction, two veneer and two global
+pointer assertions pass. Fresh Ghidra exports are local; no game files changed.
+See SCOREBUG_EXECUTABLE_ROUTES.md for the bounded search and limitations.
+
 # Team-name overlay lifetime follow-up
 
 Investigated whether a special duration could keep a name overlay out of the

@@ -1096,3 +1096,11 @@ counts and their direct indexed consumers, with context-sensitive effects.
 These checks do not emulate PS3 floating-point state or establish gameplay
 behavior; no non-finite value or other game asset was written.
 
+# Alternate HUD context follow-up
+
+Read-only local assertions pass for ten native instructions, two resolved TOC
+veneers and two global pointers. Ghidra exports cover selected state writers and
+callers. Linear alias search yields leads only and does not cover every computed
+or indirect store. The Director unit suite and handoff check pass; no gameplay
+or game-file modification was performed.
+
