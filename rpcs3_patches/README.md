@@ -44,5 +44,5 @@ top of each script):
   write `TAG caller-address [text]` to `log/TTY.log` through sys_tty_write. This is
   how the real name call sites were found; leave them out of normal play.
 
-These checks only model the game. Confirmed in-game: scorebug rank and the transfer
-entries. Not yet confirmed in-game: the Team Select and matchup rank caves (the Team Select crash fix above has only been checked offline).
+These checks only model the game. Confirmed in-game: all three poll-rank entries
+(scorebug, Team Select, matchup card) and the transfer entries.
