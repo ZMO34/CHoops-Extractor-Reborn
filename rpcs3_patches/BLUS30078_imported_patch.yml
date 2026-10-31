@@ -1,0 +1,518 @@
+Version: 1.2
+
+# College Hoops 2K8 (BLUS30078) - RPCS3 game patches by Claude Code.
+# Keyed to the 2026-27 year-patched EBOOT (V4.2 base build); enable entries in
+# Manage > Game Patches. Groups: 60 FPS, poll rank on the scorebug / Team Select /
+# pregame matchup card, recruit generation (heights, skilled bigs, international),
+# and Legacy transfers (frequency, unhappiness, no sit-out).
+
+PPU-cd3a6cffbf5c1930053d0873658d0f3c46e19c8b:
+  "60 FPS (all screens)":
+    Games:
+      "College Hoops 2K8":
+        BLUS30078: [ All ]
+    Author: "Claude Code"
+    Notes: "The vblank handler flips every N vblanks (ctx+0x3CE4). The game sets N to the largest interval requested by its systems (function 0x6FC58): 1 in menus, 2 (30 fps) in gameplay. This forces N = 1. Frame time scales with N x vblank period or uses real time, so game speed stays correct. Set Vblank Rate back to 60 in this game's custom config; keep Frame limit 60. Needs a PC that holds 60 fps in RPCS3."
+    Patch Version: 1.0
+    Patch:
+      - [ be32, 0x0006FCA4, 0x38600001 ] # mr r3,r8 (largest requested interval) -> li r3,1
+
+  "Scorebug: team names (home_city / away_city)":
+    Games:
+      "College Hoops 2K8":
+        BLUS30078: [ All ]
+    Author: "Claude Code"
+    Notes: "The scorebug's home_city/away_city text providers (0x4EF9A4 / 0x4EFABC) ask a mode check (0x4EED80) and, in a normal game, skip the existing formatter 0x4EF92C that writes the team's name string (team +4). These two edits let the formatter run. Only visible with a scorebug layout that draws the home_city/away_city text nodes. Do not enable together with the poll-rank scorebug entry, which already includes this fix."
+    Patch Version: 1.0
+    Patch:
+      - [ be32, 0x004EF9F0, 0x60000000 ] # home: bne cr7 (skip name formatter) -> nop
+      - [ be32, 0x004EFB08, 0x60000000 ] # away: bne cr7 (skip name formatter) -> nop
+
+  "Scorebug: team names with poll rank (#5 DUKE)":
+    Games:
+      "College Hoops 2K8":
+        BLUS30078: [ All ]
+    Author: "Claude Code"
+    Notes: "Rewrites the scorebug home/away text providers (0x4EF9A4 / 0x4EFABC) in place. Scorebug team objects (0x57F050 / 0x57F064) are per-game copies of the roster team record, so each is matched to the current media poll (0x5BDB44, slots 0-24) by its unique team ID (anchor +0x15E); ID 0 is never matched. Ranked text uses the game's own formatter (0x49E0E4) and English templates 0x12BE2A9D '#{0}' (rank) and 0xDB12E271 '{0} {1}' (rank text + team name), written straight into the slot like native providers. Unranked teams show the name only. Includes the team-name fix: do NOT enable together with 'Scorebug: team names'. Drops the provider's game-mode-4 special text."
+    Patch Version: 1.2
+    Patch:
+      - [ be32, 0x004ef9a4, 0x7c0802a6 ]
+      - [ be32, 0x004ef9a8, 0xf821ff01 ]
+      - [ be32, 0x004ef9ac, 0xf8010110 ]
+      - [ be32, 0x004ef9b0, 0xfbe100f0 ]
+      - [ be32, 0x004ef9b4, 0xfbc100e8 ]
+      - [ be32, 0x004ef9b8, 0xfba100e0 ]
+      - [ be32, 0x004ef9bc, 0xfb8100d8 ]
+      - [ be32, 0x004ef9c0, 0xfb6100d0 ]
+      - [ be32, 0x004ef9c4, 0x7c7f1b79 ]
+      - [ be32, 0x004ef9c8, 0x41820080 ]
+      - [ be32, 0x004ef9cc, 0x4808f685 ]
+      - [ be32, 0x004ef9d0, 0x7c3c0b78 ]
+      - [ be32, 0x004ef9d4, 0x7c7e1b78 ]
+      - [ be32, 0x004ef9d8, 0xa37e015e ]
+      - [ be32, 0x004ef9dc, 0x2f9b0000 ]
+      - [ be32, 0x004ef9e0, 0x419e0034 ]
+      - [ be32, 0x004ef9e4, 0x3ba00000 ]
+      - [ be32, 0x004ef9e8, 0x38600000 ]
+      - [ be32, 0x004ef9ec, 0x7fa4eb78 ]
+      - [ be32, 0x004ef9f0, 0x480ce155 ]
+      - [ be32, 0x004ef9f4, 0x2f830000 ]
+      - [ be32, 0x004ef9f8, 0x419e0010 ]
+      - [ be32, 0x004ef9fc, 0xa003015e ]
+      - [ be32, 0x004efa00, 0x7f80d800 ]
+      - [ be32, 0x004efa04, 0x419e00e8 ]
+      - [ be32, 0x004efa08, 0x3bbd0001 ]
+      - [ be32, 0x004efa0c, 0x2f9d0019 ]
+      - [ be32, 0x004efa10, 0x419cffd8 ]
+      - [ be32, 0x004efa14, 0x387c0070 ]
+      - [ be32, 0x004efa18, 0x809e0004 ]
+      - [ be32, 0x004efa1c, 0x38a0ffff ]
+      - [ be32, 0x004efa20, 0x4bfae795 ]
+      - [ be32, 0x004efa24, 0xe8410028 ]
+      - [ be32, 0x004efa28, 0x7fe3fb78 ]
+      - [ be32, 0x004efa2c, 0x389c0070 ]
+      - [ be32, 0x004efa30, 0x38a00001 ]
+      - [ be32, 0x004efa34, 0x4bfadbd1 ]
+      - [ be32, 0x004efa38, 0xe8410028 ]
+      - [ be32, 0x004efa3c, 0x387c0070 ]
+      - [ be32, 0x004efa40, 0x4bfaf965 ]
+      - [ be32, 0x004efa44, 0xe8410028 ]
+      - [ be32, 0x004efa48, 0xeb6100d0 ]
+      - [ be32, 0x004efa4c, 0xeb8100d8 ]
+      - [ be32, 0x004efa50, 0xeba100e0 ]
+      - [ be32, 0x004efa54, 0xebc100e8 ]
+      - [ be32, 0x004efa58, 0xebe100f0 ]
+      - [ be32, 0x004efa5c, 0xe8010110 ]
+      - [ be32, 0x004efa60, 0x7c0803a6 ]
+      - [ be32, 0x004efa64, 0x38210100 ]
+      - [ be32, 0x004efa68, 0x4e800020 ]
+      - [ be32, 0x004efabc, 0x7c0802a6 ]
+      - [ be32, 0x004efac0, 0xf821ff01 ]
+      - [ be32, 0x004efac4, 0xf8010110 ]
+      - [ be32, 0x004efac8, 0xfbe100f0 ]
+      - [ be32, 0x004efacc, 0xfbc100e8 ]
+      - [ be32, 0x004efad0, 0xfba100e0 ]
+      - [ be32, 0x004efad4, 0xfb8100d8 ]
+      - [ be32, 0x004efad8, 0xfb6100d0 ]
+      - [ be32, 0x004efadc, 0x7c7f1b79 ]
+      - [ be32, 0x004efae0, 0x4182ff68 ]
+      - [ be32, 0x004efae4, 0x4808f581 ]
+      - [ be32, 0x004efae8, 0x4bfffee8 ]
+      - [ be32, 0x004efaec, 0x39400000 ]
+      - [ be32, 0x004efaf0, 0x915c0070 ]
+      - [ be32, 0x004efaf4, 0x915c0078 ]
+      - [ be32, 0x004efaf8, 0x915c0088 ]
+      - [ be32, 0x004efafc, 0x915c0090 ]
+      - [ be32, 0x004efb00, 0x915c009c ]
+      - [ be32, 0x004efb04, 0x397d0001 ]
+      - [ be32, 0x004efb08, 0x917c0084 ]
+      - [ be32, 0x004efb0c, 0x3c0012be ]
+      - [ be32, 0x004efb10, 0x60002a9d ]
+      - [ be32, 0x004efb14, 0x901c0080 ]
+      - [ be32, 0x004efb18, 0x38000001 ]
+      - [ be32, 0x004efb1c, 0x901c008c ]
+      - [ be32, 0x004efb20, 0x381c0084 ]
+      - [ be32, 0x004efb24, 0x901c0094 ]
+      - [ be32, 0x004efb28, 0x80029298 ]
+      - [ be32, 0x004efb2c, 0x901c0098 ]
+      - [ be32, 0x004efb30, 0x387c0070 ]
+      - [ be32, 0x004efb34, 0x389c0080 ]
+      - [ be32, 0x004efb38, 0x38bc0088 ]
+      - [ be32, 0x004efb3c, 0x38c00000 ]
+      - [ be32, 0x004efb40, 0x4bfae5a5 ]
+      - [ be32, 0x004efb44, 0xe8410028 ]
+      - [ be32, 0x004efb48, 0x387c0078 ]
+      - [ be32, 0x004efb4c, 0x809e0004 ]
+      - [ be32, 0x004efb50, 0x38a0ffff ]
+      - [ be32, 0x004efb54, 0x4bfae661 ]
+      - [ be32, 0x004efb58, 0xe8410028 ]
+      - [ be32, 0x004efb5c, 0x3c00db12 ]
+      - [ be32, 0x004efb60, 0x6000e271 ]
+      - [ be32, 0x004efb64, 0x901c0080 ]
+      - [ be32, 0x004efb68, 0x38000002 ]
+      - [ be32, 0x004efb6c, 0x901c008c ]
+      - [ be32, 0x004efb70, 0x381c0070 ]
+      - [ be32, 0x004efb74, 0x901c0094 ]
+      - [ be32, 0x004efb78, 0x8122d75c ]
+      - [ be32, 0x004efb7c, 0x913c0098 ]
+      - [ be32, 0x004efb80, 0x381c0078 ]
+      - [ be32, 0x004efb84, 0x901c00a0 ]
+      - [ be32, 0x004efb88, 0x913c00a4 ]
+      - [ be32, 0x004efb8c, 0x7fe3fb78 ]
+      - [ be32, 0x004efb90, 0x389c0080 ]
+      - [ be32, 0x004efb94, 0x38bc0088 ]
+      - [ be32, 0x004efb98, 0x38c00000 ]
+      - [ be32, 0x004efb9c, 0x4bfae549 ]
+      - [ be32, 0x004efba0, 0xe8410028 ]
+      - [ be32, 0x004efba4, 0x387c0070 ]
+      - [ be32, 0x004efba8, 0x4bfaf7fd ]
+      - [ be32, 0x004efbac, 0xe8410028 ]
+      - [ be32, 0x004efbb0, 0x387c0078 ]
+      - [ be32, 0x004efbb4, 0x4bfaf7f1 ]
+      - [ be32, 0x004efbb8, 0xe8410028 ]
+      - [ be32, 0x004efbbc, 0x4bfffe8c ]
+
+  "Pregame matchup card: poll rank (#6 Fighting Illini (13-0))":
+    Games:
+      "College Hoops 2K8":
+        BLUS30078: [ All ]
+    Author: "Claude Code"
+    Notes: "Code cave (RPCS3 calloc) at the pregame matchup card's mascot STR_FROM call (0x70EEEC in 0x70EE00, found with a TTY probe; team in r28). If the team is in the current media poll (matched by team ID +0x15E) the mascot becomes '#N <mascot>'."
+    Patch Version: 1.1
+    Patch:
+      - [ calloc, 0x0070eeec, 88 ]
+      - [ be32, 0x0070eeec, 0xf821ff01 ]
+      - [ be32, 0x0070eeec, 0xfbe100f0 ]
+      - [ be32, 0x0070eeec, 0xfbc100e8 ]
+      - [ be32, 0x0070eeec, 0xfba100e0 ]
+      - [ be32, 0x0070eeec, 0xfb8100d8 ]
+      - [ be32, 0x0070eeec, 0xfb6100d0 ]
+      - [ be32, 0x0070eeec, 0xf84100c8 ]
+      - [ be32, 0x0070eeec, 0x7c7f1b78 ]
+      - [ be32, 0x0070eeec, 0x7f9ee378 ]
+      - [ be32, 0x0070eeec, 0x4849e1b7 ]
+      - [ be32, 0x0070eeec, 0xe8410028 ]
+      - [ be32, 0x0070eeec, 0x7c3c0b78 ]
+      - [ be32, 0x0070eeec, 0xa37e015e ]
+      - [ be32, 0x0070eeec, 0x2f9b0000 ]
+      - [ be32, 0x0070eeec, 0x419e0108 ]
+      - [ be32, 0x0070eeec, 0x3ba00000 ]
+      - [ be32, 0x0070eeec, 0x38600000 ]
+      - [ be32, 0x0070eeec, 0x7fa4eb78 ]
+      - [ be32, 0x0070eeec, 0x485bdb47 ]
+      - [ be32, 0x0070eeec, 0x2f830000 ]
+      - [ be32, 0x0070eeec, 0x419e0010 ]
+      - [ be32, 0x0070eeec, 0xa003015e ]
+      - [ be32, 0x0070eeec, 0x7f80d800 ]
+      - [ be32, 0x0070eeec, 0x419e0014 ]
+      - [ be32, 0x0070eeec, 0x3bbd0001 ]
+      - [ be32, 0x0070eeec, 0x2f9d0019 ]
+      - [ be32, 0x0070eeec, 0x419cffd8 ]
+      - [ be32, 0x0070eeec, 0x480000d4 ]
+      - [ be32, 0x0070eeec, 0x39400000 ]
+      - [ be32, 0x0070eeec, 0x915c0070 ]
+      - [ be32, 0x0070eeec, 0x915c0078 ]
+      - [ be32, 0x0070eeec, 0x915c0088 ]
+      - [ be32, 0x0070eeec, 0x915c0090 ]
+      - [ be32, 0x0070eeec, 0x915c009c ]
+      - [ be32, 0x0070eeec, 0x387c0078 ]
+      - [ be32, 0x0070eeec, 0x7fe4fb78 ]
+      - [ be32, 0x0070eeec, 0x38a00001 ]
+      - [ be32, 0x0070eeec, 0x4849d607 ]
+      - [ be32, 0x0070eeec, 0xe8410028 ]
+      - [ be32, 0x0070eeec, 0x397d0001 ]
+      - [ be32, 0x0070eeec, 0x917c0084 ]
+      - [ be32, 0x0070eeec, 0x3c0012be ]
+      - [ be32, 0x0070eeec, 0x60002a9d ]
+      - [ be32, 0x0070eeec, 0x901c0080 ]
+      - [ be32, 0x0070eeec, 0x38000001 ]
+      - [ be32, 0x0070eeec, 0x901c008c ]
+      - [ be32, 0x0070eeec, 0x381c0084 ]
+      - [ be32, 0x0070eeec, 0x901c0094 ]
+      - [ be32, 0x0070eeec, 0x80029298 ]
+      - [ be32, 0x0070eeec, 0x901c0098 ]
+      - [ be32, 0x0070eeec, 0x387c0070 ]
+      - [ be32, 0x0070eeec, 0x389c0080 ]
+      - [ be32, 0x0070eeec, 0x38bc0088 ]
+      - [ be32, 0x0070eeec, 0x38c00000 ]
+      - [ be32, 0x0070eeec, 0x4849e0e7 ]
+      - [ be32, 0x0070eeec, 0xe8410028 ]
+      - [ be32, 0x0070eeec, 0x3c00db12 ]
+      - [ be32, 0x0070eeec, 0x6000e271 ]
+      - [ be32, 0x0070eeec, 0x901c0080 ]
+      - [ be32, 0x0070eeec, 0x38000002 ]
+      - [ be32, 0x0070eeec, 0x901c008c ]
+      - [ be32, 0x0070eeec, 0x381c0070 ]
+      - [ be32, 0x0070eeec, 0x901c0094 ]
+      - [ be32, 0x0070eeec, 0x8122d75c ]
+      - [ be32, 0x0070eeec, 0x913c0098 ]
+      - [ be32, 0x0070eeec, 0x381c0078 ]
+      - [ be32, 0x0070eeec, 0x901c00a0 ]
+      - [ be32, 0x0070eeec, 0x913c00a4 ]
+      - [ be32, 0x0070eeec, 0x7fe3fb78 ]
+      - [ be32, 0x0070eeec, 0x389c0080 ]
+      - [ be32, 0x0070eeec, 0x38bc0088 ]
+      - [ be32, 0x0070eeec, 0x38c00000 ]
+      - [ be32, 0x0070eeec, 0x4849e0e7 ]
+      - [ be32, 0x0070eeec, 0xe8410028 ]
+      - [ be32, 0x0070eeec, 0x387c0070 ]
+      - [ be32, 0x0070eeec, 0x4849f3a7 ]
+      - [ be32, 0x0070eeec, 0xe8410028 ]
+      - [ be32, 0x0070eeec, 0x387c0078 ]
+      - [ be32, 0x0070eeec, 0x4849f3a7 ]
+      - [ be32, 0x0070eeec, 0xe8410028 ]
+      - [ be32, 0x0070eeec, 0xe84100c8 ]
+      - [ be32, 0x0070eeec, 0xeb6100d0 ]
+      - [ be32, 0x0070eeec, 0xeb8100d8 ]
+      - [ be32, 0x0070eeec, 0xeba100e0 ]
+      - [ be32, 0x0070eeec, 0xebc100e8 ]
+      - [ be32, 0x0070eeec, 0xebe100f0 ]
+      - [ be32, 0x0070eeec, 0x38210100 ]
+      - [ be32, 0x0070eeec, 0xf8410028 ]
+  "Team names: poll rank on short name (Team Select: #6 ILLINOIS)":
+    Games:
+      "College Hoops 2K8":
+        BLUS30078: [ All ]
+    Author: "Claude Code"
+    Notes: "Code cave (RPCS3 calloc) at the Legacy Team Select screen's short-name STR_FROM call (0x6E42D8 in 0x6E3FE4, found with a TTY probe). The block makes the call itself; if the text pointer is the short name of a team in the current media poll the name becomes '#N <short name>'. Other text reaching this call (path from 0x6E4724) is left alone."
+    Patch Version: 1.1
+    Patch:
+      - [ calloc, 0x006e42d8, 88 ]
+      - [ be32, 0x006e42d8, 0xf821ff01 ]
+      - [ be32, 0x006e42d8, 0xfbe100f0 ]
+      - [ be32, 0x006e42d8, 0xfbc100e8 ]
+      - [ be32, 0x006e42d8, 0xfba100e0 ]
+      - [ be32, 0x006e42d8, 0xfb8100d8 ]
+      - [ be32, 0x006e42d8, 0xfb6100d0 ]
+      - [ be32, 0x006e42d8, 0xf84100c8 ]
+      - [ be32, 0x006e42d8, 0x7c7f1b78 ]
+      - [ be32, 0x006e42d8, 0x7c9e2378 ]
+      - [ be32, 0x006e42d8, 0x4849e1b7 ]
+      - [ be32, 0x006e42d8, 0xe8410028 ]
+      - [ be32, 0x006e42d8, 0x7c3c0b78 ]
+      - [ be32, 0x006e42d8, 0x7fdbf378 ]
+      - [ be32, 0x006e42d8, 0x2f9b0000 ]
+      - [ be32, 0x006e42d8, 0x419e0108 ]
+      - [ be32, 0x006e42d8, 0x3ba00000 ]
+      - [ be32, 0x006e42d8, 0x38600000 ]
+      - [ be32, 0x006e42d8, 0x7fa4eb78 ]
+      - [ be32, 0x006e42d8, 0x485bdb47 ]
+      - [ be32, 0x006e42d8, 0x2f830000 ]
+      - [ be32, 0x006e42d8, 0x419e0010 ]
+      - [ be32, 0x006e42d8, 0x80030000 ]
+      - [ be32, 0x006e42d8, 0x7f80d800 ]
+      - [ be32, 0x006e42d8, 0x419e0014 ]
+      - [ be32, 0x006e42d8, 0x3bbd0001 ]
+      - [ be32, 0x006e42d8, 0x2f9d0019 ]
+      - [ be32, 0x006e42d8, 0x419cffd8 ]
+      - [ be32, 0x006e42d8, 0x480000d4 ]
+      - [ be32, 0x006e42d8, 0x39400000 ]
+      - [ be32, 0x006e42d8, 0x915c0070 ]
+      - [ be32, 0x006e42d8, 0x915c0078 ]
+      - [ be32, 0x006e42d8, 0x915c0088 ]
+      - [ be32, 0x006e42d8, 0x915c0090 ]
+      - [ be32, 0x006e42d8, 0x915c009c ]
+      - [ be32, 0x006e42d8, 0x387c0078 ]
+      - [ be32, 0x006e42d8, 0x7fe4fb78 ]
+      - [ be32, 0x006e42d8, 0x38a00001 ]
+      - [ be32, 0x006e42d8, 0x4849d607 ]
+      - [ be32, 0x006e42d8, 0xe8410028 ]
+      - [ be32, 0x006e42d8, 0x397d0001 ]
+      - [ be32, 0x006e42d8, 0x917c0084 ]
+      - [ be32, 0x006e42d8, 0x3c0012be ]
+      - [ be32, 0x006e42d8, 0x60002a9d ]
+      - [ be32, 0x006e42d8, 0x901c0080 ]
+      - [ be32, 0x006e42d8, 0x38000001 ]
+      - [ be32, 0x006e42d8, 0x901c008c ]
+      - [ be32, 0x006e42d8, 0x381c0084 ]
+      - [ be32, 0x006e42d8, 0x901c0094 ]
+      - [ be32, 0x006e42d8, 0x80029298 ]
+      - [ be32, 0x006e42d8, 0x901c0098 ]
+      - [ be32, 0x006e42d8, 0x387c0070 ]
+      - [ be32, 0x006e42d8, 0x389c0080 ]
+      - [ be32, 0x006e42d8, 0x38bc0088 ]
+      - [ be32, 0x006e42d8, 0x38c00000 ]
+      - [ be32, 0x006e42d8, 0x4849e0e7 ]
+      - [ be32, 0x006e42d8, 0xe8410028 ]
+      - [ be32, 0x006e42d8, 0x3c00db12 ]
+      - [ be32, 0x006e42d8, 0x6000e271 ]
+      - [ be32, 0x006e42d8, 0x901c0080 ]
+      - [ be32, 0x006e42d8, 0x38000002 ]
+      - [ be32, 0x006e42d8, 0x901c008c ]
+      - [ be32, 0x006e42d8, 0x381c0070 ]
+      - [ be32, 0x006e42d8, 0x901c0094 ]
+      - [ be32, 0x006e42d8, 0x8122d75c ]
+      - [ be32, 0x006e42d8, 0x913c0098 ]
+      - [ be32, 0x006e42d8, 0x381c0078 ]
+      - [ be32, 0x006e42d8, 0x901c00a0 ]
+      - [ be32, 0x006e42d8, 0x913c00a4 ]
+      - [ be32, 0x006e42d8, 0x7fe3fb78 ]
+      - [ be32, 0x006e42d8, 0x389c0080 ]
+      - [ be32, 0x006e42d8, 0x38bc0088 ]
+      - [ be32, 0x006e42d8, 0x38c00000 ]
+      - [ be32, 0x006e42d8, 0x4849e0e7 ]
+      - [ be32, 0x006e42d8, 0xe8410028 ]
+      - [ be32, 0x006e42d8, 0x387c0070 ]
+      - [ be32, 0x006e42d8, 0x4849f3a7 ]
+      - [ be32, 0x006e42d8, 0xe8410028 ]
+      - [ be32, 0x006e42d8, 0x387c0078 ]
+      - [ be32, 0x006e42d8, 0x4849f3a7 ]
+      - [ be32, 0x006e42d8, 0xe8410028 ]
+      - [ be32, 0x006e42d8, 0xe84100c8 ]
+      - [ be32, 0x006e42d8, 0xeb6100d0 ]
+      - [ be32, 0x006e42d8, 0xeb8100d8 ]
+      - [ be32, 0x006e42d8, 0xeba100e0 ]
+      - [ be32, 0x006e42d8, 0xebc100e8 ]
+      - [ be32, 0x006e42d8, 0xebe100f0 ]
+      - [ be32, 0x006e42d8, 0x38210100 ]
+      - [ be32, 0x006e42d8, 0xf8410028 ]
+  "Recruits: Taller centers (6'9\" - 7'4\")":
+    Games:
+      "College Hoops 2K8":
+        BLUS30078: [ All ]
+    Author: "Claude Code"
+    Notes: "Recruit generator 0x7599EC sets height = min + (max - min) x bucket / 11 (bell-shaped bucket) from per-position float tables read only there: min at 0x10034110, max at 0x100340FC (PG,SG,SF,PF,C). Stock center range 78-86 in (6'6\" - 7'2\"); this sets 81-88 in. Height is stored in 7 bits, so no truncation. Applies to recruits generated while enabled. Enable at most one Recruits height entry."
+    Patch Version: 1.0
+    Patch:
+      - [ be32, 0x10034120, 0x42A20000 ] # center min height 78.0 -> 81.0
+      - [ be32, 0x1003410C, 0x42B00000 ] # center max height 86.0 -> 88.0
+
+  "Recruits: Much taller centers (6'11\" - 7'6\")":
+    Games:
+      "College Hoops 2K8":
+        BLUS30078: [ All ]
+    Author: "Claude Code"
+    Notes: "As Taller centers, with a center range of 83-90 in."
+    Patch Version: 1.0
+    Patch:
+      - [ be32, 0x10034120, 0x42A60000 ] # center min height 78.0 -> 83.0
+      - [ be32, 0x1003410C, 0x42B40000 ] # center max height 86.0 -> 90.0
+
+  "Recruits: Skilled bigs (PF/C shooting + ballhandling)":
+    Games:
+      "College Hoops 2K8":
+        BLUS30078: [ All ]
+    Author: "Claude Code"
+    Notes: "Recruit ratings are generated per position between a minimum (int table 0x1270AA18) and maximum (float table 0x1270ACF0); step = (max - min) / 11 is derived at startup (0x75B6C0). Generator index -> rating was mapped through the recruit-to-player converter (0x754480). Raises PF and C mid-range, 3-point, free throw, ballhandling and shoot-off-dribble ranges. Applies to recruits generated while enabled."
+    Patch Version: 1.0
+    Patch:
+      - [ be32, 0x1270ab84, 0x00000037 ] # PF Mid-range min 50 -> 55
+      - [ be32, 0x1270ae5c, 0x42aa0000 ] # PF Mid-range max 80 -> 85
+      - [ be32, 0x1270abfc, 0x00000032 ] # C Mid-range min 40 -> 50
+      - [ be32, 0x1270aed4, 0x42a40000 ] # C Mid-range max 75 -> 82
+      - [ be32, 0x1270ab88, 0x0000002d ] # PF 3-point min 35 -> 45
+      - [ be32, 0x1270ae60, 0x42aa0000 ] # PF 3-point max 80 -> 85
+      - [ be32, 0x1270ac00, 0x00000028 ] # C 3-point min 30 -> 40
+      - [ be32, 0x1270aed8, 0x42a00000 ] # C 3-point max 70 -> 80
+      - [ be32, 0x1270ab8c, 0x00000037 ] # PF Free throws min 50 -> 55
+      - [ be32, 0x1270ae64, 0x42b00000 ] # PF Free throws max 84 -> 88
+      - [ be32, 0x1270ac04, 0x00000037 ] # C Free throws min 50 -> 55
+      - [ be32, 0x1270aedc, 0x42aa0000 ] # C Free throws max 80 -> 85
+      - [ be32, 0x1270ab98, 0x00000037 ] # PF Ballhandling min 40 -> 55
+      - [ be32, 0x1270ae70, 0x42a00000 ] # PF Ballhandling max 70 -> 80
+      - [ be32, 0x1270ac10, 0x00000032 ] # C Ballhandling min 40 -> 50
+      - [ be32, 0x1270aee8, 0x42960000 ] # C Ballhandling max 65 -> 75
+      - [ be32, 0x1270abdc, 0x00000037 ] # PF Shoot off dribble min 50 -> 55
+      - [ be32, 0x1270aeb4, 0x42a00000 ] # PF Shoot off dribble max 75 -> 80
+      - [ be32, 0x1270ac54, 0x00000032 ] # C Shoot off dribble min 45 -> 50
+      - [ be32, 0x1270af2c, 0x429c0000 ] # C Shoot off dribble max 70 -> 78
+
+  "Recruits: Taller guards and wings (PG/SG/SF)":
+    Games:
+      "College Hoops 2K8":
+        BLUS30078: [ All ]
+    Author: "Claude Code"
+    Notes: "Recruit height ranges (same tables as the center entries): PG 66-77 -> 70-78 in, SG 69-79 -> 73-80 in, SF 75-81 -> 76-82 in. Typical heights rise about 2.3, 2.3 and 1 in. Can be combined with one center height entry."
+    Patch Version: 1.0
+    Patch:
+      - [ be32, 0x10034110, 0x428c0000 ] # PG min height 66 -> 70
+      - [ be32, 0x100340fc, 0x429c0000 ] # PG max height 77 -> 78
+      - [ be32, 0x10034114, 0x42920000 ] # SG min height 69 -> 73
+      - [ be32, 0x10034100, 0x42a00000 ] # SG max height 79 -> 80
+      - [ be32, 0x10034118, 0x42980000 ] # SF min height 75 -> 76
+      - [ be32, 0x10034104, 0x42a40000 ] # SF max height 81 -> 82
+
+  "Recruits: International - no tier cap":
+    Games:
+      "College Hoops 2K8":
+        BLUS30078: [ All ]
+    Author: "Claude Code"
+    Notes: "The recruit generator rolls a talent tier 0-4 that selects the rating distribution (tier 4 averages bucket 7.8/10, tier 2 averages 5.1/10). Recruits from international regions (location region codes 53-58, check 0x75C1E0) are capped at tier 2 at 0x759CF4. This removes the cap so they roll like domestic recruits. Enable at most one International entry."
+    Patch Version: 1.0
+    Patch:
+      - [ be32, 0x00759CF4, 0x60000000 ] # li r26,2 (cap tier at 2) -> nop
+
+  "Recruits: International - elite (tier 3 or 4)":
+    Games:
+      "College Hoops 2K8":
+        BLUS30078: [ All ]
+    Author: "Claude Code"
+    Notes: "International recruits below tier 3 are raised to tier 3, so every international recruit uses the tier 3 or tier 4 rating distribution."
+    Patch Version: 1.0
+    Patch:
+      - [ be32, 0x00759CEC, 0x2F9A0003 ] # cmpwi cr7,r26,1 -> cmpwi cr7,r26,3
+      - [ be32, 0x00759CF0, 0x409C0008 ] # ble cr7,+8 -> bge cr7,+8
+      - [ be32, 0x00759CF4, 0x3B400003 ] # li r26,2 -> li r26,3
+
+  "Transfers: More (33/67/100%)":
+    Games:
+      "College Hoops 2K8":
+        BLUS30078: [ All ]
+    Author: "Claude Code"
+    Notes: "Chance becomes state / 3 instead of (state - 1) / 3. Value gate unchanged."
+    Patch Version: 1.0
+    Patch:
+      - [ be32, 0x005B4F78, 0x60000000 ] # fsubs f0,f0,f30 (minus 1.0) -> nop
+
+  "Transfers: Much more (More + looser value gate)":
+    Games:
+      "College Hoops 2K8":
+        BLUS30078: [ All ]
+    Author: "Claude Code"
+    Notes: "As More, and the value gate threshold uses 1.0 instead of 0.66."
+    Patch Version: 1.0
+    Patch:
+      - [ be32, 0x005B4F78, 0x60000000 ] # fsubs f0,f0,f30 (minus 1.0) -> nop
+      - [ be32, 0x005B5054, 0xC002C8A4 ] # lfs f0,0.66 -> lfs f0,1.0 (TOC -0x375C)
+
+  "Unhappiness: More (more players get a transfer state)":
+    Games:
+      "College Hoops 2K8":
+        BLUS30078: [ All ]
+    Author: "Claude Code"
+    Notes: "In-season unhappiness check (0x5A7230): a healthy, non-redshirting player gains +1 transfer state when position rating x 0.45 x class factor (x 0.5 walk-on) exceeds his secondary value. This uses 0.65 instead of 0.45 (TOC -0x390C, read only in this function). CPU coaches respond 65% of the time by raising playing time; your team gets the unhappy-player prompt. Combine with one Transfers frequency entry."
+    Patch Version: 1.0
+    Patch:
+      - [ be32, 0x005A7694, 0xC002C6F4 ] # lfs f0,0.45 (TOC -0x3924) -> lfs f0,0.65 (TOC -0x390C)
+
+  "Unhappiness: Much more (multiplier 1.0)":
+    Games:
+      "College Hoops 2K8":
+        BLUS30078: [ All ]
+    Author: "Claude Code"
+    Notes: "As Unhappiness: More, but the multiplier is 1.0 (TOC -0x375C, otherwise read only by the transfer generator). Expect many more unhappy-player prompts for your team."
+    Patch Version: 1.0
+    Patch:
+      - [ be32, 0x005A7694, 0xC002C8A4 ] # lfs f0,0.45 (TOC -0x3924) -> lfs f0,1.0 (TOC -0x375C)
+
+  "Transfers: No sit-out (eligible immediately)":
+    Games:
+      "College Hoops 2K8":
+        BLUS30078: [ All ]
+    Author: "Claude Code"
+    Notes: "Transfer finalizer (0x5BC250) no longer writes redshirt code 2 (Transfer); the code it just cleared stays 0 (None). Scholarship, class and redshirt-used history unchanged. Applies to transfers finalized while enabled; can be combined with one frequency entry."
+    Patch Version: 1.0
+    Patch:
+      - [ be32, 0x005BC334, 0x60000000 ] # oris r0,r0,0x0800 (redshirt code = Transfer) -> nop
+
+  "Transfers: Maximum (every eligible player rolls 100%)":
+    Games:
+      "College Hoops 2K8":
+        BLUS30078: [ All ]
+    Author: "Claude Code"
+    Notes: "Chance gate always passes for players with a nonzero state; value gate unchanged. Expect the 400-player queue to fill."
+    Patch Version: 1.0
+    Patch:
+      - [ be32, 0x005B4F7C, 0xFFE0F090 ] # fdivs f31,f0,f28 -> fmr f31,f30 (1.0)
+
+  "Transfers: Maximum + looser value gate (1.0)":
+    Games:
+      "College Hoops 2K8":
+        BLUS30078: [ All ]
+    Author: "Claude Code"
+    Notes: "Chance gate always passes for players with a nonzero state, and the value gate threshold uses 1.0 instead of 0.66."
+    Patch Version: 1.0
+    Patch:
+      - [ be32, 0x005B4F7C, 0xFFE0F090 ] # fdivs f31,f0,f28 -> fmr f31,f30 (1.0)
+      - [ be32, 0x005B5054, 0xC002C8A4 ] # lfs f0,0.66 -> lfs f0,1.0 (TOC -0x375C)
+
+  "Transfers: Extreme (Maximum + value gate 3.0)":
+    Games:
+      "College Hoops 2K8":
+        BLUS30078: [ All ]
+    Author: "Claude Code"
+    Notes: "Chance gate always passes for players with a nonzero state, and the value gate threshold uses 3.0 (TOC -0x3754, read only by this function), so nearly every such player is queued. Expect the 400-player queue to fill."
+    Patch Version: 1.0
+    Patch:
+      - [ be32, 0x005B4F7C, 0xFFE0F090 ] # fdivs f31,f0,f28 -> fmr f31,f30 (1.0)
+      - [ be32, 0x005B5054, 0xC002C8AC ] # lfs f0,0.66 -> lfs f0,3.0 (TOC -0x3754)

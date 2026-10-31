@@ -1,3 +1,10 @@
+## Unreleased — RPCS3 game patches
+
+- Add `rpcs3_patches/`: the BLUS30078 RPCS3 patch file (60 FPS, poll rank on the
+  scorebug / Team Select / pregame matchup card, recruit generation, Legacy
+  transfers) with its code-cave generators, offline interpreter checks and TTY
+  probes. Emulator patches only; the editor still does not patch executables.
+
 # v1.23
 
 - Native macOS Apple Silicon/Intel app packages and Windows x64 release archives.
