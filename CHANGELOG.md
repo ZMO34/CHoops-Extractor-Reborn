@@ -4,6 +4,7 @@
 - Rebuild conference games from current membership after realignment; unchanged conferences keep stock games; placement avoids double-booking and refuses over-capacity plans.
 - Balance game totals by trimming/adding non-conference games only.
 - Move the stored season to another year (month/day kept; leap-day games relocated) to match year-patched executables.
+- End every team's regular season before its conference tournament starts (March <offset>; later games left brackets unfilled and stopped the Legacy sim) and lower tournament qualifier counts above conference size.
 - CLI: roster-schedule-report and roster-schedule-rebuild. Not gameplay-tested.
 
 # v1.23

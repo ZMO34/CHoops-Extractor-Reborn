@@ -71,12 +71,39 @@ keeping month, day and tip-off; Feb 29 games move to Feb 28 or Mar 1 when the
 target year is not a leap year, avoiding double-booking. Match the year to the
 executable you play with.
 
+## Conference tournaments
+
+Conference +0x1E is the tournament calendar offset: the conference tournament
+starts on March <offset> of the season's second year (2026-27 Legacy save:
+AEC/Patriot brackets on March 5, MAAC/Big Sky/Summit on March 6, SWAC on
+March 10, matching offsets 5, 6 and 10). Every member must finish all
+regular-season games, conference and non-conference, by March <offset - 1>:
+
+- Conferences whose members still had games on or after the start day (A-Sun,
+  Sun Belt, Horizon, MVC, OVC) got no tournament records at all.
+- NEC (offset 4) had one member with a regular-season game on March 4. Its
+  bracket was created without the play-in game, leaving "Stony Brook vs TBD"
+  unfillable, and the sim could not advance past March 4/5.
+
+The owner's realigned community roster already had 24 games on or after a
+team's tournament start; route 96 conferences have no tournament and no limit.
+Rebuild re-places conference games before each deadline, removes non-conference
+games on or after either team's deadline, and balancing never adds games past
+it. The report counts remaining games on or after a team's tournament start.
+
+Conference +0x1C is the tournament qualifier count. Native construction copies
+it without clamping into 16 entrant slots, and qualifier selection reads that
+many ranked members (see the Legacy scheduling research). Realignment can leave
+counts above membership (Atlantic Sun 10 with 5 members, Pacific-12 12 with 7).
+Rebuild lowers such counts to min(members, 16) by default (CLI
+`--keep-tournament-slots` to skip); counts are only ever lowered.
+
 ## Command line
 
 ```
 roster-schedule-report INPUT
 roster-schedule-rebuild INPUT OUTPUT [--target CONF=GAMES]... [--keep-former] [--balance MIN:MAX]
-                        [--season-year YEAR] [--no-rebuild]
+                        [--season-year YEAR] [--no-rebuild] [--keep-tournament-slots]
 ```
 
 `CONF` is a conference index, abbreviation or name. Without `--target`,
@@ -92,4 +119,8 @@ the table identical. Balancing that copy (24–31): 18 removed, 21 added, every
 current D1 team at 24–31 games, still 0 double-booked dates. Not
 gameplay-tested; no emulator run. Season year 2007 → 2026 on that copy: 9 Feb 29
 games moved, 0 double-booked dates. The tournament-year diagnosis comes from
-read-only comparison of owner-supplied Legacy saves.
+read-only comparison of owner-supplied Legacy saves. Tournament check on the
+installed 2026-27 copy: 13 qualifier counts lowered (only those conference
+fields changed outside the table); with the start-day rule 18 conference games
+moved and 1 non-conference game removed, leaving 0 games on or after a team's
+tournament start and every D1 team at 24-31 games.

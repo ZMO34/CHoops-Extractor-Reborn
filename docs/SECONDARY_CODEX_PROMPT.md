@@ -96,7 +96,10 @@ Legacy saves copy it, which is why realignment left old conference pairings.
 Roster Editor → Season schedule… lists and edits games, rebuilds conference
 games from current membership, balances season totals and moves the stored
 season to another year (a 2026-27 executable patch needs 2026-27 game dates);
-matching CLI commands exist. Writes preserve unknown fields, never touch trailing zero records, reparse
+matching CLI commands exist. Every team's regular season now ends before its
+conference tournament starts (March <offset +0x1E>; games on or after it left a
+bracket with an unfillable TBD that stopped a Legacy sim), and oversized
+tournament qualifier counts (+0x1C) are lowered to conference size. Writes preserve unknown fields, never touch trailing zero records, reparse
 the table and reject changes outside it. Home/away order, site and trailing
 fields remain unconfirmed. Synthetic tests and a read-only private-roster check
 pass; gameplay validation has not been run. Details:

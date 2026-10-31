@@ -35,6 +35,8 @@ SPECIAL_CONFERENCE_TYPE = 4  # NCAA / Top 25 / Classics / Created / ABL grouping
 CURRENT_D1 = 0
 # Stock regular seasons run 23-31 games; outside this range is reported.
 LOW_TOTAL, HIGH_TOTAL = 22, 32
+NO_TOURNAMENT_ROUTE = 96  # event registration skips this route (Ivy/Independents)
+BRACKET_SLOTS = 16  # conference entrant IDs are 16 u16 slots before the count
 
 
 def encode_key(date, minutes, index=0):
@@ -263,14 +265,77 @@ def report(model):
         elif same and not g['flags'] & CONFERENCE_FLAG:
             unflagged.append(g['key'])
     double = sorted({(teams[t]['school_name'], d.isoformat()) for (t, d), n in days.items() if n > 1})
+    late = games_after_tournament_start(model, table.games)
     return dict(games=len(table.games), capacity=table.capacity, free_slots=table.capacity - len(table.games),
                 conference_flag_mismatches=len(mismatched), mismatched_keys=mismatched,
                 intra_conference_unflagged=len(unflagged), unflagged_keys=unflagged,
-                double_booked=double,
+                double_booked=double, games_after_tournament_start=len(late),
+                oversized_tournaments=oversized_tournaments(model),
                 teams=[dict(index=t, school_name=teams[t]['school_name'], **v) for t, v in sorted(per_team.items())])
 
 
 # ---- conference rebuild ----------------------------------------------
+def tournament_deadline(model, conference, season_end_year):
+    """Last date a member of this conference may play a regular-season game.
+
+    Conference +0x1E is the tournament calendar offset: its tournament starts
+    on March <offset> of the season's second year. In a Legacy save, every
+    conference whose members still had games on or after that day got no
+    tournament, and NEC (one member playing on its start day) got a partial
+    bracket with an unfillable TBD game that stopped the sim.
+    """
+    row = model.rows['conferences'][conference]
+    day = row.get('tourney_day') or 0
+    if row.get('presentation_id') == NO_TOURNAMENT_ROUTE or not 2 <= day <= 31:
+        return None
+    return datetime.date(season_end_year, 3, day - 1)
+
+
+def team_deadlines(model, games):
+    """Team index -> last allowed regular-season date (only teams with one)."""
+    if not games:
+        return {}
+    end_year = max(decode_key(g['key'])[0] for g in games).year
+    out = {}
+    for team in model.rows['teams']:
+        conf = team.get('conference_index')
+        if team.get('team_type_code') == CURRENT_D1 and conf is not None:
+            deadline = tournament_deadline(model, conf, end_year)
+            if deadline:
+                out[team['index']] = deadline
+    return out
+
+
+def games_after_tournament_start(model, games=None):
+    """Games (any type) on or after either team's conference tournament start."""
+    games = Schedule(model).games if games is None else games
+    deadlines = team_deadlines(model, games)
+    far = datetime.date.max
+    return [g for g in games
+            if decode_key(g['key'])[0] > min(deadlines.get(g['first'], far), deadlines.get(g['second'], far))]
+
+
+def oversized_tournaments(model):
+    """D1 conferences whose qualifier count exceeds members or bracket slots."""
+    out = []
+    for conf in model.rows.get('conferences', []):
+        if conf.get('conference_type') == SPECIAL_CONFERENCE_TYPE or conf.get('presentation_id') == NO_TOURNAMENT_ROUTE:
+            continue
+        allowed = min(len(conf.get('team_indices', [])), BRACKET_SLOTS)
+        if conf.get('tourney_slots', 0) > allowed:
+            out.append(dict(index=conf['index'], name=conf['conference_name'].strip(),
+                            qualifiers=conf['tourney_slots'], allowed=allowed))
+    return out
+
+
+def clamp_tournament_slots(model):
+    """Lower each oversized qualifier count to min(members, 16); one edit each."""
+    fixed = oversized_tournaments(model)
+    for item in fixed:
+        model.edit('conferences', item['index'], 'tourney_slots', item['allowed'])
+    return fixed
+
+
 def conference_groups(model):
     """D1 conferences and their current D1 members (reciprocal lists)."""
     teams = model.rows['teams']
@@ -328,12 +393,19 @@ def plan_conference_rebuild(model, targets=None, drop_former=True, keep_unlisted
     member_of = {t: c for c, members in groups.items() for t in members}
     days = _conference_days(table.games)
 
-    kept, dropped, reflagged = [], 0, 0
+    kept, dropped, reflagged, dropped_late = [], 0, 0, 0
     changed = set()  # conferences whose stored pairings no longer match membership
+    team_limit = team_deadlines(model, table.games)
+    far = datetime.date.max
     for g in table.games:
         g = dict(g)
         same = member_of.get(g['first']) is not None and member_of.get(g['first']) == member_of.get(g['second'])
         was = bool(g['flags'] & CONFERENCE_FLAG)
+        # Non-conference games after either team's tournament start cannot be
+        # played; conference games there are re-placed below.
+        if not same and decode_key(g['key'])[0] > min(team_limit.get(g['first'], far), team_limit.get(g['second'], far)):
+            dropped_late += 1
+            continue
         if same != was:
             changed.update(member_of[t] for t in (g['first'], g['second']) if t in member_of)
         if was and not same and drop_former:
@@ -343,9 +415,21 @@ def plan_conference_rebuild(model, targets=None, drop_former=True, keep_unlisted
             reflagged += 1
         g['flags'] = g['flags'] | CONFERENCE_FLAG if same else g['flags'] & ~CONFERENCE_FLAG
         kept.append(g)
+    end_year = max(days).year
+    deadlines = {c: tournament_deadline(model, c, end_year) for c in groups}
+    # Conferences whose stored games run past their tournament start need
+    # those games moved; keep their current per-team conference game count.
+    late_only = {}
+    for conf, members in groups.items():
+        if conf in changed or not deadlines[conf]:
+            continue
+        inside = [g for g in kept if g['flags'] & CONFERENCE_FLAG and g['first'] in members and g['second'] in members]
+        if any(decode_key(g['key'])[0] > deadlines[conf] for g in inside):
+            counts = Counter(t for g in inside for t in (g['first'], g['second']))
+            late_only[conf] = Counter(counts[t] for t in members).most_common(1)[0][0]
     # Untouched conferences keep their stock schedule unless a target is given.
     defaults = {} if keep_unlisted else {c: default_conference_games(len(groups[c])) for c in changed if c in groups}
-    targets = defaults | {c: t for c, t in dict(targets or {}).items() if c in groups}
+    targets = late_only | defaults | {c: t for c, t in dict(targets or {}).items() if c in groups}
 
     added, unplaced, trimmed = [], [], 0
     summary = {}
@@ -363,9 +447,15 @@ def plan_conference_rebuild(model, targets=None, drop_former=True, keep_unlisted
         for r, pairs in enumerate(cycle * repeats):
             meetings += [(r, a, b) for a, b in pairs[:limit - len(meetings)]]
         remaining = Counter(frozenset((a, b)) for _, a, b in meetings)
+        inside = [g for g in kept if g['flags'] & CONFERENCE_FLAG and g['first'] in members and g['second'] in members]
+        # Games after the conference tournament starts are re-placed earlier.
+        deadline = deadlines[conf]
+        late = [g for g in inside if deadline and decode_key(g['key'])[0] > deadline]
+        for g in late:
+            kept.remove(g)
         # Stored intra-conference games satisfy wanted meetings first.
         planned, extras, kept_count = Counter(), [], 0
-        for g in [g for g in kept if g['flags'] & CONFERENCE_FLAG and g['first'] in members and g['second'] in members]:
+        for g in [g for g in inside if g not in late]:
             pair = frozenset((g['first'], g['second']))
             if remaining[pair]:
                 remaining[pair] -= 1
@@ -391,7 +481,8 @@ def plan_conference_rebuild(model, targets=None, drop_former=True, keep_unlisted
                 conf_trimmed += 1
         trimmed += conf_trimmed
         summary[conf] = dict(members=len(members), target_games=target, kept_games=kept_count, added=0,
-                             trimmed=conf_trimmed, unchanged=False, pending=pending)
+                             trimmed=conf_trimmed, moved_before_tournament=len(late), unchanged=False,
+                             deadline=deadline.isoformat() if deadline else None, pending=pending)
 
     busy = defaultdict(set)
     for g in kept:
@@ -403,10 +494,12 @@ def plan_conference_rebuild(model, targets=None, drop_former=True, keep_unlisted
         pending = info.pop('pending', [])
         if not pending:
             continue
+        deadline = deadlines[conf]
+        allowed = [d for d in days if not deadline or d <= deadline] or days
         span = max(1, max(r for r, _, _ in pending))
         for r, a, b in pending:
-            ideal = round(r * (len(days) - 1) / span)
-            date = _pick_day(days, ideal, busy[a], busy[b])
+            ideal = round(r * (len(allowed) - 1) / span)
+            date = _pick_day(allowed, ideal, busy[a], busy[b])
             if date is None:
                 unplaced.append((a, b))
                 continue
@@ -422,6 +515,8 @@ def plan_conference_rebuild(model, targets=None, drop_former=True, keep_unlisted
     names = model.rows['teams']
     d1 = [t for t in member_of]
     result = dict(kept=len(kept), dropped_former_conference=dropped, reflagged=reflagged, trimmed_extra=trimmed,
+                  moved_before_tournament=sum(i.get('moved_before_tournament', 0) for i in summary.values()),
+                  dropped_after_tournament_start=dropped_late,
                   added=len(added), unplaced=len(unplaced), total=len(kept) + len(added),
                   capacity=table.capacity, conferences=summary,
                   low_total_teams=[[names[t]['school_name'], totals[t]] for t in d1 if totals[t] < LOW_TOTAL],
@@ -493,6 +588,8 @@ def plan_balance(model, minimum=LOW_TOTAL + 2, maximum=HIGH_TOTAL - 1):
             removed += 1
 
     days = _nonconference_days(games)
+    limit = team_deadlines(model, games)
+    far = datetime.date.max
     busy = defaultdict(set)
     met = Counter()
     for g in games:
@@ -513,7 +610,9 @@ def plan_balance(model, minimum=LOW_TOTAL + 2, maximum=HIGH_TOTAL - 1):
         for opponent in pool:
             if opponent == team or same_conference(model, team, opponent) or met[frozenset((team, opponent))]:
                 continue
-            date = _pick_day(days, len(days) // 2, busy[team], busy[opponent])
+            last = min(limit.get(team, far), limit.get(opponent, far))
+            allowed = [d for d in days if d <= last]
+            date = _pick_day(allowed, len(allowed) // 2, busy[team], busy[opponent]) if allowed else None
             if date is None:
                 continue
             key = _free_key(used, date, DEFAULT_MINUTES)
@@ -547,12 +646,15 @@ def balance_totals(model, minimum=LOW_TOTAL + 2, maximum=HIGH_TOTAL - 1):
     return summary
 
 
-def rebuild_file(source, output, targets=None, drop_former=True, balance=None, season_year=None, rebuild=True):
+def rebuild_file(source, output, targets=None, drop_former=True, balance=None, season_year=None, rebuild=True,
+                 fix_tournaments=True):
     """CLI: rebuild conference games, balance totals and/or set the season year in a copy."""
     from .editor_model import EditorModel
     from .workflow import save_model
     model = EditorModel.open(source)
     result = dict(rebuild=rebuild_conference_games(model, targets, drop_former)) if rebuild else {}
+    if fix_tournaments:
+        result['tournament_qualifiers'] = clamp_tournament_slots(model)
     if balance:
         result['balance'] = balance_totals(model, *balance)
     if season_year is not None:

@@ -102,6 +102,14 @@ class RebuildDialog(QDialog):
         self.drop_former = QCheckBox('Remove conference games between former conference-mates')
         self.drop_former.setChecked(True)
         layout.addWidget(self.drop_former)
+        oversized = backend.oversized_tournaments(model)
+        self.fix_tournaments = QCheckBox(
+            f'Lower tournament qualifier counts above conference size ({len(oversized)} conferences)')
+        self.fix_tournaments.setToolTip('\n'.join(f"{o['name']}: {o['qualifiers']} → {o['allowed']}" for o in oversized)
+                                        or 'All qualifier counts fit their conferences')
+        self.fix_tournaments.setChecked(bool(oversized))
+        self.fix_tournaments.setEnabled(bool(oversized))
+        layout.addWidget(self.fix_tournaments)
         _, plan = backend.plan_conference_rebuild(model)
         groups = backend.conference_groups(model)
         names = {c['index']: c['conference_name'].strip() for c in model.rows['conferences']}
@@ -158,6 +166,10 @@ def describe(plan):
              f"Removed {plan['dropped_former_conference']} former-conference games, trimmed "
              f"{plan['trimmed_extra']} extra meetings, added {plan['added']} games, re-flagged {plan['reflagged']}.",
              ]
+    if plan.get('moved_before_tournament') or plan.get('dropped_after_tournament_start'):
+        lines.append(f"Moved {plan['moved_before_tournament']} conference games and removed "
+                     f"{plan['dropped_after_tournament_start']} non-conference games that fell on or after "
+                     "a team's conference tournament start.")
     if plan['unplaced']:
         lines.append(f"{plan['unplaced']} games could not be placed on a free conference date.")
     if plan['low_total_teams']:
@@ -291,7 +303,9 @@ class ScheduleEditor(QDialog):
             f"{info['games']:,} games • {info['free_slots']:,} free slots • "
             f"{info['conference_flag_mismatches']} conference games between non-members • "
             f"{info['intra_conference_unflagged']} unflagged games between conference-mates • "
-            f"{len(info['double_booked'])} double-booked team dates")
+            f"{len(info['double_booked'])} double-booked team dates • "
+            f"{info['games_after_tournament_start']} games on/after a team's tournament start • "
+            f"{len(info['oversized_tournaments'])} oversized tournaments")
         team = self.team.currentData()
         if self.problems.isChecked():
             rows = [r for r in rows if r['conference_game'] != r['same_conference']]
@@ -356,11 +370,18 @@ class ScheduleEditor(QDialog):
         except ToolError as error:
             return QMessageBox.warning(self, 'Rebuild conference games', str(error))
         if dialog.exec() == QDialog.DialogCode.Accepted:
-            plan = self.apply('Rebuild conference games',
-                              lambda: backend.rebuild_conference_games(self.model, **dialog.options(), keep_unlisted=True))
+            fix = dialog.fix_tournaments.isChecked()
+
+            def run():
+                plan = backend.rebuild_conference_games(self.model, **dialog.options(), keep_unlisted=True)
+                plan['tournament_qualifiers'] = backend.clamp_tournament_slots(self.model) if fix else []
+                return plan
+            plan = self.apply('Rebuild conference games', run)
             if plan:
+                fixed = ''.join(f"\nTournament qualifiers: {o['name']} {o['qualifiers']} → {o['allowed']}"
+                                for o in plan['tournament_qualifiers'])
                 QMessageBox.information(self, 'Conference games rebuilt',
-                                        describe(plan) + '\n\nSave a roster copy to keep these changes.')
+                                        describe(plan) + fixed + '\n\nSave a roster copy to keep these changes.')
 
     def balance(self):
         if self.busy():

@@ -158,3 +158,55 @@ def test_season_year_keeps_month_day_and_moves_leap_day():
     assert S.set_season_year(model, 2026)['shifted_years'] == 0  # no-op, no extra undo step
     model.undo()
     assert bytes(model.data) == before
+
+
+def _conference(model, **values):
+    for field, value in values.items():
+        model.edit('conferences', 0, field, value)
+    model.history.clear()
+    model.edits.clear()
+
+
+def test_rebuild_moves_conference_games_before_tournament_start():
+    early = S.encode_key(datetime.date(2008, 2, 20), 1140)
+    on_start = S.encode_key(datetime.date(2008, 3, 3), 1140)
+    model = fixture([(early, 0, 1, S.CONFERENCE_FLAG),
+                     (S.encode_key(datetime.date(2008, 3, 1), 1140), 0, 1, S.CONFERENCE_FLAG),
+                     (on_start, 1, 0, S.CONFERENCE_FLAG)])
+    _conference(model, tourney_day=3)  # tournament starts Mar 3; games allowed through Mar 2
+    assert S.tournament_deadline(model, 0, 2008) == datetime.date(2008, 3, 2)
+    assert len(S.games_after_tournament_start(model)) == 1
+    plan = S.rebuild_conference_games(model)
+    assert plan['moved_before_tournament'] == 1
+    assert S.report(model)['games_after_tournament_start'] == 0
+    assert all(S.decode_key(g['key'])[0] <= datetime.date(2008, 3, 2) for g in S.Schedule(model).games)
+
+
+def test_no_tournament_route_has_no_deadline():
+    model = fixture([(S.encode_key(datetime.date(2008, 3, 9), 1140), 0, 1, S.CONFERENCE_FLAG)])
+    _conference(model, tourney_day=3)
+    model.data[model.row_offset('conferences', 0) + 0x1a:model.row_offset('conferences', 0) + 0x1c] =         S.NO_TOURNAMENT_ROUTE.to_bytes(2, 'big')
+    model.reload()
+    assert S.tournament_deadline(model, 0, 2008) is None
+    assert not S.games_after_tournament_start(model)
+
+
+def test_clamp_tournament_slots_lowers_to_membership_only():
+    model = fixture([(key(5), 0, 1, S.CONFERENCE_FLAG)])
+    _conference(model, tourney_slots=10)
+    assert S.oversized_tournaments(model)[0]['allowed'] == 2
+    fixed = S.clamp_tournament_slots(model)
+    assert [f['allowed'] for f in fixed] == [2] and model.rows['conferences'][0]['tourney_slots'] == 2
+    assert not S.oversized_tournaments(model) and S.clamp_tournament_slots(model) == []
+
+
+def test_nonconference_games_after_tournament_start_are_removed_and_never_added():
+    data_games = [(S.encode_key(datetime.date(2008, 1, d), 1140), 0, 1, S.CONFERENCE_FLAG) for d in (5, 9)]
+    model = fixture(data_games + [(S.encode_key(datetime.date(2008, 3, 6), 1140), 0, 1, 0)], both_members=False)
+    _conference(model, tourney_day=4)  # team 0's conference starts Mar 4
+    assert len(S.games_after_tournament_start(model)) == 1
+    plan = S.rebuild_conference_games(model, drop_former=False)
+    assert plan['dropped_after_tournament_start'] == 1
+    assert not S.games_after_tournament_start(model)
+    S.balance_totals(model, 0, 30)
+    assert not S.games_after_tournament_start(model)
