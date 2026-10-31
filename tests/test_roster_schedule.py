@@ -143,3 +143,18 @@ def test_cli_targets_accept_index_and_reject_unknown():
     with pytest.raises(ToolError):
         S.parse_targets(model, ['0'])
     assert S.parse_balance('24:31') == (24, 31) and S.parse_balance(None) is None
+
+
+def test_season_year_keeps_month_day_and_moves_leap_day():
+    leap = S.encode_key(datetime.date(2008, 2, 29), 1140)
+    model = fixture([(S.encode_key(datetime.date(2007, 11, 9), 795), 0, 1, 0), (leap, 1, 0, S.CONFERENCE_FLAG)])
+    before = bytes(model.data)
+    assert S.season_start_year(model) == 2007
+    summary = S.set_season_year(model, 2026)
+    assert summary['shifted_years'] == 19 and summary['leap_day_moves'] == 1
+    dates = [S.decode_key(g['key'])[:2] for g in S.Schedule(model).games]
+    assert dates == [(datetime.date(2026, 11, 9), 795), (datetime.date(2027, 2, 28), 1140)]
+    assert S.Schedule(model).games[1]['flags'] & S.CONFERENCE_FLAG
+    assert S.set_season_year(model, 2026)['shifted_years'] == 0  # no-op, no extra undo step
+    model.undo()
+    assert bytes(model.data) == before

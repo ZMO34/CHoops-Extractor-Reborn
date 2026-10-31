@@ -262,7 +262,8 @@ class ScheduleEditor(QDialog):
         for text, action in (('Add game…', self.add_game), ('Edit game…', self.edit_game),
                              ('Delete selected', self.delete_games),
                              ('Rebuild conference games…', self.rebuild),
-                             ('Balance game totals…', self.balance), ('Undo', self.undo)):
+                             ('Balance game totals…', self.balance), ('Season year…', self.season_year),
+                             ('Undo', self.undo)):
             button = QPushButton(text)
             button.clicked.connect(action)
             buttons.addWidget(button)
@@ -284,7 +285,9 @@ class ScheduleEditor(QDialog):
 
         rows = backend.Schedule(self.model).rows()
         info = backend.report(self.model)
+        start = backend.season_start_year(self.model) if rows else None
         self.status.setText(
+            (f"Season {start}–{str(start + 1)[-2:]} • " if start else '') +
             f"{info['games']:,} games • {info['free_slots']:,} free slots • "
             f"{info['conference_flag_mismatches']} conference games between non-members • "
             f"{info['intra_conference_unflagged']} unflagged games between conference-mates • "
@@ -368,6 +371,24 @@ class ScheduleEditor(QDialog):
             if plan:
                 QMessageBox.information(self, 'Game totals balanced',
                                         describe_balance(plan) + '\n\nSave a roster copy to keep these changes.')
+
+    def season_year(self):
+        if self.busy():
+            return
+        from PySide6.QtWidgets import QInputDialog
+        current = backend.season_start_year(self.model)
+        year, ok = QInputDialog.getInt(
+            self, 'Season year',
+            'Season starts in (month and day are kept; Feb 29 games move when needed).\n'
+            'Use the year your game runs Legacy in, e.g. 2026 for a 2026-27 executable patch.',
+            current, 2000, 2126)
+        if ok and year != current:
+            plan = self.apply('Season year', lambda: backend.set_season_year(self.model, year))
+            if plan:
+                QMessageBox.information(self, 'Season year changed',
+                                        f"Moved {plan['games']:,} games from {plan['from_year']} to {plan['to_year']}; "
+                                        f"{plan['leap_day_moves']} Feb 29 games moved.\n\n"
+                                        'Save a roster copy to keep these changes.')
 
     def undo(self):
         if self.busy() or not self.model.history:

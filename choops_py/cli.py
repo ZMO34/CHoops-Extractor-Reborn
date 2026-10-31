@@ -51,6 +51,8 @@ def parser():
                 s.add_argument('--target',action='append',default=[],metavar='CONFERENCE=GAMES',help='Conference games per team; conference index or abbreviation')
                 s.add_argument('--keep-former',action='store_true',help='Keep conference games between former conference-mates as non-conference games')
                 s.add_argument('--balance',metavar='MIN:MAX',help='Then trim/add non-conference games so teams play MIN..MAX games')
+                s.add_argument('--season-year',type=int,metavar='YEAR',help='Move games to the season starting in YEAR (month/day kept)')
+                s.add_argument('--no-rebuild',action='store_true',help='Skip the conference rebuild')
             elif group=='inspect-iff':s.add_argument('--dump-subfiles',action='store_true')
             elif group=='rip':
                 flags=s.add_mutually_exclusive_group();flags.add_argument('--cache',action='store_true');flags.add_argument('--build-cache',action='store_true')
@@ -300,7 +302,7 @@ def execute(a):
             if c=='roster-schedule-report':
                 result=schedule.report(EditorModel.open(a.input));return {k:v for k,v in result.items() if not k.endswith('_keys')}
             return schedule.rebuild_file(a.input,a.output,schedule.parse_targets(EditorModel.open(a.input),a.target),
-                                         not a.keep_former,schedule.parse_balance(a.balance))
+                                         not a.keep_former,schedule.parse_balance(a.balance),a.season_year,not a.no_rebuild)
         return workflow.decode(a.input,a.output)
     if c=='inspect-txtr':
         from .formats.txtr import TXTR

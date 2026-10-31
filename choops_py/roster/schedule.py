@@ -547,14 +547,16 @@ def balance_totals(model, minimum=LOW_TOTAL + 2, maximum=HIGH_TOTAL - 1):
     return summary
 
 
-def rebuild_file(source, output, targets=None, drop_former=True, balance=None):
-    """CLI: rebuild conference games (optionally balance totals) into a copy."""
+def rebuild_file(source, output, targets=None, drop_former=True, balance=None, season_year=None, rebuild=True):
+    """CLI: rebuild conference games, balance totals and/or set the season year in a copy."""
     from .editor_model import EditorModel
     from .workflow import save_model
     model = EditorModel.open(source)
-    result = dict(rebuild=rebuild_conference_games(model, targets, drop_former))
+    result = dict(rebuild=rebuild_conference_games(model, targets, drop_former)) if rebuild else {}
     if balance:
         result['balance'] = balance_totals(model, *balance)
+    if season_year is not None:
+        result['season_year'] = set_season_year(model, season_year)
     result['report'] = {k: v for k, v in report(model).items() if not k.endswith('_keys') and k != 'teams'}
     result['save'] = save_model(model, output)
     return result
@@ -584,3 +586,62 @@ def parse_balance(value):
         return int(low), int(high)
     except ValueError as error:
         raise ToolError('schedule_invalid_target', 'Use --balance MIN:MAX, e.g. 24:31') from error
+
+
+# ---- season year ------------------------------------------------------
+def season_start_year(model):
+    """Calendar year of the earliest stored game (the season's opening year)."""
+    table = Schedule(model)
+    if not table.games:
+        raise ToolError('schedule_empty', 'The schedule has no games')
+    return decode_key(table.games[0]['key'])[0].year
+
+
+def plan_season_year(model, start_year):
+    """Move every game to the season starting in start_year, keeping month/day.
+
+    Patched executables run Legacy in a later season and generate their own
+    tournament games with the same month/day in that season, so stored games
+    must use the same years. Feb 29 games move to Feb 28 or Mar 1 when the
+    target year is not a leap year, avoiding double-booking where possible.
+    """
+    start_year = model.integer(start_year)
+    table = Schedule(model)
+    delta = start_year - season_start_year(model)
+    games = [dict(g) for g in table.games]
+    moved = []
+    busy = defaultdict(set)
+    targets = []
+    for g in games:
+        date, minutes, _ = decode_key(g['key'])
+        year = date.year + delta
+        try:
+            target = date.replace(year=year)
+        except ValueError:  # Feb 29 in a non-leap target year
+            target = None
+        targets.append((target, date, minutes))
+        if target:
+            busy[g['first']].add(target)
+            busy[g['second']].add(target)
+    used = set()
+    for g, (target, date, minutes) in zip(games, targets):
+        if target is None:
+            options = [datetime.date(date.year + delta, 2, 28), datetime.date(date.year + delta, 3, 1)]
+            free = [d for d in options if d not in busy[g['first']] and d not in busy[g['second']]]
+            target = (free or options)[0]
+            busy[g['first']].add(target)
+            busy[g['second']].add(target)
+            moved.append(target.isoformat())
+        g['key'] = _free_key(used, target, minutes)
+        used.add(g['key'])
+    return games, dict(from_year=start_year - delta, to_year=start_year, shifted_years=delta,
+                       leap_day_moves=len(moved), games=len(games))
+
+
+def set_season_year(model, start_year):
+    table = Schedule(model)
+    games, summary = plan_season_year(model, start_year)
+    if summary['shifted_years']:
+        _transaction(model, dict(table='schedule', field='season_year', old=summary['from_year'], value=start_year),
+                     lambda: table.write(games))
+    return summary

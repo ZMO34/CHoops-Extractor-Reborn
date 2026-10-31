@@ -94,8 +94,9 @@ The roster payload stores a fixed regular season (header +0x30: 5,523 slots of
 20-byte games; key packs date/time; flag bit 27 marks conference games). New
 Legacy saves copy it, which is why realignment left old conference pairings.
 Roster Editor → Season schedule… lists and edits games, rebuilds conference
-games from current membership and balances season totals; matching CLI commands
-exist. Writes preserve unknown fields, never touch trailing zero records, reparse
+games from current membership, balances season totals and moves the stored
+season to another year (a 2026-27 executable patch needs 2026-27 game dates);
+matching CLI commands exist. Writes preserve unknown fields, never touch trailing zero records, reparse
 the table and reject changes outside it. Home/away order, site and trailing
 fields remain unconfirmed. Synthetic tests and a read-only private-roster check
 pass; gameplay validation has not been run. Details:

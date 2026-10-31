@@ -21,8 +21,13 @@ Existing Legacy saves are not changed.
 - Flag bit 27 (`0x08000000`) marks conference games: stock conference-game
   clusters exactly match the original team-index conference blocks.
 - Dated games come first, then explicit empty markers (`teams 0x7FFF, site
-  0xFFFF`, 64 in stock), then all-zero records (936) that are never written.
-  Writable capacity = dated games + empty markers (4,587 stock).
+  0xFFFF`, 64 in stock), then all-zero records (936). The editor never writes
+  the zero records: Legacy mode appends its own early-season tournament,
+  postseason and classics games there (about 270 in observed saves), so they
+  must stay free. Editor capacity = dated games + empty markers (4,587 stock).
+- In Legacy saves the same table records results: bit 29 (`0x20000000`) marks
+  played games, and the last two fields hold scores. Tournament games use flag
+  `0x13000000` and a real site (arena) value.
 - Team index = roster `teams` row index (0–338 current D1 in stock).
 
 Unresolved: which stored team is home (kept in stored order, shown as Team 1 /
@@ -54,11 +59,24 @@ preserved on every write.
 - Every write is one undoable roster edit, reparses the table, and rejects any
   change outside the table range.
 
+## Season year
+
+Legacy mode generates its tournament games in its own season year and keeps
+only month/day of the stored games' calendar. Stock executables run 2007-08,
+matching stock roster dates. A 2026-27 executable patch generated its
+tournaments in Nov-Dec 2026 while the stored games stayed in 2007-08: the
+season-schedule screen showed no games for a team and the sim stopped advancing.
+**Season year…** (CLI `--season-year`) moves every game to the chosen season,
+keeping month, day and tip-off; Feb 29 games move to Feb 28 or Mar 1 when the
+target year is not a leap year, avoiding double-booking. Match the year to the
+executable you play with.
+
 ## Command line
 
 ```
 roster-schedule-report INPUT
 roster-schedule-rebuild INPUT OUTPUT [--target CONF=GAMES]... [--keep-former] [--balance MIN:MAX]
+                        [--season-year YEAR] [--no-rebuild]
 ```
 
 `CONF` is a conference index, abbreviation or name. Without `--target`,
@@ -72,4 +90,6 @@ private community roster: 4,523 → 4,572 games after rebuild, 0 conference flag
 mismatches, 0 double-booked team dates, save/reparse valid, all bytes outside
 the table identical. Balancing that copy (24–31): 18 removed, 21 added, every
 current D1 team at 24–31 games, still 0 double-booked dates. Not
-gameplay-tested; no emulator run.
+gameplay-tested; no emulator run. Season year 2007 → 2026 on that copy: 9 Feb 29
+games moved, 0 double-booked dates. The tournament-year diagnosis comes from
+read-only comparison of owner-supplied Legacy saves.
