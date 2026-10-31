@@ -51,7 +51,10 @@ In v1.10, select a player to see Player, Ratings and Scholarship tabs beside the
 table. Double-click a value to edit it; height is entered as e.g. 6 ft 3 in. Position
 uses PG/SG/SF/PF/C. Scholarship offers Scholarship/Walk-on. Undo and Save copy work
 across these edits. Schools combines the former Teams/Edit Schools categories;
-Realign conference retains reciprocal membership. Shoes and export actions are
+Realign conference retains reciprocal membership. Realignment does not change the
+stored season schedule; use **Season schedule…** to rebuild conference games and
+save a copy before starting a new Legacy ([SCHEDULE_EDITOR.md](SCHEDULE_EDITOR.md)).
+Shoes and export actions are
 grouped menus. Team Assets now supplies alternate/independent-asset creation;
 D1 conversion remains unavailable. Older dialog/button descriptions below are
 historical; use the current side panels and Team Assets guide.

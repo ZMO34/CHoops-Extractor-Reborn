@@ -62,6 +62,8 @@ COMMANDS={
     'roster-detect':Command(('input',)), 'roster-decode':Command(('input','output')),
     'roster-export-json':Command(('input','output')), 'roster-validate':Command(('input',)),
     'roster-save':Command(('input','patch','output'),('safe-roster',),True),
+    'roster-schedule-report':Command(('input',)),
+    'roster-schedule-rebuild':Command(('input','output'),('schedule-rebuild',),True),
     'inspect-iff':Command(('input','output'),('inspect-iff',)),
     'validate-iff':Command(('input','output'),(),True),
     'round-trip-iff':Command(('input','output'),('compare',),True),

@@ -88,6 +88,19 @@ source docs; update those docs, then regenerate rather than editing this output.
 
 Embedded source: docs/CURRENT_STATUS.md
 
+# Unreleased — season schedule editor
+
+The roster payload stores a fixed regular season (header +0x30: 5,523 slots of
+20-byte games; key packs date/time; flag bit 27 marks conference games). New
+Legacy saves copy it, which is why realignment left old conference pairings.
+Roster Editor → Season schedule… lists and edits games, rebuilds conference
+games from current membership and balances season totals; matching CLI commands
+exist. Writes preserve unknown fields, never touch trailing zero records, reparse
+the table and reject changes outside it. Home/away order, site and trailing
+fields remain unconfirmed. Synthetic tests and a read-only private-roster check
+pass; gameplay validation has not been run. Details:
+[SCHEDULE_EDITOR.md](SCHEDULE_EDITOR.md).
+
 # v1.23 — native macOS and Windows release packaging
 
 Added native Apple Silicon and Intel Mac app packaging alongside Windows x64.

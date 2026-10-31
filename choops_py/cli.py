@@ -47,6 +47,10 @@ def parser():
             elif group=='build':s.add_argument('--overwrite',action='store_true');s.add_argument('--dry-run',action='store_true')
             elif group=='safe-roster':s.add_argument('--safe-only',action='store_true',required=True)
             elif group=='compare':s.add_argument('--compare',action='store_true')
+            elif group=='schedule-rebuild':
+                s.add_argument('--target',action='append',default=[],metavar='CONFERENCE=GAMES',help='Conference games per team; conference index or abbreviation')
+                s.add_argument('--keep-former',action='store_true',help='Keep conference games between former conference-mates as non-conference games')
+                s.add_argument('--balance',metavar='MIN:MAX',help='Then trim/add non-conference games so teams play MIN..MAX games')
             elif group=='inspect-iff':s.add_argument('--dump-subfiles',action='store_true')
             elif group=='rip':
                 flags=s.add_mutually_exclusive_group();flags.add_argument('--cache',action='store_true');flags.add_argument('--build-cache',action='store_true')
@@ -291,6 +295,12 @@ def execute(a):
         if c=='roster-detect':return workflow.detect(a.input)
         if c=='roster-validate':return EditorModel.open(a.input).validate()
         if c=='roster-save':return workflow.save(a.input,a.patch,a.output)
+        if c.startswith('roster-schedule-'):
+            from .roster import schedule
+            if c=='roster-schedule-report':
+                result=schedule.report(EditorModel.open(a.input));return {k:v for k,v in result.items() if not k.endswith('_keys')}
+            return schedule.rebuild_file(a.input,a.output,schedule.parse_targets(EditorModel.open(a.input),a.target),
+                                         not a.keep_former,schedule.parse_balance(a.balance))
         return workflow.decode(a.input,a.output)
     if c=='inspect-txtr':
         from .formats.txtr import TXTR

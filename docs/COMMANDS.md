@@ -123,6 +123,7 @@ Use `python -m choops_py.cli --help` or `<command> --help` for complete flags. A
 | Mod staging | import MOD FILE --iff ARCHIVE [--sub TEXTURE], list-overrides MOD, validate-mod MOD |
 | JB build | build-copy VANILLA_JB MOD OUTPUT --overwrite [--dry-run], validate-build VANILLA_USRDIR MODDED_USRDIR REPORTS |
 | Roster | roster-detect, roster-decode, roster-export-json, roster-validate, roster-save INPUT JSON OUTPUT --safe-only |
+| Season schedule | roster-schedule-report INPUT, roster-schedule-rebuild INPUT OUTPUT [--target CONF=GAMES]... [--keep-former] [--balance MIN:MAX] |
 | Container checks | inspect-txtr, inspect-iff, validate-iff, round-trip-iff, inspect-cdf-pair, validate-cdf-pair, inspect-tool-wrapper |
 
 Texture exports accept --raw, --dds and --gtf2dds PATH as applicable; raw payload preservation is always performed. Imports require --same-format-only or --same-size-only as shown by help and accept --dds2gtf PATH. Standard IFF/SCNE imports output a new file; CDF imports output a paired folder. Team logo batch import uses the original export manifest and a directory of edited DDS files.

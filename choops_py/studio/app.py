@@ -1435,6 +1435,10 @@ class Window(QMainWindow):
         recruiting_button=QPushButton('Recruiting diagnostics…')
         recruiting_button.clicked.connect(lambda:open_recruiting_diagnostics(self))
         extra.addWidget(recruiting_button)
+        from .schedule_editor import open_schedule_editor
+        schedule_button=QPushButton('Season schedule…')
+        schedule_button.clicked.connect(lambda:open_schedule_editor(self))
+        extra.addWidget(schedule_button)
         layout.addLayout(extra)
 
         self.roster_search = QLineEdit()

@@ -1,3 +1,10 @@
+# Unreleased — season schedule editor
+
+- Parse the roster's stored season schedule (header +0x30, 20-byte games) and edit it in Roster Editor → Season schedule…: list/filter games, add, edit and delete, all undoable.
+- Rebuild conference games from current membership after realignment; unchanged conferences keep stock games; placement avoids double-booking and refuses over-capacity plans.
+- Balance game totals by trimming/adding non-conference games only.
+- CLI: roster-schedule-report and roster-schedule-rebuild. Not gameplay-tested.
+
 # v1.23
 
 - Native macOS Apple Silicon/Intel app packages and Windows x64 release archives.
