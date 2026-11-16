@@ -11,10 +11,14 @@ does not patch executables.
 | --- | --- |
 | Frame rate | 60 FPS (all screens): also set Vblank Rate 60 in the game's custom config |
 | Poll rank | Scorebug (`#5 DUKE`), Legacy Team Select (`#6 ILLINOIS`), pregame matchup card (`#6 Fighting Illini (13-0)`) |
+| Scorebug record | Scorebug team names with poll rank and season record (`#5 DUKE 12-3`); replaces the poll-rank scorebug entry |
 | Recruits | Taller centers, taller guards/wings, skilled PF/C, international tiers |
 | Transfers | Frequency levels, unhappiness levels, no sit-out |
 | Quick Game | LT/RT team cycling in conference member order (alphabetical once the roster's member lists are sorted) |
 | Rules | 30-second shot clock (was 35) |
+| MyPlayer | Sit on the bench with your player (needs the game's Player Lock ON) |
+| Coach Carousel | No minimum years at your school before your coach gets job offers |
+| MyPlayer v2 | Bench, ratings that grow from your game stats, a starting lineup on merit, and a chosen position (Off / PG / SG / SF / PF / C in Game Settings) |
 | NCAA Tournament | 68 teams with a four-game First Four (Stage 1, plus a DEBUG copy that logs the bracket build); First Four on the Tournament Tree (Stage 2) |
 
 Each entry's `Notes` field describes what it changes and which entries it must not
@@ -30,6 +34,33 @@ ranked rewrite the text with the game's formatter and English templates `#{0}` a
 
 Do not turn the Team Select STR_FROM call into a nop: another path (0x6E4724)
 branches in just before it, and doing so crashed the game.
+
+## Scorebug season record
+
+`Scorebug: team names with poll rank and record (#5 DUKE 12-3)` puts RPCS3 `calloc`
+blocks at the two scorebug team-name providers (home 0x4EF9A4, away 0x4EFABC; the
+stock first word at both is `cmpdi r3,0`). Each block is a whole replacement
+provider that returns to the caller itself, so it has no size limit. It builds the
+name and poll rank exactly like the poll-rank entry, then appends the record with
+the game's formatter and English template 0x4F6600F7 `{0} {1}-{2}`.
+
+The record comes from the pregame matchup card, which formats `({0}-{1})`
+(0x3DE3C74B) natively at 0x70F5D0: it gets the team through 0x70938C, which
+returns the same per-game team objects as the scorebug (0x57F050 home, 0x57F064
+away), and reads wins and losses as bytes at team +0x1FC and +0x1FD. The card shows
+the record only when the game-mode word (0x4A3924, library 0x72330) is 2; the
+scorebug block uses the same check, and also leaves out a 0-0 record. Which
+named mode the value 2 is has not been established beyond this shared gate.
+
+Enable it instead of `Scorebug: team names with poll rank (#5 DUKE)` and
+`Scorebug: team names`; all three patch the same providers. Like the poll-rank
+entry it drops the provider's game-mode-4 special text. Regenerate and check with:
+
+```
+cd rpcs3_patches/tools
+python record_test.py          # interpreter run of the real cave bytes
+python record_write.py         # (re)write the entry into BLUS30078_imported_patch.yml
+```
 
 ## Quick Game team cycling
 
@@ -49,6 +80,119 @@ The reset value is the float 35.0 at library TOC +0x6714 (0xA5B1DC), read only b
 the shot-clock reset code (0x3C80B4, 0x3C8568, 0x3C8580), which stores it as the
 live, reset and maximum shot clock (game state +0x280/+0x284/+0x288). The entry
 writes 30.0 there.
+
+## MyPlayer bench
+
+The game's own Player Lock (Options > Game Settings; settings block 0x1283958C,
+word +0xF8) stops every automatic switch of the controlled player, but a substitution
+still hands control to the sub: the five on-court slots of a team stay fixed (list
+head 0x12ACCDC0, next slot +0x5C) and a sub swaps the player data (slot+0x04, with its
+controller record at slot+0x10) into the same slot. The controller record's first
+word is the user number, -1 for CPU; 0x29CA70 swaps two records.
+
+`MyPlayer: sit on the bench with your player` is a code cave at the start of the
+per-frame control update 0x29DCBC (controller 1, Player Lock ON only). It remembers
+your player (the one you control when play starts, or after a pause in which you
+picked someone else). While he is off the court, the controller record of whoever
+holds your controller is swapped into a spare record inside the cave, so the CPU
+plays the whole team; when he is back in any slot, control is swapped to him. Its
+four state words and the spare record live at the start of the cave (jumped over).
+The settings block and the slot layout were found with the `myplayer_*` probes.
+
+### MyPlayer v2: progression and merit lineup
+
+`MyPlayer: bench, progression from game stats, starting lineup on merit` replaces the
+bench entry (enable only one; both hook the same place). It identifies your player by
+the name pointers of his per-game object (slot+0x64, +0/+4), finds his roster row
+(roster header *(0x1252F5E8+8), players at +0xC, stride 0x134) and his team row.
+
+Progression: his box score is at *(obj+0x14)+4 (index 0 = game total). Every frame the
+cave compares the counters with the last values it saw and, for each new made shot,
+rebound, assist, steal or block, adds hundredths to ratings (stored x100, cap 99) both
+in the game object and in the roster row; a turnover costs 0.02 Ballhandling. Gains
+per unit are the `GAINS` table in `tools/myplayer_mode.py`. The roster change persists
+only when the roster or Legacy is saved.
+
+Merit lineup: when a new game starts (new object, or counters back to zero), the
+game's own CPU lineup routine 0x51CE24(team, 0) and rotation routine
+0x771254(team, 1, 0) run on his team (TOC 0xA64A94), so starters and minutes follow
+the current ratings; the new order shows from the next game. AST/STL/BLK/TO offsets
+(0x120..0x12C) are inferred from the box-score column order.
+
+Position (v2.1): the option row (Game Settings table at 0x12F352C0, 0x5C per row,
+built by the static constructor 0x67F8B8) is switched from widget type 5 (ON/OFF
+pill) to type 7 (text list, as Play Mode / Attendance) by a cave on its type store
+`stw r12,0x2E0(r9)` at 0x681004. A text-list box is as wide as the widest caption
+its +0x24 function measures (0x68541C: table r6, indices r4..r5 via 0x4A1214); a cave
+there and `li r5,5` at 0x685428 make it measure the six captions instead of Off / On.
+The MyPlayer option in Game Settings then cycles Off, Point Guard,
+Shooting Guard, Small Forward, Power Forward, Center (settings +0xF8 = 0..5; from Off
+the first step is Point Guard). Three small caves replace the option's two arrow
+handlers (stores at 0x685364 / 0x6853B0, which flipped the word with `v == 0`) and
+the caption lookup (0x68B014), which now indexes a six-entry table: the game's own Off
+caption (*0x12839474) and the english.iff strings 0x1732BE2F, 0x6204EEE1, 0x579CFFC9,
+0x79A66D2B, 0x1941965F (Point Guard .. Center); english.iff is unchanged. Game code
+reads the word only as zero / non-zero (0x4BDD94, 0x67E8F4). On a change of value, on
+the first frame, and when a new game starts without your player on the team you
+control, your player becomes the on-court teammate whose roster position (row +0x2B,
+0 PG .. 4 C) matches, else the player you control. After the lineup routines run, he
+is swapped into the starting row of the depth chart (team row +0xCC: 7 rows x 5
+position words, cleared by 0x51CE24) at that position. Not verified in game: whether
+the settings save keeps values above 1, and whether the depth chart holds roster row
+pointers (if it does not, the swap finds nothing and changes nothing).
+
+Transfer (v2.2; alphabetical since v2.7: the arrows step to the next / previous
+school by short name, a-z folded, skipping teams without a name, with Off at both
+ends; v2.8: right arrow (row +0x18) steps forward, only current D1 teams, team type
+at team row +0x2BC bits 15..17 = 0): a 19th Game Settings row, "Transfer", cycles Off and every school
+(team row +0x00, the short name; UTF-16 pointer shown through 0x1E1000). The menu
+reads row i at menu+0x1C + i*0x5C and the count at menu+0x40 (0x13009C, 0x13A6DC;
+Game Settings menu at 0x9EEE24); a cave at the settings constructor's last store
+(0x683FC8) copies the 18 rows into a 19-row buffer, adds the new row (template: the
+MyPlayer row; own max / value / arrows / caption / width functions through OPDs
+built at run time) and repoints the menu. The choice and your player's roster and
+team rows live at 0x13076F00 (last page of the BSS, after its end 0x13076138), so
+it is lost when the game closes. Legacy's offseason transfer pass (0x5BC250) works
+through a list at 0x12EA39A8 (12-byte entries: player, old team, new team; count
+*0x12EA4C74): remove (0x7644B8) then mark transfer + redshirt 2 and add (0x764548).
+A cave at its start appends your player (or retargets his entry) and clears the
+choice. (v2.2 also had a MyPlayer-only cave on `oris r0,r0,0x800` at 0x5BC334; v2.4
+drops it because it shares that address with the existing "Transfers: No sit-out"
+entry, which already makes every transfer eligible at once.) Not verified in game: the school-name pointer offset (derived from roster
+slots at file +0x6C vs runtime +0x3C), and that the pass runs after the choice.
+
+Coach follows the transfer (v2.3): the carousel probe (`tools/myplayer_carousel.py`)
+showed the openings list at 0x12D9CE88 (0x14-byte entries: team, previous team,
+previous coach, hire, flags; count *0x12D9E9E0, current *0x12D9E9E4), the candidate
+list at 0x12D9EA00 (7 entries: coach, score; built by 0x5934A0 for the current
+opening) and user profile 0 at 0x12E30DC8 + 0x28 (+4 = that user's coach). The
+season-end review 0x594BDC opens jobs through 0x5930D4, 0x765E38 and
+0x593884(team, coach, reason); a cave after its team loop (0x594EE8) does the same
+for the Transfer school unless your coach (+8 team index) is already there, and a
+cave at the candidate builder's epilogue (0x5935D8) puts your coach first for that
+opening, so the dialog 0x5940A8 offers you the job and accepting runs the game's own
+move (old school opened with reason 2, user flags copied, profile updated by
+0x5999CC). The choice is cleared once both your player and your coach are there.
+Not verified in game.
+
+Player follows coach (v2.5): when the carousel accept code (0x5940A8) makes user 0's
+coach the coach of a new school (`stw r30,0x30(r31)` at 0x5946DC, r28 = his previous
+school), a cave moves your player from r28 to r31 at once with 0x7644B8 / 0x764548 and
+sets his transfer flag (+0x8C bit 31). Your player is SCR_ROW if he is on r28's
+roster, else r28's depth-chart starter at the MyPlayer position, so it also works when
+he has not played a game since the game was started. Not verified in game.
+
+Coach Carousel years limit (`tools/carousel_years.py`, separate entry): a coach's
+years at his school are coach +0x24 (0x73A07C). The candidate builder skips an
+employed coach with 1 year or less (`cmpwi cr7,r3,1` at 0x5937C8); a cave passes the
+test for user 0's coach only. The carousel screen shows "you have not been with your
+current team long enough" from the same test; `bgt` at 0x63616C becomes `b`.
+Not verified in game.
+
+Camera: the game's camera table (*TOC-0x7A8C = 0x12C75498, 31 rows of 0x2C: +0 mode,
++4 caption) already has a Player Lock camera (mode 0x20, caption 0xC80F7FBB). It
+follows the controlled player and, sharing the relabelled caption, shows as
+"MyPlayer" in Camera Options; with the bench patch it follows your player.
 
 ## NCAA First Four (68 teams)
 
@@ -155,10 +299,15 @@ top of each script):
   `director` record from Director.iff (game data, not included; path at the top).
 - `ff_patch_write.py`: writes the three NCAA Tournament entries into the patch file.
 - `tree_probe_write.py`: diagnostic Tournament Tree navigation probes (not shipped).
+- `myplayer_bench.py`: the MyPlayer bench cave and its patch entry.
+- `myplayer_mode.py`: MyPlayer v2 (bench, progression, merit lineup) and its patch entry.
+- `myplayer_probe.py`, `myplayer_scan.py`, `myplayer_court.py`: diagnostic probes
+  used to find it (menu controller table, settings block scan, user-controlled slot
+  and team list every ~3 s); not shipped.
 
 These checks only model the game. Confirmed in-game: all three poll-rank entries
 (scorebug, Team Select, matchup card), the transfer entries, Quick Game cycling, the
-30-second shot clock, and both NCAA Tournament stages (four play-in games, winners in
+30-second shot clock, the MyPlayer bench, and both NCAA Tournament stages (four play-in games, winners in
 East 16 / South 16 / Midwest 11 / West 11, appearance credit, the next season's 2K
 Sports Classic, the four play-in pages on the Tournament Tree, and the Selection Show
 naming every First Four matchup on screen and in the commentary: East and South 1-16,

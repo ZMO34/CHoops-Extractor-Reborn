@@ -523,3 +523,28 @@ ELF without changing it. It reports static metadata, not live state or game
 compatibility. Conditional popup backgrounds still require matching visibility,
 opacity and transition state. No new executable or installable scorebug is
 produced by this inspection.
+
+## Season record on the team names (RPCS3 patch)
+
+Read-only analysis of the decoded EBOOT (`EBOOT.elf`, the V4.2 year-patched build
+the RPCS3 patch file is keyed to) locates the record the pregame matchup card
+shows as `(13-0)`. Its text callback at 0x70F5D0 obtains the team through
+0x70938C, which returns the same per-game team objects as the scorebug name
+providers (0x57F050 home, 0x57F064 away), and formats English ID 0x3DE3C74B
+`({0}-{1})` from two bytes: wins at team +0x1FC and losses at +0x1FD. It does so
+only when the game-mode word returned by 0x4A3924 (library 0x72330, `*(*(TOC-0x7050))`)
+equals 2; otherwise it shows the string at team +0xC. Among 219 compares after
+calls to that function, 2 is the most frequent value; the Legacy bracket code
+treats modes 1, 2, 4 and 5 as season modes (mask 0x36). The name of mode 2 is
+not established beyond the matchup card's own gate.
+
+`rpcs3_patches/tools/record_asm.py` builds replacement providers that append
+` W-L` with template 0x4F6600F7 `{0} {1}-{2}` (present with identical text in the
+stock and V5.5 English tables) under the same mode-2 gate, after the poll rank.
+`record_test.py` executes the real cave bytes in the repository's PPC64
+interpreter with modeled game calls: 16 checks cover ranked/unranked, both
+sides, other modes, 0-0, 255-255, team ID 0, null output/team, register and
+stack restoration, handle frees and position independence. This is an emulator
+patch, not an EBOOT or asset edit. RPCS3 was NOT RUN here; the in-game result
+(fit inside the name panel, behaviour in tournaments and other modes) needs the
+user's test.
