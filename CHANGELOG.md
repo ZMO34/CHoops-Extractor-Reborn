@@ -1,3 +1,38 @@
+## Unreleased — RPCS3 game patches
+
+- Add `rpcs3_patches/`: the BLUS30078 RPCS3 patch file (60 FPS, poll rank on the
+  scorebug / Team Select / pregame matchup card, recruit generation, Legacy
+  transfers) with its code-cave generators, offline interpreter checks and TTY
+  probes. Emulator patches only; the editor still does not patch executables.
+- Add Quick Game team cycling in conference member order (alphabetical after
+  realignment) and a 30-second shot clock to the patch file.
+- Add a 68-team NCAA Tournament with a four-game First Four (Stage 1, plus a DEBUG
+  copy that logs the bracket build) and the four play-in pages and "PLAY-IN GAME
+  WINNER" slots on the Tournament Tree (Stage 2), with their generators and checks.
+- Add `Scorebug: team names with poll rank and record (#5 DUKE 12-3)`: calloc
+  replacements of both scorebug name providers that append the season record the
+  pregame matchup card reads (team +0x1FC/+0x1FD) under the card's own game-mode
+  check, with `record_asm.py`, `record_test.py` and `record_write.py`. Interpreter
+  checks only; not run in RPCS3 here.
+- Add `Three-point line: modern NCAA distance` (`threept_write.py`).
+- Add MyPlayer (`myplayer_mode.py`, v2.8): with the game's Player Lock option
+  (relabelled MyPlayer, now Off / Point Guard .. Center), the CPU plays while your
+  player sits; ratings grow from his game stats; the game's lineup routines run on
+  his team each game with him started at his position; a Game Settings "Transfer"
+  row (current D1 schools, alphabetical) opens that school's job in the Coach
+  Carousel and offers it to you first; when your coach takes any job your player
+  moves with him. The MyPlayer camera is the game's own Player Lock camera. Earlier
+  stage `myplayer_bench.py` (v1.1) and the TTY probes used to find the data
+  (`myplayer_probe/scan/court/data/refs/obj/cam/carousel.py`) are included;
+  `myplayer_text.py` relabels english.iff in place.
+- Add `Coach Carousel: no minimum years at your school before job offers`
+  (`carousel_years.py`).
+- Verification: offline assembly / branch-range / position-independence checks;
+  the owner ran the game for the confirmed parts (bench, progression, position
+  row and box, camera, carousel offer and the player following the coach, the
+  alphabetical D1 Transfer list). Not confirmed: the forced Transfer offer end to
+  end, the depth-chart position swap, and settings saves keeping MyPlayer > 1.
+
 # v1.23
 
 - Native macOS Apple Silicon/Intel app packages and Windows x64 release archives.
