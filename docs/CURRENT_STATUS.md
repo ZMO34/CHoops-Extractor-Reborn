@@ -1,3 +1,15 @@
+# Unreleased — uniform font palettes survive base-layout normalization
+
+Folder overrides that recolour a uniform's jersey_numbers/names font were silently
+reverted during build: base-JB texture normalization re-imported the glyph pixels
+into the base record, which also restored the base 256-entry ARGB palette. The
+game's CPU copy path colours numbers and surnames through that palette, so the
+override's colours never reached the JB. Normalization now copies the replacement
+palette back for indexed uniform fonts only (linear L8, remap 0x5500); header,
+payload size and every other texture keep the base layout. Reports mark such
+records with font_palette=replacement. DDS imports still carry pixels only, so a
+palette change must come from a raw TXTR record override. No RPCS3 or testing JB.
+
 # v1.23 — native macOS and Windows release packaging
 
 Added native Apple Silicon and Intel Mac app packaging alongside Windows x64.

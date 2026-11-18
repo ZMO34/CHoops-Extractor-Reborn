@@ -77,3 +77,24 @@ def test_every_jersey_number_renders_including_00(number):
     image=Image.new('RGBA',(80,4),(255,0,0,255))
     rendered=number_image(image,[(i*8,5) for i in range(10)],number,(32,8))
     assert rendered.getbbox() and rendered.getpixel((0,7))[3]==0
+
+
+def test_base_layout_normalization_keeps_replacement_font_palette():
+    from choops_py.texture_tools.archive_layout import normalize_record,font_palette
+    blocks=txtr_fixture(format=0xa1,width=4,height=4,split=True)
+    header=bytearray(blocks[0]);struct.pack_into('>I',header,0x5c,0x5500)
+    pixels=b'\x00\x01\x02\x01'*4
+    base_palette=b''.join(bytes(c) for c in [(0,247,247,247),(255,237,107,55),(255,254,254,254)]+[(0,0,0,0)]*253)
+    new_palette=b''.join(bytes(c) for c in [(0,19,41,75),(255,255,255,255),(255,19,41,75)]+[(0,0,0,0)]*253)
+    base=[bytes(header),pixels+base_palette]
+    replacement=[bytes(header),pixels+new_palette]
+    result,reports=normalize_record(replacement,base,'TXTR')
+    assert font_palette(TXTR(result))[2]==new_palette
+    assert atlas(TXTR(result)).getpixel((1,0))==(255,255,255,255)
+    assert reports and reports[0]['font_palette']=='replacement'
+    assert base==[bytes(header),pixels+base_palette]
+    # An unchanged font is left alone; non-font L8 is not treated as a font.
+    same,reports=normalize_record(list(base),base,'TXTR')
+    assert same==base and reports==[]
+    plain=bytearray(header);struct.pack_into('>I',plain,0x5c,0xaae4)
+    assert font_palette(TXTR([bytes(plain),pixels+base_palette])) is None

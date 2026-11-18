@@ -18,6 +18,38 @@ def stadium_archive(group):
 _STADIUM_HASHES=frozenset(replacement_hash(f's{i:03d}{suffix}.iff') for i in range(1024) for suffix in ('','n'))
 
 
+FONT_PALETTE_BYTES=1024
+
+
+def font_palette(texture):
+    """Locate an indexed uniform font's trailing 256-entry ARGB palette.
+
+    Font TXTRs (jersey_numbers/names) are linear L8 with remap 0x5500; the game's
+    CPU copy path colours glyphs through this palette, so it is authored artwork,
+    not layout. Returns (block, offset, bytes) or None for any other texture.
+    """
+    info=texture.info()
+    if info['format']!='L8' or not info['linear'] or info['cubemap'] or info['remap']!=0x5500:return None
+    block=info['payload_block'];data=texture.blocks[block]
+    start=(info['payload_offset']+info['image_size']+3)&~3
+    if start+FONT_PALETTE_BYTES>len(data):return None
+    return block,start,bytes(data[start:start+FONT_PALETTE_BYTES])
+
+
+def keep_font_palette(result,replacement):
+    """Copy a replacement font's palette into the base-layout result."""
+    source=font_palette(replacement)
+    if source is None:return result,False
+    target=font_palette(TXTR(result))
+    if target is None or target[2]==source[2]:return result,False
+    blocks=list(result);block,start,_=target
+    data=bytearray(blocks[block]);data[start:start+FONT_PALETTE_BYTES]=source[2]
+    blocks[block]=bytes(data)
+    check=font_palette(TXTR(blocks))
+    if check is None or check[2]!=source[2]:raise ValueError('Indexed font palette did not survive base-layout normalization')
+    return blocks,True
+
+
 def normalize_record(parts,base,kind,job=None,compact=True):
     """Keep replacement geometry and artwork; restore base image layout."""
     if kind=='TXTR':current=[TXTR(parts)];reference=[TXTR(base)]
@@ -45,6 +77,10 @@ def normalize_record(parts,base,kind,job=None,compact=True):
         selector=f'texture_{index}' if kind=='SCNE' else 'texture'
         result,report=apply_dds(result,kind,selector,to_dds(texture.gtf()),job,
                                 preserve_layout=True,reference=target)
+        if kind=='TXTR':
+            # DDS round-trips carry pixels only; keep a replacement font's colours.
+            result,kept=keep_font_palette(result,texture)
+            if kept:report=dict(report,font_palette='replacement')
         reports.append(dict(texture=selector,**report))
     if kind=='SCNE' and reports and compact:result=repack_images(parts,result)
     return result,reports

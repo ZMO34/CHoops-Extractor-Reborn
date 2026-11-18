@@ -143,6 +143,8 @@ Font TXTRs jersey_numbers/names use indexed L8, remap 0x5500, and a 256-entry
 ARGB palette after the four-byte-aligned mip payload. The remap forces GPU ones;
 CPU path 0x7A87B4/0x79F33C uses the palette instead. Preview decoding preserves
 that authored RGBA and rejects missing palettes rather than using a system font.
+Folder builds keep a replacement font's palette through base-layout
+normalization; a DDS override carries indices only and keeps the source palette.
 NAME/numbers holds ten BE (x,width) u16 pairs; aligned copies/advances reproduce
 0x4E7C8C, including sentinel 100 -> 00. Global jerseynum00 supplies the template.
 UnAD/unidata +1C..28 places front numbers and +2C..38 places back numbers;
